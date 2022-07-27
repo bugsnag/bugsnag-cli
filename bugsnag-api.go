@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alecthomas/kong"
-	"io"
 )
 
 func main() {
@@ -40,22 +38,7 @@ func main() {
 		println("Dsym!")
 	case "upload dart-symbol <path>":
 		println("Dart Symbol!")
-		var requestFieldData = map[string]string{}
-		requestFieldData["buildId"] = commands.Upload.DartSymbol.BuildID
-		requestFieldData["apiKey"] = commands.Upload.ApiKey
-		for _, path := range commands.Upload.DartSymbol.Path {
-			request, err := BuildFileRequest("https://upload.bugsnag.com/dart-symbol", requestFieldData, "symbolFile", path)
-
-			if err != nil {
-				break
-			}
-
-			response, err := SendRequest(request)
-
-			b, err := io.ReadAll(response.Body)
-			fmt.Println(string(b))
-
-		}
+		DartUpload("https://upload.bugsnag.com/dart-symbol", commands.Upload.ApiKey,commands.Upload.DartSymbol.BuildID  ,commands.Upload.DartSymbol.Path)
 	case "upload breakpad-symbol <path>":
 		println("BreakpadSymbol!")
 	case "create-build":
