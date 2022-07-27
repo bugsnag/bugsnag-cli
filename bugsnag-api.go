@@ -26,12 +26,18 @@ func main() {
 	ctx := kong.Parse(&commands)
 
 	switch ctx.Command() {
-	case "android-mapping <path>":
+	case "uplod android-mapping <path>":
 		println("mapping file!")
-	case "ndk-library <path>":
-		println("ndk library!")
-	case "source-map <path>":
+	case "upload ndk-library <path>":
+		println("mapping file!")
+	case "upload source-map <path>":
 		println("source maps!")
+	case "upload dsym <path>":
+		println("Dsym!")
+	case "upload dart-symbol <path>":
+		println("Dart Symbol!")
+	case "upload breakpad-symbol <path>":
+		println("BreakpadSymbol!")
 	case "create-build":
 		SendBuildInfo(ctx)
 	default:
