@@ -9,9 +9,11 @@ import (
 	"path/filepath"
 )
 
-// Create a multi-part form request adding a file as a parameter
-func BuildFileRequest(url string, fieldName string, filename string) (*http.Request, error) {
-	file, err := os.Open(filename)
+/*
+	BuildFileRequest - Create a multi-part form request adding a file as a parameter
+ */
+func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
+	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +21,7 @@ func BuildFileRequest(url string, fieldName string, filename string) (*http.Requ
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(fieldName, filepath.Base(file.Name()))
+	part, err := writer.CreateFormFile(fileFieldName, filepath.Base(file.Name()))
 
 	if err != nil {
 		return nil, err
