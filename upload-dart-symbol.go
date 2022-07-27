@@ -7,4 +7,5 @@ type DartSymbol struct {
 	AppVersionCode string `help:"Module version code (Android only)"`
 	AppBundleVersion string `help:"App bundle version (Apple platforms only)"`
 	Platform string `help:"platform the program was built for"`
+	BuildID string `help:"foobar"`
 }

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/alecthomas/kong"
+import (
+	"fmt"
+	"github.com/alecthomas/kong"
+	"io"
+)
 
 func main() {
 	var commands struct {
@@ -36,6 +40,22 @@ func main() {
 		println("Dsym!")
 	case "upload dart-symbol <path>":
 		println("Dart Symbol!")
+		var requestFieldData = map[string]string{}
+		requestFieldData["buildId"] = commands.Upload.DartSymbol.BuildID
+		requestFieldData["apiKey"] = commands.Upload.ApiKey
+		for _, path := range commands.Upload.DartSymbol.Path {
+			request, err := BuildFileRequest("https://upload.bugsnag.com/dart-symbol", requestFieldData, "symbolFile", path)
+
+			if err != nil {
+				break
+			}
+
+			response, err := SendRequest(request)
+
+			b, err := io.ReadAll(response.Body)
+			fmt.Println(string(b))
+
+		}
 	case "upload breakpad-symbol <path>":
 		println("BreakpadSymbol!")
 	case "create-build":

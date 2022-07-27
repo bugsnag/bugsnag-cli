@@ -21,7 +21,13 @@ func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName st
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
+
+	for key, value := range fieldData {
+		writer.WriteField(key, value)
+	}
+
 	part, err := writer.CreateFormFile(fileFieldName, filepath.Base(file.Name()))
+
 
 	if err != nil {
 		return nil, err
