@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
+	"os"
 )
 
 func main() {
@@ -27,6 +28,20 @@ func main() {
 	}
 	ctx := kong.Parse(&commands)
 
+	// Check if we have an API key.
+	// Look at moving this to its own utils file and make it more generic?
+	if commands.Upload.ApiKey == "" {
+		println("No API KEY...")
+		println("Checking for ENV")
+		if value, ok := os.LookupEnv("BUGSNAG_API_KEY"); ok{
+			commands.Upload.ApiKey = value
+			println("ENV found!")
+		} else {
+			println("No ENV for API key...")
+			return
+		}
+	}
+
 	switch ctx.Command() {
 	case "uplod android-mapping <path>":
 		println("mapping file!")
@@ -38,7 +53,8 @@ func main() {
 		println("Dsym!")
 	case "upload dart-symbol <path>":
 		println("Dart Symbol!")
-		DartUpload("https://upload.bugsnag.com/dart-symbol", commands.Upload.ApiKey,commands.Upload.DartSymbol.BuildID  ,commands.Upload.DartSymbol.Path)
+		var uri = "https://upload.bugsnag.com/dart-symbol"
+		DartUpload(uri, commands.Upload.ApiKey,commands.Upload.DartSymbol.BuildID  ,commands.Upload.DartSymbol.Path)
 	case "upload breakpad-symbol <path>":
 		println("BreakpadSymbol!")
 	case "create-build":

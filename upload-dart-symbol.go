@@ -27,7 +27,7 @@ func DartUpload(url string, apiKey string, buildId string, path []string) {
 		}
 
 		response, err := SendRequest(request)
-
+		fmt.Println(response.Status)
 		b, err := io.ReadAll(response.Body)
 		fmt.Println(string(b))
 
