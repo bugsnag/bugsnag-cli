@@ -1,6 +1,9 @@
 package main
 
-import "github.com/alecthomas/kong"
+import (
+	"github.com/alecthomas/kong"
+	"os"
+)
 
 func main() {
 	var commands struct {
@@ -25,13 +28,35 @@ func main() {
 	}
 	ctx := kong.Parse(&commands)
 
+	// Check if we have an API key.
+	// Look at moving this to its own utils file and make it more generic?
+	if commands.Upload.ApiKey == "" {
+		println("No API KEY...")
+		println("Checking for ENV")
+		if value, ok := os.LookupEnv("BUGSNAG_API_KEY"); ok{
+			commands.Upload.ApiKey = value
+			println("ENV found!")
+		} else {
+			println("No ENV for API key...")
+			return
+		}
+	}
+
 	switch ctx.Command() {
-	case "android-mapping <path>":
+	case "uplod android-mapping <path>":
 		println("mapping file!")
-	case "ndk-library <path>":
-		println("ndk library!")
-	case "source-map <path>":
+	case "upload ndk-library <path>":
+		println("mapping file!")
+	case "upload source-map <path>":
 		println("source maps!")
+	case "upload dsym <path>":
+		println("Dsym!")
+	case "upload dart-symbol <path>":
+		println("Dart Symbol!")
+		var uri = "https://upload.bugsnag.com/dart-symbol"
+		DartUpload(uri, commands.Upload.ApiKey,commands.Upload.DartSymbol.BuildID  ,commands.Upload.DartSymbol.Path)
+	case "upload breakpad-symbol <path>":
+		println("BreakpadSymbol!")
 	case "create-build":
 		SendBuildInfo(ctx)
 	default:

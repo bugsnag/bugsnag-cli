@@ -1,0 +1,10 @@
+agents:
+  queue: ms-arm-12-8
+
+steps:
+  - label: Build CLI Binary
+    commands:
+      - make build
+    plugins:
+      artifacts#v1.5.0:
+        upload: "bugsnag-api"
