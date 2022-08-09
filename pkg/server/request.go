@@ -1,4 +1,4 @@
-package request
+package server
 
 import (
 	"bytes"
@@ -8,9 +8,8 @@ import (
 	"os"
 	"path/filepath"
 )
-/*
-	BuildFileRequest - Create a multi-part form request adding a file as a parameter
-*/
+
+// BuildFileRequest - Create a multi-part form request adding a file as a parameter
 func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -26,7 +25,6 @@ func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName st
 	}
 
 	part, err := writer.CreateFormFile(fileFieldName, filepath.Base(file.Name()))
-
 
 	if err != nil {
 		return nil, err
@@ -44,6 +42,7 @@ func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName st
 	return request, nil
 }
 
+// SendRequest Sends request
 func SendRequest(request *http.Request) (*http.Response, error) {
 	client := &http.Client{}
 
@@ -53,4 +52,8 @@ func SendRequest(request *http.Request) (*http.Response, error) {
 	}
 
 	return response, nil
+}
+
+func HelloWorld(msg string)  string{
+	return msg
 }
