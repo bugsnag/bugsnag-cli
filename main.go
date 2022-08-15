@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/alecthomas/kong"
 	log "unknwon.dev/clog/v2"
 )
@@ -14,56 +14,92 @@ func init() {
 	}
 }
 
-
-func main()  {
+func main() {
 	defer log.Stop()
 
-	log.Info("Bugsnag CLI Tool")
+	log.Info("bugsnag upload CLI Tool")
 
 	var commands struct {
 		UploadServer string `help:"Bugsnag On-Premise upload server URL"`
-		ApiKey    string	`help:"Bugsnag project API key"`
+		ApiKey       string `help:"Bugsnag project API key"`
 		Upload       struct {
 			// shared options
-			Overwrite 		bool   					`help:"ignore existing upload with same version"`
-			Timeout   		int    					`help:"seconds to wait before failing an upload request"`
-			Retries   		int    					`help:"number of retry attempts before failing a request"`
-			ExtraOptions	map[string]string		`help:"additional arguments to pass to the upload request" mapsep:","`
+			Overwrite     bool              `help:"ignore existing upload with same version"`
+			Timeout       int               `help:"seconds to wait before failing an upload request"`
+			Retries       int               `help:"number of retry attempts before failing a request"`
+			UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 
 			// required options
-			Path 	  		[]string 				`help:"Path to directory to search" arg:"" name:"path" type:"path"`
+			Path []string `help:"Path to directory to search" arg:"" name:"path" type:"path"`
 		} `cmd:"" help:"Upload files"`
 	}
 
 	ctx := kong.Parse(&commands)
 
-	pathIsValid, path := utils.ValidatePath(commands.Upload.Path)
-
-	//// Check if path(s) provided are valid
-	if !pathIsValid {
-		// If the path(s) is not valid, log it and return early
-		log.Error("%s does not exist", path)
-		return
-	}
-
-	// Set the upload URL
-	uploadUrl := utils.SetUploadUrl(commands.UploadServer)
-
-	//Check that we have an API key set
+	// Check if we have an apiKey in the request
 	if commands.ApiKey == "" {
 		log.Error("no API key provided")
 		return
 	}
 
-	log.Info("uploading to " + uploadUrl)
+	// Check if the path(s) provided are valid.
+	if !utils.ValidatePath(commands.Upload.Path) {
+		log.Error("path(s) provided is not valid")
+		return
+	}
+
+	// Set the server upload URL
+	uploadUrl := utils.SetUploadUrl(commands.UploadServer)
+
+	log.Info("uploading files to " + uploadUrl)
+
+	// Build a file list form given path(s)
+	log.Info("building file list...")
+
+	var fileList []string
+
+	for _, path := range commands.Upload.Path {
+		if utils.IsDir(path) {
+			log.Info("searching " + " for files...")
+			files, err := utils.FilePathWalkDir(path)
+			if err != nil {
+				log.Error("error getting files from dir")
+				return
+			}
+			for _, s := range files {
+				fileList = append(fileList, s)
+			}
+		} else {
+			fileList = append(fileList, path)
+		}
+	}
+
+	log.Info("File list built..")
+
+	// Build UploadOptions list
+	uploadOptions := make(map[string]string)
+
+	uploadOptions["apiKey"] = commands.ApiKey
+
+	for key, value := range commands.Upload.UploadOptions {
+		uploadOptions[key] = value
+	}
 
 	switch ctx.Command() {
+
+	// Upload command
 	case "upload <path>":
-		log.Info("Starting Upload")
-		//fmt.Println(validation.ValidatePath())
+		for _, file := range fileList {
+			log.Info("starting upload for " + file)
+			response, err := upload.All(file, uploadOptions, uploadUrl)
+			if err != nil {
+				log.Error(response)
+				return
+			}
+			log.Info(file + " upload " + response)
+		}
+
 	default:
 		println(ctx.Command())
 	}
-
-	server.HelloWorld("test")
 }
