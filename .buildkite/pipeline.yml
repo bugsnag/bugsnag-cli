@@ -7,4 +7,4 @@ steps:
       - make build
     plugins:
       artifacts#v1.5.0:
-        upload: "bugsnag-api"
+        upload: "bugsnag-cli"
