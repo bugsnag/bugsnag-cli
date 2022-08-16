@@ -1,8 +1,10 @@
 package utils
 
+const DefaultUploadURL = "https://upload.bugsnag.com/"
+
 func SetUploadUrl(url string) string {
 	if url == "" {
-		url = "https://upload.bugsnag.com/"
+		url = DefaultUploadURL
 	}
 	return url
 }

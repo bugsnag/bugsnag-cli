@@ -10,13 +10,11 @@ import (
 // ValidatePath - Checks path(s) provided is a valid
 func ValidatePath(paths []string) bool {
 	for _,path := range paths {
-		if _, err := os.Stat(path); err == nil {
-			return true
-		} else if errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(path); err != nil {
 			return false
 		}
 	}
-	return false
+	return true
 }
 
 func walk(s string, d fs.DirEntry, err error) (string, error) {
@@ -59,9 +57,5 @@ func IsDir(path string) bool{
 		return false
 	}
 
-	if pathInfo.IsDir() {
-		return true
-	}
-
-	return false
+	return pathInfo.IsDir()
 }
