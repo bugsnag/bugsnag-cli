@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/alecthomas/kong"
@@ -16,8 +17,6 @@ func init() {
 
 func main() {
 	defer log.Stop()
-
-	log.Info("bugsnag upload CLI Tool")
 
 	var commands struct {
 		UploadServer string `help:"Bugsnag On-Premise upload server URL"`
@@ -39,13 +38,13 @@ func main() {
 	// Check if we have an apiKey in the request
 	if commands.ApiKey == "" {
 		log.Error("no API key provided")
-		return
+		utils.CleanupAndExit(1)
 	}
 
 	// Check if the path(s) provided are valid.
 	if !utils.ValidatePath(commands.Upload.Path) {
 		log.Error("path(s) provided is not valid")
-		return
+		utils.CleanupAndExit(1)
 	}
 
 	// Set the server upload URL
@@ -64,7 +63,7 @@ func main() {
 			files, err := utils.FilePathWalkDir(path)
 			if err != nil {
 				log.Error("error getting files from dir")
-				return
+				utils.CleanupAndExit(1)
 			}
 			for _, s := range files {
 				fileList = append(fileList, s)
@@ -85,6 +84,8 @@ func main() {
 		uploadOptions[key] = value
 	}
 
+	fmt.Println(ctx.Command())
+
 	switch ctx.Command() {
 
 	// Upload command
@@ -94,7 +95,7 @@ func main() {
 			response, err := upload.All(file, uploadOptions, uploadUrl)
 			if err != nil {
 				log.Error(response)
-				return
+				utils.CleanupAndExit(1)
 			}
 			log.Info(file + " upload " + response)
 		}

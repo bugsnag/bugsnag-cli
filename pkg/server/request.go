@@ -53,7 +53,3 @@ func SendRequest(request *http.Request) (*http.Response, error) {
 
 	return response, nil
 }
-
-func HelloWorld(msg string)  string{
-	return msg
-}

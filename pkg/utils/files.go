@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
