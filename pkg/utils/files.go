@@ -59,9 +59,5 @@ func IsDir(path string) bool{
 		return false
 	}
 
-	if pathInfo.IsDir() {
-		return true
-	}
-
-	return false
+	return pathInfo.IsDir()
 }
