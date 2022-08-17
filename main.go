@@ -1,15 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/alecthomas/kong"
+	"os"
 	log "unknwon.dev/clog/v2"
 )
 
 func init() {
-	err := log.NewConsole()
+	err := log.NewConsole(100,
+		log.ConsoleConfig{
+			Level:      log.LevelInfo,
+		},
+	)
 	if err != nil {
 		panic("unable to create new logger: " + err.Error())
 	}
@@ -19,7 +23,8 @@ func main() {
 	defer log.Stop()
 
 	var commands struct {
-		UploadServer string `help:"Bugsnag On-Premise upload server URL"`
+		UploadServer string `help:"Bugsnag On-Premise upload server URL" default:"https://upload.bugsnag.com"`
+		Port		 int	`help:"Port number for the upload server" default:"443"`
 		ApiKey       string `help:"Bugsnag project API key"`
 		Upload       struct {
 			// shared options
@@ -33,22 +38,25 @@ func main() {
 		} `cmd:"" help:"Upload files"`
 	}
 
+	// If running without any extra arguments, default to the --help flag
+	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
+	if len(os.Args) < 2 {
+		os.Args = append(os.Args, "--help")
+	}
+
 	ctx := kong.Parse(&commands)
 
 	// Check if we have an apiKey in the request
 	if commands.ApiKey == "" {
-		log.Error("no API key provided")
-		utils.CleanupAndExit(1)
+		log.Fatal("no API key provided")
+		//utils.CleanupAndExit(1)
 	}
 
 	// Check if the path(s) provided are valid.
 	if !utils.ValidatePath(commands.Upload.Path) {
 		log.Error("path(s) provided is not valid")
-		utils.CleanupAndExit(1)
+		//utils.CleanupAndExit(1)
 	}
-
-	// Set the server upload URL
-	uploadUrl := utils.SetUploadUrl(commands.UploadServer)
 
 	log.Info("uploading files to " + uploadUrl)
 
@@ -84,15 +92,13 @@ func main() {
 		uploadOptions[key] = value
 	}
 
-	fmt.Println(ctx.Command())
-
 	switch ctx.Command() {
 
 	// Upload command
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, uploadUrl)
+			response, err := upload.All(file, uploadOptions, uploadUrl + ":" + string(commands.Port))
 			if err != nil {
 				log.Error(response)
 				utils.CleanupAndExit(1)

@@ -10,6 +10,8 @@ func CleanupAndExit(statusCode int)  {
 	// Stop the logger
 	log.Stop()
 
+	os.Args = append(os.Args, "--help")
+
 	// Exit with the desired status code.
 	os.Exit(statusCode)
 }

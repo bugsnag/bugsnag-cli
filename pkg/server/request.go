@@ -10,7 +10,7 @@ import (
 )
 
 // BuildFileRequest - Create a multi-part form request adding a file as a parameter
-func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
+func BuildFileRequest(url string, fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
