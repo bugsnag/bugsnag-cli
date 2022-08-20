@@ -2,26 +2,13 @@ package main
 
 import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/alecthomas/kong"
 	"os"
-	log "unknwon.dev/clog/v2"
 )
 
-func init() {
-	err := log.NewConsole(100,
-		log.ConsoleConfig{
-			Level:      log.LevelInfo,
-		},
-	)
-	if err != nil {
-		panic("unable to create new logger: " + err.Error())
-	}
-}
-
 func main() {
-	defer log.Stop()
-
 	var commands struct {
 		UploadServer string `help:"Bugsnag On-Premise upload server URL" default:"https://upload.bugsnag.com"`
 		Port		 int	`help:"Port number for the upload server" default:"443"`
@@ -48,17 +35,15 @@ func main() {
 
 	// Check if we have an apiKey in the request
 	if commands.ApiKey == "" {
-		log.Fatal("no API key provided")
-		//utils.CleanupAndExit(1)
+		log.Error("no API key provided", 1)
 	}
 
 	// Check if the path(s) provided are valid.
 	if !utils.ValidatePath(commands.Upload.Path) {
-		log.Error("path(s) provided is not valid")
-		//utils.CleanupAndExit(1)
+		log.Error("path(s) provided is not valid", 1)
 	}
 
-	log.Info("uploading files to " + uploadUrl)
+	log.Info("uploading files to " + commands.UploadServer)
 
 	// Build a file list form given path(s)
 	log.Info("building file list...")
@@ -70,8 +55,7 @@ func main() {
 			log.Info("searching " + " for files...")
 			files, err := utils.FilePathWalkDir(path)
 			if err != nil {
-				log.Error("error getting files from dir")
-				utils.CleanupAndExit(1)
+				log.Error("error getting files from dir", 1)
 			}
 			for _, s := range files {
 				fileList = append(fileList, s)
@@ -98,10 +82,9 @@ func main() {
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, uploadUrl + ":" + string(commands.Port))
+			response, err := upload.All(file, uploadOptions, commands.UploadServer + ":" + string(commands.Port))
 			if err != nil {
-				log.Error(response)
-				utils.CleanupAndExit(1)
+				log.Error(response, 1)
 			}
 			log.Info(file + " upload " + response)
 		}
