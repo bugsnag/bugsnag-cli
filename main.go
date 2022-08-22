@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
@@ -85,11 +86,12 @@ func main() {
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, endpoint + ":" + string(commands.Port))
+			response, err := upload.All(file, uploadOptions, endpoint)
 			if err != nil {
+				fmt.Println(err)
 				log.Error(response, 1)
 			}
-			log.Info(file + " upload " + response)
+			log.Success(file + " upload " + response)
 		}
 
 	default:

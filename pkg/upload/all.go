@@ -34,7 +34,7 @@ func All(file string, uploadOptions map[string]string, uploadUrl string) (string
 		return "error reading body from response", err
 	}
 
-	if res.Status != "200" {
+	if res.Status != "200 OK" {
 		err := errors.New(res.Status)
 		return res.Status + " " + string(b), err
 	}
