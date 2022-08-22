@@ -10,7 +10,7 @@ import (
 
 func main() {
 	var commands struct {
-		UploadServer string `help:"Bugsnag On-Premise upload server URL" default:"https://upload.bugsnag.com"`
+		RootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
 		Port		 int	`help:"Port number for the upload server" default:"443"`
 		ApiKey       string `help:"Bugsnag project API key"`
 		Upload       struct {
@@ -43,7 +43,10 @@ func main() {
 		log.Error("path(s) provided is not valid", 1)
 	}
 
-	log.Info("uploading files to " + commands.UploadServer)
+	// Build connection URI
+	endpoint := utils.BuildEndpointUrl(commands.RootUrl, commands.Port)
+
+	log.Info("uploading files to " + endpoint)
 
 	// Build a file list form given path(s)
 	log.Info("building file list...")
@@ -82,7 +85,7 @@ func main() {
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, commands.UploadServer + ":" + string(commands.Port))
+			response, err := upload.All(file, uploadOptions, endpoint + ":" + string(commands.Port))
 			if err != nil {
 				log.Error(response, 1)
 			}
