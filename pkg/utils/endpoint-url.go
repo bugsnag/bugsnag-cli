@@ -1,5 +1,7 @@
 package utils
 
+import "strconv"
+
 func BuildEndpointUrl(url string, port int) string {
 
 	var baseUrl string
@@ -11,7 +13,7 @@ func BuildEndpointUrl(url string, port int) string {
 	}
 
 	if port != 0 {
-		return baseUrl + ":" + string(port)
+		return baseUrl + ":" + strconv.Itoa(port)
 	}
 
 	return baseUrl
