@@ -8,3 +8,11 @@ steps:
     plugins:
       artifacts#v1.5.0:
         upload: "bugsnag-cli"
+
+  - label: Run CLI Tests
+    commands:
+      - bundle install
+      - bundle exec maze-runner
+    plugins:
+      artifacts#v1.5.0:
+        download: "bugsnag-cli"
