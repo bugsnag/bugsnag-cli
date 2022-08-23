@@ -7,7 +7,7 @@ import (
 
 )
 
-func All(file string, uploadOptions map[string]string, uploadUrl string) (string, error) {
+func All(file string, uploadOptions map[string]string, uploadUrl string, timeout int) (string, error) {
 	var fileFieldName string
 	fileFieldName = "file"
 
@@ -22,7 +22,7 @@ func All(file string, uploadOptions map[string]string, uploadUrl string) (string
 		return "error building file request", err
 	}
 
-	res, err := server.SendRequest(req)
+	res, err := server.SendRequest(req, timeout)
 
 	if err != nil {
 		return "error sending file request", err

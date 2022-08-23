@@ -7,18 +7,19 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/alecthomas/kong"
 	"os"
+	"strconv"
 )
 
 func main() {
 	var commands struct {
-		RootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
+		UploadAPIRootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
 		Port		 int	`help:"Port number for the upload server" default:"443"`
 		ApiKey       string `help:"Bugsnag project API key"`
 		Upload       struct {
 			// shared options
 			Overwrite     bool              `help:"ignore existing upload with same version"`
-			Timeout       int               `help:"seconds to wait before failing an upload request"`
-			Retries       int               `help:"number of retry attempts before failing a request"`
+			Timeout       int               `help:"seconds to wait before failing an upload request" default:"300"`
+			Retries       int               `help:"number of retry attempts before failing a request" default:"0"`
 			UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 
 			// required options
@@ -45,7 +46,7 @@ func main() {
 	}
 
 	// Build connection URI
-	endpoint := utils.BuildEndpointUrl(commands.RootUrl, commands.Port)
+	endpoint := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
 	log.Info("uploading files to " + endpoint)
 
@@ -76,6 +77,12 @@ func main() {
 
 	uploadOptions["apiKey"] = commands.ApiKey
 
+	if commands.Upload.Overwrite {
+		uploadOptions["overwrite"] =  "true"
+	}
+
+	uploadOptions["retries"] =  strconv.Itoa(commands.Upload.Retries)
+
 	for key, value := range commands.Upload.UploadOptions {
 		uploadOptions[key] = value
 	}
@@ -86,7 +93,7 @@ func main() {
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, endpoint)
+			response, err := upload.All(file, uploadOptions, endpoint, commands.Upload.Timeout)
 			if err != nil {
 				fmt.Println(err)
 				log.Error(response, 1)

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // BuildFileRequest - Create a multi-part form request adding a file as a parameter
@@ -43,8 +44,11 @@ func BuildFileRequest(url string, fieldData map[string]string, fileFieldName str
 }
 
 // SendRequest Sends request
-func SendRequest(request *http.Request) (*http.Response, error) {
-	client := &http.Client{}
+func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
+
+	client := &http.Client{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
 
 	response, err := client.Do(request)
 	if err != nil {
