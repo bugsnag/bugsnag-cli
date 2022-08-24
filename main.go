@@ -10,10 +10,10 @@ import (
 	"strconv"
 )
 
-type UploadPath []string
+type UploadPaths []string
 
 // Validate that the path(s) exist
-func (p UploadPath) Validate() error {
+func (p UploadPaths) Validate() error {
 	for _,path := range p {
 		if _, err := os.Stat(path); err != nil {
 			return err
