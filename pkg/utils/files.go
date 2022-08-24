@@ -42,9 +42,5 @@ func FilePathWalkDir(root string) ([]string, error) {
 func IsDir(path string) bool{
 	pathInfo, err := os.Stat(path)
 
-	if err != nil {
-		return false
-	}
-
-	return pathInfo.IsDir()
+	return err != nil && pathInfo.IsDir()
 }
