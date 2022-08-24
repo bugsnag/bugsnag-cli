@@ -18,7 +18,7 @@ func All(file string, uploadOptions map[string]string, uploadUrl string, timeout
 	req, err := server.BuildFileRequest(uploadUrl, uploadOptions, fileFieldName, file)
 
 	if err != nil {
-		return "error building file request", err
+		return fmt.Errorf("error building file request: %w", err)
 	}
 
 	res, err := server.SendRequest(req, timeout)
