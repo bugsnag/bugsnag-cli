@@ -13,7 +13,7 @@ func BuildEndpointUrl(url string, port int) string {
 	}
 
 	if port != 0 {
-		return baseUrl + ":" + strconv.Itoa(port)
+		return fmt.Sprintf("%s:%d", baseUrl, port)
 	}
 
 	return baseUrl
