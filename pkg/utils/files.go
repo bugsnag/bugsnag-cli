@@ -6,16 +6,6 @@ import (
 	"path/filepath"
 )
 
-// ValidatePath - Checks path(s) provided is a valid
-func ValidatePath(paths []string) bool {
-	for _,path := range paths {
-		if _, err := os.Stat(path); err != nil {
-			return false
-		}
-	}
-	return true
-}
-
 func walk(s string, d fs.DirEntry, err error) (string, error) {
 	if err != nil {
 		return "", err

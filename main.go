@@ -10,6 +10,18 @@ import (
 	"strconv"
 )
 
+type UploadPath []string
+
+// Validate that the path(s) exist
+func (p UploadPath) Validate() error {
+	for _,path := range p {
+		if _, err := os.Stat(path); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func main() {
 	var commands struct {
 		UploadAPIRootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
@@ -23,9 +35,12 @@ func main() {
 			UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 
 			// required options
-			Path []string `help:"Path to directory to search" arg:"" name:"path" type:"path"`
+			Path UploadPath `help:"Path to directory to search" arg:"" name:"path" type:"path"`
 		} `cmd:"" help:"Upload files"`
 	}
+
+
+
 
 	// If running without any extra arguments, default to the --help flag
 	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
@@ -38,11 +53,6 @@ func main() {
 	// Check if we have an apiKey in the request
 	if commands.ApiKey == "" {
 		log.Error("no API key provided", 1)
-	}
-
-	// Check if the path(s) provided are valid.
-	if !utils.ValidatePath(commands.Upload.Path) {
-		log.Error("path(s) provided is not valid", 1)
 	}
 
 	// Build connection URI
