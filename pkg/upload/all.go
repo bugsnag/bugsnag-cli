@@ -2,9 +2,8 @@ package upload
 
 import (
 	"errors"
-	"io"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
-
+	"io"
 )
 
 func All(file string, uploadOptions map[string]string, uploadUrl string, timeout int) (string, error) {
