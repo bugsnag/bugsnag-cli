@@ -1,6 +1,6 @@
 package utils
 
-import "strconv"
+import "fmt"
 
 func BuildEndpointUrl(url string, port int) string {
 

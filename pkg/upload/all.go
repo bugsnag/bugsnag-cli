@@ -1,12 +1,12 @@
 package upload
 
 import (
-	"errors"
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"io"
 )
 
-func All(file string, uploadOptions map[string]string, uploadUrl string, timeout int) (string, error) {
+func All(file string, uploadOptions map[string]string, uploadUrl string, timeout int) error {
 	var fileFieldName string
 	fileFieldName = "file"
 
@@ -24,18 +24,18 @@ func All(file string, uploadOptions map[string]string, uploadUrl string, timeout
 	res, err := server.SendRequest(req, timeout)
 
 	if err != nil {
-		return "error sending file request", err
+		return fmt.Errorf("error sending file request: %w", err)
 	}
 
 	b, err := io.ReadAll(res.Body)
 
 	if err != nil {
-		return "error reading body from response", err
+		return fmt.Errorf("error reading body from response: %w", err)
+
 	}
 
 	if res.Status != "200 OK" {
-		err := errors.New(res.Status)
-		return res.Status + " " + string(b), err
+		return fmt.Errorf("%s : %s : %w", res.Status, string(b), err)
 	}
-	return "OK", nil
+	return nil
 }
