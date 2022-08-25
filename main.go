@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/alecthomas/kong"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
-	"github.com/alecthomas/kong"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"strconv"
 )
@@ -35,12 +34,9 @@ func main() {
 			UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 
 			// required options
-			Path UploadPath `help:"Path to directory to search" arg:"" name:"path" type:"path"`
+			Path UploadPaths `help:"Path to directory to search" arg:"" name:"path" type:"path"`
 		} `cmd:"" help:"Upload files"`
 	}
-
-
-
 
 	// If running without any extra arguments, default to the --help flag
 	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
@@ -103,12 +99,11 @@ func main() {
 	case "upload <path>":
 		for _, file := range fileList {
 			log.Info("starting upload for " + file)
-			response, err := upload.All(file, uploadOptions, endpoint, commands.Upload.Timeout)
+			err := upload.All(file, uploadOptions, endpoint, commands.Upload.Timeout)
 			if err != nil {
-				fmt.Println(err)
-				log.Error(response, 1)
+				log.Error(err.Error(), 1)
 			}
-			log.Success(file + " upload " + response)
+			log.Success(file + " uploaded successfully")
 		}
 
 	default:
