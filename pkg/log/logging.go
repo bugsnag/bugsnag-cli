@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"github.com/mattn/go-isatty"
 )
 
 const Reset = "\033[0m"
@@ -13,21 +14,38 @@ const White = "\033[37m"
 
 // Error - Displays error message and exits with a status code
 func Error(message string, statusCode int)  {
-	fmt.Println("[" + Red + "ERROR" + Reset + "] " + message )
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		fmt.Println("[" + Red + "ERROR" + Reset + "] " + message )
+
+	} else {
+		fmt.Println("[ERROR] " + message )
+	}
 	os.Exit(statusCode)
 }
 
 // Warn - Displays warn message
 func Warn(message string)  {
-	fmt.Println("[" + Yellow + "WARN" + Reset + "] " + message )
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		fmt.Println("[" + Yellow + "WARN" + Reset + "] " + message )
+	} else {
+		fmt.Println("[WARN] " + message )
+	}
 }
 
 // Info - Displays info message
 func Info(message string)  {
-	fmt.Println("[" + White + "INFO" + Reset + "] " + message )
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		fmt.Println("[" + White + "INFO" + Reset + "] " + message)
+	} else {
+		fmt.Println("[INFO] " + message)
+	}
 }
 
 // Success - Displays success message
 func Success(message string)  {
-	fmt.Println("[" + Green + "SUCCESS" + Reset + "] " + message )
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		fmt.Println("[" + Green + "SUCCESS" + Reset + "] " + message )
+	} else {
+		fmt.Println("[SUCCESS] " + message )
+	}
 }
