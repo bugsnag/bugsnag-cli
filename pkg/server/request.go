@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"bytes"
@@ -7,12 +7,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-/*
-	BuildFileRequest - Create a multi-part form request adding a file as a parameter
- */
-func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
+// BuildFileRequest - Create a multi-part form request adding a file as a parameter
+func BuildFileRequest(url string, fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
@@ -27,7 +26,6 @@ func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName st
 	}
 
 	part, err := writer.CreateFormFile(fileFieldName, filepath.Base(file.Name()))
-
 
 	if err != nil {
 		return nil, err
@@ -45,13 +43,17 @@ func BuildFileRequest(url string,  fieldData map[string]string, fileFieldName st
 	return request, nil
 }
 
-func SendRequest(request *http.Request) (*http.Response, error) {
-	client := &http.Client{}
+// SendRequest Sends request
+func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 
-    response, err := client.Do(request)
-    if err != nil {
-        return nil, err
-    }
+	client := &http.Client{
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
 
 	return response, nil
 }
