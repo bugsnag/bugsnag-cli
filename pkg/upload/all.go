@@ -35,7 +35,7 @@ func All(file string, uploadOptions map[string]string, uploadUrl string, timeout
 	}
 
 	if res.Status != "200 OK" {
-		return fmt.Errorf("%s : %s : %w", res.Status, string(b), err)
+		return fmt.Errorf("%s : %s", res.Status, string(b))
 	}
 	return nil
 }
