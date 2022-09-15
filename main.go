@@ -59,21 +59,10 @@ func main() {
 	// Build a file list form given path(s)
 	log.Info("building file list...")
 
-	var fileList []string
+	fileList, err := utils.BuildFileList(commands.Upload.Path)
 
-	for _, path := range commands.Upload.Path {
-		if utils.IsDir(path) {
-			log.Info("searching " + " for files...")
-			files, err := utils.FilePathWalkDir(path)
-			if err != nil {
-				log.Error("error getting files from dir", 1)
-			}
-			for _, s := range files {
-				fileList = append(fileList, s)
-			}
-		} else {
-			fileList = append(fileList, path)
-		}
+	if err != nil {
+		log.Error(" error building file list", 1)
 	}
 
 	log.Info("File list built..")
