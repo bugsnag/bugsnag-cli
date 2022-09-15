@@ -1,31 +1,12 @@
 package utils
 
 import (
-	"io/fs"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"path/filepath"
 )
 
-func walk(s string, d fs.DirEntry, err error) (string, error) {
-	if err != nil {
-		return "", err
-	}
-	if ! d.IsDir() {
-		println(s)
-		return s, nil
-	}
-	return "", nil
-}
-
-//FindFilesInDir - Finds files in a given directory
-func FindFilesInDir(directory string) ([]string, error) {
-	files, err := FilePathWalkDir(directory)
-	if err != nil {
-		return nil, err
-	}
-	return files, nil
-}
-
+// FilePathWalkDir - finds files within a given directory
 func FilePathWalkDir(root string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -37,10 +18,31 @@ func FilePathWalkDir(root string) ([]string, error) {
 	return files, err
 }
 
-
 // IsDir - Checks if a provided path is a directory or not
 func IsDir(path string) bool{
 	pathInfo, err := os.Stat(path)
 
-	return err != nil && pathInfo.IsDir()
+	return err == nil && pathInfo.IsDir()
+}
+
+// BuildFileList - Builds a list of files from a given path(s)
+func BuildFileList(paths []string) ([]string, error) {
+	var fileList []string
+
+	for _, path := range paths {
+		if IsDir(path) {
+			log.Info("searching " + path + " for files...")
+			files, err := FilePathWalkDir(path)
+			if err != nil {
+				return nil, err
+			}
+			for _, s := range files {
+				fileList = append(fileList, s)
+			}
+		} else {
+			fileList = append(fileList, path)
+		}
+	}
+
+	return fileList, nil
 }
