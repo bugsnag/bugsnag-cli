@@ -55,14 +55,14 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
+		
 	case "upload dart-symbol <path>":
 		err := upload.Dart()
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-		
+
 	default:
 		println(ctx.Command())
 	}
