@@ -27,6 +27,8 @@ func main() {
 		Port		 int	`help:"Port number for the upload server" default:"443"`
 		ApiKey       string `help:"Bugsnag project API key"`
 		Upload       struct {
+			DartSymbol     upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files"`
+
 			// shared options
 			Overwrite     bool              `help:"ignore existing upload with same version"`
 			Timeout       int               `help:"seconds to wait before failing an upload request" default:"300"`
@@ -94,6 +96,9 @@ func main() {
 			}
 			log.Success(file + " uploaded successfully")
 		}
+
+	case "upload dart <path>":
+		log.Info("Upload dart symbol file(s)...")
 
 	default:
 		println(ctx.Command())
