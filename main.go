@@ -22,7 +22,7 @@ func main() {
 
 			// required options
 			All            upload.DiscoverAndUploadAny `cmd:"" help:"Find and upload any symbol files"`
-			DartSymbol     upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files"`
+			DartSymbol     upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files" name:"dart"`
 		} `cmd:"" help:"Upload files"`
 	}
 
