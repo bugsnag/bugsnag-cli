@@ -20,15 +20,15 @@ type DartSymbol struct {
 }
 
 func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
-	log.Info("building file list...")
+	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
-		log.Error(" error building file list", 1)
+		log.Error("error building file list", 1)
 	}
 
-	log.Info("File list built...")
+	log.Info("File list built")
 
 	for _, file := range fileList {
 
@@ -91,10 +91,13 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 				return fmt.Errorf("%s : %s", res.Status, string(b))
 			}
 
+			log.Success(file)
+
 			continue
 		}
 
-		log.Warn("No files to process...")
+		log.Info("Skipping " + file)
+
 	}
 
 	return nil

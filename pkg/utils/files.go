@@ -31,7 +31,7 @@ func BuildFileList(paths []string) ([]string, error) {
 
 	for _, path := range paths {
 		if IsDir(path) {
-			log.Info("searching " + path + " for files...")
+			log.Info("Searching directory for files")
 			files, err := FilePathWalkDir(path)
 			if err != nil {
 				return nil, err

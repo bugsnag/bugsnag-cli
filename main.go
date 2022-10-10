@@ -42,7 +42,7 @@ func main() {
 	// Build connection URI
 	endpoint := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
-	log.Info("uploading files to " + endpoint)
+	log.Info("Uploading files to: " + endpoint)
 
 	switch ctx.Command() {
 
