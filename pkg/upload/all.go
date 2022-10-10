@@ -14,7 +14,9 @@ type DiscoverAndUploadAny struct {
 	UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 }
 
-func All(paths []string, options map[string]string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
+func All(paths []string, options map[string]string, endpoint string, timeout int, retries int, overwrite bool,
+	apiKey string) error {
+
 	var fileFieldName string
 
 	// Build the file list from the path(s)

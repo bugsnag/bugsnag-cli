@@ -44,7 +44,6 @@ func main() {
 
 	log.Info("uploading files to " + endpoint)
 
-
 	switch ctx.Command() {
 
 	// Upload command
@@ -56,13 +55,21 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 		
-	case "upload dart-symbol <path>":
-		err := upload.Dart()
+	case "upload dart <path>":
+		err := upload.Dart(commands.Upload.DartSymbol.Path,
+			commands.Upload.DartSymbol.AppVersion,
+			commands.Upload.DartSymbol.AppVersionCode,
+			commands.Upload.DartSymbol.AppBundleVersion,
+			commands.Upload.DartSymbol.IosAppPath,
+			endpoint + "/dart-symbol",
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
 	default:
 		println(ctx.Command())
 	}
