@@ -7,10 +7,8 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io"
-	"io/ioutil"
 	"os"
 	"regexp"
-	"strings"
 )
 
 type DartSymbol struct {
@@ -21,18 +19,7 @@ type DartSymbol struct {
 	IosAppPath string `help:"(optional) the path to the built IOS app."`
 }
 
-func Dart(paths []string,
-	appVersion string,
-	appVersionCode string,
-	appBundleVersion string,
-	iosAppPath string,
-	endpoint string,
-	timeout int,
-	retries int,
-	overwrite bool,
-	apiKey string) error {
-
-	// Build the file list from the path(s)
+func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
 	log.Info("building file list...")
 
 	fileList, err := utils.BuildFileList(paths)
@@ -45,11 +32,14 @@ func Dart(paths []string,
 
 	for _, file := range fileList {
 
-		// Process Android
+		// Check if we're dealing with an android file
 		androidPlatform, _ := regexp.MatchString("android-([^;]*).symbols", file)
 
+		// Process the android file
 		if androidPlatform {
-			log.Info("Processing android file " + file + "...")
+
+			log.Info("Processing android symbol file: " + file)
+
 			buildId, err := GetAndroidBuildId(file)
 
 			if err != nil {
@@ -100,28 +90,6 @@ func Dart(paths []string,
 			if res.Status != "202 Accepted" {
 				return fmt.Errorf("%s : %s", res.Status, string(b))
 			}
-			continue
-		}
-
-		// Process IOS
-		iosPlatform, _ := regexp.MatchString("ios-([^;]*).symbols", file)
-
-		if iosPlatform {
-			log.Info("Processing IOS file " + file + "...")
-
-			// Builds the base path from the file that its processing
-			regx := regexp.MustCompile(`/[^/]*$`)
-			basePath := regx.ReplaceAllString(file, "")
-			basePath = regx.ReplaceAllString(basePath, "")
-			basePath = basePath + "/build/ios/iphoneos/"
-
-			str, err := GetIosBuildId(basePath)
-
-			if err != nil {
-				log.Error(err.Error(), 1)
-			}
-
-			log.Info(str)
 
 			continue
 		}
@@ -130,50 +98,6 @@ func Dart(paths []string,
 	}
 
 	return nil
-}
-
-// GetIosBuildId - Gets the build ID of an IOS App (Dwarf) file
-func GetIosBuildId(basePath string) (string, error) {
-	files, err := ioutil.ReadDir(basePath)
-
-	if err != nil {
-		return "", fmt.Errorf("unable to read files from dir " + err.Error())
-	}
-
-	for _,file := range files {
-		if strings.Contains(file.Name(), ".app") && file.IsDir() {
-			log.Info(basePath + file.Name() + "/Frameworks/App.framework/App")
-
-			elfFile, err := elf.Open("/Users/josh.edney/repos/bugsnag-cli/examples/flutter/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App")
-
-			if err != nil {
-				return "", fmt.Errorf("unable to open elf file " + err.Error())
-			}
-
-			dwarfData, err := elfFile.DWARF()
-
-			if err != nil {
-				return "", fmt.Errorf("unable to get dwarf data " + err.Error())
-			}
-
-			entryReader := dwarfData.Reader()
-
-			for {
-				entry, err := entryReader.Next()
-
-				if err != nil {
-					return "", fmt.Errorf("unable to read entry from dwarf file " + err.Error())
-				}
-
-				fmt.Println(entry)
-			}
-
-		} else {
-			return "", fmt.Errorf("unable to find IOS app")
-		}
-	}
-
-	return "", nil
 }
 
 //GetAndroidBuildId - Gets the build ID of an Android symbol (elf) file
