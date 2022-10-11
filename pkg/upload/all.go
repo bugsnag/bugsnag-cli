@@ -10,7 +10,7 @@ import (
 )
 
 type DiscoverAndUploadAny struct {
-	Path utils.UploadPaths `arg:"" optional:"" name:"path" help:"Path to directory to search" type:"path"`
+	Path          utils.UploadPaths `arg:"" optional:"" name:"path" help:"Path to directory to search" type:"path"`
 	UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 }
 
@@ -36,10 +36,10 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 	uploadOptions["apiKey"] = apiKey
 
 	if overwrite {
-		uploadOptions["overwrite"] =  "true"
+		uploadOptions["overwrite"] = "true"
 	}
 
-	uploadOptions["retries"] =  strconv.Itoa(retries)
+	uploadOptions["retries"] = strconv.Itoa(retries)
 
 	if uploadOptions["fileNameField"] != "" {
 		fileFieldName = uploadOptions["fileNameField"]

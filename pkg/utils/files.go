@@ -19,7 +19,7 @@ func FilePathWalkDir(root string) ([]string, error) {
 }
 
 // IsDir - Checks if a provided path is a directory or not
-func IsDir(path string) bool{
+func IsDir(path string) bool {
 	pathInfo, err := os.Stat(path)
 
 	return err == nil && pathInfo.IsDir()
