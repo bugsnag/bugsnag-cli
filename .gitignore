@@ -1,2 +1,5 @@
 bugsnag-cli
 Gemfile.lock
+
+# Binary build directory
+./build
