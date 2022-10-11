@@ -13,8 +13,7 @@ steps:
   # Test Upload All Command macOS
   - label: macOS - Test Upload All Command
     commands:
-      - bundle install
-      - bundle exec maze-runner
+      - build/bugsnag-cli-arm64-darwin --help
     plugins:
       artifacts#v1.5.0:
         download: "build/bugsnag-cli-arm64-darwin"
