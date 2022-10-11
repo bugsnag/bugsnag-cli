@@ -20,6 +20,19 @@ steps:
         download: "build/bugsnag-cli-arm64-darwin"
     depends_on: build
 
+  # Test Upload All Command Linux
+  - label: Linux (WSL) - Test Upload All Command
+    commands:
+      - chmod a+x build/bugsnag-cli-amd64-linux
+      - ./build/bugsnag-cli-amd64-linux --help
+    plugins:
+      artifacts#v1.5.0:
+        download: "build/bugsnag-cli-amd64-linux"
+    agents:
+      queue: windows-general-wsl
+    depends_on: build
+
+
 #  # Test Upload Dart Command Windows
 #  - label: Window - Test Upload Dart Command
 #  # Test Upload Dart Command macOS
