@@ -13,6 +13,7 @@ steps:
   # Test Upload All Command macOS
   - label: macOS - Test Upload All Command
     commands:
+      - chmod a+x build/bugsnag-cli-arm64-darwin
       - ./build/bugsnag-cli-arm64-darwin --help
     plugins:
       artifacts#v1.5.0:
