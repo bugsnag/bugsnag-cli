@@ -17,7 +17,6 @@ steps:
     plugins:
       artifacts#v1.5.0:
         download: "build/bugsnag-cli-arm64-darwin"
-    queue: macos-12
 
 #  # Test Upload Dart Command Windows
 #  - label: Window - Test Upload Dart Command
