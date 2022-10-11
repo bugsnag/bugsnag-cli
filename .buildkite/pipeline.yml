@@ -1,3 +1,6 @@
+agents:
+  queue: macos-12-arm
+
 steps:
   - label: Build CLI Binaries
     commands:
@@ -5,8 +8,6 @@ steps:
     plugins:
       artifacts#v1.5.0:
         upload: "build/"
-    agents:
-      queue: macos-12
 
   # Test Upload All Command macOS
   - label: macOS - Test Upload All Command
@@ -16,8 +17,6 @@ steps:
     plugins:
       artifacts#v1.5.0:
         download: "build/bugsnag-cli-arm64-darwin"
-    agents:
-      queue: macos-12
 
 #  # Test Upload Dart Command Windows
 #  - label: Window - Test Upload Dart Command
