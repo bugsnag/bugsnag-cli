@@ -191,7 +191,7 @@ func GetIosAppPath(symbolFile string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("unable to find IOS app path")
+	return "", fmt.Errorf("unable to find IOS app path, try adding --ios-app-path")
 }
 
 // DwarfDumpUuid - Gets the UUID from the Dwarf debug info of a file
