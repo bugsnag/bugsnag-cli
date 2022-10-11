@@ -3,6 +3,7 @@ agents:
 
 steps:
   - label: Build CLI Binaries
+    key: build
     commands:
       - make build-all
     plugins:
@@ -17,6 +18,7 @@ steps:
     plugins:
       artifacts#v1.5.0:
         download: "build/bugsnag-cli-arm64-darwin"
+    depends_on: build
 
 #  # Test Upload Dart Command Windows
 #  - label: Window - Test Upload Dart Command
