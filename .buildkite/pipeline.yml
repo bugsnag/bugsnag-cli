@@ -4,10 +4,10 @@ agents:
 steps:
   - label: Build CLI Binary
     commands:
-      - make build
+      - make build-all
     plugins:
       artifacts#v1.5.0:
-        upload: "bugsnag-cli"
+        upload: "build/*"
 
   - label: Run CLI Tests
     commands:
@@ -15,4 +15,4 @@ steps:
       - bundle exec maze-runner
     plugins:
       artifacts#v1.5.0:
-        download: "bugsnag-cli"
+        download: "build/*"

@@ -1,4 +1,9 @@
 bugsnag-cli
 Gemfile.lock
 
+
 examples/**/**
+
+# Binary build directory
+./build
+
