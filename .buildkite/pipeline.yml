@@ -14,23 +14,24 @@ steps:
   - label: macOS - Test Upload All Command
     commands:
       - chmod a+x bin/bugsnag-cli-arm64-darwin
-      - ./bin/bugsnag-cli-arm64-darwin --help
+      - bundle install
+      - bundle exec maze-runner
     plugins:
       artifacts#v1.5.0:
         download: "bin/bugsnag-cli-arm64-darwin"
     depends_on: build
 
-  # Test Upload All Command Linux
-  - label: Linux (WSL) - Test Upload All Command
-    commands:
-      - chmod a+x bin/bugsnag-cli-amd64-linux
-      - ./bin/bugsnag-cli-amd64-linux --help
-    plugins:
-      artifacts#v1.5.0:
-        download: "bin/bugsnag-cli-amd64-linux"
-    agents:
-      queue: windows-general-wsl
-    depends_on: build
+#  # Test Upload All Command Linux
+#  - label: Linux (WSL) - Test Upload All Command
+#    commands:
+#      - chmod a+x bin/bugsnag-cli-amd64-linux
+#      - ./bin/bugsnag-cli-amd64-linux --help
+#    plugins:
+#      artifacts#v1.5.0:
+#        download: "bin/bugsnag-cli-amd64-linux"
+#    agents:
+#      queue: windows-general-wsl
+#    depends_on: build
 
 
 #  # Test Upload Dart Command Windows
