@@ -3,19 +3,20 @@ package upload
 import (
 	"debug/elf"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/server"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 type DartSymbol struct {
-	Path             []string `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
+	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
 	AppVersion       string   `help:"(optional) the version of the application."`
 	AppVersionCode   string   `help:"(optional) the version code for the application (Android only)."`
 	AppBundleVersion string   `help:"(optional) the bundle version for the application (iOS only)."`

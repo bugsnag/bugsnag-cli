@@ -8,26 +8,26 @@ steps:
       - make build-all
     plugins:
       artifacts#v1.5.0:
-        upload: "build/*"
+        upload: "bin/*"
 
   # Test Upload All Command macOS
   - label: macOS - Test Upload All Command
     commands:
-      - chmod a+x build/bugsnag-cli-arm64-darwin
-      - ./build/bugsnag-cli-arm64-darwin --help
+      - chmod a+x bin/bugsnag-cli-arm64-darwin
+      - ./bin/bugsnag-cli-arm64-darwin --help
     plugins:
       artifacts#v1.5.0:
-        download: "build/bugsnag-cli-arm64-darwin"
+        download: "bin/bugsnag-cli-arm64-darwin"
     depends_on: build
 
   # Test Upload All Command Linux
   - label: Linux (WSL) - Test Upload All Command
     commands:
-      - chmod a+x build/bugsnag-cli-amd64-linux
-      - ./build/bugsnag-cli-amd64-linux --help
+      - chmod a+x bin/bugsnag-cli-amd64-linux
+      - ./bin/bugsnag-cli-amd64-linux --help
     plugins:
       artifacts#v1.5.0:
-        download: "build/bugsnag-cli-amd64-linux"
+        download: "bin/bugsnag-cli-amd64-linux"
     agents:
       queue: windows-general-wsl
     depends_on: build

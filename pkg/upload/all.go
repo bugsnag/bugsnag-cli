@@ -10,7 +10,7 @@ import (
 )
 
 type DiscoverAndUploadAny struct {
-	Path          utils.UploadPaths `arg:"" optional:"" name:"path" help:"Path to directory to search" type:"path"`
+	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
 	UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 }
 
