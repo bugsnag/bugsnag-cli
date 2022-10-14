@@ -1,4 +1,4 @@
-Feature: CLI behavior
+Feature: Basic CLI behavior
 
   Scenario: Starting bugsnag-cli on mac without any flags
     When I run bugsnag-cli on mac
@@ -11,3 +11,8 @@ Feature: CLI behavior
   Scenario: Starting bugsnag-cli upload all on mac without a path
     When I run bugsnag-cli upload all on mac without a path
     Then I should see the missing path error
+
+  Scenario: Starting bugsnag-cli upload all with an invalid path
+    When I run bugsnag-cli upload all on mac with an invalid path
+    Then I should see the no such file or directory error
+    
