@@ -11,7 +11,7 @@ steps:
         upload: "bin/*"
 
   # Test Upload All Command macOS
-  - label: macOS - Test Upload All Command
+  - label: macOS - Test CLI
     commands:
       - chmod a+x bin/bugsnag-cli-arm64-darwin
       - bundle install
