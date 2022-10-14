@@ -15,4 +15,3 @@ Feature: Basic CLI behavior
   Scenario: Starting bugsnag-cli upload all with an invalid path
     When I run bugsnag-cli upload all on mac with an invalid path
     Then I should see the no such file or directory error
-    
