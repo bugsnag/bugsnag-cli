@@ -25,3 +25,7 @@ build-mac:
 	[ -d build ] || mkdir -p bin
 	GOOS=darwin GOARCH=amd64 go build -ldflags '-s' -o bin/bugsnag-cli-amd64-darwin main.go
 	GOOS=darwin GOARCH=arm64 go build -ldflags '-s' -o bin/bugsnag-cli-arm64-darwin main.go
+
+.PHONY: unit-test
+unit-test:
+	go test -v ./test/...
