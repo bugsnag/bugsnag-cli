@@ -6,11 +6,10 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io"
-	"strconv"
 )
 
 type DiscoverAndUploadAny struct {
-	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
 	UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
 }
 
@@ -39,17 +38,15 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 		uploadOptions["overwrite"] = "true"
 	}
 
-	uploadOptions["retries"] = strconv.Itoa(retries)
+	for key, value := range options {
+		uploadOptions[key] = value
+	}
 
 	if uploadOptions["fileNameField"] != "" {
 		fileFieldName = uploadOptions["fileNameField"]
 		delete(uploadOptions, "fileNameField")
 	} else {
 		fileFieldName = "file"
-	}
-
-	for key, value := range options {
-		uploadOptions[key] = value
 	}
 
 	for _, file := range fileList {
