@@ -3,33 +3,37 @@ package utils_testing
 import (
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-//Pwd - Gets the current working directory
-func GetTestDataDir() string {
+//GetBasePath - Gets the current working directory
+func GetBasePath() string {
 	path, err := os.Getwd()
 
 	if err != nil {
 		log.Println(err)
 	}
 
-	return path + "/../testdata"
+	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
+	basePath := sampleRegexp.ReplaceAllString(path, "")
+
+	return basePath
 }
 
 // TestIsDir - Tests the IsDir function
 func TestIsDir(t *testing.T) {
-	got := utils.IsDir(GetTestDataDir())
+	got := utils.IsDir(GetBasePath())
 	want := true
 
 	if got != want {
-		t.Errorf("got %q, wanted %q - %q", strconv.FormatBool(got), strconv.FormatBool(want), GetTestDataDir())
+		t.Errorf("got %q, wanted %q - %q", strconv.FormatBool(got), strconv.FormatBool(want), GetBasePath())
 	}
 
-	got = utils.IsDir(GetTestDataDir() + "/android-mapping.txt")
+	got = utils.IsDir(GetBasePath() + "/README.md")
 	want = false
 
 	if got != want {
@@ -39,14 +43,14 @@ func TestIsDir(t *testing.T) {
 
 // TestBuildFileList - Tests the BuildFileList function
 func TestBuildFileList(t *testing.T) {
-	paths := []string{GetTestDataDir()}
+	paths := []string{GetBasePath() + "/test/testdata"}
 	got, err := utils.BuildFileList(paths)
 
 	if err !=nil {
 		t.Errorf(err.Error())
 	}
 
-	want := []string{"/Users/josh.edney/repos/bugsnag-cli/test/testdata/android-mapping.txt"}
+	want := []string{GetBasePath() + "/test/testdata/android-mapping.txt"}
 
 	if got[0] != want[0] {
 		t.Errorf("got %q, want %q", got[0], want[0])
