@@ -4,34 +4,19 @@ import (
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestEndpointBuilding(t *testing.T) {
-	got := utils.BuildEndpointUrl("", 0)
-	want := "https://upload.bugsnag.com"
+	results := utils.BuildEndpointUrl("", 0)
+	assert.Equal(t, results, "https://upload.bugsnag.com", "They should be the same")
 
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
+	results = utils.BuildEndpointUrl("https://localhost", 0)
+	assert.Equal(t, results, "https://localhost", "They should be the same")
 
-	got = utils.BuildEndpointUrl("https://localhost", 0)
-	want = "https://localhost"
+	results = utils.BuildEndpointUrl("", 8443)
+	assert.Equal(t, results, "https://upload.bugsnag.com:8443", "They should be the same")
 
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
-
-	got = utils.BuildEndpointUrl("", 8443)
-	want = "https://upload.bugsnag.com:8443"
-
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
-
-	got = utils.BuildEndpointUrl("https://localhost", 8443)
-	want = "https://localhost:8443"
-
-	if got != want {
-		t.Errorf("got %q, wanted %q", got, want)
-	}
+	results = utils.BuildEndpointUrl("https://localhost", 8443)
+	assert.Equal(t, results, "https://localhost:8443", "They should be the same")
 }
