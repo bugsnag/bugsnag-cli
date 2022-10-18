@@ -4,10 +4,11 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strconv"
+	//"strconv"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/stretchr/testify/assert"
 )
 
 //GetBasePath - Gets the current working directory
@@ -26,36 +27,35 @@ func GetBasePath() string {
 
 // TestIsDir - Tests the IsDir function
 func TestIsDir(t *testing.T) {
-	got := utils.IsDir(GetBasePath())
-	want := true
+	results := utils.IsDir(GetBasePath())
 
-	if got != want {
-		t.Errorf("got %q, wanted %q - %q", strconv.FormatBool(got), strconv.FormatBool(want), GetBasePath())
-	}
+	assert.Equal(t, results, true, "This should be true")
 
-	got = utils.IsDir(GetBasePath() + "/README.md")
-	want = false
+	results = utils.IsDir(GetBasePath() + "/README.md")
 
-	if got != want {
-		t.Errorf("got %q, wanted %q", strconv.FormatBool(got), strconv.FormatBool(want))
-	}
+	assert.Equal(t, results, false, "This should be false")
 }
 
 // TestBuildFileList - Tests the BuildFileList function
 func TestBuildFileList(t *testing.T) {
 	paths := []string{GetBasePath() + "/test/testdata"}
-	got, err := utils.BuildFileList(paths)
+
+	results, err := utils.BuildFileList(paths)
 
 	if err !=nil {
 		t.Errorf(err.Error())
 	}
 
-	want := []string{GetBasePath() + "/test/testdata/android-mapping.txt"}
-
-	if got[0] != want[0] {
-		t.Errorf("got %q, want %q", got[0], want[0])
-	}
+	assert.Equal(t, results, []string{GetBasePath() + "/test/testdata/android-mapping.txt"}, "The files should be the same")
 }
 
 // TestFilePathWalkDir - Tests the FilePathWalkDir function
-func TestFilePathWalkDir(t *testing.T) {}
+func TestFilePathWalkDir(t *testing.T) {
+	results, err := utils.FilePathWalkDir(GetBasePath() + "/test/testdata")
+
+	if err !=nil {
+		t.Errorf(err.Error())
+	}
+
+	assert.Equal(t, results, []string{GetBasePath() + "/test/testdata/android-mapping.txt"}, "This should return a file")
+}
