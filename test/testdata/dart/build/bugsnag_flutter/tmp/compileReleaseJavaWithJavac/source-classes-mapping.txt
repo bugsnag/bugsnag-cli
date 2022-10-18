@@ -1,0 +1,18 @@
+com/bugsnag/android/InternalHooks.java
+ com.bugsnag.android.InternalHooks
+com/bugsnag/flutter/BSGFunction.java
+ com.bugsnag.flutter.BSGFunction
+com/bugsnag/flutter/JsonHelper.java
+ com.bugsnag.flutter.JsonHelper
+com/bugsnag/flutter/BugsnagFlutter.java
+ com.bugsnag.flutter.BugsnagFlutter
+com/bugsnag/flutter/EnumHelper.java
+ com.bugsnag.flutter.EnumHelper
+com/bugsnag/flutter/BugsnagFlutterEnabledErrorTypes.java
+ com.bugsnag.flutter.BugsnagFlutterEnabledErrorTypes
+com/bugsnag/flutter/BugsnagFlutterPlugin.java
+ com.bugsnag.flutter.BugsnagFlutterPlugin
+com/bugsnag/flutter/BugsnagFlutterConfiguration.java
+ com.bugsnag.flutter.BugsnagFlutterConfiguration
+com/bugsnag/flutter/BuildConfig.java
+ com.bugsnag.flutter.BuildConfig

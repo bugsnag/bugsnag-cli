@@ -1,0 +1,4 @@
+#Tue Oct 18 11:43:57 BST 2022
+base.0=/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

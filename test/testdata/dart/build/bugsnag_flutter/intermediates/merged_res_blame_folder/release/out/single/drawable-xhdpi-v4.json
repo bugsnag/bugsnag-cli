@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/drawable-xhdpi-v4/notification_bg_low_pressed.9.png",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/drawable-xhdpi-v4/notification_bg_low_normal.9.png",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/drawable-xhdpi-v4/notification_bg_low_normal.9.png"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/drawable-xhdpi-v4/notification_bg_normal.9.png",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/drawable-xhdpi-v4/notification_bg_normal.9.png"
+    }
+]

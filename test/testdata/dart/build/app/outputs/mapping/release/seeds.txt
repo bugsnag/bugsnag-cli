@@ -1,0 +1,624 @@
+io.flutter.view.AccessibilityViewEmbedder: io.flutter.view.AccessibilityViewEmbedder$ReflectionAccessors reflectionAccessors
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType fromDescriptor(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void nativeNotifyLowMemoryWarning(long)
+io.flutter.embedding.android.FlutterImageView: io.flutter.embedding.engine.renderer.FlutterRenderer getAttachedRenderer()
+com.bugsnag.android.ErrorType: java.lang.String desc
+io.flutter.view.AccessibilityViewEmbedder
+com.bugsnag.android.Breadcrumb
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State[] values()
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.Client client
+com.bugsnag.android.NativeInterface: java.util.Map getDevice()
+com.bugsnag.android.AnrPlugin: void notifyAnrDetected(java.util.List)
+com.bugsnag.android.NativeStackframe: void setLoadAddress(java.lang.Long)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiMode: io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiMode[] values()
+com.bugsnag.android.ndk.NativeBridge: void startedSession(java.lang.String,java.lang.String,int,int)
+com.bugsnag.android.NdkPlugin: void notifyRemoveCallback(java.lang.String)
+com.bugsnag.android.BreadcrumbState: java.util.List copy()
+com.bugsnag.android.ndk.NativeBridge: void updateContext(java.lang.String)
+androidx.lifecycle.ReflectiveGenericLifecycleObserver
+androidx.core.graphics.drawable.IconCompat: IconCompat()
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiMode: io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiMode valueOf(java.lang.String)
+com.bugsnag.examples.flutter.MainActivity
+com.bugsnag.android.NativeStackframe: java.lang.String getCodeIdentifier()
+com.bugsnag.android.NativeStackframe: void setCodeIdentifier(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: void pausedSession()
+io.flutter.embedding.engine.FlutterJNI: void runBundleAndSnapshotFromLibrary(java.lang.String,java.lang.String,java.lang.String,android.content.res.AssetManager)
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.deferredcomponents.DeferredComponentManager deferredComponentManager
+io.flutter.embedding.engine.FlutterJNI: void nativeLoadDartDeferredLibrary(long,int,java.lang.String[])
+androidx.core.app.CoreComponentFactory
+androidx.core.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.NativeStackframe: java.lang.String codeIdentifier
+com.bugsnag.android.ndk.NativeBridge: void addMetadataDouble(java.lang.String,java.lang.String,double)
+com.bugsnag.android.ErrorType: ErrorType(java.lang.String,int,java.lang.String)
+com.bugsnag.android.NativeStackframe: void toStream(com.bugsnag.android.JsonStream)
+com.bugsnag.android.BreadcrumbType: java.lang.String toString()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: void install()
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.FlutterOverlaySurface createOverlaySurface()
+io.flutter.embedding.engine.FlutterJNI: void setDeferredComponentManager(io.flutter.embedding.engine.deferredcomponents.DeferredComponentManager)
+com.bugsnag.android.Severity: java.lang.String str
+io.flutter.embedding.engine.FlutterOverlaySurface: int getId()
+com.bugsnag.android.Severity: java.lang.String access$getStr$p(com.bugsnag.android.Severity)
+android.support.v4.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+io.flutter.view.AccessibilityViewEmbedder: boolean performAction(int,int,android.os.Bundle)
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$ErrorInfo: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$ErrorInfo[] values()
+com.bugsnag.android.Breadcrumb: void toStream(com.bugsnag.android.JsonStream)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: int access$100(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+io.flutter.plugins.GeneratedPluginRegistrant: GeneratedPluginRegistrant()
+com.bugsnag.android.ThreadType: com.bugsnag.android.ThreadType[] values()
+io.flutter.view.AccessibilityBridge$Flag: io.flutter.view.AccessibilityBridge$Flag valueOf(java.lang.String)
+com.bugsnag.android.AnrPlugin
+io.flutter.embedding.engine.FlutterJNI: void dispatchPlatformMessage(java.lang.String,java.nio.ByteBuffer,int,int)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType[] $VALUES
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.WindowInsets access$400(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+io.flutter.embedding.engine.FlutterJNI: void dispatchPointerDataPacket(java.nio.ByteBuffer,int)
+androidx.versionedparcelable.CustomVersionedParcelable
+com.bugsnag.android.NativeInterface: void clearMetadata(java.lang.String,java.lang.String)
+com.bugsnag.android.NativeInterface: void notify(byte[],byte[],com.bugsnag.android.Severity,com.bugsnag.android.NativeStackframe[])
+io.flutter.embedding.engine.systemchannels.TextInputChannel$TextCapitalization: io.flutter.embedding.engine.systemchannels.TextInputChannel$TextCapitalization[] values()
+com.bugsnag.android.ndk.NativeBridge: void install(java.lang.String,java.lang.String,java.lang.String,int,boolean,int,boolean,int)
+io.flutter.embedding.engine.FlutterJNI: void updateCustomAccessibilityActions(java.nio.ByteBuffer,java.lang.String[])
+com.bugsnag.android.NdkPlugin: NdkPlugin()
+io.flutter.embedding.android.TransparencyMode: io.flutter.embedding.android.TransparencyMode[] values()
+io.flutter.embedding.android.FlutterImageView: android.view.Surface getSurface()
+com.bugsnag.android.AnrPlugin: void performOneTimeSetup(com.bugsnag.android.Client)
+io.flutter.embedding.engine.FlutterJNI: void setAsyncWaitForVsyncDelegate(io.flutter.embedding.engine.FlutterJNI$AsyncWaitForVsyncDelegate)
+com.bugsnag.android.NativeStackframe: void setMethod(java.lang.String)
+com.bugsnag.android.BreadcrumbState: void add(com.bugsnag.android.Breadcrumb)
+io.flutter.embedding.engine.FlutterJNI: void setPlatformMessageHandler(io.flutter.embedding.engine.dart.PlatformMessageHandler)
+com.bugsnag.android.NativeInterface: java.lang.String getReleaseStage()
+io.flutter.embedding.engine.FlutterJNI: void nativeUpdateJavaAssetManager(long,android.content.res.AssetManager,java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: java.util.Set flutterUiDisplayListeners
+android.support.v4.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.NativeInterface: java.lang.String getAppVersion()
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType$Companion Companion
+com.bugsnag.android.NativeInterface: boolean isDiscardErrorClass(java.lang.String)
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Logger getLogger()
+io.flutter.view.AccessibilityBridge$TextDirection: io.flutter.view.AccessibilityBridge$TextDirection[] values()
+com.bugsnag.android.NativeInterface: void setBinaryArch(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: void addHandledEvent()
+com.bugsnag.android.Thread$State: com.bugsnag.android.Thread$State valueOf(java.lang.String)
+com.bugsnag.android.BreadcrumbType: BreadcrumbType(java.lang.String,int,java.lang.String)
+io.flutter.embedding.android.FlutterImageView$SurfaceKind: io.flutter.embedding.android.FlutterImageView$SurfaceKind[] values()
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: java.util.List mutators
+com.bugsnag.android.NativeInterface: void notify(java.lang.String,java.lang.String,com.bugsnag.android.Severity,java.lang.StackTraceElement[])
+com.bugsnag.android.NativeInterface: com.bugsnag.android.LastRunInfo getLastRunInfo()
+io.flutter.embedding.engine.FlutterJNI: boolean prefetchDefaultFontManagerCalled
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.WindowInsetsAnimation$Callback getAnimationCallback()
+com.bugsnag.android.NdkPlugin: java.util.concurrent.atomic.AtomicBoolean oneTimeSetupPerformed
+com.bugsnag.android.NativeInterface: java.io.File getNativeReportPath()
+io.flutter.embedding.engine.FlutterJNI: void nativeSetSemanticsEnabled(long,boolean)
+io.flutter.embedding.engine.FlutterJNI: void nativeSurfaceChanged(long,int,int)
+com.bugsnag.android.NdkPlugin: void enableCrashReporting()
+io.flutter.plugins.GeneratedPluginRegistrant
+com.bugsnag.android.NativeStackframe: void setType(com.bugsnag.android.ErrorType)
+com.bugsnag.android.Telemetry: com.bugsnag.android.Telemetry valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void nativeRunBundleAndSnapshotFromLibrary(long,java.lang.String,java.lang.String,java.lang.String,android.content.res.AssetManager)
+com.bugsnag.android.NativeStackframe: java.lang.Long getSymbolAddress()
+com.bugsnag.android.ndk.NativeBridge: void notifyRemoveCallback(java.lang.String)
+io.flutter.view.AccessibilityViewEmbedder: java.lang.String TAG
+androidx.lifecycle.FullLifecycleObserverAdapter
+com.bugsnag.android.NativeInterface: void addMetadata(java.lang.String,java.lang.String,java.lang.Object)
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$ErrorInfo: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$ErrorInfo valueOf(java.lang.String)
+com.bugsnag.android.NativeInterface: java.util.Map getMetadata()
+com.bugsnag.android.AnrPlugin: void disableAnrReporting()
+com.bugsnag.android.NativeStackframe: java.lang.Long symbolAddress
+com.bugsnag.android.Breadcrumb: java.lang.String getMessage()
+io.flutter.view.FlutterCallbackInformation: FlutterCallbackInformation(java.lang.String,java.lang.String,java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: void initCallbackCounts(java.util.Map)
+io.flutter.view.FlutterCallbackInformation
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType ERROR
+io.flutter.embedding.android.FlutterSplashView$SavedState: android.os.Bundle access$700(io.flutter.embedding.android.FlutterSplashView$SavedState)
+io.flutter.view.AccessibilityViewEmbedder: AccessibilityViewEmbedder(android.view.View,int)
+io.flutter.embedding.engine.FlutterJNI: android.graphics.Bitmap getBitmap()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.WindowInsets access$402(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback,android.view.WindowInsets)
+com.bugsnag.android.NativeInterface: NativeInterface()
+io.flutter.embedding.engine.FlutterOverlaySurface: android.view.Surface surface
+io.flutter.embedding.engine.FlutterJNI: java.lang.String getObservatoryUri()
+android.support.v4.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType[] $VALUES
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback
+com.bugsnag.android.NativeInterface: void setContext(java.lang.String)
+com.bugsnag.android.BaseObservable: void addObserver(com.bugsnag.android.internal.StateObserver)
+com.bugsnag.android.NativeStackframe: void setPC(java.lang.Boolean)
+io.flutter.view.AccessibilityViewEmbedder: android.view.accessibility.AccessibilityNodeInfo createAccessibilityNodeInfo(int)
+com.bugsnag.android.NativeInterface: void notify(byte[],byte[],com.bugsnag.android.Severity,java.lang.StackTraceElement[])
+io.flutter.embedding.android.DrawableSplashScreen$DrawableSplashScreenView: void setSplashDrawable(android.graphics.drawable.Drawable)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: java.util.List finalClippingPaths
+io.flutter.embedding.engine.FlutterJNI: void nativeInit(android.content.Context,java.lang.String[],java.lang.String,java.lang.String,java.lang.String,long)
+com.bugsnag.android.NdkPlugin: void unload()
+io.flutter.embedding.engine.FlutterJNI: void ensureRunningOnMainThread()
+io.flutter.embedding.engine.FlutterJNI: void onSurfaceDestroyed()
+com.bugsnag.android.NativeStackframe: java.lang.Boolean isPC
+com.bugsnag.android.NativeStackframe: java.lang.String method
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.ndk.NativeBridge nativeBridge
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType[] values()
+com.bugsnag.android.NativeInterface: java.lang.String[] getCpuAbi()
+io.flutter.embedding.engine.FlutterJNI: void detachFromNativeAndReleaseResources()
+com.bugsnag.android.BreadcrumbState: java.util.concurrent.atomic.AtomicInteger index
+com.bugsnag.android.NativeStackframe: java.lang.Long frameAddress
+io.flutter.embedding.android.FlutterView: android.view.accessibility.AccessibilityNodeProvider getAccessibilityNodeProvider()
+io.flutter.embedding.engine.systemchannels.PlatformChannel$HapticFeedbackType: io.flutter.embedding.engine.systemchannels.PlatformChannel$HapticFeedbackType[] values()
+androidx.core.app.RemoteActionCompatParcelizer
+io.flutter.embedding.engine.FlutterJNI: void ensureAttachedToNative()
+io.flutter.embedding.engine.FlutterJNI: boolean nativeFlutterTextUtilsIsRegionalIndicator(int)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType valueOf(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: java.util.Map makeSafeMetadata(java.util.Map)
+io.flutter.embedding.engine.FlutterOverlaySurface: FlutterOverlaySurface(int,android.view.Surface)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback animationCallback
+io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference: androidx.lifecycle.Lifecycle lifecycle
+com.bugsnag.android.ndk.NativeBridge: void setStaticJsonData(java.lang.String)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack$FlutterMutatorType: io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack$FlutterMutatorType valueOf(java.lang.String)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: android.graphics.Matrix getFinalMatrix()
+com.bugsnag.android.Severity: com.bugsnag.android.Severity WARNING
+com.bugsnag.android.NdkPlugin: void initCallbackCounts(java.util.Map)
+com.bugsnag.android.ndk.NativeBridge: void setInternalMetricsEnabled(boolean)
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: void getTransformMatrix(float[])
+android.support.v4.app.RemoteActionCompatParcelizer
+com.bugsnag.android.NativeStackframe: void setFrameAddress(java.lang.Long)
+com.bugsnag.android.NativeInterface
+com.bugsnag.android.NativeInterface: void leaveBreadcrumb(byte[],com.bugsnag.android.BreadcrumbType)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean access$300(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+io.flutter.embedding.android.FlutterSplashView$SavedState: java.lang.String access$600(io.flutter.embedding.android.FlutterSplashView$SavedState)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback: void onEnd(android.view.WindowInsetsAnimation)
+com.bugsnag.android.BreadcrumbState: void toStream(com.bugsnag.android.JsonStream)
+com.bugsnag.android.AnrPlugin: com.bugsnag.android.AnrPlugin$Companion Companion
+io.flutter.plugin.platform.SingleViewPresentation: android.widget.FrameLayout container
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.LibraryLoader libraryLoader
+io.flutter.embedding.engine.FlutterJNI: void invokePlatformMessageResponseCallback(int,java.nio.ByteBuffer,int)
+com.bugsnag.android.NativeInterface: void leaveBreadcrumb(java.lang.String,com.bugsnag.android.BreadcrumbType)
+androidx.activity.ComponentActivity$2
+io.flutter.embedding.engine.systemchannels.PlatformChannel$HapticFeedbackType: io.flutter.embedding.engine.systemchannels.PlatformChannel$HapticFeedbackType valueOf(java.lang.String)
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType$Companion Companion
+com.bugsnag.android.NativeInterface: void startSession()
+io.flutter.embedding.engine.FlutterJNI: void invokePlatformMessageEmptyResponseCallback(int)
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.SingleViewPresentation$PresentationState detachState()
+com.bugsnag.android.AnrPlugin: java.lang.String ANR_ERROR_CLASS
+io.flutter.embedding.engine.FlutterJNI: long nativeAttach(io.flutter.embedding.engine.FlutterJNI,boolean)
+com.bugsnag.android.AnrPlugin: void access$initNativePlugin(com.bugsnag.android.AnrPlugin)
+com.bugsnag.android.ndk.NativeBridge: void removeMetadata(java.lang.String,java.lang.String)
+io.flutter.view.AccessibilityViewEmbedder: android.view.View rootAccessibilityView
+io.flutter.embedding.engine.FlutterJNI: void nativeInvokePlatformMessageResponseCallback(long,int,java.nio.ByteBuffer,int)
+com.bugsnag.android.NativeStackframe: void setFile(java.lang.String)
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_PAUSE
+com.bugsnag.android.ThreadSendPolicy: com.bugsnag.android.ThreadSendPolicy valueOf(java.lang.String)
+com.bugsnag.android.TaskType: com.bugsnag.android.TaskType[] values()
+com.bugsnag.android.BreadcrumbState: BreadcrumbState(int,com.bugsnag.android.CallbackState,com.bugsnag.android.Logger)
+com.bugsnag.android.ndk.NativeBridge: void updateLowMemory(boolean,java.lang.String)
+com.bugsnag.android.AnrPlugin: com.bugsnag.android.Client client
+com.bugsnag.android.BaseObservable: java.util.concurrent.CopyOnWriteArrayList getObservers$bugsnag_android_core_release()
+com.bugsnag.android.NativeInterface: void setClient(com.bugsnag.android.Client)
+io.flutter.embedding.engine.FlutterJNI: android.os.Looper mainLooper
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.WindowInsets lastWindowInsets
+androidx.lifecycle.LiveData$LifecycleBoundObserver
+com.bugsnag.android.BreadcrumbType: java.lang.String access$getType$p(com.bugsnag.android.BreadcrumbType)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: java.util.List getMutators()
+com.bugsnag.android.NativeInterface: void leaveBreadcrumb(java.lang.String,java.lang.String,java.util.Map)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType USER
+com.bugsnag.android.NativeStackframe: java.lang.Long getFrameAddress()
+com.bugsnag.android.NdkPlugin: java.lang.String getBinaryArch()
+io.flutter.embedding.engine.FlutterJNI: boolean nativeFlutterTextUtilsIsVariationSelector(int)
+com.bugsnag.android.Severity: com.bugsnag.android.Severity ERROR
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_START
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.dart.PlatformMessageHandler platformMessageHandler
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_CREATE
+com.bugsnag.android.NdkPlugin: java.util.Map getCurrentCallbackSetCounts()
+io.flutter.embedding.engine.FlutterJNI: void attachToNative(boolean)
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: android.graphics.SurfaceTexture surfaceTexture()
+android.support.v4.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+com.bugsnag.android.NativeInterface: void pauseSession()
+io.flutter.embedding.engine.FlutterJNI: io.flutter.view.FlutterCallbackInformation nativeLookupCallbackInformation(long)
+com.bugsnag.android.NativeInterface: void setAutoDetectAnrs(boolean)
+com.bugsnag.android.ndk.NativeBridge: void updateOrientation(java.lang.String)
+com.bugsnag.android.NdkPlugin: void notifyAddCallback(java.lang.String)
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Event createEmptyEvent()
+androidx.savedstate.Recreator
+io.flutter.embedding.engine.FlutterJNI: boolean loadLibraryCalled
+com.bugsnag.android.ndk.NativeBridge: void addMetadataOpaque(java.lang.String,java.lang.String,java.lang.String)
+androidx.annotation.Keep
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.ndk.NativeBridge initNativeBridge(com.bugsnag.android.Client)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback: android.view.WindowInsets onProgress(android.view.WindowInsets,java.util.List)
+io.flutter.embedding.engine.FlutterOverlaySurface: int id
+io.flutter.embedding.engine.FlutterJNI: void setViewportMetrics(float,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int)
+androidx.activity.OnBackPressedDispatcher$LifecycleOnBackPressedCancellable
+com.bugsnag.android.AnrPlugin: java.lang.Class loadClass(java.lang.String)
+io.flutter.view.FlutterCallbackInformation: java.lang.String callbackName
+androidx.versionedparcelable.ParcelImpl: android.os.Parcelable$Creator CREATOR
+com.bugsnag.android.Breadcrumb: Breadcrumb(java.lang.String,com.bugsnag.android.BreadcrumbType,java.util.Map,java.util.Date,com.bugsnag.android.Logger)
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_DESTROY
+com.bugsnag.android.AnrPlugin: void unload()
+androidx.versionedparcelable.CustomVersionedParcelable: CustomVersionedParcelable()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: int access$500(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+com.bugsnag.android.NdkPlugin: void setInternalMetricsEnabled(boolean)
+io.flutter.view.AccessibilityViewEmbedder: void setFlutterNodesTranslateBounds(android.view.accessibility.AccessibilityNodeInfo,android.graphics.Rect,android.view.accessibility.AccessibilityNodeInfo)
+io.flutter.embedding.engine.FlutterJNI: void nativeUnregisterTexture(long,long)
+io.flutter.embedding.engine.FlutterJNI: void nativeInvokePlatformMessageEmptyResponseCallback(long,int)
+com.bugsnag.android.NativeStackframe: NativeStackframe(java.lang.String,java.lang.String,java.lang.Number,java.lang.Long,java.lang.Long,java.lang.Long,java.lang.Boolean,com.bugsnag.android.ErrorType,java.lang.String)
+com.bugsnag.android.NativeInterface: java.util.Map getApp()
+com.bugsnag.android.Severity: Severity(java.lang.String,int,java.lang.String)
+io.flutter.embedding.android.RenderMode: io.flutter.embedding.android.RenderMode valueOf(java.lang.String)
+com.bugsnag.android.NativeStackframe: java.lang.String file
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType valueOf(java.lang.String)
+com.bugsnag.android.Severity: com.bugsnag.android.Severity[] values()
+com.bugsnag.android.ndk.NativeBridge: void updateUserName(java.lang.String)
+com.bugsnag.android.NdkPlugin: void setStaticData(java.util.Map)
+com.bugsnag.android.Severity
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.FlutterJNI nativeSpawn(long,java.lang.String,java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: boolean getIsSoftwareRenderingEnabled()
+com.bugsnag.android.Severity: com.bugsnag.android.Severity valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void requestDartDeferredLibrary(int)
+com.bugsnag.android.ndk.NativeBridge: boolean isInvalidMessage(java.lang.Object)
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Event createEvent(java.lang.Throwable,com.bugsnag.android.Client,com.bugsnag.android.SeverityReason)
+io.flutter.embedding.engine.FlutterOverlaySurface
+io.flutter.embedding.engine.FlutterJNI: io.flutter.plugin.platform.PlatformViewsController platformViewsController
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: java.util.List getFinalClippingPaths()
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorView: void setOnDescendantFocusChangeListener(android.view.View$OnFocusChangeListener)
+androidx.core.app.RemoteActionCompat: RemoteActionCompat()
+com.bugsnag.android.BaseObservable: void removeObserver(com.bugsnag.android.internal.StateObserver)
+com.bugsnag.android.ndk.OpaqueValue
+com.bugsnag.android.NativeInterface: java.lang.String getEndpoint()
+io.flutter.plugin.editing.TextInputPlugin$InputTarget$Type: io.flutter.plugin.editing.TextInputPlugin$InputTarget$Type[] values()
+io.flutter.view.AccessibilityBridge$AccessibilityFeature: io.flutter.view.AccessibilityBridge$AccessibilityFeature valueOf(java.lang.String)
+com.bugsnag.android.AnrPlugin: void initNativePlugin()
+com.bugsnag.android.NativeStackframe: void setLineNumber(java.lang.Number)
+io.flutter.embedding.android.FlutterActivityLaunchConfigs$BackgroundMode: io.flutter.embedding.android.FlutterActivityLaunchConfigs$BackgroundMode valueOf(java.lang.String)
+io.flutter.view.AccessibilityBridge$StringAttributeType: io.flutter.view.AccessibilityBridge$StringAttributeType valueOf(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: java.util.concurrent.atomic.AtomicBoolean installed
+androidx.lifecycle.SingleGeneratedAdapterObserver
+com.bugsnag.android.ndk.NativeBridge: void handleAddMetadata(com.bugsnag.android.StateEvent$AddMetadata)
+io.flutter.embedding.engine.FlutterJNI
+com.bugsnag.android.NativeStackframe: java.lang.String getMethod()
+io.flutter.embedding.engine.FlutterJNI: void removeIsDisplayingFlutterUiListener(io.flutter.embedding.engine.renderer.FlutterUiDisplayListener)
+com.bugsnag.android.BaseObservable: void updateState$bugsnag_android_core_release(kotlin.jvm.functions.Function0)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.View$OnApplyWindowInsetsListener getInsetsListener()
+io.flutter.embedding.engine.FlutterJNI: java.lang.String[] computePlatformResolvedLocale(java.lang.String[])
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$DoublePrecision: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$DoublePrecision[] values()
+io.flutter.embedding.engine.FlutterJNI: void onBeginFrame()
+com.bugsnag.android.ndk.NativeBridge: java.io.File reportDirectory
+com.bugsnag.android.NativeInterface: java.util.Collection getEnabledReleaseStages()
+com.bugsnag.android.AnrPlugin: java.lang.String LOAD_ERR_MSG
+io.flutter.embedding.engine.FlutterJNI: void unregisterTexture(long)
+io.flutter.embedding.engine.FlutterJNI: void onSurfaceChanged(int,int)
+com.bugsnag.android.NativeStackframe: java.lang.Number getLineNumber()
+com.bugsnag.android.NativeStackframe: java.lang.Long getLoadAddress()
+com.bugsnag.android.BreadcrumbState: int getBreadcrumbIndex()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean access$202(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback,boolean)
+io.flutter.embedding.engine.FlutterJNI: java.lang.String observatoryUri
+com.bugsnag.android.ndk.OpaqueValue: java.lang.String getJson()
+com.bugsnag.android.NdkPlugin: java.lang.String LOAD_ERR_MSG
+io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference: HiddenLifecycleReference(androidx.lifecycle.Lifecycle)
+com.bugsnag.android.BreadcrumbType
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: android.graphics.Matrix finalMatrix
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State valueOf(java.lang.String)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiOverlay: io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiOverlay[] values()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: void attachToGLContext(int)
+io.flutter.embedding.android.FlutterSplashView$SavedState: java.lang.String previousCompletedSplashIsolate
+io.flutter.embedding.engine.FlutterJNI: void setLocalizationPlugin(io.flutter.plugin.localization.LocalizationPlugin)
+com.bugsnag.android.NativeStackframe: java.lang.String getFile()
+io.flutter.view.AccessibilityViewEmbedder: void copyAccessibilityFields(android.view.accessibility.AccessibilityNodeInfo,android.view.accessibility.AccessibilityNodeInfo)
+com.bugsnag.android.ndk.NativeBridge: java.util.Map getCurrentCallbackSetCounts()
+io.flutter.embedding.engine.FlutterJNI: void registerTexture(long,io.flutter.embedding.engine.renderer.SurfaceTextureWrapper)
+com.bugsnag.android.NativeInterface: java.util.Map getUser()
+com.bugsnag.android.NativeInterface: boolean resumeSession()
+com.bugsnag.android.NativeStackframe: NativeStackframe(java.lang.String,java.lang.String,java.lang.Number,java.lang.Long,java.lang.Long,java.lang.Long,java.lang.Boolean,com.bugsnag.android.ErrorType,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+io.flutter.embedding.engine.FlutterJNI: void handlePlatformMessage(java.lang.String,java.nio.ByteBuffer,int)
+io.flutter.embedding.engine.FlutterJNI: void setAccessibilityDelegate(io.flutter.embedding.engine.FlutterJNI$AccessibilityDelegate)
+com.bugsnag.android.BreadcrumbState: com.bugsnag.android.Breadcrumb[] store
+io.flutter.embedding.engine.FlutterJNI: void onRenderingStopped()
+androidx.savedstate.SavedStateRegistry$1
+io.flutter.embedding.android.DrawableSplashScreen$DrawableSplashScreenView
+com.bugsnag.android.ndk.NativeBridge: void addMetadataString(java.lang.String,java.lang.String,java.lang.String)
+com.bugsnag.android.Breadcrumb: com.bugsnag.android.BreadcrumbType getType()
+io.flutter.embedding.engine.FlutterJNI: void onFirstFrame()
+android.support.v4.graphics.drawable.IconCompatParcelizer
+androidx.core.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.NativeStackframe: com.bugsnag.android.ErrorType type
+androidx.core.app.CoreComponentFactory: CoreComponentFactory()
+androidx.lifecycle.Lifecycling$1
+com.bugsnag.android.AnrPlugin: void load(com.bugsnag.android.Client)
+io.flutter.embedding.android.FlutterView
+io.flutter.embedding.engine.FlutterJNI: void addEngineLifecycleListener(io.flutter.embedding.engine.FlutterEngine$EngineLifecycleListener)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$DeviceOrientation: io.flutter.embedding.engine.systemchannels.PlatformChannel$DeviceOrientation[] values()
+io.flutter.embedding.engine.FlutterJNI: boolean isAttached()
+io.flutter.view.AccessibilityViewEmbedder: void cacheVirtualIdMappings(android.view.View,int,int)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$ClipboardContentFormat: io.flutter.embedding.engine.systemchannels.PlatformChannel$ClipboardContentFormat valueOf(java.lang.String)
+com.bugsnag.android.Thread$State: com.bugsnag.android.Thread$State[] values()
+io.flutter.embedding.engine.FlutterJNI: java.util.Set engineLifecycleListeners
+io.flutter.embedding.engine.FlutterJNI: java.lang.String TAG
+io.flutter.embedding.engine.FlutterJNI: void handlePlatformMessageResponse(int,java.nio.ByteBuffer)
+io.flutter.embedding.engine.FlutterJNI: void nativeDispatchSemanticsAction(long,int,int,java.nio.ByteBuffer,int)
+io.flutter.view.AccessibilityViewEmbedder: int nextFlutterId
+io.flutter.embedding.engine.FlutterJNI: void nativePrefetchDefaultFontManager()
+io.flutter.embedding.android.FlutterActivity: FlutterActivity()
+com.bugsnag.android.ndk.NativeBridge: com.bugsnag.android.Logger logger
+io.flutter.embedding.engine.FlutterJNI: void onSurfaceWindowChanged(android.view.Surface)
+com.bugsnag.android.ndk.NativeBridge: void handleInstallMessage(com.bugsnag.android.StateEvent$Install)
+com.bugsnag.android.ndk.NativeBridge: void refreshSymbolTable()
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.PlatformViewFactory viewFactory
+io.flutter.view.AccessibilityViewEmbedder: boolean onAccessibilityHoverEvent(int,android.view.MotionEvent)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType REQUEST
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: void remove()
+com.bugsnag.android.ThreadSendPolicy: com.bugsnag.android.ThreadSendPolicy[] values()
+io.flutter.embedding.engine.FlutterJNI: void dispatchSemanticsAction(int,int,java.nio.ByteBuffer,int)
+androidx.core.graphics.drawable.IconCompat
+io.flutter.embedding.engine.FlutterJNI: void deferredComponentInstallFailure(int,java.lang.String,boolean)
+com.bugsnag.android.BreadcrumbType: java.lang.String type
+androidx.core.app.RemoteActionCompat
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event valueOf(java.lang.String)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType LOG
+com.bugsnag.android.Telemetry: com.bugsnag.android.Telemetry[] values()
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack$FlutterMutatorType: io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack$FlutterMutatorType[] values()
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType REACTNATIVEJS
+com.bugsnag.android.ndk.NativeBridge: long getSignalUnwindStackFunction()
+com.bugsnag.android.NativeStackframe: java.lang.Number lineNumber
+com.bugsnag.android.Severity: com.bugsnag.android.Severity INFO
+io.flutter.embedding.android.FlutterImageView
+io.flutter.embedding.android.FlutterActivityLaunchConfigs$BackgroundMode: io.flutter.embedding.android.FlutterActivityLaunchConfigs$BackgroundMode[] values()
+com.bugsnag.android.ndk.NativeBridge: NativeBridge()
+com.bugsnag.android.NativeInterface: void markLaunchCompleted()
+io.flutter.embedding.engine.FlutterJNI: void updateJavaAssetManager(android.content.res.AssetManager,java.lang.String)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean access$200(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+com.bugsnag.android.AnrPlugin: AnrPlugin()
+com.bugsnag.android.NativeInterface: void deliverReport(byte[],byte[],byte[],java.lang.String,boolean)
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Session getCurrentSession()
+com.bugsnag.android.ndk.NativeBridge: java.util.concurrent.locks.ReentrantLock lock
+io.flutter.view.FlutterCallbackInformation: java.lang.String callbackClassName
+io.flutter.view.AccessibilityViewEmbedder: java.util.Map originToFlutterId
+androidx.core.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+io.flutter.embedding.engine.FlutterJNI: void updateSemantics(java.nio.ByteBuffer,java.lang.String[],java.nio.ByteBuffer[])
+com.bugsnag.android.ndk.NativeBridge: void onStateChange(com.bugsnag.android.StateEvent)
+io.flutter.embedding.engine.FlutterJNI: void init(android.content.Context,java.lang.String[],java.lang.String,java.lang.String,java.lang.String,long)
+io.flutter.embedding.engine.FlutterJNI: boolean nativeFlutterTextUtilsIsEmoji(int)
+io.flutter.view.AccessibilityBridge$TextDirection: io.flutter.view.AccessibilityBridge$TextDirection valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void dispatchEmptyPlatformMessage(java.lang.String,int)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorView: android.graphics.Matrix getPlatformViewMatrix()
+com.bugsnag.android.Breadcrumb: Breadcrumb(com.bugsnag.android.BreadcrumbInternal,com.bugsnag.android.Logger)
+io.flutter.embedding.android.FlutterSplashView$SavedState: android.os.Bundle splashScreenState
+io.flutter.embedding.engine.FlutterJNI: void nativeSetViewportMetrics(long,float,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int)
+io.flutter.embedding.android.FlutterSplashView$SavedState
+io.flutter.embedding.engine.FlutterJNI: boolean initCalled
+io.flutter.embedding.engine.FlutterJNI: android.graphics.Bitmap nativeGetBitmap(long)
+io.flutter.embedding.android.RenderMode: io.flutter.embedding.android.RenderMode[] values()
+com.bugsnag.android.NdkPlugin: void performOneTimeSetup(com.bugsnag.android.Client)
+com.bugsnag.android.NativeInterface: void setUser(java.lang.String,java.lang.String,java.lang.String)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType STATE
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SoundType: io.flutter.embedding.engine.systemchannels.PlatformChannel$SoundType valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: boolean nativeFlutterTextUtilsIsEmojiModifier(int)
+io.flutter.embedding.engine.FlutterJNI: void setAccessibilityFeatures(int)
+androidx.versionedparcelable.ParcelImpl
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: int overlayInsetTypes
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType DART
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$UnknownNumberParsing: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$UnknownNumberParsing valueOf(java.lang.String)
+io.flutter.embedding.android.FlutterSplashView$SavedState: android.os.Parcelable$Creator CREATOR
+io.flutter.view.AccessibilityBridge$AccessibilityFeature: io.flutter.view.AccessibilityBridge$AccessibilityFeature[] values()
+androidx.activity.ComponentActivity$3
+com.bugsnag.android.ErrorType
+com.bugsnag.android.NativeInterface: java.nio.charset.Charset UTF8Charset
+io.flutter.embedding.engine.FlutterJNI: void nativeOnVsync(long,long,long)
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.SingleViewPresentation$PresentationState state
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_RESUME
+io.flutter.embedding.engine.FlutterJNI: void asyncWaitForVsync(long)
+androidx.core.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+com.bugsnag.android.NativeInterface: void setUser(byte[],byte[],byte[])
+com.bugsnag.android.Breadcrumb: void logNull(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void dispatchSemanticsAction(int,io.flutter.view.AccessibilityBridge$Action)
+com.bugsnag.android.BaseObservable: void updateState(com.bugsnag.android.StateEvent)
+io.flutter.embedding.engine.FlutterJNI: void markTextureFrameAvailable(long)
+com.bugsnag.android.NativeStackframe
+androidx.lifecycle.CompositeGeneratedAdaptersObserver
+com.bugsnag.android.ndk.NativeBridge: void addFeatureFlag(java.lang.String,java.lang.String)
+io.flutter.view.AccessibilityViewEmbedder: android.util.SparseArray flutterIdToOrigin
+io.flutter.embedding.engine.FlutterJNI: void setSemanticsEnabled(boolean)
+io.flutter.embedding.engine.FlutterJNI: boolean setRefreshRateFPSCalled
+com.bugsnag.android.NdkPlugin: java.util.Map getCurrentNativeApiCallUsage()
+io.flutter.embedding.engine.FlutterJNI: void setRefreshRateFPS(float)
+com.bugsnag.android.ndk.NativeBridge: void updateLastRunInfo(int)
+io.flutter.embedding.engine.FlutterJNI: void onDisplayPlatformView(int,int,int,int,int,int,int,io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack)
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_STOP
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: void pushClipRect(int,int,int,int)
+io.flutter.embedding.android.FlutterView$ZeroSides: io.flutter.embedding.android.FlutterView$ZeroSides valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void loadDartDeferredLibrary(int,java.lang.String[])
+io.flutter.embedding.android.FlutterSurfaceView: io.flutter.embedding.engine.renderer.FlutterRenderer getAttachedRenderer()
+com.bugsnag.android.BreadcrumbState
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: void pushTransform(float[])
+com.bugsnag.android.Breadcrumb: com.bugsnag.android.BreadcrumbInternal impl
+io.flutter.plugin.platform.SingleViewPresentation: boolean startFocused
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.FlutterJNI spawn(java.lang.String,java.lang.String)
+com.bugsnag.android.BreadcrumbState: com.bugsnag.android.CallbackState callbackState
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Client client
+com.bugsnag.android.ndk.NativeBridge: void notifyAddCallback(java.lang.String)
+com.bugsnag.android.NativeStackframe: java.lang.Long loadAddress
+io.flutter.embedding.android.FlutterImageView$SurfaceKind: io.flutter.embedding.android.FlutterImageView$SurfaceKind valueOf(java.lang.String)
+com.bugsnag.android.Breadcrumb: java.util.Map getMetadata()
+com.bugsnag.android.ndk.NativeBridge: void clearMetadataTab(java.lang.String)
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType PROCESS
+com.bugsnag.android.NativeInterface: java.io.File getNativeReportPath(java.io.File)
+io.flutter.plugins.GeneratedPluginRegistrant: void registerWith(io.flutter.embedding.engine.FlutterEngine)
+io.flutter.plugin.platform.SingleViewPresentation: android.view.View$OnFocusChangeListener focusChangeListener
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: FlutterMutatorsStack()
+io.flutter.plugins.GeneratedPluginRegistrant: java.lang.String TAG
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType MANUAL
+com.bugsnag.android.Breadcrumb: Breadcrumb(java.lang.String,com.bugsnag.android.Logger)
+com.bugsnag.android.ndk.NativeBridge: java.util.Map getCurrentNativeApiCallUsage()
+com.bugsnag.android.ndk.NativeBridge: void addUnhandledEvent()
+com.bugsnag.android.NativeInterface: void registerSession(long,java.lang.String,int,int)
+io.flutter.plugin.platform.SingleViewPresentation: SingleViewPresentation(android.content.Context,android.view.Display,io.flutter.plugin.platform.PlatformViewFactory,io.flutter.plugin.platform.AccessibilityEventsDelegate,int,java.lang.Object,android.view.View$OnFocusChangeListener)
+io.flutter.embedding.engine.FlutterJNI: long performNativeAttach(io.flutter.embedding.engine.FlutterJNI,boolean)
+io.flutter.plugin.platform.SingleViewPresentation
+com.bugsnag.android.AnrPlugin: void setUnwindFunction(long)
+io.flutter.view.AccessibilityViewEmbedder: android.view.accessibility.AccessibilityNodeInfo getRootNode(android.view.View,int,android.graphics.Rect)
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.FlutterJNI$AccessibilityDelegate accessibilityDelegate
+io.flutter.embedding.engine.FlutterJNI: io.flutter.plugin.localization.LocalizationPlugin localizationPlugin
+io.flutter.view.AccessibilityBridge$StringAttributeType: io.flutter.view.AccessibilityBridge$StringAttributeType[] values()
+io.flutter.embedding.android.FlutterSplashView$SavedState: android.os.Bundle access$702(io.flutter.embedding.android.FlutterSplashView$SavedState,android.os.Bundle)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean needsSave
+io.flutter.embedding.engine.FlutterJNI: io.flutter.embedding.engine.FlutterJNI$AsyncWaitForVsyncDelegate asyncWaitForVsyncDelegate
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event[] values()
+com.bugsnag.android.AnrPlugin: java.lang.String ANR_ERROR_MSG
+io.flutter.embedding.android.TransparencyMode: io.flutter.embedding.android.TransparencyMode valueOf(java.lang.String)
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: SurfaceTextureWrapper(android.graphics.SurfaceTexture)
+io.flutter.embedding.engine.FlutterJNI: void nativeMarkTextureFrameAvailable(long,long)
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorView
+io.flutter.embedding.engine.FlutterOverlaySurface: android.view.Surface getSurface()
+io.flutter.embedding.engine.FlutterJNI: void onPreEngineRestart()
+io.flutter.embedding.android.FlutterView$ZeroSides: io.flutter.embedding.android.FlutterView$ZeroSides[] values()
+io.flutter.embedding.engine.FlutterJNI: void nativeRegisterTexture(long,long,io.flutter.embedding.engine.renderer.SurfaceTextureWrapper)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$Brightness: io.flutter.embedding.engine.systemchannels.PlatformChannel$Brightness[] values()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.View view
+com.bugsnag.android.ErrorType: java.lang.String getDesc$bugsnag_android_core_release()
+com.bugsnag.android.Breadcrumb: void setType(com.bugsnag.android.BreadcrumbType)
+io.flutter.plugin.platform.SingleViewPresentation: void onCreate(android.os.Bundle)
+io.flutter.view.AccessibilityBridge$Action: io.flutter.view.AccessibilityBridge$Action valueOf(java.lang.String)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean animating
+com.bugsnag.android.TaskType: com.bugsnag.android.TaskType valueOf(java.lang.String)
+io.flutter.embedding.engine.systemchannels.TextInputChannel$TextInputType: io.flutter.embedding.engine.systemchannels.TextInputChannel$TextInputType valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: android.graphics.Bitmap decodeImage(java.nio.ByteBuffer,long)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback: void onPrepare(android.view.WindowInsetsAnimation)
+com.bugsnag.android.NdkPlugin: void disableCrashReporting()
+io.flutter.embedding.engine.FlutterJNI: void nativeDispatchPointerDataPacket(long,java.nio.ByteBuffer,int)
+io.flutter.view.AccessibilityViewEmbedder: android.view.View platformViewOfNode(int)
+com.bugsnag.android.NdkPlugin
+com.bugsnag.android.NativeInterface: com.bugsnag.android.Client getClient()
+com.bugsnag.android.ndk.NativeBridge
+com.bugsnag.android.ndk.NativeBridge: boolean is32bit()
+com.bugsnag.android.NdkPlugin: long getSignalUnwindStackFunction()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.View access$600(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+com.bugsnag.android.NativeInterface: java.io.File getPersistenceDirectory()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$InsetsListener insetsListener
+io.flutter.view.AccessibilityBridge$Action: io.flutter.view.AccessibilityBridge$Action[] values()
+io.flutter.embedding.android.FlutterView: io.flutter.embedding.engine.FlutterEngine getAttachedFlutterEngine()
+com.bugsnag.android.NativeInterface: void deepMerge(java.util.Map,java.util.Map)
+io.flutter.view.AccessibilityViewEmbedder: void setFlutterNodeParent(android.view.accessibility.AccessibilityNodeInfo,android.view.View,android.view.accessibility.AccessibilityNodeInfo)
+io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference: androidx.lifecycle.Lifecycle getLifecycle()
+io.flutter.embedding.android.FlutterSurfaceView
+com.bugsnag.android.DeliveryStatus: com.bugsnag.android.DeliveryStatus valueOf(java.lang.String)
+com.bugsnag.android.Severity: com.bugsnag.android.Severity$Companion Companion
+androidx.fragment.app.Fragment$2
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.NdkPlugin$Companion Companion
+io.flutter.embedding.engine.FlutterJNI: void nativeDispatchPlatformMessage(long,java.lang.String,java.nio.ByteBuffer,int,int)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$ClipboardContentFormat: io.flutter.embedding.engine.systemchannels.PlatformChannel$ClipboardContentFormat[] values()
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType NAVIGATION
+io.flutter.view.FlutterCallbackInformation: java.lang.String callbackLibraryPath
+com.bugsnag.android.AnrPlugin: java.util.concurrent.atomic.AtomicBoolean oneTimeSetupPerformed
+com.bugsnag.android.ThreadType: com.bugsnag.android.ThreadType valueOf(java.lang.String)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: ImeSyncDeferringInsetsCallback(android.view.View,int,int)
+io.flutter.view.AccessibilityBridge$Flag: io.flutter.view.AccessibilityBridge$Flag[] values()
+com.bugsnag.android.ndk.NativeBridge: java.lang.String makeSafe(java.lang.String)
+com.bugsnag.android.NativeInterface: void notify(java.lang.String,java.lang.String,com.bugsnag.android.Severity,com.bugsnag.android.NativeStackframe[])
+io.flutter.embedding.engine.FlutterJNI: void nativeImageHeaderCallback(long,int,int)
+io.flutter.view.AccessibilityViewEmbedder: java.util.Map embeddedViewToDisplayBounds
+io.flutter.embedding.android.FlutterTextureView: io.flutter.embedding.engine.renderer.FlutterRenderer getAttachedRenderer()
+io.flutter.embedding.engine.FlutterJNI: void nativeDestroy(long)
+io.flutter.embedding.engine.FlutterJNI: void nativeSetAccessibilityFeatures(long,int)
+com.bugsnag.android.AnrPlugin: com.bugsnag.android.AnrDetailsCollector collector
+com.bugsnag.android.ndk.NativeBridge: void addBreadcrumb(java.lang.String,java.lang.String,java.lang.String,java.lang.Object)
+io.flutter.view.AccessibilityViewEmbedder: java.lang.Integer getRecordFlutterId(android.view.View,android.view.accessibility.AccessibilityRecord)
+io.flutter.plugin.platform.SingleViewPresentation: SingleViewPresentation(android.content.Context,android.view.Display,io.flutter.plugin.platform.AccessibilityEventsDelegate,io.flutter.plugin.platform.SingleViewPresentation$PresentationState,android.view.View$OnFocusChangeListener,boolean)
+io.flutter.embedding.android.FlutterSplashView$SavedState: java.lang.String access$602(io.flutter.embedding.android.FlutterSplashView$SavedState,java.lang.String)
+com.bugsnag.examples.flutter.MainActivity: MainActivity()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback: ImeSyncDeferringInsetsCallback$AnimationCallback(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback)
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.AccessibilityEventsDelegate accessibilityEventsDelegate
+com.bugsnag.android.NativeStackframe: void setSymbolAddress(java.lang.Long)
+com.bugsnag.android.NativeStackframe: java.lang.Boolean isPC()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: android.graphics.SurfaceTexture surfaceTexture
+com.bugsnag.android.ndk.NativeBridge: void addMetadataBoolean(java.lang.String,java.lang.String,boolean)
+io.flutter.embedding.engine.FlutterJNI: void ensureNotAttachedToNative()
+com.bugsnag.android.BaseObservable: BaseObservable()
+io.flutter.embedding.android.FlutterSplashView$SavedState: FlutterSplashView$SavedState(android.os.Parcelable)
+io.flutter.embedding.engine.systemchannels.SettingsChannel$PlatformBrightness: io.flutter.embedding.engine.systemchannels.SettingsChannel$PlatformBrightness[] values()
+com.bugsnag.android.BreadcrumbState: int maxBreadcrumbs
+com.bugsnag.android.NativeStackframe: com.bugsnag.android.ErrorType getType()
+com.bugsnag.android.Severity: void toStream(com.bugsnag.android.JsonStream)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$Brightness: io.flutter.embedding.engine.systemchannels.PlatformChannel$Brightness valueOf(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: void updateUserEmail(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void prefetchDefaultFontManager()
+io.flutter.embedding.engine.FlutterJNI: void loadLibrary()
+io.flutter.plugin.platform.SingleViewPresentation: int viewId
+io.flutter.embedding.engine.FlutterJNI: void notifyLowMemoryWarning()
+io.flutter.embedding.engine.FlutterJNI: float refreshRateFPS
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: void release()
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.SingleViewPresentation$AccessibilityDelegatingFrameLayout rootView
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_ANY
+io.flutter.view.AccessibilityViewEmbedder: android.view.accessibility.AccessibilityNodeInfo convertToFlutterNode(android.view.accessibility.AccessibilityNodeInfo,int,android.view.View)
+io.flutter.plugin.platform.SingleViewPresentation: io.flutter.plugin.platform.PlatformView getView()
+io.flutter.plugin.editing.TextInputPlugin$InputTarget$Type: io.flutter.plugin.editing.TextInputPlugin$InputTarget$Type valueOf(java.lang.String)
+com.bugsnag.android.ndk.NativeBridge: void deliverReportAtPath(java.lang.String)
+io.flutter.embedding.android.FlutterSplashView$SavedState: FlutterSplashView$SavedState(android.os.Parcel)
+io.flutter.embedding.engine.FlutterJNI: void nativeSurfaceDestroyed(long)
+com.bugsnag.android.ndk.NativeBridge: void updateInForeground(boolean,java.lang.String)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: android.view.View access$602(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback,android.view.View)
+io.flutter.plugin.platform.SingleViewPresentation: android.content.Context outerContext
+io.flutter.embedding.engine.FlutterJNI: boolean nativeFlutterTextUtilsIsEmojiModifierBase(int)
+io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+io.flutter.embedding.engine.mutatorsstack.FlutterMutatorsStack: void pushClipRRect(int,int,int,int,float[])
+android.support.v4.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.ndk.NativeBridge: void clearFeatureFlags()
+com.bugsnag.android.NativeInterface: java.lang.String getContext()
+io.flutter.embedding.engine.systemchannels.TextInputChannel$TextInputType: io.flutter.embedding.engine.systemchannels.TextInputChannel$TextInputType[] values()
+com.bugsnag.android.NdkPlugin: void load(com.bugsnag.android.Client)
+io.flutter.embedding.engine.FlutterJNI: boolean nativeGetIsSoftwareRenderingEnabled()
+io.flutter.embedding.engine.FlutterJNI: void nativeDispatchEmptyPlatformMessage(long,java.lang.String,int)
+com.bugsnag.android.ndk.NativeBridge: void clearFeatureFlag(java.lang.String)
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType ANDROID
+com.bugsnag.android.Breadcrumb: void setMessage(java.lang.String)
+com.bugsnag.android.ErrorType: com.bugsnag.android.ErrorType C
+com.bugsnag.android.DeliveryStatus: com.bugsnag.android.DeliveryStatus[] values()
+com.bugsnag.android.ndk.NativeBridge: void updateIsLaunching(boolean)
+io.flutter.embedding.engine.FlutterJNI: FlutterJNI()
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiOverlay: io.flutter.embedding.engine.systemchannels.PlatformChannel$SystemUiOverlay valueOf(java.lang.String)
+io.flutter.embedding.android.FlutterSplashView$SavedState: void writeToParcel(android.os.Parcel,int)
+com.bugsnag.android.BreadcrumbState: com.bugsnag.android.Logger logger
+io.flutter.plugin.platform.SingleViewPresentation: java.lang.Object createParams
+io.flutter.embedding.android.FlutterTextureView
+com.bugsnag.android.BreadcrumbType: com.bugsnag.android.BreadcrumbType[] values()
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: int deferredInsetTypes
+io.flutter.embedding.engine.FlutterJNI: void onDisplayOverlaySurface(int,int,int,int,int)
+com.bugsnag.android.AnrPlugin: com.bugsnag.android.LibraryLoader libraryLoader
+io.flutter.embedding.engine.FlutterJNI: void setPlatformViewsController(io.flutter.plugin.platform.PlatformViewsController)
+androidx.core.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+com.bugsnag.android.NativeInterface: java.util.List getBreadcrumbs()
+io.flutter.embedding.engine.FlutterJNI: void dispatchSemanticsAction(int,io.flutter.view.AccessibilityBridge$Action,java.lang.Object)
+com.bugsnag.android.ndk.NativeBridge: void deliverPendingReports()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: void detachFromGLContext()
+io.flutter.embedding.engine.FlutterJNI: void nativeDeferredComponentInstallFailure(int,java.lang.String,boolean)
+io.flutter.embedding.engine.systemchannels.TextInputChannel$TextCapitalization: io.flutter.embedding.engine.systemchannels.TextInputChannel$TextCapitalization valueOf(java.lang.String)
+com.bugsnag.android.NativeInterface: void setAutoNotify(boolean)
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$DoublePrecision: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$DoublePrecision valueOf(java.lang.String)
+io.flutter.embedding.engine.FlutterJNI: void addIsDisplayingFlutterUiListener(io.flutter.embedding.engine.renderer.FlutterUiDisplayListener)
+io.flutter.embedding.engine.FlutterJNI: void destroyOverlaySurfaces()
+com.bugsnag.android.Breadcrumb: void setMetadata(java.util.Map)
+io.flutter.embedding.engine.FlutterJNI: void removeEngineLifecycleListener(io.flutter.embedding.engine.FlutterEngine$EngineLifecycleListener)
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event[] $VALUES
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.NdkPlugin$Companion access$Companion()
+com.bugsnag.android.Breadcrumb: java.lang.String getStringTimestamp()
+com.bugsnag.android.Breadcrumb: com.bugsnag.android.Logger logger
+io.flutter.view.AccessibilityViewEmbedder: boolean requestSendAccessibilityEvent(android.view.View,android.view.View,android.view.accessibility.AccessibilityEvent)
+io.flutter.embedding.engine.FlutterJNI: void nativeSurfaceCreated(long,android.view.Surface)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback$AnimationCallback: io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback this$0
+io.flutter.embedding.engine.FlutterJNI: void onSurfaceCreated(android.view.Surface)
+com.bugsnag.android.repackaged.dslplatform.json.JsonReader$UnknownNumberParsing: com.bugsnag.android.repackaged.dslplatform.json.JsonReader$UnknownNumberParsing[] values()
+com.bugsnag.android.ndk.NativeBridge: void updateUserId(java.lang.String)
+com.bugsnag.android.Breadcrumb: java.util.Date getTimestamp()
+androidx.activity.ImmLeaksCleaner
+io.flutter.embedding.engine.systemchannels.PlatformChannel$SoundType: io.flutter.embedding.engine.systemchannels.PlatformChannel$SoundType[] values()
+com.bugsnag.android.BaseObservable: java.util.concurrent.CopyOnWriteArrayList observers
+io.flutter.embedding.engine.FlutterJNI: void onEndFrame()
+io.flutter.embedding.engine.FlutterJNI: java.lang.Long nativeShellHolderId
+com.bugsnag.android.Severity: com.bugsnag.android.Severity[] $VALUES
+io.flutter.view.AccessibilityViewEmbedder: void addChildrenToFlutterNode(android.view.accessibility.AccessibilityNodeInfo,android.view.View,android.view.accessibility.AccessibilityNodeInfo)
+io.flutter.embedding.engine.FlutterJNI: void nativeSurfaceWindowChanged(long,android.view.Surface)
+io.flutter.embedding.engine.systemchannels.PlatformChannel$DeviceOrientation: io.flutter.embedding.engine.systemchannels.PlatformChannel$DeviceOrientation valueOf(java.lang.String)
+io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback: boolean access$302(io.flutter.plugin.editing.ImeSyncDeferringInsetsCallback,boolean)
+com.bugsnag.android.NdkPlugin: com.bugsnag.android.ndk.NativeBridge getNativeBridge()
+com.bugsnag.android.AnrPlugin: void enableAnrReporting()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: void updateTexImage()
+io.flutter.embedding.engine.systemchannels.SettingsChannel$PlatformBrightness: io.flutter.embedding.engine.systemchannels.SettingsChannel$PlatformBrightness valueOf(java.lang.String)
+com.bugsnag.android.BreadcrumbState: int validIndexMask
+android.support.v4.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()
+androidx.core.graphics.drawable.IconCompatParcelizer
+io.flutter.view.FlutterCallbackInformation: io.flutter.view.FlutterCallbackInformation lookupCallbackInformation(long)
+com.bugsnag.android.NativeInterface: java.lang.String getSessionEndpoint()
+io.flutter.embedding.engine.renderer.SurfaceTextureWrapper: boolean released
+androidx.core.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()

@@ -204,12 +204,20 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
 		return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
 	}
 
-	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile)
+	fileNameRegex := regexp.MustCompile(`^.*[\\/]`)
+	fileName := fileNameRegex.ReplaceAllString(symbolFile, "")
+
+	archRegex := regexp.MustCompile(`^[^_]*-`)
+	arch := archRegex.ReplaceAllString(fileName, "")
+
+	archRegex = regexp.MustCompile(`\.[^.]*$`)
+	arch = archRegex.ReplaceAllString(arch, "")
+
+	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile, "--arch", arch)
 	output, _ := cmd.CombinedOutput()
 	outputArray := strings.Fields(string(output))
 
 	uuidArray[outputArray[2]] = outputArray[1]
-	uuidArray[outputArray[6]] = outputArray[5]
 
 	for key, value := range uuidArray {
 		uuidArch := strings.Replace(key, "(", "", -1)

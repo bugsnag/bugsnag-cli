@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/layout-v21/notification_action_tombstone.xml",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/layout-v21/notification_action_tombstone.xml"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/layout-v21/notification_template_custom_big.xml",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/layout-v21/notification_template_icon_group.xml",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/examples/flutter/build/bugsnag_flutter/intermediates/res/merged/release/layout-v21/notification_action.xml",
+        "source": "/Users/administrator/.gradle/caches/transforms-2/files-2.1/5333129088c549fb5c349f1a3efe9cb3/core-1.1.0/res/layout-v21/notification_action.xml"
+    }
+]
