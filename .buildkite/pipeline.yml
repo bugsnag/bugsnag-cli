@@ -3,7 +3,6 @@ agents:
 
 steps:
   - label: Build CLI Binaries
-    key: build
     commands:
       - make build-all
     plugins:
@@ -14,4 +13,10 @@ steps:
   - label: Unit Test
     commands:
       - make unit-test
-    depends_on: build
+
+- label: E2E Test
+  commands:
+    - bin/bugsnag-cli-amd64-darwin --help
+  plugins:
+    artifacts#v1.5.0:
+      download: "bin/bugsnag-cli-amd64-darwin"
