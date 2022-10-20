@@ -1,6 +1,0 @@
-io/flutter/plugins/GeneratedPluginRegistrant.java
- io.flutter.plugins.GeneratedPluginRegistrant
-com/bugsnag/examples/flutter/BuildConfig.java
- com.bugsnag.examples.flutter.BuildConfig
-com/bugsnag/examples/flutter/MainActivity.java
- com.bugsnag.examples.flutter.MainActivity

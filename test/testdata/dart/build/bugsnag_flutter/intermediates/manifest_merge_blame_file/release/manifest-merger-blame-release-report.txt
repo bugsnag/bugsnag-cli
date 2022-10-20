@@ -1,8 +1,0 @@
-1<?xml version="1.0" encoding="utf-8"?>
-2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.bugsnag.flutter" >
-4
-5    <uses-sdk android:minSdkVersion="14" />
-5-->/Users/administrator/buildkite-agent/builds/ms-arm-12-5-1/bugsnag/bugsnag-flutter/packages/bugsnag_flutter/android/src/main/AndroidManifest.xml
-6
-7</manifest>
