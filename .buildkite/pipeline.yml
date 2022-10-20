@@ -19,6 +19,7 @@ steps:
     depends_on: build
     commands:
       - chmod +x bin/bugsnag-cli-amd64-darwin
+      - bundle install
       - bin/bugsnag-cli-amd64-darwin --help
     plugins:
       artifacts#v1.5.0:
