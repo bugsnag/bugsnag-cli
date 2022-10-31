@@ -1,18 +1,30 @@
 agents:
-  queue: ms-arm-12-8
+  queue: macos-12-arm
 
 steps:
-  - label: Build CLI Binary
+  - label: Build CLI Binaries
+    key: build
     commands:
       - make build-all
     plugins:
       artifacts#v1.5.0:
-        upload: "build/*"
+        upload:
+          - bin/*
 
-  - label: Run CLI Tests
+  # Unit Test
+  - label: Unit Test
     commands:
+      - make unit-test
+
+  - label: E2E Test
+    depends_on: build
+    commands:
+      - chmod +x bin/bugsnag-cli-arm64-darwin
       - bundle install
       - bundle exec maze-runner
     plugins:
       artifacts#v1.5.0:
-        download: "build/*"
+        download:
+          - bin/bugsnag-cli-arm64-darwin
+        upload:
+          - maze_output/**/*

@@ -3,23 +3,24 @@ package upload
 import (
 	"debug/elf"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/server"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 type DartSymbol struct {
-	Path             []string `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
-	AppVersion       string   `help:"(optional) the version of the application."`
-	AppVersionCode   string   `help:"(optional) the version code for the application (Android only)."`
-	AppBundleVersion string   `help:"(optional) the bundle version for the application (iOS only)."`
-	IosAppPath       string   `help:"(optional) the path to the built IOS app."`
+	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
+	AppVersion       string            `help:"(optional) the version of the application."`
+	AppVersionCode   string            `help:"(optional) the version code for the application (Android only)."`
+	AppBundleVersion string            `help:"(optional) the bundle version for the application (iOS only)."`
+	IosAppPath       string            `help:"(optional) the path to the built IOS app."`
 }
 
 func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
@@ -203,12 +204,20 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
 		return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
 	}
 
-	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile)
+	fileNameRegex := regexp.MustCompile(`^.*[\\/]`)
+	fileName := fileNameRegex.ReplaceAllString(symbolFile, "")
+
+	archRegex := regexp.MustCompile(`^[^_]*-`)
+	arch := archRegex.ReplaceAllString(fileName, "")
+
+	archRegex = regexp.MustCompile(`\.[^.]*$`)
+	arch = archRegex.ReplaceAllString(arch, "")
+
+	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile, "--arch", arch)
 	output, _ := cmd.CombinedOutput()
 	outputArray := strings.Fields(string(output))
 
 	uuidArray[outputArray[2]] = outputArray[1]
-	uuidArray[outputArray[6]] = outputArray[5]
 
 	for key, value := range uuidArray {
 		uuidArch := strings.Replace(key, "(", "", -1)
