@@ -146,8 +146,7 @@ func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite b
 // GetIosAppPath - Gets the base path to the built IOS app
 func GetIosAppPath(symbolFile string) (string, error) {
 	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
-	basePath := filepath.Join(sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos/")
-
+	basePath := filepath.Join(sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos")
 	files, err := ioutil.ReadDir(basePath)
 
 	if err != nil {
@@ -156,7 +155,7 @@ func GetIosAppPath(symbolFile string) (string, error) {
 
 	for _, file := range files {
 		if strings.Contains(file.Name(), ".app") && file.IsDir() {
-			iosAppPath := filepath.Join(basePath + file.Name() + "/Frameworks/App.framework/App")
+			iosAppPath := filepath.Join(basePath + "/" + file.Name() + "/Frameworks/App.framework/App")
 			return iosAppPath, nil
 		}
 	}

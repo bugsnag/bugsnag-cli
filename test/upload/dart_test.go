@@ -3,7 +3,7 @@ package upload_testing
 import (
 	"log"
 	"os"
-	"path/filepath"
+	"regexp"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
@@ -12,18 +12,19 @@ import (
 
 func GetBasePath() string {
 	path, err := os.Getwd()
-
 	if err != nil {
 		log.Println(err)
 	}
 
-	return filepath.Base(path)
+	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
+	basePath := sampleRegexp.ReplaceAllString(path, "")
+
+	return basePath
 }
 
 func TestReadElfBuildId(t *testing.T) {
 	t.Log("Testing getting a build ID from an ELF file")
 	results, err := upload.ReadElfBuildId(GetBasePath() + "/test/testdata/dart/app-debug-info/app.android-arm64.symbols")
-
 	if err != nil {
 		t.Error(err)
 	}
