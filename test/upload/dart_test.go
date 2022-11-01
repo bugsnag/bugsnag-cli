@@ -17,10 +17,7 @@ func GetBasePath() string {
 		log.Println(err)
 	}
 
-	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
-	basePath := sampleRegexp.ReplaceAllString(path, "")
-
-	return basePath
+	return filepath.Base(path)
 }
 
 func TestReadElfBuildId(t *testing.T) {
