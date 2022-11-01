@@ -5,3 +5,4 @@ examples/**/**
 # Binary build directory
 ./bin
 
+.DS_Store
