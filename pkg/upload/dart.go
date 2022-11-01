@@ -36,7 +36,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 
 	for _, file := range fileList {
 
-		// Check if we're dealing with an android or IOS symbol file
+		// Check if we're dealing with an android or iOS symbol file
 		androidPlatform, _ := regexp.MatchString("android-([^;]*).symbols", file)
 		iosPlatform, _ := regexp.MatchString("ios-([^;]*).symbols", file)
 
