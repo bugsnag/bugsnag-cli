@@ -1,13 +1,25 @@
+require 'rbconfig'
+
+os = RbConfig::CONFIG['host_os']
+arch = RbConfig::CONFIG['host_cpu']
+
+case
+when os.downcase.include?('linux')
+  os = 'linux'
+when os.downcase.include?('darwin')
+  os = 'macos'
+end
+
 When(/^I run bugsnag-cli on mac$/) do
-  @output = `bin/bugsnag-cli-arm64-darwin 2>&1`
+  @output = `bin/#{arch}-#{os}/bugsnag-cli 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/bugsnag-cli-arm64-darwin #{flags}`
+  @output = `bin/#{arch}-#{os}/bugsnag-cli #{flags}`
 end
 
 Then(/^I should see the help banner$/) do
-  run_output.include?("Usage: bugsnag-cli-arm64-darwin <command>")
+  run_output.include?("Usage: bugsnag-cli <command>")
 end
 
 Then(/^I should see the API Key error$/) do
