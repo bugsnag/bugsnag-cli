@@ -3,6 +3,7 @@ package upload_testing
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"testing"
 
@@ -24,7 +25,7 @@ func GetBasePath() string {
 
 func TestReadElfBuildId(t *testing.T) {
 	t.Log("Testing getting a build ID from an ELF file")
-	results, err := upload.ReadElfBuildId(GetBasePath() + "/test/testdata/dart/app-debug-info/app.android-arm64.symbols")
+	results, err := upload.ReadElfBuildId(filepath.Join(GetBasePath()+ "/test/testdata/dart/app-debug-info/app.android-arm64.symbols"))
 	if err != nil {
 		t.Error(err)
 	}
