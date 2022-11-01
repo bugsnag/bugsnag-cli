@@ -1,11 +1,9 @@
 package upload
 
 import (
-	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"io"
 )
 
 type DiscoverAndUploadAny struct {
