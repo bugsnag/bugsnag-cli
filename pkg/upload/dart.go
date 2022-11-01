@@ -3,10 +3,10 @@ package upload
 import (
 	"debug/elf"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -51,48 +51,14 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := make(map[string]string)
-
-			uploadOptions["apiKey"] = apiKey
-
-			uploadOptions["buildId"] = buildId
-
-			uploadOptions["platform"] = "android"
-
-			if overwrite {
-				uploadOptions["overwrite"] = "true"
-			}
-
-			if appVersion != "" {
-				uploadOptions["appVersion"] = appVersion
-			}
-
-			if appVersionCode != "" {
-				uploadOptions["appVersionCode"] = appVersionCode
-			}
+			uploadOptions := BuildUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
 
 			fileFieldName := "symbolFile"
 
-			req, err := server.BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
 
-			if err != nil {
-				return fmt.Errorf("error building file request: %w", err)
-			}
-
-			res, err := server.SendRequest(req, timeout)
-
-			if err != nil {
-				return fmt.Errorf("error sending file request: %w", err)
-			}
-
-			b, err := io.ReadAll(res.Body)
-
-			if err != nil {
-				return fmt.Errorf("error reading body from response: %w", err)
-			}
-
-			if res.Status != "202 Accepted" {
-				return fmt.Errorf("%s : %s", res.Status, string(b))
+			if requestStatus != nil {
+				return requestStatus
 			}
 
 			log.Success(file)
@@ -112,55 +78,21 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 				}
 			}
 
-			uuid, err := DwarfDumpUuid(file, iosAppPath)
+			buildId, err := DwarfDumpUuid(file, iosAppPath)
 
 			if err != nil {
 				return err
 			}
 
 			// Build Upload options
-			uploadOptions := make(map[string]string)
-
-			uploadOptions["apiKey"] = apiKey
-
-			uploadOptions["buildId"] = uuid
-
-			uploadOptions["platform"] = "ios"
-
-			if overwrite {
-				uploadOptions["overwrite"] = "true"
-			}
-
-			if appVersion != "" {
-				uploadOptions["appVersion"] = appVersion
-			}
-
-			if appBundleVersion != "" {
-				uploadOptions["AppBundleVersion"] = appBundleVersion
-			}
+			uploadOptions := BuildUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
 
 			fileFieldName := "symbolFile"
 
-			req, err := server.BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
 
-			if err != nil {
-				return fmt.Errorf("error building file request: %w", err)
-			}
-
-			res, err := server.SendRequest(req, timeout)
-
-			if err != nil {
-				return fmt.Errorf("error sending file request: %w", err)
-			}
-
-			b, err := io.ReadAll(res.Body)
-
-			if err != nil {
-				return fmt.Errorf("error reading body from response: %w", err)
-			}
-
-			if res.Status != "202 Accepted" {
-				return fmt.Errorf("%s : %s", res.Status, string(b))
+			if requestStatus != nil {
+				return requestStatus
 			}
 
 			log.Success(file)
@@ -174,10 +106,47 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 	return nil
 }
 
+// BuildUploadOptions - Builds the upload options for processing dart files
+func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string{
+	uploadOptions := make(map[string]string)
+
+	uploadOptions["apiKey"] = apiKey
+
+	uploadOptions["buildId"] = uuid
+
+	uploadOptions["platform"] = platform
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	if platform == "ios" {
+		if appVersion != "" {
+			uploadOptions["appVersion"] = appVersion
+		}
+
+		if appExtraVersion != "" {
+			uploadOptions["AppBundleVersion"] = appExtraVersion
+		}
+	}
+
+	if platform == "android" {
+		if appVersion != "" {
+			uploadOptions["appVersion"] = appVersion
+		}
+
+		if appExtraVersion != "" {
+			uploadOptions["appVersionCode"] = appExtraVersion
+		}
+	}
+
+	return uploadOptions
+}
+
 // GetIosAppPath - Gets the base path to the built IOS app
 func GetIosAppPath(symbolFile string) (string, error) {
 	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
-	basePath := sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos/"
+	basePath := filepath.Join(sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos/")
 
 	files, err := ioutil.ReadDir(basePath)
 
@@ -187,7 +156,7 @@ func GetIosAppPath(symbolFile string) (string, error) {
 
 	for _, file := range files {
 		if strings.Contains(file.Name(), ".app") && file.IsDir() {
-			iosAppPath := basePath + file.Name() + "/Frameworks/App.framework/App"
+			iosAppPath := filepath.Join(basePath + file.Name() + "/Frameworks/App.framework/App")
 			return iosAppPath, nil
 		}
 	}
@@ -231,6 +200,7 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
 	return "", fmt.Errorf("unable to find matching UUID")
 }
 
+// ReadElfBuildId - Gets the build ID from an ELF file
 func ReadElfBuildId(path string) (string, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, 0)
 

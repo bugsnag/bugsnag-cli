@@ -50,26 +50,11 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 	}
 
 	for _, file := range fileList {
-		req, err := server.BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
 
-		if err != nil {
-			return fmt.Errorf("error building file request: %w", err)
-		}
+		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
 
-		res, err := server.SendRequest(req, timeout)
-
-		if err != nil {
-			return fmt.Errorf("error sending file request: %w", err)
-		}
-
-		b, err := io.ReadAll(res.Body)
-
-		if err != nil {
-			return fmt.Errorf("error reading body from response: %w", err)
-		}
-
-		if res.Status != "200 OK" {
-			return fmt.Errorf("%s : %s", res.Status, string(b))
+		if requestStatus != nil {
+			return requestStatus
 		}
 	}
 
