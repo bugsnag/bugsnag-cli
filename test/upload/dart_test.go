@@ -25,7 +25,7 @@ func TestReadElfBuildId(t *testing.T) {
 	results, err := upload.ReadElfBuildId(GetBasePath() + "/test/testdata/dart/app-debug-info/app.android-arm64.symbols")
 
 	if err != nil {
-		log.Println(err)
+		t.Error(err)
 	}
 
 	assert.Equal(t, results, "07cc131ca803c124e93268ce19322737", "Build Ids should be the same")
