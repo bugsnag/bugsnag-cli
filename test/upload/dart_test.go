@@ -3,7 +3,7 @@ package upload_testing
 import (
 	"log"
 	"os"
-	"regexp"
+	"path/filepath"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
