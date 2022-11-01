@@ -2,30 +2,16 @@ package upload_testing
 
 import (
 	"log"
-	"os"
 	"path/filepath"
-	"regexp"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/stretchr/testify/assert"
 )
 
-func GetBasePath() string {
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-
-	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
-	basePath := sampleRegexp.ReplaceAllString(path, "")
-
-	return basePath
-}
-
 func TestReadElfBuildId(t *testing.T) {
 	t.Log("Testing getting a build ID from an ELF file")
-	results, err := upload.ReadElfBuildId(filepath.Join(GetBasePath()+ "/test/testdata/dart/app-debug-info/app.android-arm64.symbols"))
+	results, err := upload.ReadElfBuildId(filepath.Join("../testdata/dart/app-debug-info/app.android-arm64.symbols"))
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +21,7 @@ func TestReadElfBuildId(t *testing.T) {
 
 func TestDwarfDumpUuid(t *testing.T) {
 	t.Log("Testing getting a build ID from a Dwarf file")
-	results, err := upload.DwarfDumpUuid(GetBasePath()+"/test/testdata/dart/app-debug-info/app.ios-arm64.symbols", GetBasePath()+"/test/testdata/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App")
+	results, err := upload.DwarfDumpUuid("../testdata/dart/app-debug-info/app.ios-arm64.symbols", "../testdata/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App")
 
 	if err != nil {
 		log.Println(err)
@@ -46,11 +32,11 @@ func TestDwarfDumpUuid(t *testing.T) {
 
 func TestGetIosAppPath(t *testing.T) {
 	t.Log("Testing getting the IOS app path from a given symbols path")
-	results, err := upload.GetIosAppPath(GetBasePath() + "/test/testdata/dart/app-debug-info/app.android-arm64.symbols")
+	results, err := upload.GetIosAppPath("../testdata/dart/app-debug-info/app.android-arm64.symbols")
 
 	if err != nil {
 		log.Println(err)
 	}
 
-	assert.Equal(t, results, GetBasePath()+"/test/testdata/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "They should match")
+	assert.Equal(t, results, "../testdata/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "They should match")
 }
