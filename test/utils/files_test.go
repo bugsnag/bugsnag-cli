@@ -32,7 +32,7 @@ func TestIsDir(t *testing.T) {
 
 	t.Log("Testing given path is not a directory")
 	results = utils.IsDir(GetBasePath() + "/README.md")
-	assert.Equal(t, results, false, "This should be false")
+	assert.Equal(t, results, false, "A regular file should not be a directory")
 }
 
 // TestBuildFileList - Tests the BuildFileList function
