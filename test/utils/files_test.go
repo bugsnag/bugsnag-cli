@@ -28,7 +28,7 @@ func GetBasePath() string {
 func TestIsDir(t *testing.T) {
 	t.Log("Testing given path is a directory")
 	results := utils.IsDir(GetBasePath())
-	assert.Equal(t, results, true, "This should be true")
+	assert.Equal(t, results, true, "Base path should be a directory")
 
 	t.Log("Testing given path is not a directory")
 	results = utils.IsDir(GetBasePath() + "/README.md")
