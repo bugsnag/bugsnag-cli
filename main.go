@@ -10,10 +10,11 @@ import (
 
 func main() {
 	var commands struct {
-		UploadAPIRootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-		Port             int    `help:"Port number for the upload server" default:"443"`
-		ApiKey           string `help:"Bugsnag project API key"`
-		Upload           struct {
+		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
+		Port              int    `help:"Port number for the upload server" default:"443"`
+		ApiKey            string `help:"Bugsnag project API key"`
+		FailOnUploadError bool   `help:"FailOnUploadError" default:false`
+		Upload            struct {
 
 			// shared options
 			Overwrite bool `help:"ignore existing upload with same version"`
@@ -48,8 +49,15 @@ func main() {
 
 	// Upload command
 	case "upload all <path>":
-		err := upload.All(commands.Upload.All.Path, commands.Upload.All.UploadOptions, endpoint, commands.Upload.Timeout,
-			commands.Upload.Retries, commands.Upload.Overwrite, commands.ApiKey)
+		err := upload.All(
+			commands.Upload.All.Path,
+			commands.Upload.All.UploadOptions,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey,
+			commands.FailOnUploadError)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
@@ -65,7 +73,8 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
-			commands.ApiKey)
+			commands.ApiKey,
+			commands.FailOnUploadError)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

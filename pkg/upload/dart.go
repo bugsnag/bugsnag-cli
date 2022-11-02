@@ -23,10 +23,11 @@ type DartSymbol struct {
 	IosAppPath       string            `help:"(optional) the path to the built IOS app."`
 }
 
-func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
+func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
+	numberOfFiles := len(fileList)
 
 	if err != nil {
 		log.Error("error building file list", 1)
@@ -58,10 +59,14 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
 
 			if requestStatus != nil {
-				return requestStatus
+				if numberOfFiles > 1 && failOnUploadError {
+					return requestStatus
+				} else {
+					log.Warn(requestStatus.Error())
+				}
+			} else {
+				log.Success(file)
 			}
-
-			log.Success(file)
 
 			continue
 		}
@@ -92,22 +97,25 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
 
 			if requestStatus != nil {
-				return requestStatus
+				if numberOfFiles > 1 && failOnUploadError {
+					return requestStatus
+				} else {
+					log.Warn(requestStatus.Error())
+				}
+			} else {
+				log.Success(file)
 			}
-
-			log.Success(file)
 
 			continue
 		}
 		log.Info("Skipping " + file)
-
 	}
 
 	return nil
 }
 
 // BuildUploadOptions - Builds the upload options for processing dart files
-func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string{
+func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
 	uploadOptions := make(map[string]string)
 
 	uploadOptions["apiKey"] = apiKey

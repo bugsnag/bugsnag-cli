@@ -44,7 +44,7 @@ func BuildFileRequest(url string, fieldData map[string]string, fileFieldName str
 	return request, nil
 }
 
-// SendRequest Sends request
+// SendRequest - Sends request
 func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 
 	client := &http.Client{
@@ -59,6 +59,7 @@ func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 	return response, nil
 }
 
+// ProcessRequest - Builds and sends file requests to the API
 func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldName string, file string, timeout int) error {
 	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
 
