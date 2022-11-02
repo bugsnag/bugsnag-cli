@@ -9,7 +9,7 @@ steps:
     plugins:
       artifacts#v1.5.0:
         upload:
-          - bin/*
+          - bin/**/*
 
   # Unit Test
   - label: Unit Test
