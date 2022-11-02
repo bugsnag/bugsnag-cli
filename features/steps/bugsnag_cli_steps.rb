@@ -8,6 +8,8 @@ when os.downcase.include?('linux')
   os = 'linux'
 when os.downcase.include?('darwin')
   os = 'macos'
+when os.downcase.include?('windows_nt')
+  os = 'windows'
 end
 
 When(/^I run bugsnag-cli on mac$/) do
