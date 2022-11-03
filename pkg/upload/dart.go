@@ -68,7 +68,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 
 		// Process IOS file
 		if iosPlatform {
-			log.Info("Processing IOS symbol file: " + file)
+			log.Info("Processing iOS symbol file: " + file)
 
 			if iosAppPath == "" {
 				iosAppPath, err = GetIosAppPath(file)
