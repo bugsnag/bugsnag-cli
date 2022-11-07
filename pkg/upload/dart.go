@@ -2,6 +2,7 @@ package upload
 
 import (
 	"debug/elf"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -53,9 +54,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			// Build Upload options
 			uploadOptions := BuildUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
 
-			fileFieldName := "symbolFile"
-
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
 
 			if requestStatus != nil {
 				return requestStatus
@@ -93,9 +92,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			// Build Upload options
 			uploadOptions := BuildUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
 
-			fileFieldName := "symbolFile"
-
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
 
 			if requestStatus != nil {
 				return requestStatus
@@ -210,6 +207,10 @@ func GetArchFromElfFile(symbolFile string) (string, error) {
 		arch = "armv7"
 	}
 
+	if arch == "" {
+		return "", fmt.Errorf("unable to find arch type")
+	}
+
 	return arch, nil
 }
 
@@ -226,6 +227,13 @@ func GetIosAppPath(symbolFile string) (string, error) {
 	for _, file := range files {
 		if strings.Contains(file.Name(), ".app") && file.IsDir() {
 			iosAppPath := filepath.Join(basePath + "/" + file.Name() + "/Frameworks/App.framework/App")
+
+			_, err := os.Stat(iosAppPath)
+
+			if errors.Is(err, os.ErrNotExist) {
+				return "", err
+			}
+
 			return iosAppPath, nil
 		}
 	}
@@ -236,12 +244,16 @@ func GetIosAppPath(symbolFile string) (string, error) {
 // DwarfDumpUuid - Gets the UUID/Build ID from the Dwarf debug info of a file for a given Arch
 func DwarfDumpUuid(symbolFile string, dwarfFile string, arch string) (string, error) {
 	dwarfDumpLocation, err := exec.LookPath("dwarfdump")
-	uuidArray := make(map[string]string)
 
 	if err != nil {
-		return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
+		dwarfDumpLocation, err = exec.LookPath("llvm-dwarfdump")
+
+		if err != nil {
+			return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
+		}
 	}
 
+	uuidArray := make(map[string]string)
 	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile, "--arch", arch)
 	output, _ := cmd.CombinedOutput()
 	outputArray := strings.Fields(string(output))
