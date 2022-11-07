@@ -160,7 +160,7 @@ func ReadElfFile(symbolFile string) (*elf.File, error) {
 	_elf, err := elf.NewFile(file)
 
 	if err != nil {
-		return nil, fmt.Errorf("error reading symbol file")
+		return nil, fmt.Errorf("error reading symbol file: %w", err)
 	}
 
 	return _elf, nil
