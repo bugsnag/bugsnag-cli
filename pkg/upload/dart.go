@@ -107,7 +107,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 }
 
 // BuildUploadOptions - Builds the upload options for processing dart files
-func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string{
+func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
 	uploadOptions := make(map[string]string)
 
 	uploadOptions["apiKey"] = apiKey
@@ -172,8 +172,7 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
 		return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
 	}
 
-	fileNameRegex := regexp.MustCompile(`^.*[\\/]`)
-	fileName := fileNameRegex.ReplaceAllString(symbolFile, "")
+	fileName := filepath.Base(symbolFile)
 
 	archRegex := regexp.MustCompile(`^[^_]*-`)
 	arch := archRegex.ReplaceAllString(fileName, "")
