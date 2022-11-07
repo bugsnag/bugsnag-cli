@@ -154,7 +154,7 @@ func ReadElfFile(symbolFile string) (*elf.File, error) {
 	file, err := os.OpenFile(symbolFile, os.O_RDONLY, 0)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to open file")
+		return nil, fmt.Errorf("unable to open file: %w", err)
 	}
 
 	_elf, err := elf.NewFile(file)
