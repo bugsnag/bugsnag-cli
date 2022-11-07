@@ -44,7 +44,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 		if androidPlatform {
 			log.Info("Processing android symbol file: " + file)
 
-			buildId, err := ReadElfBuildId(file)
+			buildId, err := GetBuildIdFromElfFile(file)
 
 			if err != nil {
 				return err
@@ -66,7 +66,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			continue
 		}
 
-		// Process IOS file
+		// Process iOS file
 		if iosPlatform {
 			log.Info("Processing iOS symbol file: " + file)
 
@@ -78,7 +78,13 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 				}
 			}
 
-			buildId, err := DwarfDumpUuid(file, iosAppPath)
+			arch, err := GetArchFromElfFile(file)
+
+			if err != nil {
+				return err
+			}
+
+			buildId, err := DwarfDumpUuid(file, iosAppPath, arch)
 
 			if err != nil {
 				return err
@@ -143,7 +149,71 @@ func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite b
 	return uploadOptions
 }
 
-// GetIosAppPath - Gets the base path to the built IOS app
+// ReadElfFile - Gets all data from the symbol file
+func ReadElfFile(symbolFile string) (*elf.File, error) {
+	file, err := os.OpenFile(symbolFile, os.O_RDONLY, 0)
+
+	if err != nil {
+		return nil, fmt.Errorf("unable to open file")
+	}
+
+	_elf, err := elf.NewFile(file)
+
+	if err != nil {
+		return nil, fmt.Errorf("error reading symbol file")
+	}
+
+	return _elf, nil
+}
+
+// GetBuildIdFromElfFile - Gets the build ID from the symbol file
+func GetBuildIdFromElfFile(symbolFile string) (string, error) {
+	elfData, err := ReadElfFile(symbolFile)
+
+	if err != nil {
+		return "", err
+	}
+
+	if sect := elfData.Section(".note.gnu.build-id"); sect != nil {
+		data, err := sect.Data()
+
+		if err != nil {
+			return "", fmt.Errorf("error reading symbol file")
+		}
+
+		buildId := fmt.Sprintf("%x", data[16:])
+
+		return buildId, nil
+	}
+
+	return "", fmt.Errorf("unable to find buildId")
+}
+
+// GetArchFromElfFile - Gets the Arch from the symbol file to help with getting the UUID from the built iOS app
+func GetArchFromElfFile(symbolFile string) (string, error) {
+	elfData, err := ReadElfFile(symbolFile)
+
+	if err != nil {
+		return "", err
+	}
+
+	var arch string
+
+	switch elfData.Machine.String() {
+	case "EM_AARCH64":
+		arch = "arm64"
+	case "EM_386":
+		arch = "x86"
+	case "EM_X86_64":
+		arch = "x86_64"
+	case "ARM":
+		arch = "armv7"
+	}
+
+	return arch, nil
+}
+
+// GetIosAppPath - Gets the path to the built iOS app relative to the symbol files
 func GetIosAppPath(symbolFile string) (string, error) {
 	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
 	basePath := filepath.Join(sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos")
@@ -163,22 +233,14 @@ func GetIosAppPath(symbolFile string) (string, error) {
 	return "", fmt.Errorf("unable to find iOS app path, try adding --ios-app-path")
 }
 
-// DwarfDumpUuid - Gets the UUID from the Dwarf debug info of a file
-func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
+// DwarfDumpUuid - Gets the UUID/Build ID from the Dwarf debug info of a file for a given Arch
+func DwarfDumpUuid(symbolFile string, dwarfFile string, arch string) (string, error) {
 	dwarfDumpLocation, err := exec.LookPath("dwarfdump")
 	uuidArray := make(map[string]string)
 
 	if err != nil {
 		return "", fmt.Errorf("unable to find dwarfdump on system: %w", err)
 	}
-
-	fileName := filepath.Base(symbolFile)
-
-	archRegex := regexp.MustCompile(`^[^_]*-`)
-	arch := archRegex.ReplaceAllString(fileName, "")
-
-	archRegex = regexp.MustCompile(`\.[^.]*$`)
-	arch = archRegex.ReplaceAllString(arch, "")
 
 	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile, "--arch", arch)
 	output, _ := cmd.CombinedOutput()
@@ -196,34 +258,4 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string) (string, error) {
 	}
 
 	return "", fmt.Errorf("unable to find matching UUID")
-}
-
-// ReadElfBuildId - Gets the build ID from an ELF file
-func ReadElfBuildId(path string) (string, error) {
-	file, err := os.OpenFile(path, os.O_RDONLY, 0)
-
-	if err != nil {
-		return "", fmt.Errorf("unable to open file")
-	}
-
-	elfData, err := elf.NewFile(file)
-
-	if err != nil {
-		return "", fmt.Errorf("error reading symbol file")
-	}
-
-	if sect := elfData.Section(".note.gnu.build-id"); sect != nil {
-		data, err := sect.Data()
-
-		if err != nil {
-			return "", fmt.Errorf("error reading symbol file")
-		}
-
-		buildId := fmt.Sprintf("%x", data[16:])
-
-		return buildId, nil
-
-	}
-
-	return "", fmt.Errorf("unable to find buildId")
 }
