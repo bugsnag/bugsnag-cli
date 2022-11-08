@@ -193,6 +193,9 @@ func GetArchFromElfFile(symbolFile string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	var arch string
+
 	switch elfData.Machine {
 	case elf.EM_AARCH64:
 		arch = "arm64"
