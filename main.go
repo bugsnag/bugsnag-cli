@@ -11,18 +11,18 @@ import (
 func main() {
 	var commands struct {
 		UploadAPIRootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-		Port		 int	`help:"Port number for the upload server" default:"443"`
-		ApiKey       string `help:"Bugsnag project API key"`
-		Upload       struct {
+		Port             int    `help:"Port number for the upload server" default:"443"`
+		ApiKey           string `help:"Bugsnag project API key"`
+		Upload           struct {
 
 			// shared options
-			Overwrite     bool              `help:"ignore existing upload with same version"`
-			Timeout       int               `help:"seconds to wait before failing an upload request" default:"300"`
-			Retries       int               `help:"number of retry attempts before failing a request" default:"0"`
+			Overwrite bool `help:"ignore existing upload with same version"`
+			Timeout   int  `help:"seconds to wait before failing an upload request" default:"300"`
+			Retries   int  `help:"number of retry attempts before failing a request" default:"0"`
 
 			// required options
-			All            upload.DiscoverAndUploadAny `cmd:"" help:"Find and upload any symbol files"`
-			DartSymbol     upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files" name:"dart"`
+			All        upload.DiscoverAndUploadAny `cmd:"" help:"Find and upload any symbol files"`
+			DartSymbol upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files" name:"dart"`
 		} `cmd:"" help:"Upload files"`
 	}
 
@@ -42,8 +42,7 @@ func main() {
 	// Build connection URI
 	endpoint := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
-	log.Info("uploading files to " + endpoint)
-
+	log.Info("Uploading files to: " + endpoint)
 
 	switch ctx.Command() {
 
@@ -55,14 +54,22 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-		
-	case "upload dart-symbol <path>":
-		err := upload.Dart()
+
+	case "upload dart <path>":
+		err := upload.Dart(commands.Upload.DartSymbol.Path,
+			commands.Upload.DartSymbol.AppVersion,
+			commands.Upload.DartSymbol.AppVersionCode,
+			commands.Upload.DartSymbol.AppBundleVersion,
+			commands.Upload.DartSymbol.IosAppPath,
+			endpoint+"/dart-symbol",
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
 	default:
 		println(ctx.Command())
 	}

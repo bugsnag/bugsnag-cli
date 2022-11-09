@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -56,4 +57,30 @@ func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 	}
 
 	return response, nil
+}
+
+func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldName string, file string, timeout int) error {
+	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
+
+	if err != nil {
+		return fmt.Errorf("error building file request: %w", err)
+	}
+
+	res, err := SendRequest(req, timeout)
+
+	if err != nil {
+		return fmt.Errorf("error sending file request: %w", err)
+	}
+
+	b, err := io.ReadAll(res.Body)
+
+	if err != nil {
+		return fmt.Errorf("error reading body from response: %w", err)
+	}
+
+	if res.StatusCode != 202 {
+		return fmt.Errorf("%s : %s", res.Status, string(b))
+	}
+
+	return nil
 }

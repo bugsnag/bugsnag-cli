@@ -1,5 +1,8 @@
 bugsnag-cli
 Gemfile.lock
 
+examples/**/**
 # Binary build directory
-./build
+./bin
+
+.DS_Store

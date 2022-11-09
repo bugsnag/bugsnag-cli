@@ -19,7 +19,7 @@ func FilePathWalkDir(root string) ([]string, error) {
 }
 
 // IsDir - Checks if a provided path is a directory or not
-func IsDir(path string) bool{
+func IsDir(path string) bool {
 	pathInfo, err := os.Stat(path)
 
 	return err == nil && pathInfo.IsDir()
@@ -31,7 +31,7 @@ func BuildFileList(paths []string) ([]string, error) {
 
 	for _, path := range paths {
 		if IsDir(path) {
-			log.Info("searching " + path + " for files...")
+			log.Info("Searching directory for files")
 			files, err := FilePathWalkDir(path)
 			if err != nil {
 				return nil, err

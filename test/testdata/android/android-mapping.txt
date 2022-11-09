@@ -1,0 +1,18 @@
+com.bugsnag.android.AppData -> com.bugsnag.android.a:
+    com.bugsnag.android.Configuration config -> a
+    android.content.Context appContext -> b
+    java.lang.String packageName -> c
+    java.lang.String appName -> d
+    java.lang.Integer versionCode -> e
+    java.lang.String versionName -> f
+    java.lang.String guessedReleaseStage -> g
+    38:50:void toStream(com.bugsnag.android.JsonStream) -> a
+    53:56:java.lang.String getReleaseStage() -> a
+    81:89:java.lang.String getAppName() -> b
+    98:102:java.lang.Integer getVersionCode() -> c
+    111:115:java.lang.String getVersionName() -> d
+    124:131:java.lang.String guessReleaseStage() -> e
+    7:14:void run(java.lang.Runnable) -> a
+    16:22:void closeQuietly(java.io.Closeable) -> a
+    25:28:void close(java.net.URLConnection) -> a
+    31:43:int copy(java.io.Reader,java.io.Writer) -> a
