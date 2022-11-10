@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-set -x
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
 
 # Detect the version of OS we're using
 UNAME=$(uname)
@@ -16,7 +19,7 @@ fi
 echo "Downloading $ARCH-$OS-bugsnag-cli"
 
 # Get download URL
-DOWNLOAD_URL=$(curl -s https://api.github.com/repos/joshedney/red-bucket/releases/latest | \
+DOWNLOAD_URL=$(curl -s https://api.github.com/repos/bugsnag/bugsnag-cli/releases/latest | \
 grep "$ARCH-$OS-bugsnag-cli*" | \
 grep "browser_download_url" | \
 cut -d : -f 2,3 | \
@@ -30,10 +33,4 @@ if [[ "$OS" == "linux" || "$OS" == "macos" ]]; then
   sudo mv /tmp/bugsnag-cli /usr/local/bin/bugsnag-cli
   sudo chmod +x /usr/local/bin/bugsnag-cli
   echo "bugsnag-cli added to /usr/local/bin"
-fi
-
-# Remove app from quarantine on macos
-if [ "$OS" == "macos" ]; then
-  echo "Removing file from Apple quarantine"
-  xattr -d com.apple.quarantine /usr/local/bin/bugsnag-cli
 fi
