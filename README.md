@@ -6,6 +6,8 @@
 
 Tooling to process and upload symbol files to Bugsnag.
 
+---
+
 ### Install & Update Script
 
 To **install** or **update** bugsnag-cli, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
@@ -16,9 +18,11 @@ curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/je/go-live-prep/i
 wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/je/go-live-prep/install.sh | bash
 ```
 
-Running either of the above commands downloads a script and runs it. The script downloads the latest release to `/usr/local/bin`.
+Running either of the above commands downloads the installation script and runs it on your machine. The script downloads the latest release to the following location: `/usr/local/bin`.
 
 You can also find the latest binary on the Github [releases](https://github.com/bugsnag/bugsnag-cli/releases) page.
+
+---
 
 ## Usage
 
