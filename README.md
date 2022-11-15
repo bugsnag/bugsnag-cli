@@ -1,61 +1,64 @@
 # Bugsnag CLI
 [![Build status](https://badge.buildkite.com/4c42f3d6345b14ecdc243abcf974cad0cfd9844e1b0e5f2418.svg)](https://buildkite.com/bugsnag/bugsnag-cli)
 
-
-## About
-
-Tooling to process and upload symbol files to Bugsnag.
-
----
-
-### Install & Update Script
+## Installation
 
 To **install** or **update** bugsnag-cli, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
 ```sh
-curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/je/go-live-prep/install.sh | bash
+curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
 ```
 ```sh
-wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/je/go-live-prep/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
 ```
 
 Running either of the above commands downloads the installation script and runs it on your machine. The script downloads the latest release to the following location: `/usr/local/bin`.
 
 You can also find the latest binary on the Github [releases](https://github.com/bugsnag/bugsnag-cli/releases) page.
 
----
-
 ## Usage
 
-### Dart
+See the [Bugsnag docs website](https://docs.bugsnag.com/build-integrations/bugsnag-cli/) for full usage documentation.
 
-Uploads symbol files generated from Flutter to Bugsnag
-
-Example: `bugsnag-cli upload dart --api-key=YOUR_API_KEY path/to/symbol/files`
-
-Full list of options as described by `bugsnag-cli upload dart --help`
-
-```shell
-Usage: bugsnag-cli upload dart <path>
-
-Upload Dart symbol files
-
-Arguments:
-  <path>    Path to directory or file to upload
+```
+Usage: bugsnag-cli <command>
 
 Flags:
-  -h, --help                         Show context-sensitive help.
-      --upload-api-root-url="https://upload.bugsnag.com"
-                                     Bugsnag On-Premise upload server URL. Can contain port number
-      --port=443                     Port number for the upload server
-      --api-key=STRING               Bugsnag project API key
-      --fail-on-upload-error         FailOnUploadError
+  -h, --help                                                Show context-sensitive help.
+      --upload-api-root-url="https://upload.bugsnag.com"    Bugsnag On-Premise upload server URL. Can contain port number
+      --port=443                                            Port number for the upload server
+      --api-key=STRING                                      Bugsnag integration API key for this application
+      --fail-on-upload-error                                Stops the upload when a mapping file fails to upload to Bugsnag successfully
 
-      --overwrite                    ignore existing upload with same version
-      --timeout=300                  seconds to wait before failing an upload request
-      --retries=0                    number of retry attempts before failing a request
+Commands:
+  upload all <path>
+    Upload any symbol/mapping files
 
-      --app-version=STRING           (optional) the version of the application.
-      --app-version-code=STRING      (optional) the version code for the application (Android only).
-      --app-bundle-version=STRING    (optional) the bundle version for the application (iOS only).
-      --ios-app-path=STRING          (optional) the path to the built iOS app.
+  upload dart <path>
+    Process and upload symbol files for Flutter
+
+Run "bugsnag-cli <command> --help" for more information on a command.
 ```
+
+## Bugsnag On-Premise
+
+If you are using Bugsnag On-premise, you should use the `--upload-api-root-url` option to set the url of your [upload server](https://docs.bugsnag.com/on-premise/single-machine/service-ports/#bugsnag-upload-server), for example:
+
+```sh
+bugsnag-cli upload \
+  --upload-api-root-url https://bugsnag.my-company.com/
+  # ... other options
+```
+
+## Support
+
+* Check out the [documentation](https://docs.bugsnag.com/build-integrations/bugsnag-cli/)
+* [Search open and closed issues](https://github.com/bugsnag/bugsnag-cli/issues?q=+) for similar problems
+* [Report a bug or request a feature](https://github.com/bugsnag/bugsnag-cli/issues/new)
+
+## Contributing
+
+Most updates to this repo will be made by Bugsnag employees. We are unable to accommodate significant external PRs such as features additions or any large refactoring, however minor fixes are welcome. See [contributing](CONTRIBUTING.md) for more information.
+
+## License
+
+This package is free software released under the MIT License. See [LICENSE.txt](./LICENSE.txt) for details.
