@@ -79,6 +79,7 @@ get_group() {
 file_not_grpowned() {
   [[ " $(id -G "${USER}") " != *" $(get_group "$1") "* ]]
 }
+
 BUGSNAG_CLI_GIT_REMOTE="https://api.github.com/repos/bugsnag/bugsnag-cli/releases/latest"
 
 # USER isn't always set so provide a fall back for the installer and subprocesses.
@@ -108,75 +109,20 @@ ohai "This script will install:"
 echo "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
 directories=(
-  bin bin/bugsnag-cli
-)
-group_chmods=()
-for dir in "${directories[@]}"; do
-  if exists_but_not_writable "${BUGSNAG_CLI_PREFIX}/${dir}"; then
-    group_chmods+=("${BUGSNAG_CLI_PREFIX}/${dir}")
-  fi
-done
-
-directories=(
   bin
 )
+
 mkdirs=()
+
 for dir in "${directories[@]}"; do
   if ! [[ -d "${BUGSNAG_CLI_PREFIX}/${dir}" ]]; then
     mkdirs+=("${BUGSNAG_CLI_PREFIX}/${dir}")
   fi
 done
 
-chmods=()
-if [[ "${#group_chmods[@]}" -gt 0 ]]; then
-  chmods+=("${group_chmods[@]}")
-fi
-
-chowns=()
-chgrps=()
-if [[ "${#chmods[@]}" -gt 0 ]]; then
-  for dir in "${chmods[@]}"; do
-    if file_not_owned "${dir}"; then
-      chowns+=("${dir}")
-    fi
-    if file_not_grpowned "${dir}"; then
-      chgrps+=("${dir}")
-    fi
-  done
-fi
-
-if [[ "${#group_chmods[@]}" -gt 0 ]]; then
-  ohai "The following existing directories will be made group writable:"
-  printf "%s\n" "${group_chmods[@]}"
-fi
-if [[ "${#chowns[@]}" -gt 0 ]]; then
-  ohai "The following existing directories will have their owner set to ${tty_underline}${USER}${tty_reset}:"
-  printf "%s\n" "${chowns[@]}"
-fi
-if [[ "${#chgrps[@]}" -gt 0 ]]; then
-  ohai "The following existing directories will have their group set to ${tty_underline}${GROUP}${tty_reset}:"
-  printf "%s\n" "${chgrps[@]}"
-fi
 if [[ "${#mkdirs[@]}" -gt 0 ]]; then
   ohai "The following new directories will be created:"
   printf "%s\n" "${mkdirs[@]}"
-fi
-
-if [[ -d "${BUGSNAG_CLI_PREFIX}" ]]; then
-  if [[ "${#chmods[@]}" -gt 0 ]]; then
-    execute "chmod" "u+rwx" "${chmods[@]}"
-  fi
-  if [[ "${#group_chmods[@]}" -gt 0 ]]; then
-    execute "chmod" "g+rwx" "${group_chmods[@]}"
-  fi
-  if [[ "${#chowns[@]}" -gt 0 ]]; then
-    execute "chown" "${USER}" "${chowns[@]}"
-  fi
-  if [[ "${#chgrps[@]}" -gt 0 ]]; then
-    execute "chgrp" "${GROUP}" "${chgrps[@]}"
-  fi
-else
-  execute "mkdir" "-p" "${BUGSNAG_CLI_PREFIX}"
 fi
 
 if [[ "${#mkdirs[@]}" -gt 0 ]]; then
