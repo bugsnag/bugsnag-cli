@@ -48,34 +48,6 @@ exists_but_not_writable() {
   [[ -e "$1" ]] && ! [[ -r "$1" && -w "$1" && -x "$1" ]]
 }
 
-have_sudo_access() {
-  if [[ ! -x "/usr/bin/sudo" ]]; then
-    return 1
-  fi
-
-  local -a SUDO=("/usr/bin/sudo")
-  if [[ -n "${SUDO_ASKPASS-}" ]]; then
-    SUDO+=("-A")
-  elif [[ -n "${NONINTERACTIVE-}" ]]; then
-    SUDO+=("-n")
-  fi
-
-  if [[ -z "${HAVE_SUDO_ACCESS-}" ]]; then
-    if [[ -n "${NONINTERACTIVE-}" ]]; then
-      "${SUDO[@]}" -l mkdir &>/dev/null
-    else
-      "${SUDO[@]}" -v && "${SUDO[@]}" -l mkdir &>/dev/null
-    fi
-    HAVE_SUDO_ACCESS="$?"
-  fi
-
-  if [[ -n "${BUGSNAG_CLI_ON_MACOS-}" ]] && [[ "${HAVE_SUDO_ACCESS}" -ne 0 ]]; then
-    abort "Need sudo access on macOS (e.g. the user ${USER} needs to be an Administrator)!"
-  fi
-
-  return "${HAVE_SUDO_ACCESS}"
-}
-
 ohai() {
   printf "${tty_blue}==>${tty_bold} %s${tty_reset}\n" "$(shell_join "$@")"
 }
@@ -87,20 +59,6 @@ warn() {
 execute() {
   if ! "$@"; then
     abort "$(printf "Failed during: %s" "$(shell_join "$@")")"
-  fi
-}
-
-execute_sudo() {
-  local -a args=("$@")
-  if have_sudo_access; then
-    if [[ -n "${SUDO_ASKPASS-}" ]]; then
-      args=("-A" "${args[@]}")
-    fi
-    ohai "/usr/bin/sudo" "${args[@]}"
-    execute "/usr/bin/sudo" "${args[@]}"
-  else
-    ohai "${args[@]}"
-    execute "${args[@]}"
   fi
 }
 
@@ -134,72 +92,17 @@ OS="$(uname)"
 if [[ "${OS}" == "Linux" ]]; then
   BUGSNAG_CLI_ON_LINUX=1
   OS_NAME="linux"
+  GROUP="$(id -gn)"
 elif [[ "${OS}" == "Darwin" ]]; then
   BUGSNAG_CLI_ON_MACOS=1
   OS_NAME="macos"
+  GROUP="admin"
 else
   abort "This install script only works on Linux or Macos"
 fi
 
-# Get the OS and ARCH we're using
-if [[ -n "${BUGSNAG_CLI_ON_MACOS}" ]]; then
-  UNAME_MACHINE="$(/usr/bin/uname -m)"
-
-  if [[ "${UNAME_MACHINE}" == "arm64" ]]; then
-    # On ARM macOS, this script installs to /opt/bugsnag only
-    BUGSNAG_CLI_PREFIX="/opt/bugsnag"
-  else
-    # On Intel macOS, this script installs to /usr/local/bugsnag only
-    BUGSNAG_CLI_PREFIX="/usr/local/bugsnag"
-  fi
-  GROUP="admin"
-  INSTALL=("/usr/bin/install" -d -o "root" -g "wheel" -m "0755")
-else
-  UNAME_MACHINE="$(uname -m)"
-
-  # On Linux, this script installs to /usr/local/bugsnag only
-  BUGSNAG_CLI_PREFIX="/usr/local/bugsnag"
-
-  GROUP="$(id -gn)"
-  INSTALL=("/usr/bin/install" -d -o "${USER}" -g "${GROUP}" -m "0755")
-fi
-
-unset HAVE_SUDO_ACCESS # unset this from the environment
-
-# Invalidate sudo timestamp before exiting (if it wasn't active before).
-if [[ -x /usr/bin/sudo ]] && ! /usr/bin/sudo -n -v 2>/dev/null; then
-  trap '/usr/bin/sudo -k' EXIT
-fi
-
-# Things can fail later if `pwd` doesn't exist.
-# Also sudo prints a warning message for no good reason
-cd "/usr" || exit 1
-
-ohai 'Checking for `sudo` access (which may request your password)...'
-
-if [[ -n "${BUGSNAG_CLI_ON_MACOS-}" ]]; then
-  have_sudo_access
-elif
-  ! [[ -w "${BUGSNAG_CLI_PREFIX}" ]]
-  ! have_sudo_access
-then
-  abort "$(
-    cat <<EOABORT
-Insufficient permissions to install Bugsnag CLI to \"${BUGSNAG_CLI_PREFIX}\" (the default prefix).
-EOABORT
-  )"
-fi
-
-if [[ -d "${BUGSNAG_CLI_PREFIX}" && ! -x "${BUGSNAG_CLI_PREFIX}" ]]; then
-  abort "$(
-    cat <<EOABORT
-The Homebrew prefix ${tty_underline}${BUGSNAG_CLI_PREFIX}${tty_reset} exists but is not searchable.
-If this is not intentional, please restore the default permissions and
-try running the installer again:
-    sudo chmod 775 ${BUGSNAG_CLI_PREFIX}
-EOABORT
-  )"
-fi
+UNAME_MACHINE="$(uname -m)"
+BUGSNAG_CLI_PREFIX="${HOME}/.local/bugsnag"
 
 ohai "This script will install:"
 echo "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
@@ -261,26 +164,26 @@ fi
 
 if [[ -d "${BUGSNAG_CLI_PREFIX}" ]]; then
   if [[ "${#chmods[@]}" -gt 0 ]]; then
-    execute_sudo "chmod" "u+rwx" "${chmods[@]}"
+    execute "chmod" "u+rwx" "${chmods[@]}"
   fi
   if [[ "${#group_chmods[@]}" -gt 0 ]]; then
-    execute_sudo "chmod" "g+rwx" "${group_chmods[@]}"
+    execute "chmod" "g+rwx" "${group_chmods[@]}"
   fi
   if [[ "${#chowns[@]}" -gt 0 ]]; then
-    execute_sudo "chown" "${USER}" "${chowns[@]}"
+    execute "chown" "${USER}" "${chowns[@]}"
   fi
   if [[ "${#chgrps[@]}" -gt 0 ]]; then
-    execute_sudo "chgrp" "${GROUP}" "${chgrps[@]}"
+    execute "chgrp" "${GROUP}" "${chgrps[@]}"
   fi
 else
-  execute_sudo "${INSTALL[@]}" "${BUGSNAG_CLI_PREFIX}"
+  execute "mkdir" "-p" "${BUGSNAG_CLI_PREFIX}"
 fi
 
 if [[ "${#mkdirs[@]}" -gt 0 ]]; then
-  execute_sudo "mkdir" "-p" "${mkdirs[@]}"
-  execute_sudo "chmod" "ug=rwx" "${mkdirs[@]}"
-  execute_sudo "chown" "${USER}" "${mkdirs[@]}"
-  execute_sudo "chgrp" "${GROUP}" "${mkdirs[@]}"
+  execute "mkdir" "-p" "${mkdirs[@]}"
+  execute "chmod" "ug=rwx" "${mkdirs[@]}"
+  execute "chown" "${USER}" "${mkdirs[@]}"
+  execute "chgrp" "${GROUP}" "${mkdirs[@]}"
 fi
 
 ohai "Downloading and installing Bugsnag CLI..."
@@ -296,7 +199,7 @@ ohai "Downloading and installing Bugsnag CLI..."
 
   execute "curl" "-L" "--no-progress-meter" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
-  execute_sudo "chmod" "ug=rwx" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
+  execute "chmod" "ug=rwx" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
 ) ||
   exit 1
@@ -312,7 +215,6 @@ echo
 
 ring_bell
 
-ohai "Next steps:"
 case "${SHELL}" in
 */bash*)
   if [[ -r "${HOME}/.bash_profile" ]]; then
@@ -329,9 +231,9 @@ case "${SHELL}" in
   ;;
 esac
 
-# `which` is a shell function defined above.
-# shellcheck disable=SC2230
 if [[ "$(which bugsnag-cli)" != "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli" ]]; then
+  ohai "Next steps:"
+
   cat <<EOS
 - Run these three commands in your terminal to add Bugsnag CLI to your ${tty_bold}PATH${tty_reset}:
     echo "# Bugsnag CLI" >> ${shell_profile}
