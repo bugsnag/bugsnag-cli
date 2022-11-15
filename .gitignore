@@ -1,5 +1,5 @@
 bugsnag-cli
 Gemfile.lock
- bin/*
- bin/**/**
+bin/*
+bin/**/**
 .DS_Store
