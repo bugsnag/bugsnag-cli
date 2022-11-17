@@ -35,7 +35,7 @@ steps:
       - bundle install
       - bundle exec maze-runner
     agents:
-      queue: macos-12-arm
+      queue: windows-general-wsl
     plugins:
       artifacts#v1.5.0:
         download:
