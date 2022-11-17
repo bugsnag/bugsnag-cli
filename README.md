@@ -11,7 +11,7 @@ curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh
 wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
 ```
 
-Running either of the above commands downloads the installation script and runs it on your machine. The script downloads the latest release to the following location: `/usr/local/bin`.
+Running either of the above commands downloads the installation script and runs it on your machine. The script downloads the latest release to the following location: `~/.local/bugsnag`.
 
 You can also find the latest binary on the Github [releases](https://github.com/bugsnag/bugsnag-cli/releases) page.
 

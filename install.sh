@@ -143,7 +143,7 @@ ohai "Downloading and installing Bugsnag CLI..."
     tr -d \" |
     xargs)
 
-  execute "curl" "-L" "--no-progress-meter" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
+  execute "curl" "-#" "-L" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
   execute "chmod" "ug=rwx" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
