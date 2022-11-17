@@ -32,7 +32,7 @@ steps:
   - label: Windows E2E Test
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos/bugsnag-cli
+      - chmod +x bin/x86_64-windows/bugsnag-cli.exe
       - bundle install
       - bundle exec maze-runner
     agents:
