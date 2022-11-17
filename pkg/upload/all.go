@@ -8,7 +8,7 @@ import (
 
 type DiscoverAndUploadAny struct {
 	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
-	UploadOptions map[string]string `help:"additional arguments to pass to the upload request" mapsep:","`
+	UploadOptions map[string]string `help:"(optional) additional arguments to pass to the upload request" mapsep:","`
 }
 
 func All(paths []string, options map[string]string, endpoint string, timeout int, retries int, overwrite bool,

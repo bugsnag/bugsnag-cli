@@ -12,19 +12,19 @@ func main() {
 	var commands struct {
 		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
 		Port              int    `help:"Port number for the upload server" default:"443"`
-		ApiKey            string `help:"Bugsnag project API key"`
-		FailOnUploadError bool   `help:"FailOnUploadError" default:false`
+		ApiKey            string `help:"Bugsnag integration API key for this application"`
+		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
 		Upload            struct {
 
 			// shared options
-			Overwrite bool `help:"ignore existing upload with same version"`
-			Timeout   int  `help:"seconds to wait before failing an upload request" default:"300"`
-			Retries   int  `help:"number of retry attempts before failing a request" default:"0"`
+			Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
+			Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
+			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
 
 			// required options
-			All        upload.DiscoverAndUploadAny `cmd:"" help:"Find and upload any symbol files"`
-			DartSymbol upload.DartSymbol           `cmd:"" help:"Upload Dart symbol files" name:"dart"`
-		} `cmd:"" help:"Upload files"`
+			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
+			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+		} `cmd:"" help:"Upload symbol/mapping files"`
 	}
 
 	// If running without any extra arguments, default to the --help flag
