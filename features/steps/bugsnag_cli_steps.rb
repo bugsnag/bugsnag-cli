@@ -4,7 +4,7 @@ os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
 
 case
-when os.downcase.include?('windows_nt'), ENV['WSL_DISTRO_NAME'] != ''
+when os.downcase.include?('windows_nt'), ENV['WSL_DISTRO_NAME'] != nil
   os = 'windows'
   binary = 'bugsnag-cli.exe'
 when os.downcase.include?('linux')
