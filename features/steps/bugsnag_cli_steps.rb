@@ -6,18 +6,21 @@ arch = RbConfig::CONFIG['host_cpu']
 case
 when os.downcase.include?('linux')
   os = 'linux'
+  binary = 'bugsnag-cli'
 when os.downcase.include?('darwin')
   os = 'macos'
+  binary = 'bugsnag-cli'
 when os.downcase.include?('windows_nt')
   os = 'windows'
+  binary = 'bugsnag-cli.exe'
 end
 
 When(/^I run bugsnag-cli on mac$/) do
-  @output = `bin/#{arch}-#{os}/bugsnag-cli 2>&1`
+  @output = `bin/#{arch}-#{os}/#{binary} 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/#{arch}-#{os}/bugsnag-cli #{flags}`
+  @output = `bin/#{arch}-#{os}/#{binary} #{flags}`
 end
 
 Then(/^I should see the help banner$/) do
@@ -29,9 +32,9 @@ Then(/^I should see the API Key error$/) do
 end
 
 Then(/^I should see the missing path error$/) do
-  run_output.include?("bugsnag-cli-arm64-darwin: error: expected \"<path>\"")
+  run_output.include?("error: expected \"<path>\"")
 end
 
 Then(/^I should see the no such file or directory error$/) do
-  run_output.include?("bugsnag-cli-arm64-darwin: error: <path>: stat /path/to/no/file: no such file or directory")
+  run_output.include?("error: <path>: stat /path/to/no/file: no such file or directory")
 end
