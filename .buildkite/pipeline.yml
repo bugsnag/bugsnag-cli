@@ -16,7 +16,7 @@ steps:
     commands:
       - make unit-test
 
-  - label: E2E Test
+  - label: Mac E2E Test
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos/bugsnag-cli
@@ -26,5 +26,20 @@ steps:
       artifacts#v1.5.0:
         download:
           - bin/arm64-macos/bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - label: Windows E2E Test
+    depends_on: build
+    commands:
+      - chmod +x bin/x86_64-windows/bugsnag-cli.exe
+      - bundle install
+      - bundle exec maze-runner
+    agents:
+      queue: windows-general-wsl
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/x86_64-windows/bugsnag-cli.exe
         upload:
           - maze_output/**/*
