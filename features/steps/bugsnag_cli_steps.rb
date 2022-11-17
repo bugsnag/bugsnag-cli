@@ -4,15 +4,15 @@ os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
 
 case
+when os.downcase.include?('windows_nt'), ENV['WSL_DISTRO_NAME'] == 'bugsnag'
+  os = 'windows'
+  binary = 'bugsnag-cli.exe'
 when os.downcase.include?('linux')
   os = 'linux'
   binary = 'bugsnag-cli'
 when os.downcase.include?('darwin')
   os = 'macos'
   binary = 'bugsnag-cli'
-when os.downcase.include?('windows_nt')
-  os = 'windows'
-  binary = 'bugsnag-cli.exe'
 end
 
 When(/^I run bugsnag-cli on mac$/) do
