@@ -39,6 +39,6 @@ steps:
     plugins:
       artifacts#v1.5.0:
         download:
-          - bin/amd64-windows/bugsnag-cli.exe
+          - bin/x86_64-windows/bugsnag-cli.exe
         upload:
           - maze_output/**/*
