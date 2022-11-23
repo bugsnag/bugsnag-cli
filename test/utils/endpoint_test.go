@@ -1,6 +1,7 @@
 package utils_testing
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -8,19 +9,34 @@ import (
 )
 
 func TestEndpointBuilding(t *testing.T) {
-	t.Log("Testing the default endpoint")
-	results := utils.BuildEndpointUrl("", 0)
-	assert.Equal(t, results, "https://upload.bugsnag.com", "They should be the same")
+	defaultUrl := "https://upload.bugsnag.com"
+	defaultPort := 443
 
-	t.Log("Testing setting an endpoint")
-	results = utils.BuildEndpointUrl("https://localhost", 0)
-	assert.Equal(t, results, "https://localhost", "They should be the same")
+	t.Log("Testing setting an endpoint with CLI defaults")
+	results, err := utils.BuildEndpointUrl(defaultUrl, defaultPort)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, fmt.Sprintf("%s:%d", defaultUrl, defaultPort), results, "They should be the same")
 
-	t.Log("Testing setting a port")
-	results = utils.BuildEndpointUrl("", 8443)
-	assert.Equal(t, results, "https://upload.bugsnag.com:8443", "They should be the same")
+	t.Log("Testing setting a port with the CLI default URL")
+	results, err = utils.BuildEndpointUrl(defaultUrl, 8443)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, results, defaultUrl + ":8443", "They should be the same")
 
 	t.Log("Testing setting an endpoint and port")
-	results = utils.BuildEndpointUrl("https://localhost", 8443)
+	results, err = utils.BuildEndpointUrl("https://localhost", 8443)
+	if err != nil {
+		t.Error(err)
+	}
 	assert.Equal(t, results, "https://localhost:8443", "They should be the same")
+
+	t.Log("Testing setting an endpoint with a port and port")
+	results, err = utils.BuildEndpointUrl("https://localhost:1234", 8443)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, results, "https://localhost:1234", "They should be the same")
 }
