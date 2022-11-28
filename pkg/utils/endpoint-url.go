@@ -20,5 +20,5 @@ func BuildEndpointUrl(uri string, port int) (string, error) {
 		return fmt.Sprintf("%s:%d", baseUrl, port), nil
 	}
 
-	return "", nil
+	return baseUrl.String(), nil
 }

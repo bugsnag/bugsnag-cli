@@ -9,22 +9,20 @@ import (
 )
 
 func TestEndpointBuilding(t *testing.T) {
-	defaultUrl := "https://upload.bugsnag.com"
-	defaultPort := 443
 
 	t.Log("Testing setting an endpoint with CLI defaults")
-	results, err := utils.BuildEndpointUrl(defaultUrl, defaultPort)
+	results, err := utils.BuildEndpointUrl("https://upload.bugsnag.com", 443)
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, fmt.Sprintf("%s:%d", defaultUrl, defaultPort), results, "They should be the same")
+	assert.Equal(t, fmt.Sprintf("%s:%d", "https://upload.bugsnag.com", 443), results, "They should be the same")
 
 	t.Log("Testing setting a port with the CLI default URL")
-	results, err = utils.BuildEndpointUrl(defaultUrl, 8443)
+	results, err = utils.BuildEndpointUrl("https://upload.bugsnag.com", 8443)
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, results, defaultUrl + ":8443", "They should be the same")
+	assert.Equal(t, results, "https://upload.bugsnag.com" + ":8443", "They should be the same")
 
 	t.Log("Testing setting an endpoint and port")
 	results, err = utils.BuildEndpointUrl("https://localhost", 8443)
@@ -39,4 +37,11 @@ func TestEndpointBuilding(t *testing.T) {
 		t.Error(err)
 	}
 	assert.Equal(t, results, "https://localhost:1234", "They should be the same")
+
+	t.Log("Testing setting an endpoint with no port")
+	results, err = utils.BuildEndpointUrl("https://localhost", 0)
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, results, "https://localhost", "They should be the same")
 }
