@@ -9,7 +9,7 @@ func BuildEndpointUrl(uri string, port int) (string, error) {
 	baseUrl, err := url.Parse(uri)
 
 	if err != nil {
-		return "", err
+		return baseUrl.String(), err
 	}
 
 	if baseUrl.Port() != "" {
