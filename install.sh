@@ -136,12 +136,16 @@ ohai "Downloading and installing Bugsnag CLI..."
 (
   cd "${BUGSNAG_CLI_PREFIX}" >/dev/null || return
 
-  DOWNLOAD_URL=$(curl -sS --no-progress-meter ${BUGSNAG_CLI_GIT_REMOTE} |
+  DOWNLOAD_URL=$(curl -sS ${BUGSNAG_CLI_GIT_REMOTE} |
     grep "${UNAME_MACHINE}-${OS_NAME}-bugsnag-cli*" |
     grep "browser_download_url" |
     cut -d : -f 2,3 |
     tr -d \" |
     xargs)
+
+  if [[ ! -n ${DOWNLOAD_URL} ]]; then
+    abort "Failed to get download URL from ${BUGSNAG_CLI_GIT_REMOTE}"
+  fi
 
   execute "curl" "-#" "-L" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
