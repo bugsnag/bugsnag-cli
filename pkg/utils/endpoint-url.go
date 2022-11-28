@@ -1,20 +1,24 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
-func BuildEndpointUrl(url string, port int) string {
+func BuildEndpointUrl(uri string, port int) (string, error) {
+	baseUrl, err := url.Parse(uri)
 
-	var baseUrl string
+	if err != nil {
+		return baseUrl.String(), err
+	}
 
-	if url == "" {
-		baseUrl = "https://upload.bugsnag.com"
-	} else {
-		baseUrl = url
+	if baseUrl.Port() != "" {
+		return baseUrl.String(), nil
 	}
 
 	if port != 0 {
-		return fmt.Sprintf("%s:%d", baseUrl, port)
+		return fmt.Sprintf("%s:%d", baseUrl, port), nil
 	}
 
-	return baseUrl
+	return baseUrl.String(), nil
 }

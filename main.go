@@ -41,7 +41,11 @@ func main() {
 	}
 
 	// Build connection URI
-	endpoint := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
+	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
+
+	if err != nil {
+		log.Error("Failed to build upload url: "+err.Error(), 1)
+	}
 
 	log.Info("Uploading files to: " + endpoint)
 
