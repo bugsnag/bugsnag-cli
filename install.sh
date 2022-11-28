@@ -144,7 +144,7 @@ ohai "Downloading and installing Bugsnag CLI..."
     xargs)
 
   if [[ ! -n ${DOWNLOAD_URL} ]]; then
-    abort "Failed to get download url"
+    abort "Failed to get download URL from ${BUGSNAG_CLI_GIT_REMOTE}"
   fi
 
   execute "curl" "-#" "-L" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
