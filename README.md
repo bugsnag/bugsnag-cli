@@ -1,9 +1,14 @@
 # Bugsnag CLI
 [![Build status](https://badge.buildkite.com/4c42f3d6345b14ecdc243abcf974cad0cfd9844e1b0e5f2418.svg)](https://buildkite.com/bugsnag/bugsnag-cli)
 
+Upload your Flutter app's Dart symbol files to [Bugsnag](https://www.bugsnag.com/platforms/flutter) using our CLI.
+
 ## Installation
 
-To **install** or **update** bugsnag-cli, you should run the install script. To do that, you may either download and run the script manually, or use the following cURL or Wget command:
+The binaries are available on our [GitHub releases page](https://github.com/bugsnag/bugsnag-cli/releases) for macOS, Linux and Windows.
+
+To install or upgrade to the latest binary for your architecture, you can also run the following `cURL` or `Wget` commands:
+
 ```sh
 curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
 ```
@@ -11,13 +16,11 @@ curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh
 wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
 ```
 
-Running either of the above commands downloads the installation script and runs it on your machine. The script downloads the latest release to the following location: `~/.local/bugsnag`.
-
-You can also find the latest binary on the Github [releases](https://github.com/bugsnag/bugsnag-cli/releases) page.
+The script downloads the appropriate binary and attempts to install it to `~/.local/bugsnag`.
 
 ## Usage
 
-See the [Bugsnag docs website](https://docs.bugsnag.com/build-integrations/bugsnag-cli/) for full usage documentation.
+See the our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/) for full usage information.
 
 ```
 Usage: bugsnag-cli <command>
@@ -61,4 +64,4 @@ Most updates to this repo will be made by Bugsnag employees. We are unable to ac
 
 ## License
 
-This package is free software released under the MIT License. See [LICENSE.txt](./LICENSE.txt) for details.
+This package is free software released under the MIT License. See [license](./LICENSE) for details.
