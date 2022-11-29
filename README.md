@@ -10,10 +10,10 @@ The binaries are available on our [GitHub releases page](https://github.com/bugs
 To install or upgrade to the latest binary for your architecture, you can also run the following `cURL` or `Wget` commands:
 
 ```sh
-curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
+curl -o- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/main/install.sh | bash
 ```
 ```sh
-wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/master/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/main/install.sh | bash
 ```
 
 The script downloads the appropriate binary and attempts to install it to `~/.local/bugsnag`.
