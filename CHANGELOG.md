@@ -1,4 +1,5 @@
-# 1.0.0 TBD
+# Changelog
 
-## Enhancements 
-- Add dart symbol file support [6](https://github.com/bugsnag/bugsnag-cli/pull/6)
+## 1.0.0 (2022-11-29)
+
+Initial release with support for Dart symbol files – see our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/).
