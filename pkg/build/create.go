@@ -1,9 +1,5 @@
 package build
 
-import (
-	"github.com/alecthomas/kong"
-)
-
 type CreateBuild struct {
 	AppVersion       string            `help:"The version number of the application."`
 	AppVersionCode   string            `help:"The version code for the application (Android only)."`
