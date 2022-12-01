@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
+	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -25,6 +26,7 @@ func main() {
 			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
 			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
+		CreateBuild build.CreateBuild `cmd:"" help:"Create or update build info"`
 	}
 
 	// If running without any extra arguments, default to the --help flag
@@ -47,12 +49,12 @@ func main() {
 		log.Error("Failed to build upload url: "+err.Error(), 1)
 	}
 
-	log.Info("Uploading files to: " + endpoint)
-
 	switch ctx.Command() {
 
 	// Upload command
 	case "upload all <path>":
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.All(
 			commands.Upload.All.Path,
 			commands.Upload.All.UploadOptions,
@@ -67,7 +69,11 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
+		log.Success("Upload(s) completed")
+
 	case "upload dart <path>":
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
 			commands.Upload.DartSymbol.AppVersion,
 			commands.Upload.DartSymbol.AppVersionCode,
@@ -83,10 +89,12 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
+
+		log.Success("Upload(s) completed")
+
+	case "create-build":
+		log.Info("Creating build on: " + endpoint)
 	default:
 		println(ctx.Command())
 	}
-
-	log.Success("Upload(s) completed")
-
 }
