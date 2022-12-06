@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
+	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -12,8 +13,11 @@ func main() {
 	var commands struct {
 		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
 		Port              int    `help:"Port number for the upload server" default:"443"`
-		ApiKey            string `help:"Bugsnag integration API key for this application"`
+		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
 		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
+		AppVersion        string `help:"The version of the application."`
+		AppVersionCode    string `help:"The version code for the application (Android only)."`
+		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
 		Upload            struct {
 
 			// shared options
@@ -25,6 +29,7 @@ func main() {
 			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
 			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
+		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
 
 	// If running without any extra arguments, default to the --help flag
@@ -47,12 +52,12 @@ func main() {
 		log.Error("Failed to build upload url: "+err.Error(), 1)
 	}
 
-	log.Info("Uploading files to: " + endpoint)
-
 	switch ctx.Command() {
 
 	// Upload command
 	case "upload all <path>":
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.All(
 			commands.Upload.All.Path,
 			commands.Upload.All.UploadOptions,
@@ -67,11 +72,15 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
+		log.Success("Upload(s) completed")
+
 	case "upload dart <path>":
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			commands.Upload.DartSymbol.AppVersion,
-			commands.Upload.DartSymbol.AppVersionCode,
-			commands.Upload.DartSymbol.AppBundleVersion,
+			commands.AppVersion,
+			commands.AppVersionCode,
+			commands.AppBundleVersion,
 			commands.Upload.DartSymbol.IosAppPath,
 			endpoint+"/dart-symbol",
 			commands.Upload.Timeout,
@@ -83,10 +92,12 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
+
+		log.Success("Upload(s) completed")
+
+	case "create-build":
+		log.Info("Creating build on: " + endpoint)
 	default:
 		println(ctx.Command())
 	}
-
-	log.Success("Upload(s) completed")
-
 }
