@@ -33,6 +33,10 @@ end
 
 Then(/^I should see the missing path error$/) do
   run_output.include?("error: expected \"<path>\"")
+  end
+
+Then(/^I should see the missing app version error$/) do
+  run_output.include?("[ERROR] Missing app version, please provide this via the command line options")
 end
 
 Then(/^I should see the no such file or directory error$/) do
