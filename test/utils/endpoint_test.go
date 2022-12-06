@@ -22,7 +22,7 @@ func TestEndpointBuilding(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, results, "https://upload.bugsnag.com"+":8443", "They should be the same")
+	assert.Equal(t, results, "https://upload.bugsnag.com:8443", "They should be the same")
 
 	t.Log("Testing setting an endpoint and port")
 	results, err = utils.BuildEndpointUrl("https://localhost", 8443)
