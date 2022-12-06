@@ -26,6 +26,9 @@ func main() {
 			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
 			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
+		AppVersion       string            `help:"(optional) the version of the application."`
+		AppVersionCode   string            `help:"(optional) the version code for the application (Android only)."`
+		AppBundleVersion string            `help:"(optional) the bundle version for the application (iOS only)."`
 		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
 
@@ -75,9 +78,9 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			commands.Upload.DartSymbol.AppVersion,
-			commands.Upload.DartSymbol.AppVersionCode,
-			commands.Upload.DartSymbol.AppBundleVersion,
+			commands.AppVersion,
+			commands.AppVersionCode,
+			commands.AppBundleVersion,
 			commands.Upload.DartSymbol.IosAppPath,
 			endpoint+"/dart-symbol",
 			commands.Upload.Timeout,
