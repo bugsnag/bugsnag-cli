@@ -35,9 +35,8 @@ func GetRepoUrl() (string, error) {
 //ParseGitUrl - Parses a git url to ensure that it is in HTTPS format
 func ParseGitUrl(url string) (string, error) {
 	if strings.Contains(url, "git@") {
+		url = strings.Replace(url, ":", "/", 1)
 		url = strings.Replace(url, "git@", "https://", 1)
-		url = strings.Replace(url, ":", "/", 1)
-		url = strings.Replace(url, ":", "/", 1)
 		return url, nil
 	}
 	return url, errors.New("url error")

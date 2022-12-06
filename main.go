@@ -12,10 +12,11 @@ import (
 func main() {
 	var commands struct {
 		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
+		BuildApiRootUrl   string `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
 		Port              int    `help:"Port number for the upload server" default:"443"`
 		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
 		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
-		AppVersion        string `help:"The version of the application."`
+		AppVersion        string `help:"(required) The version of the application."`
 		AppVersionCode    string `help:"The version code for the application (Android only)."`
 		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
 		Upload            struct {
@@ -96,7 +97,30 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "create-build":
+		// Build connection URI
+		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
+
+		if err != nil {
+			log.Error("Failed to build upload url: "+err.Error(), 1)
+		}
+
 		log.Info("Creating build on: " + endpoint)
+		buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
+			commands.CreateBuild.BuilderName,
+			commands.CreateBuild.ReleaseStage,
+			commands.CreateBuild.Provider,
+			commands.CreateBuild.Repository,
+			commands.CreateBuild.Revision,
+			commands.AppVersion,
+			commands.AppVersionCode,
+			commands.AppBundleVersion,
+			commands.CreateBuild.Metadata,
+			endpoint)
+		if buildUploadError != nil {
+			log.Error(buildUploadError.Error(), 1)
+		}
+
+		log.Success("Build created")
 	default:
 		println(ctx.Command())
 	}
