@@ -32,6 +32,7 @@ func ParseGitUrl(url string) string {
 	if strings.Contains(url, "git@") {
 		url = strings.Replace(url, ":", "/", 1)
 		url = strings.Replace(url, "git@", "https://", 1)
+		url = strings.Replace(url, ".git", "", 1)
 		return url
 	}
 	return url
