@@ -40,6 +40,10 @@ type SourceControl struct {
 }
 
 func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, appVersion string, appVersionCode string, appBundleVersion string, metadata map[string]string, endpoint string) error {
+	if appVersion == "" {
+		log.Error("Missing app version, please provide this via the command line options", 1)
+	}
+
 	builderName, err := SetBuilderName(builderName)
 
 	if err != nil {
@@ -70,10 +74,10 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	buildPayload, err := json.Marshal(payload)
 
 	if err != nil {
-		log.Error("Failed to create build information payload: " + err.Error(), 1)
+		log.Error("Failed to create build information payload: "+err.Error(), 1)
 	}
 
-	prettyBuildPayload,_ := utils.PrettyPrintJson(string(buildPayload))
+	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
 	log.Info("Build information: \n" + prettyBuildPayload)
 
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(buildPayload))

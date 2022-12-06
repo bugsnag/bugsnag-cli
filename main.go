@@ -16,7 +16,7 @@ func main() {
 		Port              int    `help:"Port number for the upload server" default:"443"`
 		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
 		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
-		AppVersion        string `help:"(required) The version of the application."`
+		AppVersion        string `help:"The version of the application."`
 		AppVersionCode    string `help:"The version code for the application (Android only)."`
 		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
 		Upload            struct {
