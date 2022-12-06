@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -23,11 +22,7 @@ func GetRepoUrl() (string, error) {
 		return "", err
 	}
 
-	url, err := ParseGitUrl(strings.TrimSuffix(string(cmdOutput), "\n"))
-
-	if err != nil {
-		return "", err
-	}
+	url := ParseGitUrl(strings.TrimSuffix(string(cmdOutput), "\n"))
 
 	return url, nil
 }
