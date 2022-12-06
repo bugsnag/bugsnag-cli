@@ -13,6 +13,12 @@ endif
 endif
 endif
 
+USER := $(shell whoami)
+
+GIT_SHA_FETCH := $(shell git rev-parse HEAD)
+
+export GIT_SHA=$(GIT_SHA_FETCH)
+
 build: build-$(PLATFORM) # Build for PLATFORM or the host OS
 
 .PHONY: build-all
