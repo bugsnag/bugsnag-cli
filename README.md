@@ -29,8 +29,11 @@ Flags:
   -h, --help                                                Show context-sensitive help.
       --upload-api-root-url="https://upload.bugsnag.com"    Bugsnag On-Premise upload server URL. Can contain port number
       --port=443                                            Port number for the upload server
-      --api-key=STRING                                      Bugsnag integration API key for this application
+      --api-key=STRING                                      (required) Bugsnag integration API key for this application
       --fail-on-upload-error                                Stops the upload when a mapping file fails to upload to Bugsnag successfully
+      --app-version=STRING                                  The version of the application.
+      --app-version-code=STRING                             The version code for the application (Android only).
+      --app-bundle-version=STRING                           The bundle version for the application (iOS only).
 
 Commands:
   upload all <path>
@@ -38,6 +41,9 @@ Commands:
 
   upload dart <path>
     Process and upload symbol files for Flutter
+
+  create-build
+    Provide extra information whenever you build, release, or deploy your application
 
 Run "bugsnag-cli <command> --help" for more information on a command.
 ```
