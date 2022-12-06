@@ -26,7 +26,7 @@ func main() {
 			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
 			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
-		CreateBuild build.CreateBuild `cmd:"" help:"Create or update build info"`
+		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
 
 	// If running without any extra arguments, default to the --help flag
