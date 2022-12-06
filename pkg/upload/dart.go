@@ -17,8 +17,8 @@ import (
 )
 
 type DartSymbol struct {
-	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
-	IosAppPath       string            `help:"(optional) the path to the built iOS app."`
+	Path       utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	IosAppPath string            `help:"(optional) the path to the built iOS app."`
 }
 
 func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
