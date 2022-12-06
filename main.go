@@ -13,8 +13,11 @@ func main() {
 	var commands struct {
 		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
 		Port              int    `help:"Port number for the upload server" default:"443"`
-		ApiKey            string `help:"Bugsnag integration API key for this application"`
+		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
 		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
+		AppVersion        string `help:"The version of the application."`
+		AppVersionCode    string `help:"The version code for the application (Android only)."`
+		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
 		Upload            struct {
 
 			// shared options
@@ -26,9 +29,6 @@ func main() {
 			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
 			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
-		AppVersion       string            `help:"(optional) the version of the application."`
-		AppVersionCode   string            `help:"(optional) the version code for the application (Android only)."`
-		AppBundleVersion string            `help:"(optional) the bundle version for the application (iOS only)."`
 		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
 
