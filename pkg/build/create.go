@@ -47,14 +47,10 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	builderName, err := SetBuilderName(builderName)
 
 	if err != nil {
-		log.Error("Failed to set builder name from system. "+err.Error(), 1)
+		log.Error("Failed to set builder name from system. Please provide this via the command line options. "+err.Error(), 1)
 	}
 
-	repoInfo, err := GetRepoInfo(provider, repository, revision)
-
-	if err != nil {
-		log.Error("Failed to get source control information. "+err.Error(), 1)
-	}
+	repoInfo := GetRepoInfo(provider, repository, revision)
 
 	payload := Payload{
 		ApiKey:       apiKey,
@@ -93,7 +89,7 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	b, err := io.ReadAll(res.Body)
 
 	if strings.Contains(string(b), "Source control provider is missing") {
-		log.Warn("Source control provider is missing and could not be inferred. Please resend using one of: [github-enterprise, github, gitlab-onpremise, gitlab, bitbucket-server, bitbucket]. Request was still processed but source control information was ignored.")
+		log.Info("Source control provider is missing and could not be inferred. Please resend using one of: [github-enterprise, github, gitlab-onpremise, gitlab, bitbucket-server, bitbucket]. Request was still processed but source control information was ignored.")
 	}
 
 	if err != nil {
@@ -106,15 +102,13 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	return nil
 }
 
-func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) (map[string]string, error) {
+func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) map[string]string {
 	repoInfo := make(map[string]string)
 
 	if repoUrl == "" {
-		repoUrl, err := utils.GetRepoUrl()
-		if err != nil {
-			return nil, err
-		}
+		repoUrl, _ = utils.GetRepoUrl()
 	}
+
 	repoInfo["repository"] = repoUrl
 
 	if repoProvider != "" {
@@ -122,14 +116,12 @@ func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) (map[stri
 	}
 
 	if repoHash == "" {
-		repoHash, err := utils.GetCommitHash()
-		if err != nil {
-			return nil, err
-		}
+		repoHash, _ = utils.GetCommitHash()
 	}
+
 	repoInfo["revision"] = repoHash
 
-	return repoInfo, nil
+	return repoInfo
 }
 
 func SetBuilderName(name string) (string, error) {

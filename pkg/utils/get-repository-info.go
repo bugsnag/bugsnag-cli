@@ -22,20 +22,7 @@ func GetRepoUrl() (string, error) {
 		return "", err
 	}
 
-	url := ParseGitUrl(strings.TrimSuffix(string(cmdOutput), "\n"))
-
-	return url, nil
-}
-
-//ParseGitUrl - Parses a git url to ensure that it is in HTTPS format
-func ParseGitUrl(url string) string {
-	if strings.Contains(url, "git@") {
-		url = strings.Replace(url, ":", "/", 1)
-		url = strings.Replace(url, "git@", "https://", 1)
-		url = strings.Replace(url, ".git", "", 1)
-		return url
-	}
-	return url
+	return string(cmdOutput), nil
 }
 
 // GetCommitHash - Gets the commit hash from a repo
