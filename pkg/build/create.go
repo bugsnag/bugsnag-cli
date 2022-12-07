@@ -126,10 +126,8 @@ func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) (map[stri
 		if err != nil {
 			return nil, err
 		}
-		repoInfo["revision"] = repoHash
-	} else {
-		repoInfo["revision"] = repoHash
 	}
+	repoInfo["revision"] = repoHash
 
 	return repoInfo, nil
 }
