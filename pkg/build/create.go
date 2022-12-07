@@ -114,10 +114,8 @@ func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) (map[stri
 		if err != nil {
 			return nil, err
 		}
-		repoInfo["repository"] = repoUrl
-	} else {
-		repoInfo["repository"] = repoUrl
 	}
+	repoInfo["repository"] = repoUrl
 
 	if repoProvider != "" {
 		repoInfo["provider"] = repoProvider
