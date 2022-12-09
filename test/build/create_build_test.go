@@ -26,7 +26,7 @@ func TestSetBuilderName(t *testing.T) {
 
 func TestGettingRepoInfo(t *testing.T) {
 	t.Log("Test getting repo info map, only setting the commit hash")
-	results := build.GetRepoInfo("", "", "0123456789")
+	results := build.GetRepoInfo("", "git@github.com:bugsnag/bugsnag-cli", "0123456789")
 
 	assert.Equal(t, map[string]string{
 		"repository": "git@github.com:bugsnag/bugsnag-cli",
