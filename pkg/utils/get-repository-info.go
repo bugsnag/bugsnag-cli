@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -31,15 +30,15 @@ func GetRepoUrl() string {
 		}
 	}
 
-	return string(strings.TrimSuffix(string(remoteOriginCmdOutput), "\n"))
+	return strings.TrimSuffix(string(remoteOriginCmdOutput), "\n")
 }
 
 // GetCommitHash - Gets the commit hash from a repo
-func GetCommitHash() (string, error) {
+func GetCommitHash() string {
 	gitLocation, err := exec.LookPath("git")
 
 	if err != nil {
-		return "", fmt.Errorf("unable to find git on system: %w", err)
+		return ""
 	}
 
 	cmd := exec.Command(gitLocation, "rev-parse", "HEAD")
@@ -47,7 +46,8 @@ func GetCommitHash() (string, error) {
 	cmdOutput, err := cmd.CombinedOutput()
 
 	if err != nil {
-		return "", err
+		return ""
 	}
-	return strings.TrimSuffix(string(cmdOutput), "\n"), nil
+	
+	return strings.TrimSuffix(string(cmdOutput), "\n")
 }
