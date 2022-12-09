@@ -7,22 +7,31 @@ import (
 )
 
 // GetRepoUrl - Gets the URl of a git repo.
-func GetRepoUrl() (string, error) {
+func GetRepoUrl() string {
 	gitLocation, err := exec.LookPath("git")
 
 	if err != nil {
-		return "", fmt.Errorf("unable to find git on system: %w", err)
+		return ""
 	}
 
-	cmd := exec.Command(gitLocation, "config", "--get", "remote.origin.url")
-
-	cmdOutput, err := cmd.CombinedOutput()
+	remoteOriginCmd := exec.Command(gitLocation, "config", "--get", "remote.origin.url")
+	remoteOriginCmdOutput, err := remoteOriginCmd.CombinedOutput()
 
 	if err != nil {
-		return "", err
+		remoteCmd := exec.Command(gitLocation, "remote")
+		remoteCmdOutput, err := remoteCmd.CombinedOutput()
+		if err != nil {
+			return ""
+		}
+		remotes := strings.Split(string(remoteCmdOutput), "\n")
+		remoteOriginCmd = exec.Command(gitLocation, "config", "--get", "remote."+remotes[0]+".url")
+		remoteOriginCmdOutput, err = remoteOriginCmd.CombinedOutput()
+		if err != nil {
+			return ""
+		}
 	}
 
-	return string(cmdOutput), nil
+	return string(strings.TrimSuffix(string(remoteOriginCmdOutput), "\n"))
 }
 
 // GetCommitHash - Gets the commit hash from a repo
