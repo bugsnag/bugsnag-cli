@@ -106,7 +106,7 @@ func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) map[strin
 	repoInfo := make(map[string]string)
 
 	if repoUrl == "" {
-		repoUrl, _ = utils.GetRepoUrl()
+		repoUrl = utils.GetRepoUrl()
 	}
 
 	repoInfo["repository"] = repoUrl
