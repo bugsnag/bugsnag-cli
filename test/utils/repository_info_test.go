@@ -26,12 +26,3 @@ func TestGetRepoUrl(t *testing.T) {
 	}
 	assert.Equal(t, "https://github.com/bugsnag/bugsnag-cli", results, "They should be the same")
 }
-
-func TestGetCommitHash(t *testing.T) {
-	t.Log("Test getting repo commit hash from system")
-	results, err := utils.GetCommitHash()
-	if err != nil {
-		t.Error(err)
-	}
-	assert.Equal(t, os.Getenv("GIT_SHA"), results, "They should be the same")
-}
