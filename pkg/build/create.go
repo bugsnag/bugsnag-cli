@@ -116,7 +116,7 @@ func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) map[strin
 	}
 
 	if repoHash == "" {
-		repoHash, _ = utils.GetCommitHash()
+		repoHash = utils.GetCommitHash()
 	}
 
 	repoInfo["revision"] = repoHash
