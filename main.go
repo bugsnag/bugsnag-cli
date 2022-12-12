@@ -27,8 +27,11 @@ func main() {
 			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
 
 			// required options
-			All        upload.DiscoverAndUploadAny `cmd:"" help:"Upload any symbol/mapping files"`
-			DartSymbol upload.DartSymbol           `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+			All             upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+			DartSymbol      upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+			AndroidAab      upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+			AndroidNdk      upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
+			AndroidProguard upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
 		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
