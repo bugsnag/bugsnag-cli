@@ -48,6 +48,6 @@ func GetCommitHash() string {
 	if err != nil {
 		return ""
 	}
-	
+
 	return strings.TrimSuffix(string(cmdOutput), "\n")
 }

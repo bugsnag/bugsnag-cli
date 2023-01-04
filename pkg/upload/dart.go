@@ -50,7 +50,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := BuildUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
+			uploadOptions := BuildDartUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
 
 			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
 
@@ -92,7 +92,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := BuildUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
+			uploadOptions := BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
 
 			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
 
@@ -114,8 +114,8 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 	return nil
 }
 
-// BuildUploadOptions - Builds the upload options for processing dart files
-func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
+// BuildDartUploadOptions - Builds the upload options for processing dart files
+func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
 	uploadOptions := make(map[string]string)
 
 	uploadOptions["apiKey"] = apiKey
