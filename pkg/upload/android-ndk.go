@@ -37,6 +37,8 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	log.Info("Using Android NDK Root: " + androidNdkRoot)
 
+	fmt.Println(runtime.GOARCH)
+
 	log.Info("Locating ObjCopy within Android NDK Root")
 
 	objCopyPath, err := BuildObjCopyPath(androidNdkRoot)
@@ -70,13 +72,23 @@ func GetAndroidNDKRoot(path string) (string, error) {
 
 // BuildObjCopyPath - Builds the path to the ObjCopy binary within the NDK root path
 func BuildObjCopyPath(path string) (string, error) {
+	var arch string
+
+	if runtime.GOARCH == "arm64" {
+		arch = "arm-linux-androideabi"
+	} else if runtime.GOARCH == "amd64" {
+		arch = "x86_64"
+	} else if runtime.GOARCH == "386" {
+		arch = "x86"
+	}
+
 	ndkVersion, err := GetNdkVersion(path)
 	if err != nil {
 		return "", fmt.Errorf("unable to determine ndk version from path")
 	}
 
 	if ndkVersion < 24 {
-		directoryPattern := filepath.Join(path, "/toolchains/x86_64-4.9/prebuilt/*/bin")
+		directoryPattern := filepath.Join(path, "/toolchains/"+arch+"-4.9/prebuilt/*/bin")
 		directoryMatches, err := filepath.Glob(directoryPattern)
 		if err != nil {
 			return "", err
@@ -86,10 +98,10 @@ func BuildObjCopyPath(path string) (string, error) {
 		}
 
 		if runtime.GOOS == "windows" {
-			return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy.exe"), nil
+			return filepath.Join(directoryMatches[0], arch+"-linux-android-objcopy.exe"), nil
 		}
 
-		return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy"), nil
+		return filepath.Join(directoryMatches[0], arch+"-linux-android-objcopy"), nil
 	} else {
 		directoryPattern := filepath.Join(path, "/toolchains/llvm/prebuilt/*/bin")
 		directoryMatches, err := filepath.Glob(directoryPattern)
