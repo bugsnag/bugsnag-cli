@@ -79,6 +79,7 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-ndk <path>":
+		endpoint = endpoint + "/ndk-symbol"
 		log.Info("Uploading files to: " + endpoint)
 		err := upload.ProcessAndroidNDK(
 			commands.Upload.AndroidNdk.Path,
@@ -89,7 +90,7 @@ func main() {
 			commands.Upload.AndroidNdk.BuildUuid,
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
-			endpoint+"/ndk-symbol",
+			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
@@ -103,6 +104,8 @@ func main() {
 		log.Success("Upload(s) completed")
 	case "upload dart <path>":
 
+		endpoint = endpoint + "/dart-symbol"
+
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
@@ -110,7 +113,7 @@ func main() {
 			commands.AppVersionCode,
 			commands.AppBundleVersion,
 			commands.Upload.DartSymbol.IosAppPath,
-			endpoint+"/dart-symbol",
+			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
