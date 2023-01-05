@@ -5,7 +5,10 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
-	"syscall"
+	"path/filepath"
+	"runtime"
+	"strconv"
+	"strings"
 )
 
 type AndroidNdkMapping struct {
@@ -34,6 +37,16 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	log.Info("Using Android NDK Root: " + androidNdkRoot)
 
+	log.Info("Locating ObjCopy within Android NDK Root")
+
+	objCopyPath, err := BuildObjCopyPath(androidNdkRoot)
+
+	if err != nil {
+		return err
+	}
+
+	log.Info("Using ObjCopy located: " + objCopyPath)
+
 	return nil
 }
 
@@ -53,4 +66,56 @@ func GetAndroidNDKRoot(path string) (string, error) {
 	}
 
 	return path, nil
+}
+
+// BuildObjCopyPath - Builds the path to the ObjCopy binary within the NDK root path
+func BuildObjCopyPath(path string) (string, error) {
+	ndkVersion, err := GetNdkVersion(path)
+	if err != nil {
+		return "", fmt.Errorf("unable to determine ndk version from path")
+	}
+
+	if ndkVersion < 24 {
+		directoryPattern := filepath.Join(path, "/toolchains/x86_64-4.9/prebuilt/*/bin")
+		directoryMatches, err := filepath.Glob(directoryPattern)
+		if err != nil {
+			return "", err
+		}
+		if directoryMatches == nil {
+			return "", fmt.Errorf("Unable to find objcopy within ANDROID_NDK_ROOT: " + path)
+		}
+
+		if runtime.GOOS == "windows" {
+			return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy.exe"), nil
+		}
+
+		return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy"), nil
+	} else {
+		directoryPattern := filepath.Join(path, "/toolchains/llvm/prebuilt/*/bin")
+		directoryMatches, err := filepath.Glob(directoryPattern)
+		if err != nil {
+			return "", err
+		}
+
+		if directoryMatches == nil {
+			return "", fmt.Errorf("Unable to find objcopy within ANDROID_NDK_ROOT: " + path)
+		}
+
+		if runtime.GOOS == "windows" {
+			return filepath.Join(directoryMatches[0], "llvm-objcopy.exe"), nil
+		}
+
+		return filepath.Join(directoryMatches[0], "llvm-objcopy"), nil
+	}
+	return "", nil
+}
+
+// GetNdkVersion - Returns the major NDK version
+func GetNdkVersion(path string) (int, error) {
+	ndkVersion := strings.Split(filepath.Base(path), ".")
+	ndkIntVersion, err := strconv.Atoi(ndkVersion[0])
+	if err != nil {
+		return 0, err
+	}
+	return ndkIntVersion, nil
 }
