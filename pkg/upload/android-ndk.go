@@ -5,6 +5,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
+	"syscall"
 )
 
 type AndroidNdkMapping struct {
@@ -19,6 +20,12 @@ type AndroidNdkMapping struct {
 }
 
 func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, buildUuid string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+
+	// Check if we have project root
+	if projectRoot == "" {
+		return fmt.Errorf("`--project-root` missing from options")
+	}
+
 	androidNdkRoot, err := GetAndroidNDKRoot(androidNdkRoot)
 
 	if err != nil {
