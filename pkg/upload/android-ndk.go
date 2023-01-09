@@ -2,20 +2,22 @@ package upload
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/server"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 type AndroidNdkMapping struct {
 	AndroidNdkRoot  string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
 	AppManifestPath string            `help:"(required) Path to directory or file to upload" type:"path"`
-	BuildUuid       string            `help:"Module Build UUID"`
 	Configuration   string            `help:"Build type, like 'debug' or 'release'"`
 	Path            utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	ProjectRoot     string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
@@ -23,7 +25,7 @@ type AndroidNdkMapping struct {
 	VersionName     string            `help:"Module version name"`
 }
 
-func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, buildUuid string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 
 	// Check if we have project root
 	if projectRoot == "" {
@@ -69,13 +71,14 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 						log.Error("error building file list for variant: "+variant, 1)
 					}
 
+					var soFiles []string
+
 					for _, file := range fileList {
 						if filepath.Ext(file) == ".so" {
 							uploadFileOptions[variant] = map[string]string{}
 							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/AndroidManifest.xml")
 							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/output-metadata.json")
 							uploadFileOptions[variant]["mappingPath"] = filepath.Join(path, "../../outputs/mapping/"+variant+"/mapping.txt")
-							var soFiles []string
 							soFiles = append(soFiles, file)
 							soFileList[variant] = soFiles
 						}
@@ -112,40 +115,39 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
 
 	for variant, config := range uploadFileOptions {
-		log.Info("Processing variant: " + variant)
+		log.Info("Processing files for variant: " + variant)
 
-		log.Info(config["androidManifestPath"])
-
+		log.Info("Gathering information from AndroidManifest.xml")
 		androidManifestData, err := utils.ParseAndroidManifestXML(config["androidManifestPath"])
 
 		if err != nil {
 			return err
 		}
 
-		log.Info("App Id: " + androidManifestData.AppId)
-		log.Info("Version Name: " + androidManifestData.VersionName)
-		log.Info("Version Code: " + androidManifestData.VersionCode)
-		//log.Info("UUID: " + androidManifestData.Application.MetaData.Name)
-		//log.Info("UUID: " + androidManifestData.Application.MetaData.Value)
-
-		var uuid string
-
-		for i := range androidManifestData.Application.MetaData.Name {
-			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
-				uuid = androidManifestData.Application.MetaData.Value[i]
-			}
-		}
-
-		log.Info("UUID: " + uuid)
-
-		log.Info(config["outputMetadataPath"])
-		log.Info(config["mappingPath"])
+		numberOfFiles := len(soFileList[variant])
 
 		for _, file := range soFileList[variant] {
-			log.Info(file)
+			log.Info("Parsing " + filepath.Base(file) + " using ObjCopy")
+			outputFile, err := ObjCopy(objCopyPath, file)
 
+			if err != nil {
+				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
+			}
+
+			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, projectRoot, filepath.Base(file), overwrite)
+			
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "soFile", outputFile, timeout)
+
+			if requestStatus != nil {
+				if numberOfFiles > 1 && failOnUploadError {
+					return requestStatus
+				} else {
+					log.Warn(requestStatus.Error())
+				}
+			} else {
+				log.Success(file)
+			}
 		}
-
 	}
 
 	return nil
@@ -212,6 +214,22 @@ func BuildObjCopyPath(path string) (string, error) {
 	return "", nil
 }
 
+// ObjCopy -
+func ObjCopy(objcopyPath string, file string) (string, error) {
+
+	objcopyLocation, err := exec.LookPath(objcopyPath)
+
+	if err != nil {
+		return "", err
+	}
+
+	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, file+"-sym")
+
+	_, err = cmd.CombinedOutput()
+
+	return file + "-sym", nil
+}
+
 // GetNdkVersion - Returns the major NDK version
 func GetNdkVersion(path string) (int, error) {
 	ndkVersion := strings.Split(filepath.Base(path), ".")
@@ -222,6 +240,7 @@ func GetNdkVersion(path string) (int, error) {
 	return ndkIntVersion, nil
 }
 
+// BuildVariantsList -
 func BuildVariantsList(path string) ([]string, error) {
 	var variants []string
 
