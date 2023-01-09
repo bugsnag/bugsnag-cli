@@ -48,7 +48,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	log.Info("Using ObjCopy located: " + objCopyPath)
 
-	var soFiles []string
 	uploadFileOptions := make(map[string]map[string]string)
 	soFileList := make(map[string][]string)
 
@@ -76,6 +75,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/AndroidManifest.xml")
 							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/output-metadata.json")
 							uploadFileOptions[variant]["mappingPath"] = filepath.Join(path, "../../outputs/mapping/"+variant+"/mapping.txt")
+							var soFiles []string
 							soFiles = append(soFiles, file)
 							soFileList[variant] = soFiles
 						}
@@ -101,12 +101,29 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
 			uploadFileOptions[configuration]["outputMetadataPath"] = filepath.Join(appManifestPath, "../output-metadata.json")
 			uploadFileOptions[configuration]["mappingPath"] = ""
+			var soFiles []string
 			soFiles = append(soFiles, path)
 			soFileList[configuration] = soFiles
 		}
 	}
 
-	fmt.Println(uploadFileOptions)
+	numberOfVariants := len(uploadFileOptions)
+
+	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
+
+	for variant, config := range uploadFileOptions {
+		log.Info("Processing variant: " + variant)
+
+		log.Info(config["androidManifestPath"])
+		log.Info(config["outputMetadataPath"])
+		log.Info(config["mappingPath"])
+
+		for _, file := range soFileList[variant] {
+			log.Info(file)
+
+		}
+
+	}
 
 	return nil
 }
