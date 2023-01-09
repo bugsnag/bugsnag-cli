@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -46,6 +47,66 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 	}
 
 	log.Info("Using ObjCopy located: " + objCopyPath)
+
+	var soFiles []string
+	uploadFileOptions := make(map[string]map[string]string)
+	soFileList := make(map[string][]string)
+
+	for _, path := range paths {
+		if utils.IsDir(path) {
+			if filepath.Base(path) == "merged_native_libs" {
+				log.Info("Building variants list")
+
+				variants, err := BuildVariantsList(path)
+
+				if err != nil {
+					log.Error(err.Error(), 1)
+				}
+
+				for _, variant := range variants {
+					log.Info("Building file list for variant: " + variant)
+					fileList, err := utils.BuildFileList([]string{filepath.Join(path, variant)})
+					if err != nil {
+						log.Error("error building file list for variant: "+variant, 1)
+					}
+
+					for _, file := range fileList {
+						if filepath.Ext(file) == ".so" {
+							uploadFileOptions[variant] = map[string]string{}
+							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/AndroidManifest.xml")
+							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/output-metadata.json")
+							uploadFileOptions[variant]["mappingPath"] = filepath.Join(path, "../../outputs/mapping/"+variant+"/mapping.txt")
+							soFiles = append(soFiles, file)
+							soFileList[variant] = soFiles
+						}
+					}
+				}
+
+			} else {
+				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: "+path, 1)
+			}
+		} else if filepath.Ext(path) == ".so" {
+			if configuration == "" {
+				log.Warn("`--configuration` missing from options for " + path)
+				log.Info("Skipping " + path)
+				continue
+			}
+			if appManifestPath == "" {
+				log.Warn("`--app-manifest-path` missing from options  for " + path)
+				log.Info("Skipping " + path)
+				continue
+			}
+
+			uploadFileOptions[configuration] = map[string]string{}
+			uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
+			uploadFileOptions[configuration]["outputMetadataPath"] = filepath.Join(appManifestPath, "../output-metadata.json")
+			uploadFileOptions[configuration]["mappingPath"] = ""
+			soFiles = append(soFiles, path)
+			soFileList[configuration] = soFiles
+		}
+	}
+
+	fmt.Println(uploadFileOptions)
 
 	return nil
 }
@@ -119,4 +180,19 @@ func GetNdkVersion(path string) (int, error) {
 		return 0, err
 	}
 	return ndkIntVersion, nil
+}
+
+func BuildVariantsList(path string) ([]string, error) {
+	var variants []string
+
+	fileInfo, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range fileInfo {
+		variants = append(variants, file.Name())
+	}
+
+	return variants, nil
 }
