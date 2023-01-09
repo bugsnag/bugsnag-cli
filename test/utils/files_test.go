@@ -28,7 +28,7 @@ func TestBuildFileList(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml","../testdata/android/android-mapping.txt",  "../../README.md"}, "The files should be the same")
+	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../../README.md"}, "The files should be the same")
 
 	t.Log("Testing building a file list from a single given file")
 	paths = []string{"../testdata/android/android-mapping.txt"}
