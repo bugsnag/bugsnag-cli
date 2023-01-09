@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -36,8 +37,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 	}
 
 	log.Info("Using Android NDK Root: " + androidNdkRoot)
-
-	fmt.Println(runtime.GOARCH)
 
 	log.Info("Locating ObjCopy within Android NDK Root")
 
@@ -72,15 +71,6 @@ func GetAndroidNDKRoot(path string) (string, error) {
 
 // BuildObjCopyPath - Builds the path to the ObjCopy binary within the NDK root path
 func BuildObjCopyPath(path string) (string, error) {
-	var arch string
-
-	if runtime.GOARCH == "arm64" {
-		arch = "arm-linux-androideabi"
-	} else if runtime.GOARCH == "amd64" {
-		arch = "x86_64"
-	} else if runtime.GOARCH == "386" {
-		arch = "x86"
-	}
 
 	ndkVersion, err := GetNdkVersion(path)
 	if err != nil {
@@ -88,7 +78,7 @@ func BuildObjCopyPath(path string) (string, error) {
 	}
 
 	if ndkVersion < 24 {
-		directoryPattern := filepath.Join(path, "/toolchains/"+arch+"-4.9/prebuilt/*/bin")
+		directoryPattern := filepath.Join(path, "/toolchains/x86_64-4.9/prebuilt/*/bin")
 		directoryMatches, err := filepath.Glob(directoryPattern)
 		if err != nil {
 			return "", err
@@ -98,10 +88,10 @@ func BuildObjCopyPath(path string) (string, error) {
 		}
 
 		if runtime.GOOS == "windows" {
-			return filepath.Join(directoryMatches[0], arch+"-linux-android-objcopy.exe"), nil
+			return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy.exe"), nil
 		}
 
-		return filepath.Join(directoryMatches[0], arch+"-linux-android-objcopy"), nil
+		return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy"), nil
 	} else {
 		directoryPattern := filepath.Join(path, "/toolchains/llvm/prebuilt/*/bin")
 		directoryMatches, err := filepath.Glob(directoryPattern)
@@ -130,4 +120,20 @@ func GetNdkVersion(path string) (int, error) {
 		return 0, err
 	}
 	return ndkIntVersion, nil
+}
+
+// GetVariants - Returns a list or variants from the merged_native_libs directory
+func GetVariants(path string) ([]string, error) {
+	var variants []string
+
+	fileInfo, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		return nil, err
+	}
+	for _, file := range fileInfo {
+		variants = append(variants, file.Name())
+	}
+
+	return variants, nil
 }
