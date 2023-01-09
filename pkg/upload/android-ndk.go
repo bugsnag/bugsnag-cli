@@ -135,7 +135,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			}
 
 			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, projectRoot, filepath.Base(file), overwrite)
-			
+
 			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "soFile", outputFile, timeout)
 
 			if requestStatus != nil {
