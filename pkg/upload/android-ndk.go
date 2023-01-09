@@ -72,8 +72,8 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					for _, file := range fileList {
 						if filepath.Ext(file) == ".so" {
 							uploadFileOptions[variant] = map[string]string{}
-							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/AndroidManifest.xml")
-							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged-manifests/"+variant+"/output-metadata.json")
+							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/AndroidManifest.xml")
+							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/output-metadata.json")
 							uploadFileOptions[variant]["mappingPath"] = filepath.Join(path, "../../outputs/mapping/"+variant+"/mapping.txt")
 							var soFiles []string
 							soFiles = append(soFiles, file)
@@ -115,6 +115,29 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		log.Info("Processing variant: " + variant)
 
 		log.Info(config["androidManifestPath"])
+
+		androidManifestData, err := utils.ParseAndroidManifestXML(config["androidManifestPath"])
+
+		if err != nil {
+			return err
+		}
+
+		log.Info("App Id: " + androidManifestData.AppId)
+		log.Info("Version Name: " + androidManifestData.VersionName)
+		log.Info("Version Code: " + androidManifestData.VersionCode)
+		//log.Info("UUID: " + androidManifestData.Application.MetaData.Name)
+		//log.Info("UUID: " + androidManifestData.Application.MetaData.Value)
+
+		var uuid string
+
+		for i := range androidManifestData.Application.MetaData.Name {
+			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
+				uuid = androidManifestData.Application.MetaData.Value[i]
+			}
+		}
+
+		log.Info("UUID: " + uuid)
+
 		log.Info(config["outputMetadataPath"])
 		log.Info(config["mappingPath"])
 

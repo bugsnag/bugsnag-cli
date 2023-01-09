@@ -9,7 +9,7 @@ import (
 
 type Manifest struct {
 	XMLName     xml.Name    `xml:"manifest"`
-	Package     string      `xml:"package,attr"`
+	AppId       string      `xml:"package,attr"`
 	VersionCode string      `xml:"versionCode,attr"`
 	VersionName string      `xml:"versionName,attr"`
 	Application Application `xml:"application"`
@@ -22,7 +22,8 @@ type Application struct {
 
 type MetaData struct {
 	XMLName xml.Name `xml:"meta-data"`
-	Uuid    string   `xml:"name,attr"`
+	Name    []string `xml:"name,attr"`
+	Value   []string `xml:"value,attr"`
 }
 
 // ParseAndroidManifestXML - Pulls information from a human-readable xml file into a struct
