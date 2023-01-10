@@ -39,17 +39,17 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		return err
 	}
 
-	log.Info("Using Android NDK Root: " + androidNdkRoot)
+	log.Info("Using Android NDK located here: " + androidNdkRoot)
 
-	log.Info("Locating ObjCopy within Android NDK Root")
+	log.Info("Locating Objcopy within Android NDK path")
 
-	objCopyPath, err := BuildObjCopyPath(androidNdkRoot)
+	objCopyPath, err := BuildObjcopyPath(androidNdkRoot)
 
 	if err != nil {
 		return err
 	}
 
-	log.Info("Using ObjCopy located: " + objCopyPath)
+	log.Info("Using Objcopy located: " + objCopyPath)
 
 	uploadFileOptions := make(map[string]map[string]string)
 	soFileList := make(map[string][]string)
@@ -126,8 +126,8 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		numberOfFiles := len(soFileList[variant])
 
 		for _, file := range soFileList[variant] {
-			log.Info("Parsing " + filepath.Base(file) + " using ObjCopy")
-			outputFile, err := ObjCopy(objCopyPath, file)
+			log.Info("Parsing " + filepath.Base(file) + " using Objcopy")
+			outputFile, err := Objcopy(objCopyPath, file)
 
 			if err != nil {
 				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
@@ -170,8 +170,8 @@ func GetAndroidNDKRoot(path string) (string, error) {
 	return path, nil
 }
 
-// BuildObjCopyPath - Builds the path to the ObjCopy binary within the NDK root path
-func BuildObjCopyPath(path string) (string, error) {
+// BuildObjcopyPath - Builds the path to the Objcopy binary within the NDK root path
+func BuildObjcopyPath(path string) (string, error) {
 
 	ndkVersion, err := GetNdkVersion(path)
 	if err != nil {
@@ -200,8 +200,8 @@ func BuildObjCopyPath(path string) (string, error) {
 	return "", nil
 }
 
-// ObjCopy - Processes files using objcopy
-func ObjCopy(objcopyPath string, file string) (string, error) {
+// Objcopy - Processes files using objcopy
+func Objcopy(objcopyPath string, file string) (string, error) {
 
 	objcopyLocation, err := exec.LookPath(objcopyPath)
 

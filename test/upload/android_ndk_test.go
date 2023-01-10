@@ -16,13 +16,13 @@ func TestGetAndroidNDKRoot(t *testing.T) {
 	assert.Equal(t, "/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888", results, "The paths should match")
 }
 
-func TestBuildObjCopyPath(t *testing.T) {
-	t.Log("Testing building ObjCopy path")
-	results, err := upload.BuildObjCopyPath("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+func TestBuildObjcopyPath(t *testing.T) {
+	t.Log("Testing building Objcopy path")
+	results, err := upload.BuildObjcopyPath("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, "/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-objcopy", results, "The versions should match")
+	assert.Equal(t, "/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-objcopy", results, "The paths should match")
 }
 
 func TestGetNDKVersion(t *testing.T) {
