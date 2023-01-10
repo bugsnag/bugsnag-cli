@@ -75,7 +75,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					var soFiles []string
 
 					for _, file := range fileList {
-						if filepath.Ext(file) == ".so" {
+						if filepath.Ext(file) == ".so" && !strings.Contains(filepath.Base(file), ".sym") {
 							uploadFileOptions[variant] = map[string]string{}
 							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/AndroidManifest.xml")
 							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/output-metadata.json")
@@ -221,7 +221,7 @@ func Objcopy(objcopyPath string, file string) (string, error) {
 		return "", err
 	}
 
-	outputFile := strings.ReplaceAll(file, filepath.Ext(file), "sym.so")
+	outputFile := strings.ReplaceAll(file, filepath.Ext(file), ".sym.so")
 
 	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, outputFile)
 
