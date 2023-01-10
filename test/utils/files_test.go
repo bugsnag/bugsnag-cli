@@ -28,7 +28,7 @@ func TestBuildFileList(t *testing.T) {
 		t.Errorf(err.Error())
 	}
 
-	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../../README.md"}, "The files should be the same")
+	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep", "../../README.md"}, "The files should be the same")
 
 	t.Log("Testing building a file list from a single given file")
 	paths = []string{"../testdata/android/android-mapping.txt"}
@@ -48,5 +48,5 @@ func TestFilePathWalkDir(t *testing.T) {
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt"}, "This should return a file")
+	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep"}, "This should return a file")
 }

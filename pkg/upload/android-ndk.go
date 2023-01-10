@@ -25,6 +25,7 @@ type AndroidNdkMapping struct {
 	VersionName     string            `help:"Module version name"`
 }
 
+// ProcessAndroidNDK - Processes Android NDK symbol files
 func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 
 	// Check if we have project root
@@ -78,7 +79,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 							uploadFileOptions[variant] = map[string]string{}
 							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/AndroidManifest.xml")
 							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/output-metadata.json")
-							uploadFileOptions[variant]["mappingPath"] = filepath.Join(path, "../../outputs/mapping/"+variant+"/mapping.txt")
 							soFiles = append(soFiles, file)
 							soFileList[variant] = soFiles
 						}
@@ -103,7 +103,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			uploadFileOptions[configuration] = map[string]string{}
 			uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
 			uploadFileOptions[configuration]["outputMetadataPath"] = filepath.Join(appManifestPath, "../output-metadata.json")
-			uploadFileOptions[configuration]["mappingPath"] = ""
 			var soFiles []string
 			soFiles = append(soFiles, path)
 			soFileList[configuration] = soFiles
@@ -180,20 +179,7 @@ func BuildObjCopyPath(path string) (string, error) {
 	}
 
 	if ndkVersion < 24 {
-		directoryPattern := filepath.Join(path, "/toolchains/x86_64-4.9/prebuilt/*/bin")
-		directoryMatches, err := filepath.Glob(directoryPattern)
-		if err != nil {
-			return "", err
-		}
-		if directoryMatches == nil {
-			return "", fmt.Errorf("Unable to find objcopy within ANDROID_NDK_ROOT: " + path)
-		}
-
-		if runtime.GOOS == "windows" {
-			return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy.exe"), nil
-		}
-
-		return filepath.Join(directoryMatches[0], "x86_64-linux-android-objcopy"), nil
+		log.Error("unsupported NDK version. Please upgrade to r24 or higher.", 1)
 	} else {
 		directoryPattern := filepath.Join(path, "/toolchains/llvm/prebuilt/*/bin")
 		directoryMatches, err := filepath.Glob(directoryPattern)
@@ -214,7 +200,7 @@ func BuildObjCopyPath(path string) (string, error) {
 	return "", nil
 }
 
-// ObjCopy -
+// ObjCopy - Processes files using objcopy
 func ObjCopy(objcopyPath string, file string) (string, error) {
 
 	objcopyLocation, err := exec.LookPath(objcopyPath)
@@ -240,7 +226,7 @@ func GetNdkVersion(path string) (int, error) {
 	return ndkIntVersion, nil
 }
 
-// BuildVariantsList -
+// BuildVariantsList - Returns a list of variants from a given folder
 func BuildVariantsList(path string) ([]string, error) {
 	var variants []string
 
