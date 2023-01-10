@@ -111,6 +111,11 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	numberOfVariants := len(uploadFileOptions)
 
+	if numberOfVariants < 1 {
+		log.Info("No variants to process")
+		return nil
+	}
+
 	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
 
 	for variant, config := range uploadFileOptions {
@@ -125,13 +130,20 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 		numberOfFiles := len(soFileList[variant])
 
+		if numberOfFiles < 1 {
+			log.Info("No files to process for variant: " + variant)
+			continue
+		}
+
 		for _, file := range soFileList[variant] {
-			log.Info("Parsing " + filepath.Base(file) + " using Objcopy")
+			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 			outputFile, err := Objcopy(objCopyPath, file)
 
 			if err != nil {
 				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
 			}
+
+			log.Info("Uploading debug information for " + filepath.Base(file))
 
 			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, projectRoot, filepath.Base(file), overwrite)
 
@@ -144,7 +156,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					log.Warn(requestStatus.Error())
 				}
 			} else {
-				log.Success(file)
+				log.Success(filepath.Base(file) + " uploaded")
 			}
 		}
 	}
@@ -209,11 +221,13 @@ func Objcopy(objcopyPath string, file string) (string, error) {
 		return "", err
 	}
 
-	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, file+"-sym")
+	outputFile := strings.ReplaceAll(file, filepath.Ext(file), "sym.so")
+
+	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, outputFile)
 
 	_, err = cmd.CombinedOutput()
 
-	return file + "-sym", nil
+	return outputFile, nil
 }
 
 // GetNdkVersion - Returns the major NDK version
