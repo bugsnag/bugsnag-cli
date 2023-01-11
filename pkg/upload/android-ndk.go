@@ -200,7 +200,7 @@ func BuildObjcopyPath(path string) (string, error) {
 		}
 
 		if directoryMatches == nil {
-			return "", fmt.Errorf("Unable to find objcopy within ANDROID_NDK_ROOT: " + path)
+			return "", fmt.Errorf("Unable to find objcopy within: " + path)
 		}
 
 		if runtime.GOOS == "windows" {
