@@ -171,7 +171,7 @@ func GetAndroidNDKRoot(path string) (string, error) {
 		if envPresent {
 			path = envValue
 		} else {
-			return "", fmt.Errorf("unable to find ANDROID_NDK_ROOT")
+			return "", fmt.Errorf("environment variable 'ANDROID_NDK_ROOT' not defined")
 		}
 	}
 
