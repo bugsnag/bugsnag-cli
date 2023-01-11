@@ -41,7 +41,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	log.Info("Using Android NDK located here: " + androidNdkRoot)
 
-	log.Info("Locating Objcopy within Android NDK path")
+	log.Info("Locating objcopy within Android NDK path")
 
 	objCopyPath, err := BuildObjcopyPath(androidNdkRoot)
 
