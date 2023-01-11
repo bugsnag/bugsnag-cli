@@ -102,11 +102,8 @@ func main() {
 
 		log.Success("Upload(s) completed")
 	case "upload dart <path>":
-
 		endpoint = endpoint + "/dart-symbol"
-
 		log.Info("Uploading files to: " + endpoint)
-
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
 			commands.AppVersion,
 			commands.AppVersionCode,
