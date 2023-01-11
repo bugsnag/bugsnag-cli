@@ -69,7 +69,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					log.Info("Building file list for variant: " + variant)
 					fileList, err := utils.BuildFileList([]string{filepath.Join(path, variant)})
 					if err != nil {
-						log.Error("error building file list for variant: "+variant, 1)
+						log.Error("error building file list for variant: "+ variant, 1)
 					}
 
 					var soFiles []string
