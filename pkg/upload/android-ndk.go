@@ -49,7 +49,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		return err
 	}
 
-	log.Info("Using Objcopy located: " + objCopyPath)
+	log.Info("Using objcopy located: " + objCopyPath)
 
 	uploadFileOptions := make(map[string]map[string]string)
 	soFileList := make(map[string][]string)
