@@ -69,7 +69,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					log.Info("Building file list for variant: " + variant)
 					fileList, err := utils.BuildFileList([]string{filepath.Join(path, variant)})
 					if err != nil {
-						log.Error("error building file list for variant: "+ variant, 1)
+						log.Error("error building file list for variant: "+variant, 1)
 					}
 
 					var soFiles []string
@@ -86,7 +86,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 				}
 
 			} else {
-				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: " + path, 1)
+				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: "+path, 1)
 			}
 		} else if filepath.Ext(path) == ".so" {
 			if configuration == "" {
@@ -140,7 +140,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			outputFile, err := Objcopy(objCopyPath, file)
 
 			if err != nil {
-				log.Error("failed to process file, " + file + " using objcopy. " + err.Error(), 1)
+				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
 			}
 
 			log.Info("Uploading debug information for " + filepath.Base(file))
@@ -187,7 +187,7 @@ func BuildObjcopyPath(path string) (string, error) {
 
 	ndkVersion, err := GetNdkVersion(path)
 	if err != nil {
-		return "", fmt.Errorf("unable to determine ndk version from path")
+		return "", fmt.Errorf("unable to determine ndk version from " + path)
 	}
 
 	if ndkVersion < 24 {
