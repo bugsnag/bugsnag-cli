@@ -140,7 +140,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			outputFile, err := Objcopy(objCopyPath, file)
 
 			if err != nil {
-				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
+				log.Error("failed to process file, " + file + " using objcopy. " + err.Error(), 1)
 			}
 
 			log.Info("Uploading debug information for " + filepath.Base(file))
