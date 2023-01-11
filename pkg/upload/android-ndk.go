@@ -86,7 +86,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 				}
 
 			} else {
-				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: "+path, 1)
+				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: " + path, 1)
 			}
 		} else if filepath.Ext(path) == ".so" {
 			if configuration == "" {
