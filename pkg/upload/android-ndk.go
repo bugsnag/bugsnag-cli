@@ -95,7 +95,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 				continue
 			}
 			if appManifestPath == "" {
-				log.Warn("`--app-manifest-path` missing from options  for " + path)
+				log.Warn("`--app-manifest-path` missing from options for " + path)
 				log.Info("Skipping " + path)
 				continue
 			}
