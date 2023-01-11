@@ -77,8 +77,8 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 					for _, file := range fileList {
 						if filepath.Ext(file) == ".so" && !strings.Contains(filepath.Base(file), ".sym") {
 							uploadFileOptions[variant] = map[string]string{}
-							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/AndroidManifest.xml")
-							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "../merged_manifests/"+variant+"/output-metadata.json")
+							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "..", "merged_manifests", variant, "AndroidManifest.xml")
+							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "..", "merged_manifests", variant, "output-metadata.json")
 							soFiles = append(soFiles, file)
 							soFileList[variant] = soFiles
 						}
