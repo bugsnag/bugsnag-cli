@@ -36,6 +36,8 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 				for _, variant := range variants {
 					uploadFileOptions[variant] = map[string]string{}
 					uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(mergedManifestsPath, variant, "AndroidManifest.xml")
+					uploadFileOptions[variant]["mappingPath"] = filepath.Join(mergedManifestsPath, "..", "..", "outputs", "mapping", variant, "mapping.txt")
+
 				}
 			} else {
 				log.Error("unable to find `merged_manifests` in "+path, 1)
@@ -95,6 +97,14 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 				log.Info(androidManifestData.Application.MetaData.Value[i])
 			}
+		}
+
+		log.Info("compressing mapping.txt")
+
+		err = utils.GzipCompress(config["mappingPath"])
+
+		if err != nil {
+			return err
 		}
 	}
 

@@ -1,26 +1,40 @@
 package utils
 
 import (
+	"bufio"
 	"compress/gzip"
-	"io"
+	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func GzipCompress(file string) error {
-	fileToCompress, err := os.Open(file)
+	fileData, err := os.Open(file)
+
 	if err != nil {
 		return err
 	}
 
-	defer fileToCompress.Close()
+	read := bufio.NewReader(fileData)
 
-	gzipWriter := gzip.NewWriter(fileToCompress)
-	defer gzipWriter.Close()
+	data, err := ioutil.ReadAll(read)
 
-	_, err = io.Copy(gzipWriter, fileToCompress)
 	if err != nil {
 		return err
 	}
+
+	newFile := strings.Replace(file, ".txt", ".gz", -1)
+
+	gzipFile, err := os.Create(newFile)
+
+	if err != nil {
+		return err
+	}
+
+	w := gzip.NewWriter(gzipFile)
+	w.Write(data)
+
+	w.Close()
 
 	return nil
 }
