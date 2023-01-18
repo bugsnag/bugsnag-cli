@@ -101,6 +101,31 @@ func main() {
 		}
 
 		log.Success("Upload(s) completed")
+
+	case "upload android-proguard <path>":
+		endpoint = endpoint + "/ndk-symbol"
+		log.Info("Uploading files to: " + endpoint)
+		err := upload.ProcessAndroidProguard(
+			commands.Upload.AndroidProguard.Path,
+			commands.Upload.AndroidProguard.ApplicationId,
+			commands.Upload.AndroidProguard.AppManifestPath,
+			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.Configuration,
+			commands.Upload.AndroidProguard.VersionCode,
+			commands.Upload.AndroidProguard.VersionName,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey,
+			commands.FailOnUploadError,
+			commands.Upload.AndroidProguard.DryRun)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		log.Success("Upload(s) completed")
 	case "upload dart <path>":
 		endpoint = endpoint + "/dart-symbol"
 		log.Info("Uploading files to: " + endpoint)
