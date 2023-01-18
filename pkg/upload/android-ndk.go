@@ -59,7 +59,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			if filepath.Base(path) == "merged_native_libs" {
 				log.Info("Building variants list")
 
-				variants, err := BuildVariantsList(path)
+				variants, err := utils.BuildVariantsList(path)
 
 				if err != nil {
 					log.Error(err.Error(), 1)
@@ -238,20 +238,4 @@ func GetNdkVersion(path string) (int, error) {
 		return 0, err
 	}
 	return ndkIntVersion, nil
-}
-
-// BuildVariantsList - Returns a list of variants from a given folder
-func BuildVariantsList(path string) ([]string, error) {
-	var variants []string
-
-	fileInfo, err := ioutil.ReadDir(path)
-
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range fileInfo {
-		variants = append(variants, file.Name())
-	}
-
-	return variants, nil
 }
