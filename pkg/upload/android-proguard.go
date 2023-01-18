@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -88,24 +89,38 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 			return err
 		}
 
-		log.Info(config["mappingPath"])
-		log.Info(androidManifestData.AppId)
-		log.Info(androidManifestData.VersionCode)
-		log.Info(androidManifestData.VersionName)
-		log.Info(androidManifestData.VersionName)
-		for i := range androidManifestData.Application.MetaData.Name {
-			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
-				log.Info(androidManifestData.Application.MetaData.Value[i])
+		if buildUuid == "" {
+			for i := range androidManifestData.Application.MetaData.Name {
+				if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
+					buildUuid = androidManifestData.Application.MetaData.Value[i]
+				}
 			}
 		}
 
-		log.Info("compressing mapping.txt")
+		log.Info("Compressing " + config["mappingPath"])
 
-		err = utils.GzipCompress(config["mappingPath"])
+		outputFile, err := utils.GzipCompress(config["mappingPath"])
 
 		if err != nil {
 			return err
 		}
+
+		log.Info("Uploading debug information for " + config["mappingPath"])
+
+		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, buildUuid, overwrite)
+
+		requestStatus := server.ProcessRequest(endpoint, uploadOptions, "proguard", outputFile, timeout)
+
+		if requestStatus != nil {
+			if numberOfVariants > 1 && failOnUploadError {
+				return requestStatus
+			} else {
+				log.Warn(requestStatus.Error())
+			}
+		} else {
+			log.Success(filepath.Base(config["mappingPath"]) + " uploaded")
+		}
+
 	}
 
 	return nil

@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-func GzipCompress(file string) error {
+func GzipCompress(file string) (string, error) {
 	fileData, err := os.Open(file)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	read := bufio.NewReader(fileData)
@@ -20,7 +20,7 @@ func GzipCompress(file string) error {
 	data, err := ioutil.ReadAll(read)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	newFile := strings.Replace(file, ".txt", ".gz", -1)
@@ -28,7 +28,7 @@ func GzipCompress(file string) error {
 	gzipFile, err := os.Create(newFile)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	w := gzip.NewWriter(gzipFile)
@@ -36,5 +36,5 @@ func GzipCompress(file string) error {
 
 	w.Close()
 
-	return nil
+	return newFile, nil
 }
