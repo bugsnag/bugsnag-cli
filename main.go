@@ -103,7 +103,6 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-proguard <path>":
-		endpoint = endpoint + "/ndk-symbol"
 		log.Info("Uploading files to: " + endpoint)
 		err := upload.ProcessAndroidProguard(
 			commands.Upload.AndroidProguard.Path,
