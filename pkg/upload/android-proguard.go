@@ -2,6 +2,7 @@ package upload
 
 import (
 	"path/filepath"
+	"strconv"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -19,6 +20,81 @@ type AndroidProguardMapping struct {
 }
 
 func ProcessAndroidProguard(paths []string, applicationId string, appManifestPath string, buildUuid string, configuration string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
+
+	uploadFileOptions := make(map[string]map[string]string)
+
+	for _, path := range paths {
+		// Path is a directory
+		if utils.IsDir(path) {
+			mergedManifestsPath := filepath.Join(path, "build", "intermediates", "merged_manifests")
+			if utils.IsDir(mergedManifestsPath) {
+				variants, err := utils.BuildVariantsList(mergedManifestsPath)
+				if err != nil {
+					log.Error(err.Error(), 1)
+				}
+
+				for _, variant := range variants {
+					uploadFileOptions[variant] = map[string]string{}
+					uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(mergedManifestsPath, variant, "AndroidManifest.xml")
+				}
+			} else {
+				log.Error("unable to find `merged_manifests` in "+path, 1)
+			}
+			//	Path is a file
+		} else {
+
+			if configuration == "" {
+				log.Warn("`--configuration` missing from options for " + path)
+				log.Info("Skipping " + path)
+				continue
+			}
+
+			if appManifestPath == "" {
+				log.Warn("`--app-manifest-path` missing from options for " + path)
+				log.Info("Skipping " + path)
+				continue
+			}
+
+			if filepath.Base(path) == "mapping.txt" {
+				uploadFileOptions[configuration] = map[string]string{}
+				uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
+
+			} else {
+				log.Error(path+" is not a supported file. Please use `mapping.txt`", 1)
+			}
+		}
+	}
+
+	numberOfVariants := len(uploadFileOptions)
+
+	if numberOfVariants < 1 {
+		log.Info("No variants to process")
+		return nil
+	}
+
+	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
+
+	for variant, config := range uploadFileOptions {
+		log.Info("Processing mapping.txt for variant: " + variant)
+
+		log.Info("Gathering information from AndroidManifest.xml")
+
+		androidManifestData, err := utils.ParseAndroidManifestXML(config["androidManifestPath"])
+
+		if err != nil {
+			return err
+		}
+
+		log.Info(androidManifestData.AppId)
+		log.Info(androidManifestData.VersionCode)
+		log.Info(androidManifestData.VersionName)
+		log.Info(androidManifestData.VersionName)
+		for i := range androidManifestData.Application.MetaData.Name {
+			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
+				log.Info(androidManifestData.Application.MetaData.Value[i])
+			}
+		}
+	}
 
 	return nil
 }
