@@ -79,7 +79,7 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldN
 		return fmt.Errorf("error reading body from response: %w", err)
 	}
 
-	if res.StatusCode != 202 {
+	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("%s : %s", res.Status, string(b))
 	}
 
