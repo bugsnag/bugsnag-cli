@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,7 +37,7 @@ func TestGetNDKVersion(t *testing.T) {
 
 func TestBuildVariantsList(t *testing.T) {
 	t.Log("Testing building variants list")
-	results, err := upload.BuildVariantsList("../testdata/android/variants/")
+	results, err := utils.BuildVariantsList("../testdata/android/variants/")
 	if err != nil {
 		t.Error(err)
 	}

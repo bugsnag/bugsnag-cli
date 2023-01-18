@@ -58,6 +58,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 			if filepath.Base(path) == "mapping.txt" {
 				uploadFileOptions[configuration] = map[string]string{}
 				uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
+				uploadFileOptions[configuration]["mappingPath"] = path
 
 			} else {
 				log.Error(path+" is not a supported file. Please use `mapping.txt`", 1)
@@ -85,6 +86,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 			return err
 		}
 
+		log.Info(config["mappingPath"])
 		log.Info(androidManifestData.AppId)
 		log.Info(androidManifestData.VersionCode)
 		log.Info(androidManifestData.VersionName)
