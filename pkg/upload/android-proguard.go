@@ -118,7 +118,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 				log.Warn(requestStatus.Error())
 			}
 		} else {
-			log.Success(filepath.Base(config["mappingPath"]) + " uploaded")
+			log.Success(config["mappingPath"] + " uploaded")
 		}
 
 	}
