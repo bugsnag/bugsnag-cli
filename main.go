@@ -80,7 +80,7 @@ func main() {
 
 	case "upload android-aab <path>":
 		log.Info("Uploading files to: " + endpoint)
-		err := upload.ProcessAndroidNDK(
+		err := upload.ProcessAndroidAab(
 			commands.Upload.AndroidAab.Path,
 			commands.Upload.AndroidAab.BuildUuid,
 			commands.Upload.AndroidAab.Configuration,
