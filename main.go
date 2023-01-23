@@ -78,6 +78,28 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
+	case "upload android-aab <path>":
+		log.Info("Uploading files to: " + endpoint)
+		err := upload.ProcessAndroidNDK(
+			commands.Upload.AndroidAab.Path,
+			commands.Upload.AndroidAab.BuildUuid,
+			commands.Upload.AndroidAab.Configuration,
+			commands.Upload.AndroidAab.ProjectRoot,
+			commands.Upload.AndroidAab.VersionCode,
+			commands.Upload.AndroidAab.VersionName,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey,
+			commands.FailOnUploadError)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		log.Success("Upload(s) completed")
+
 	case "upload android-ndk <path>":
 		endpoint = endpoint + "/ndk-symbol"
 		log.Info("Uploading files to: " + endpoint)
@@ -125,6 +147,7 @@ func main() {
 		}
 
 		log.Success("Upload(s) completed")
+
 	case "upload dart <path>":
 		endpoint = endpoint + "/dart-symbol"
 		log.Info("Uploading files to: " + endpoint)

@@ -13,3 +13,7 @@ type AndroidAabMapping struct {
 	VersionCode   string            `help:"Module version code"`
 	VersionName   string            `help:"Module version name"`
 }
+
+func ProcessAndroidAab(paths []string, buildUuid string, configuration string, projectRoot string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+	return nil
+}
