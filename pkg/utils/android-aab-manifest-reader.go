@@ -1,6 +1,10 @@
 package utils
 
-import "os"
+import (
+	"github.com/bugsnag/bugsnag-cli/pkg/proto_messages"
+	"google.golang.org/protobuf/proto"
+	"os"
+)
 
 func ReadAabManifest(path string) (map[string]string, error) {
 	aabManifestData := make(map[string]string)
