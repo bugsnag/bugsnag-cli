@@ -44,11 +44,6 @@ func main() {
 
 	ctx := kong.Parse(&commands)
 
-	// Check if we have an apiKey in the request
-	if commands.ApiKey == "" {
-		log.Error("no API key provided", 1)
-	}
-
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
@@ -60,6 +55,12 @@ func main() {
 
 	// Upload command
 	case "upload all <path>":
+
+		// Check if we have an apiKey in the request
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.All(
@@ -101,6 +102,12 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-ndk <path>":
+
+		// Check if we have an apiKey in the request
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		endpoint = endpoint + "/ndk-symbol"
 		log.Info("Uploading files to: " + endpoint)
 		err := upload.ProcessAndroidNDK(
@@ -125,6 +132,12 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-proguard <path>":
+
+		// Check if we have an apiKey in the request
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		log.Info("Uploading files to: " + endpoint)
 		err := upload.ProcessAndroidProguard(
 			commands.Upload.AndroidProguard.Path,
@@ -149,6 +162,12 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload dart <path>":
+
+		// Check if we have an apiKey in the request
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		endpoint = endpoint + "/dart-symbol"
 		log.Info("Uploading files to: " + endpoint)
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
@@ -170,6 +189,12 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "create-build":
+
+		// Check if we have an apiKey in the request
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		// Build connection URI
 		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
