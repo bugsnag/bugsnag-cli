@@ -1,4 +1,4 @@
-package utils
+package android
 
 import (
 	"github.com/bugsnag/bugsnag-cli/pkg/proto_messages"
