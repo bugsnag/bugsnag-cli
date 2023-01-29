@@ -3,14 +3,13 @@ package upload_testing
 import (
 	"testing"
 
-	"github.com/bugsnag/bugsnag-cli/pkg/upload"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGetAndroidNDKRoot(t *testing.T) {
 	t.Log("Testing getting Android NDK Root")
-	results, err := upload.GetAndroidNDKRoot("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+	results, err := android.GetAndroidNDKRoot("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
 	if err != nil {
 		t.Error(err)
 	}
@@ -19,7 +18,7 @@ func TestGetAndroidNDKRoot(t *testing.T) {
 
 func TestBuildObjcopyPath(t *testing.T) {
 	t.Log("Testing building Objcopy path")
-	results, err := upload.BuildObjcopyPath("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+	results, err := android.BuildObjcopyPath("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
 	if err != nil {
 		t.Error(err)
 	}
@@ -28,7 +27,7 @@ func TestBuildObjcopyPath(t *testing.T) {
 
 func TestGetNDKVersion(t *testing.T) {
 	t.Log("Testing getting Android NDK major version")
-	results, err := upload.GetNdkVersion("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+	results, err := android.GetNdkVersion("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +36,7 @@ func TestGetNDKVersion(t *testing.T) {
 
 func TestBuildVariantsList(t *testing.T) {
 	t.Log("Testing building variants list")
-	results, err := utils.BuildVariantsList("../testdata/android/variants/")
+	results, err := android.BuildVariantsList("../testdata/android/variants/")
 	if err != nil {
 		t.Error(err)
 	}
