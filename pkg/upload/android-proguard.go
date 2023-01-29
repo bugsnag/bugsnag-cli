@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -29,7 +30,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 		if utils.IsDir(path) {
 			mergedManifestsPath := filepath.Join(path, "build", "intermediates", "merged_manifests")
 			if utils.IsDir(mergedManifestsPath) {
-				variants, err := utils.BuildVariantsList(mergedManifestsPath)
+				variants, err := android.BuildVariantsList(mergedManifestsPath)
 				if err != nil {
 					log.Error(err.Error(), 1)
 				}
@@ -83,7 +84,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 
 		log.Info("Gathering information from AndroidManifest.xml")
 
-		androidManifestData, err := utils.ParseAndroidManifestXML(config["androidManifestPath"])
+		androidManifestData, err := android.ParseAndroidManifestXML(config["androidManifestPath"])
 
 		if err != nil {
 			return err
