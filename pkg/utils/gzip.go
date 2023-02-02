@@ -23,7 +23,7 @@ func GzipCompress(file string) (string, error) {
 		return "", err
 	}
 
-	newFile := strings.Replace(file, ".txt", ".gz", -1)
+	newFile := file + ".gz"
 
 	gzipFile, err := os.Create(newFile)
 
