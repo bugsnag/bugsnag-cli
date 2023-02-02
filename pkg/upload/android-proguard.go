@@ -38,7 +38,6 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 					uploadFileOptions[variant] = map[string]string{}
 					uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(mergedManifestsPath, variant, "AndroidManifest.xml")
 					uploadFileOptions[variant]["mappingPath"] = filepath.Join(mergedManifestsPath, "..", "..", "outputs", "mapping", variant, "mapping.txt")
-
 				}
 			} else {
 				log.Error("unable to find `merged_manifests` in "+path, 1)
