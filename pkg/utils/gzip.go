@@ -3,9 +3,8 @@ package utils
 import (
 	"bufio"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"os"
-	"strings"
 )
 
 func GzipCompress(file string) (string, error) {
@@ -17,13 +16,11 @@ func GzipCompress(file string) (string, error) {
 
 	read := bufio.NewReader(fileData)
 
-	data, err := ioutil.ReadAll(read)
-
 	if err != nil {
 		return "", err
 	}
 
-	newFile := strings.Replace(file, ".txt", ".gz", -1)
+	newFile := file + ".gz"
 
 	gzipFile, err := os.Create(newFile)
 
@@ -32,7 +29,7 @@ func GzipCompress(file string) (string, error) {
 	}
 
 	w := gzip.NewWriter(gzipFile)
-	w.Write(data)
+	io.Copy(w, read)
 
 	w.Close()
 
