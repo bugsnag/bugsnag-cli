@@ -32,7 +32,7 @@ func GzipCompress(file string) (string, error) {
 	}
 
 	w := gzip.NewWriter(gzipFile)
-	w.Write(data)
+	io.Copy(w, read)
 
 	w.Close()
 
