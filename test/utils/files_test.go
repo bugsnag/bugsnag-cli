@@ -21,14 +21,14 @@ func TestIsDir(t *testing.T) {
 // TestBuildFileList - Tests the BuildFileList function
 func TestBuildFileList(t *testing.T) {
 	t.Log("Testing building a file list from a given directory and file")
-	paths := []string{"../testdata/android", "../../README.md"}
+	paths := []string{"../testdata/android/variants", "../../README.md"}
 	results, err := utils.BuildFileList(paths)
 
 	if err != nil {
 		t.Errorf(err.Error())
 	}
 
-	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep", "../../README.md"}, "The files should be the same")
+	assert.Equal(t, results, []string{"../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep", "../../README.md"}, "The files should be the same")
 
 	t.Log("Testing building a file list from a single given file")
 	paths = []string{"../testdata/android/android-mapping.txt"}
@@ -44,9 +44,9 @@ func TestBuildFileList(t *testing.T) {
 // TestFilePathWalkDir - Tests the FilePathWalkDir function
 func TestFilePathWalkDir(t *testing.T) {
 	t.Log("Testing finding files within a given directory")
-	results, err := utils.FilePathWalkDir("../testdata/android")
+	results, err := utils.FilePathWalkDir("../testdata/android/variants")
 	if err != nil {
 		t.Errorf(err.Error())
 	}
-	assert.Equal(t, results, []string{"../testdata/android/AndroidManifest.xml", "../testdata/android/android-mapping.txt", "../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep"}, "This should return a file")
+	assert.Equal(t, results, []string{"../testdata/android/variants/debug/.gitkeep", "../testdata/android/variants/release/.gitkeep"}, "This should return a file")
 }

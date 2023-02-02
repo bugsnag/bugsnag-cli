@@ -2,13 +2,11 @@ package upload
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -32,7 +30,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		return fmt.Errorf("`--project-root` missing from options")
 	}
 
-	androidNdkRoot, err := GetAndroidNDKRoot(androidNdkRoot)
+	androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
 
 	if err != nil {
 		return err
@@ -42,7 +40,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 	log.Info("Locating objcopy within Android NDK path")
 
-	objCopyPath, err := BuildObjcopyPath(androidNdkRoot)
+	objCopyPath, err := android.BuildObjcopyPath(androidNdkRoot)
 
 	if err != nil {
 		return err
@@ -58,7 +56,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			if filepath.Base(path) == "merged_native_libs" {
 				log.Info("Building variants list")
 
-				variants, err := utils.BuildVariantsList(path)
+				variants, err := android.BuildVariantsList(path)
 
 				if err != nil {
 					log.Error(err.Error(), 1)
@@ -121,7 +119,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		log.Info("Processing files for variant: " + variant)
 
 		log.Info("Gathering information from AndroidManifest.xml")
-		androidManifestData, err := utils.ParseAndroidManifestXML(config["androidManifestPath"])
+		androidManifestData, err := android.ParseAndroidManifestXML(config["androidManifestPath"])
 
 		if err != nil {
 			return err
@@ -136,7 +134,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 		for _, file := range soFileList[variant] {
 			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
-			outputFile, err := Objcopy(objCopyPath, file)
+			outputFile, err := android.Objcopy(objCopyPath, file)
 
 			if err != nil {
 				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
@@ -161,80 +159,4 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 	}
 
 	return nil
-}
-
-// GetAndroidNDKRoot - Returns a valid Android NDK root path
-func GetAndroidNDKRoot(path string) (string, error) {
-	if path == "" {
-		envValue, envPresent := os.LookupEnv("ANDROID_NDK_ROOT")
-		if envPresent {
-			path = envValue
-		} else {
-			return "", fmt.Errorf("environment variable 'ANDROID_NDK_ROOT' not defined")
-		}
-	}
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return path, fmt.Errorf(path + " does not exist on the system")
-	}
-
-	return path, nil
-}
-
-// BuildObjcopyPath - Builds the path to the Objcopy binary within the NDK root path
-func BuildObjcopyPath(path string) (string, error) {
-
-	ndkVersion, err := GetNdkVersion(path)
-	if err != nil {
-		return "", fmt.Errorf("unable to determine ndk version from " + path)
-	}
-
-	if ndkVersion < 24 {
-		log.Error("unsupported NDK version. Please upgrade to r24 or higher.", 1)
-	} else {
-		directoryPattern := filepath.Join(path, "/toolchains/llvm/prebuilt/*/bin")
-		directoryMatches, err := filepath.Glob(directoryPattern)
-		if err != nil {
-			return "", err
-		}
-
-		if directoryMatches == nil {
-			return "", fmt.Errorf("Unable to find objcopy within: " + path)
-		}
-
-		if runtime.GOOS == "windows" {
-			return filepath.Join(directoryMatches[0], "llvm-objcopy.exe"), nil
-		}
-
-		return filepath.Join(directoryMatches[0], "llvm-objcopy"), nil
-	}
-	return "", nil
-}
-
-// Objcopy - Processes files using objcopy
-func Objcopy(objcopyPath string, file string) (string, error) {
-
-	objcopyLocation, err := exec.LookPath(objcopyPath)
-
-	if err != nil {
-		return "", err
-	}
-
-	outputFile := strings.ReplaceAll(file, filepath.Ext(file), ".sym.so")
-
-	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, outputFile)
-
-	_, err = cmd.CombinedOutput()
-
-	return outputFile, nil
-}
-
-// GetNdkVersion - Returns the major NDK version
-func GetNdkVersion(path string) (int, error) {
-	ndkVersion := strings.Split(filepath.Base(path), ".")
-	ndkIntVersion, err := strconv.Atoi(ndkVersion[0])
-	if err != nil {
-		return 0, err
-	}
-	return ndkIntVersion, nil
 }

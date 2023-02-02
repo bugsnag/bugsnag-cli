@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/kong v0.6.1
 	github.com/mattn/go-isatty v0.0.10
 	github.com/stretchr/testify v1.8.0
+	google.golang.org/protobuf v1.28.1
 )
 
 require (
