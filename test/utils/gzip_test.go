@@ -13,5 +13,5 @@ func TestGzipCompress(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, "../testdata/android/android-mapping.gz", results, "File should be compressed")
+	assert.Equal(t, "../testdata/android/android-mapping.txt.gz", results, "File should be compressed")
 }

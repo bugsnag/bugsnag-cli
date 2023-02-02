@@ -3,9 +3,8 @@ package utils
 import (
 	"bufio"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"os"
-	"strings"
 )
 
 func GzipCompress(file string) (string, error) {
@@ -16,8 +15,6 @@ func GzipCompress(file string) (string, error) {
 	}
 
 	read := bufio.NewReader(fileData)
-
-	data, err := ioutil.ReadAll(read)
 
 	if err != nil {
 		return "", err
