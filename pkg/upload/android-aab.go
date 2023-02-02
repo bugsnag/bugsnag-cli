@@ -56,13 +56,9 @@ func ProcessAndroidAab(paths []string, buildUuid string, configuration string, p
 
 			// Check to see if we're working with a single AAB file
 		} else if filepath.Ext(path) == ".aab" {
-
 			variant := filepath.Base(strings.Replace(path, filepath.Base(path), "", -1))
-
 			variantConfig[variant] = map[string]string{}
-
 			variantConfig[variant]["aabPath"] = path
-
 		} else {
 			return fmt.Errorf("unsupported file type for " + path)
 		}
