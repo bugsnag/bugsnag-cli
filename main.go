@@ -15,7 +15,7 @@ func main() {
 		BuildApiRootUrl   string `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
 		Port              int    `help:"Port number for the upload server" default:"443"`
 		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
-		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:false`
+		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
 		AppVersion        string `help:"The version of the application."`
 		AppVersionCode    string `help:"The version code for the application (Android only)."`
 		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
@@ -44,11 +44,6 @@ func main() {
 
 	ctx := kong.Parse(&commands)
 
-	// Check if we have an apiKey in the request
-	if commands.ApiKey == "" {
-		log.Error("no API key provided", 1)
-	}
-
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
@@ -58,8 +53,12 @@ func main() {
 
 	switch ctx.Command() {
 
-	// Upload command
 	case "upload all <path>":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.All(
@@ -78,9 +77,40 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "upload android-ndk <path>":
-		endpoint = endpoint + "/ndk-symbol"
+	case "upload android-aab <path>":
+
 		log.Info("Uploading files to: " + endpoint)
+
+		err := upload.ProcessAndroidAab(
+			commands.Upload.AndroidAab.Path,
+			commands.Upload.AndroidAab.BuildUuid,
+			commands.Upload.AndroidAab.Configuration,
+			commands.Upload.AndroidAab.ProjectRoot,
+			commands.Upload.AndroidAab.VersionCode,
+			commands.Upload.AndroidAab.VersionName,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey,
+			commands.FailOnUploadError)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		log.Success("Upload(s) completed")
+
+	case "upload android-ndk <path>":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
+		endpoint = endpoint + "/ndk-symbol"
+
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.ProcessAndroidNDK(
 			commands.Upload.AndroidNdk.Path,
 			commands.Upload.AndroidNdk.AndroidNdkRoot,
@@ -101,9 +131,47 @@ func main() {
 		}
 
 		log.Success("Upload(s) completed")
-	case "upload dart <path>":
-		endpoint = endpoint + "/dart-symbol"
+
+	case "upload android-proguard <path>":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		log.Info("Uploading files to: " + endpoint)
+
+		err := upload.ProcessAndroidProguard(
+			commands.Upload.AndroidProguard.Path,
+			commands.Upload.AndroidProguard.ApplicationId,
+			commands.Upload.AndroidProguard.AppManifestPath,
+			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.Configuration,
+			commands.Upload.AndroidProguard.VersionCode,
+			commands.Upload.AndroidProguard.VersionName,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey,
+			commands.FailOnUploadError,
+			commands.Upload.AndroidProguard.DryRun)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		log.Success("Upload(s) completed")
+
+	case "upload dart <path>":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
+		endpoint = endpoint + "/dart-symbol"
+
+		log.Info("Uploading files to: " + endpoint)
+
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
 			commands.AppVersion,
 			commands.AppVersionCode,
@@ -123,6 +191,11 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "create-build":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
 		// Build connection URI
 		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
@@ -131,6 +204,7 @@ func main() {
 		}
 
 		log.Info("Creating build on: " + endpoint)
+
 		buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
 			commands.CreateBuild.BuilderName,
 			commands.CreateBuild.ReleaseStage,

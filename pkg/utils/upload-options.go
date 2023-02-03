@@ -54,3 +54,20 @@ func BuildAndroidNDKUploadOptions(apiKey string, appId string, versionName strin
 
 	return uploadOptions
 }
+
+// BuildAndroidProguardUploadOptions - Builds the upload options for processing dart files
+func BuildAndroidProguardUploadOptions(apiKey string, appId string, versionName string, versionCode string, uuid string, overwrite bool) map[string]string {
+	uploadOptions := make(map[string]string)
+
+	uploadOptions["apiKey"] = apiKey
+	uploadOptions["appId"] = appId
+	uploadOptions["versionName"] = versionName
+	uploadOptions["versionCode"] = versionCode
+	uploadOptions["buildUUID"] = uuid
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	return uploadOptions
+}
