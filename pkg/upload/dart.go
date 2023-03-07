@@ -52,7 +52,10 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			// Build Upload options
 			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["symbolFile"] = file
+
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {
@@ -94,7 +97,10 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			// Build Upload options
 			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["symbolFile"] = file
+
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {
