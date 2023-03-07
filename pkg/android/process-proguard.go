@@ -30,7 +30,10 @@ func ProcessProguard(apiKey string, variant string, outputPath string, aabManife
 
 	uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], aabManifestData["buildUuid"], overwrite)
 
-	requestStatus := server.ProcessRequest(endpoint, uploadOptions, "proguard", outputFile, timeout)
+	fileFieldData := make(map[string]string)
+	fileFieldData["proguard"] = outputFile
+
+	requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 	if requestStatus != nil {
 		if numberOfVariants > 1 && failOnUploadError {
