@@ -92,6 +92,8 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 
 	uploadOptions["projectRoot"] = projectRoot
 
+	uploadOptions["platform"] = "android"
+
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
