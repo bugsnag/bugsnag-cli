@@ -9,9 +9,9 @@ import (
 
 func TestGetAndroidNDKRoot(t *testing.T) {
 	t.Log("Testing getting Android NDK Root")
-	results, err := android.GetAndroidNDKRoot("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+	results, err := android.GetAndroidNDKRoot("../testdata/android/sdk/ndk/24.0.8215888")
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, "/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888", results, "The paths should match")
+	assert.Equal(t, "../testdata/android/sdk/ndk/24.0.8215888", results, "The paths should match")
 }
