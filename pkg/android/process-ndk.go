@@ -48,7 +48,10 @@ func ProcessNdk(apiKey string, variant string, outputPath string, aabManifestDat
 
 			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
 
-			requestStatus := server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, "soFile", outputFile, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["soFile"] = outputFile
+
+			requestStatus := server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {

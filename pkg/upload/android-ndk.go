@@ -144,7 +144,10 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, projectRoot, filepath.Base(file), overwrite)
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "soFile", outputFile, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["soFile"] = outputFile
+
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {

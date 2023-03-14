@@ -27,11 +27,12 @@ func main() {
 			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
 
 			// required options
-			AndroidAab      upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-			All             upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-			AndroidNdk      upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
-			AndroidProguard upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-			DartSymbol      upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+			AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+			All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+			AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
+			AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
+			DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+			ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		} `cmd:"" help:"Upload symbol/mapping files"`
 		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	}
@@ -183,6 +184,34 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.FailOnUploadError)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		log.Success("Upload(s) completed")
+
+	case "upload react-native-android":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
+		// Build endpoint URI
+		endpoint = endpoint + "/react-native-source-map"
+
+		err := upload.ProcessReactNativeAndroid(commands.AppVersion,
+			commands.AppVersionCode,
+			commands.Upload.ReactNativeAndroid.CodeBundleId,
+			commands.Upload.ReactNativeAndroid.Dev,
+			commands.Upload.ReactNativeAndroid.SourceMapPath,
+			commands.Upload.ReactNativeAndroid.BundlePath,
+			commands.Upload.ReactNativeAndroid.ProjectRoot,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.ApiKey)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
