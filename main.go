@@ -191,7 +191,7 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "upload react-native-android":
+	case "upload react-native-android", "upload react-native-android <path>":
 
 		if commands.ApiKey == "" {
 			log.Error("no API key provided", 1)
@@ -200,7 +200,9 @@ func main() {
 		// Build endpoint URI
 		endpoint = endpoint + "/react-native-source-map"
 
-		err := upload.ProcessReactNativeAndroid(commands.AppVersion,
+		err := upload.ProcessReactNativeAndroid(commands.Upload.ReactNativeAndroid.Path,
+			commands.Upload.ReactNativeAndroid.AppManifestPath,
+			commands.AppVersion,
 			commands.AppVersionCode,
 			commands.Upload.ReactNativeAndroid.CodeBundleId,
 			commands.Upload.ReactNativeAndroid.Dev,
