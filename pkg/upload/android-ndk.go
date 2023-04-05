@@ -34,6 +34,10 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			projectRoot = path
 		}
 
+		if apiKey == "" {
+			getApiKeyFromManifest = true
+		}
+
 		androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
 
 		if err != nil {
@@ -117,6 +121,18 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 
 		if appId == "" {
 			appId = androidManifestData.AppId
+		}
+
+		if getApiKeyFromManifest {
+			for key, value := range androidManifestData.Application.MetaData.Name {
+				if value == "com.bugsnag.android.API_KEY" {
+					apiKey = androidManifestData.Application.MetaData.Value[key]
+				}
+			}
+
+			if apiKey == "" {
+				return fmt.Errorf("no API key provided")
+			}
 		}
 
 		numberOfFiles := len(soFiles)
