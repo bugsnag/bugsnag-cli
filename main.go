@@ -118,6 +118,7 @@ func main() {
 			commands.Upload.AndroidNdk.AppManifestPath,
 			commands.Upload.AndroidNdk.Configuration,
 			commands.Upload.AndroidNdk.ProjectRoot,
+			commands.Upload.AndroidNdk.ApplicationId,
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
 			endpoint,
