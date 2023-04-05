@@ -104,10 +104,6 @@ func main() {
 
 	case "upload android-ndk <path>":
 
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
-		}
-
 		endpoint = endpoint + "/ndk-symbol"
 
 		log.Info("Uploading files to: " + endpoint)
