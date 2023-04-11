@@ -14,7 +14,7 @@ import (
 type AndroidNdkMapping struct {
 	ApplicationId   string            `help:"Module application identifier"`
 	AndroidNdkRoot  string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
-	AppManifestPath string            `help:"(required) Path to directory or file to upload" type:"path"`
+	AppManifestPath string            `help:"Path to app manifest file" type:"path"`
 	Configuration   string            `help:"Build type, like 'debug' or 'release'"`
 	Path            utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 	ProjectRoot     string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`

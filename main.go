@@ -102,7 +102,7 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "upload android-ndk <path>":
+	case "upload android-ndk <path>", "upload android-ndk":
 
 		endpoint = endpoint + "/ndk-symbol"
 
