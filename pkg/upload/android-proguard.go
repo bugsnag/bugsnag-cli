@@ -7,6 +7,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
+	"strings"
 )
 
 type AndroidProguardMapping struct {
@@ -115,6 +116,11 @@ func ProcessAndroidProguard(paths []string, appManifestPath string, mappingPath 
 	fileFieldData["proguard"] = outputFile
 
 	requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+
+	if strings.Contains(requestStatus.Error(), "404 Not Found") {
+		log.Info("Trying https://upload.bugsnag.com...")
+		requestStatus = server.ProcessRequest("https://upload.bugsnag.com", uploadOptions, fileFieldData, timeout)
+	}
 
 	if requestStatus != nil {
 		return requestStatus
