@@ -132,9 +132,7 @@ func main() {
 
 	case "upload android-proguard <path>", "upload android-proguard":
 
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
-		}
+		endpoint = endpoint + "/proguard"
 
 		log.Info("Uploading files to: " + endpoint)
 
