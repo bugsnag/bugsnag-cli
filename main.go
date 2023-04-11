@@ -130,7 +130,7 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "upload android-proguard <path>":
+	case "upload android-proguard <path>", "upload android-proguard":
 
 		if commands.ApiKey == "" {
 			log.Error("no API key provided", 1)
@@ -140,10 +140,11 @@ func main() {
 
 		err := upload.ProcessAndroidProguard(
 			commands.Upload.AndroidProguard.Path,
-			commands.Upload.AndroidProguard.ApplicationId,
 			commands.Upload.AndroidProguard.AppManifestPath,
+			commands.Upload.AndroidProguard.MappingPath,
 			commands.Upload.AndroidProguard.BuildUuid,
 			commands.Upload.AndroidProguard.Configuration,
+			commands.Upload.AndroidProguard.ApplicationId,
 			commands.Upload.AndroidProguard.VersionCode,
 			commands.Upload.AndroidProguard.VersionName,
 			endpoint,
