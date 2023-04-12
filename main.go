@@ -83,12 +83,16 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidAab(
-			commands.Upload.AndroidAab.Path,
+			commands.Upload.AndroidAab.ApplicationId,
 			commands.Upload.AndroidAab.BuildUuid,
 			commands.Upload.AndroidAab.Configuration,
+			commands.Upload.AndroidAab.Path,
 			commands.Upload.AndroidAab.ProjectRoot,
 			commands.Upload.AndroidAab.VersionCode,
 			commands.Upload.AndroidAab.VersionName,
+			commands.Upload.AndroidAab.AndroidNdkRoot,
+			commands.Upload.AndroidAab.MappingPath,
+			commands.Upload.AndroidAab.DryRun,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

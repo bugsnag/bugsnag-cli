@@ -10,24 +10,24 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessNdk(apiKey string, variant string, outputPath string, aabManifestData map[string]string, objCopyPath string, projectRoot string, overwrite bool, timeout int, endpoint string, failOnUploadError bool) error {
+func ProcessNdk(apiKey string, configuration string, outputPath string, appId string, versionCode string, versionName string, objCopyPath string, projectRoot string, overwrite bool, timeout int, endpoint string, failOnUploadError bool) error {
 
-	log.Info("Building file list for variant: " + variant)
+	log.Info("Building file list for configuration: " + configuration)
 
 	symbolPath := []string{filepath.Join(outputPath, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")}
 
 	fileList, err := utils.BuildFileList(symbolPath)
 
 	if err != nil {
-		return fmt.Errorf("error building file list for variant: " + variant)
+		return fmt.Errorf("error building file list for configuration: " + configuration)
 	}
 
-	log.Info("Processing NDK files for variant: " + variant)
+	log.Info("Processing NDK files for configuration: " + configuration)
 
 	numberOfFiles := len(fileList)
 
 	if numberOfFiles < 1 {
-		log.Info("No files to process for variant: " + variant)
+		log.Info("No files to process for configuration: " + configuration)
 		return nil
 	}
 
@@ -46,7 +46,7 @@ func ProcessNdk(apiKey string, variant string, outputPath string, aabManifestDat
 
 			log.Info("Uploading debug information for " + filepath.Base(file))
 
-			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
+			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, appId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 			fileFieldData := make(map[string]string)
 			fileFieldData["soFile"] = outputFile

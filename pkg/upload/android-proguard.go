@@ -24,6 +24,7 @@ type AndroidProguardMapping struct {
 func ProcessAndroidProguard(paths []string, appManifestPath string, mappingPath string, buildUuid string, configuration string, appId string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
 
 	uploadFileOptions := make(map[string]string)
+	var getApiKeyFromManifest = false
 
 	for _, path := range paths {
 
@@ -96,6 +97,18 @@ func ProcessAndroidProguard(paths []string, appManifestPath string, mappingPath 
 			if androidManifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 				buildUuid = androidManifestData.Application.MetaData.Value[i]
 			}
+		}
+	}
+
+	if getApiKeyFromManifest {
+		for key, value := range androidManifestData.Application.MetaData.Name {
+			if value == "com.bugsnag.android.API_KEY" {
+				apiKey = androidManifestData.Application.MetaData.Value[key]
+			}
+		}
+
+		if apiKey == "" {
+			return fmt.Errorf("no API key provided")
 		}
 	}
 

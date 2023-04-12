@@ -26,6 +26,7 @@ type AndroidNdkMapping struct {
 func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, appId string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 
 	uploadFileOptions := make(map[string]string)
+	var getApiKeyFromManifest = false
 	var soFiles []string
 
 	for _, path := range paths {

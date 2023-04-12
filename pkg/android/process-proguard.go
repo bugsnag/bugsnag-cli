@@ -9,8 +9,8 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessProguard(apiKey string, variant string, outputPath string, aabManifestData map[string]string, overwrite bool, timeout int, numberOfVariants int, endpoint string, failOnUploadError bool) error {
-	log.Info("Processing Proguard mapping for " + variant)
+func ProcessProguard(apiKey string, configuration string, outputPath string, appId string, versionCode string, versionName string, buildUuid string, mappingPath string, overwrite bool, timeout int, endpoint string, failOnUploadError bool) error {
+	log.Info("Processing mapping.txt for variant: " + configuration)
 
 	proguardMappingPath := filepath.Join(outputPath, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
@@ -18,17 +18,17 @@ func ProcessProguard(apiKey string, variant string, outputPath string, aabManife
 		return fmt.Errorf(proguardMappingPath + " does not exist")
 	}
 
-	log.Info("Compressing " + proguardMappingPath)
+	log.Info("Compressing " + mappingPath)
 
-	outputFile, err := utils.GzipCompress(proguardMappingPath)
+	outputFile, err := utils.GzipCompress(mappingPath)
 
 	if err != nil {
 		return err
 	}
 
-	log.Info("Uploading debug information for " + outputFile)
+	log.Info("Uploading debug information for " + mappingPath)
 
-	uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], aabManifestData["buildUuid"], overwrite)
+	uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, appId, versionName, versionCode, buildUuid, overwrite)
 
 	fileFieldData := make(map[string]string)
 	fileFieldData["proguard"] = outputFile
@@ -36,14 +36,9 @@ func ProcessProguard(apiKey string, variant string, outputPath string, aabManife
 	requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 	if requestStatus != nil {
-		if numberOfVariants > 1 && failOnUploadError {
-			return requestStatus
-		} else {
-			log.Warn(requestStatus.Error())
-		}
+		return requestStatus
 	} else {
-		log.Success(proguardMappingPath + " uploaded")
+		log.Success(mappingPath + " uploaded")
 	}
-
 	return nil
 }
