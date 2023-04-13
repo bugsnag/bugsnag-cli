@@ -34,10 +34,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			projectRoot = path
 		}
 
-		if apiKey == "" {
-			getApiKeyFromManifest = true
-		}
-
 		androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
 
 		if err != nil {
@@ -73,7 +69,6 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 				}
 
 				if len(variants) > 1 {
-					fmt.Println(variants)
 					return fmt.Errorf("more than one variant found. Please specify using `--configuration`")
 				}
 
@@ -123,7 +118,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 			appId = androidManifestData.AppId
 		}
 
-		if getApiKeyFromManifest {
+		if apiKey == "" {
 			for key, value := range androidManifestData.Application.MetaData.Name {
 				if value == "com.bugsnag.android.API_KEY" {
 					apiKey = androidManifestData.Application.MetaData.Value[key]
