@@ -85,7 +85,7 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		fileList, err := utils.BuildFileList([]string{mergedNativeLibPath})
 
 		if err != nil {
-			return fmt.Errorf("error building file list for variant: " + configuration)
+			return fmt.Errorf("error building file list for variant: " + configuration + ". " + err.Error())
 		}
 
 		outputMetadataPath := filepath.Join(path, "app", "build", "merged_manifests", configuration, "output-metadata.json")
