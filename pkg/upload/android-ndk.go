@@ -55,9 +55,22 @@ func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string
 				appManifest = filepath.Join(appManifest, variant, "AndroidManifest.xml")
 			}
 
-			// Check if the appManifest path exists
-			if !utils.FileExists(appManifest) {
-				return fmt.Errorf(appManifest + " does not exist on the system. Please specify using `--app-manifest`")
+			if variant == "" {
+				if filepath.Base(appManifest) == "AndroidManifest.xml" {
+					variantPath := filepath.Join(appManifest, "..")
+
+					variants, err := android.BuildVariantsList(variantPath)
+
+					if err != nil {
+						return err
+					}
+
+					if len(variants) > 1 {
+						return fmt.Errorf("more than one variant found. Please specify using `--variant`")
+					}
+
+					variant = variants[0]
+				}
 			}
 
 			//	Build file list to process
