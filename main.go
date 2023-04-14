@@ -110,9 +110,9 @@ func main() {
 
 		err := upload.ProcessAndroidNDK(
 			commands.Upload.AndroidNdk.Path,
-			commands.Upload.AndroidNdk.AndroidNdkRoot,
-			commands.Upload.AndroidNdk.AppManifestPath,
-			commands.Upload.AndroidNdk.Configuration,
+			commands.Upload.AndroidNdk.AndroidNdkPath,
+			commands.Upload.AndroidNdk.AppManifest,
+			commands.Upload.AndroidNdk.Variant,
 			commands.Upload.AndroidNdk.ProjectRoot,
 			commands.Upload.AndroidNdk.ApplicationId,
 			commands.Upload.AndroidNdk.VersionCode,
