@@ -57,7 +57,7 @@ func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string
 
 			if variant == "" {
 				if filepath.Base(appManifest) == "AndroidManifest.xml" {
-					variantPath := filepath.Join(appManifest, "..")
+					variantPath := filepath.Join(appManifest, "..", "..")
 
 					variants, err := android.BuildVariantsList(variantPath)
 
