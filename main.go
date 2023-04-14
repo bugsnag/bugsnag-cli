@@ -109,20 +109,21 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidNDK(
-			commands.Upload.AndroidNdk.Path,
+			commands.ApiKey,
+			commands.Upload.AndroidNdk.ApplicationId,
 			commands.Upload.AndroidNdk.AndroidNdkPath,
 			commands.Upload.AndroidNdk.AppManifest,
-			commands.Upload.AndroidNdk.Variant,
+			commands.Upload.AndroidNdk.Path,
 			commands.Upload.AndroidNdk.ProjectRoot,
-			commands.Upload.AndroidNdk.ApplicationId,
+			commands.Upload.AndroidNdk.Variant,
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
 			endpoint,
-			commands.Upload.Timeout,
+			commands.FailOnUploadError,
 			commands.Upload.Retries,
+			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.FailOnUploadError)
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
@@ -151,7 +152,6 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.Upload.AndroidProguard.DryRun)
 
 		if err != nil {

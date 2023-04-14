@@ -22,7 +22,7 @@ type AndroidNdkMapping struct {
 	VersionName    string            `help:"Module version name"`
 }
 
-func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkPath string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, failOnUploadError bool, endpoint string, retries int, timeout int, overwrite bool) error {
+func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkPath string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool) error {
 
 	var fileList []string
 	var mergeNativeLibPath string
