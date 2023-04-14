@@ -2,13 +2,13 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 )
 
 type AndroidNdkMapping struct {
@@ -22,124 +22,10 @@ type AndroidNdkMapping struct {
 	VersionName    string            `help:"Module version name"`
 }
 
-// ProcessAndroidNDK - Processes Android NDK symbol files
-func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string, variant string, projectRoot string, applicationId string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkPath string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, failOnUploadError bool, endpoint string, retries int, timeout int, overwrite bool) error {
 
-	uploadFileOptions := make(map[string]map[string]string)
-	soFileList := make(map[string][]string)
-
-	for _, path := range paths {
-		if utils.IsDir(path) {
-			// Check if we have an AndroidManifest.xml and locate it if we do not
-			if appManifest == "" {
-				log.Info("Locating AndroidManifest.xml in " + path)
-				appManifest = filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
-
-				// Check if we have a variant and locate them if we do not
-				if variant == "" {
-					log.Info("Locating variant in " + appManifest)
-
-					variants, err := android.BuildVariantsList(appManifest)
-
-					if err != nil {
-						return err
-					}
-
-					if len(variants) > 1 {
-						return fmt.Errorf("more than one variant found. Please specify using `--variant`")
-					}
-
-					variant = variants[0]
-				}
-
-				appManifest = filepath.Join(appManifest, variant, "AndroidManifest.xml")
-			}
-
-			if variant == "" {
-				if filepath.Base(appManifest) == "AndroidManifest.xml" {
-					variantPath := filepath.Join(appManifest, "..", "..")
-
-					variants, err := android.BuildVariantsList(variantPath)
-
-					if err != nil {
-						return err
-					}
-
-					if len(variants) > 1 {
-						return fmt.Errorf("more than one variant found. Please specify using `--variant`")
-					}
-
-					variant = variants[0]
-				} else {
-					fmt.Errorf("missing variant. Please specify using `--variant`")
-				}
-			}
-
-			//	Build file list to process
-			log.Info("Building file list for " + variant)
-
-			mergedNativeLibs := filepath.Join(path, "app", "build", "intermediates", "merged_native_libs", variant)
-
-			files, err := utils.BuildFileList([]string{mergedNativeLibs})
-
-			if err != nil {
-				return fmt.Errorf("error building file list for " + variant + ". " + err.Error())
-			}
-
-			var soFiles []string
-
-			// Build two maps containing the required information to process the uploads
-			for _, file := range files {
-				// Ensure that we're only dealing with .so files
-				if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".sym.so") {
-					uploadFileOptions[variant] = map[string]string{}
-					uploadFileOptions[variant]["AndroidManifest"] = appManifest
-					soFiles = append(soFiles, file)
-					soFileList[variant] = soFiles
-				}
-			}
-
-			// Stop processing this file and skip to the next
-			continue
-		} else if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
-			if appManifest == "" {
-				log.Info("Locating AndroidManifest.xml")
-				appManifest = filepath.Join(path, "..", "..", "..", "..", "..", "..", "..", "..", "..", "app", "build", "intermediates", "merged_manifests")
-			}
-
-			// Check if we have a variant and locate them if we do not
-			if variant == "" {
-				if strings.Contains(path, filepath.Join("build", "intermediates", "merged_native_libs")) {
-					variant = filepath.Base(filepath.Join(path, "..", "..", "..", ".."))
-				} else {
-					return fmt.Errorf("unable to determine variant name. Please specify using `--variant`")
-				}
-			}
-
-			appManifest = filepath.Join(appManifest, variant, "AndroidManifest.xml")
-
-			var soFiles []string
-
-			uploadFileOptions[variant] = map[string]string{}
-			uploadFileOptions[variant]["AndroidManifest"] = appManifest
-			soFiles = append(soFiles, path)
-			soFileList[variant] = soFiles
-
-			// Stop processing this file and skip to the next
-			continue
-		} else {
-			// TODO better log for when the file is not a .so file
-			log.Warn("Skipping " + path + " as it is not a .so file")
-			continue
-		}
-	}
-
-	numberOfVariants := len(uploadFileOptions)
-
-	if numberOfVariants < 1 {
-		log.Info("Nothing to process")
-		return nil
-	}
+	var fileList []string
+	var mergeNativeLibPath string
 
 	// Check NDK path is set
 	androidNdkPath, err := android.GetAndroidNDKRoot(androidNdkPath)
@@ -161,57 +47,131 @@ func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string
 
 	log.Info("Objcopy Path: " + objCopyPath)
 
-	for variant, config := range uploadFileOptions {
-		log.Info("Processing files for variant: " + variant)
+	for _, path := range paths {
+		// If dir:
+		if utils.IsDir(path) {
+			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")
+			// Does merged_native_libs exist? If not, we may as well fail here...
+			if !utils.FileExists(mergeNativeLibPath) {
+				return fmt.Errorf("")
+			}
 
-		// Check if the appManifest path exists
-		if !utils.FileExists(appManifest) {
-			return fmt.Errorf(appManifest + " does not exist on the system. Please specify using `--app-manifest`")
-		}
+			// If variant not provided
+			if variant == "" {
+				//	Get a single variant from the merged_native_libs directory, or error (if 0 or >1)
+				variant, err = GetVariant(mergeNativeLibPath)
 
-		androidManifestData, err := android.ParseAndroidManifestXML(config["AndroidManifest"])
-
-		if err != nil {
-			return err
-		}
-
-		if apiKey == "" {
-			for key, value := range androidManifestData.Application.MetaData.Name {
-				if value == "com.bugsnag.android.API_KEY" {
-					apiKey = androidManifestData.Application.MetaData.Value[key]
+				if err != nil {
+					return err
 				}
 			}
 
-			if apiKey == "" {
-				return fmt.Errorf("no API key provided")
+			// Set the upload file path(s)for the variant, or error if not exists
+			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
+
+			if err != nil {
+				return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
+			}
+
+			// If manifest not provided
+			if appManifest == "" {
+				//	Get the expected path to the manifest using variant name
+				appManifest = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+			}
+
+			if projectRoot == "" {
+				projectRoot = path
+			}
+			// If file:
+		} else if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
+			// Set upload file path
+			fileList = []string{path}
+
+			// If manifest not provided
+			if appManifest == "" {
+				// If variant not provided
+				if variant == "" {
+					//	Iff the directory 2-levels above the file path is merged_native_libs
+					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
+
+					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
+						// Get variant name from directory 1-level above the file path
+						variant, err = GetVariant(mergeNativeLibPath)
+
+						if err != nil {
+							return err
+						}
+					}
+				}
+				//	Get the expected path to the manifest using path relative to .so file and variant name
+				appManifest = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+			}
+
+			if projectRoot == "" {
+				return fmt.Errorf("project root missing")
+			}
+		}
+
+		// Do we need a manifest or have all options been provided?
+		if apiKey == "" {
+			//   If so, check if it exists and read it
+			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			if err != nil {
+				return err
+			}
+
+			for key, value := range manifestData.Application.MetaData.Name {
+				if value == "com.bugsnag.android.API_KEY" {
+					apiKey = manifestData.Application.MetaData.Value[key]
+				}
 			}
 		}
 
 		if applicationId == "" {
-			applicationId = androidManifestData.AppId
+			//   If so, check if it exists and read it
+			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			if err != nil {
+				return err
+			}
+
+			applicationId = manifestData.AppId
 		}
 
 		if versionCode == "" {
-			versionCode = androidManifestData.VersionCode
+			//   If so, check if it exists and read it
+			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			if err != nil {
+				return err
+			}
+
+			versionCode = manifestData.VersionCode
 		}
 
 		if versionName == "" {
-			versionName = androidManifestData.VersionName
+			//   If so, check if it exists and read it
+			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			if err != nil {
+				return err
+			}
+
+			versionName = manifestData.VersionName
 		}
 
-		numberOfFiles := len(soFileList[variant])
+		numberOfFiles := len(fileList)
 
 		if numberOfFiles < 1 {
-			log.Info("No files to process for variant: " + variant)
-			continue
+			log.Info("No files to process")
+			return nil
 		}
 
-		for _, file := range soFileList[variant] {
+		// Upload .so file(s)
+		for _, file := range fileList {
 			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
+
 			outputFile, err := android.Objcopy(objCopyPath, file)
 
 			if err != nil {
-				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
+				return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
 			}
 
 			log.Info("Uploading debug information for " + filepath.Base(file))
@@ -233,8 +193,35 @@ func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string
 				log.Success(filepath.Base(file) + " uploaded")
 			}
 		}
-
 	}
 
 	return nil
+}
+
+func GetVariant(path string) (string, error) {
+	var variants []string
+
+	fileInfo, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		return "", err
+	}
+
+	for _, file := range fileInfo {
+		variants = append(variants, file.Name())
+	}
+
+	if len(variants) > 1 {
+		return "", fmt.Errorf("too many variants")
+	} else if len(variants) < 1 {
+		return "", fmt.Errorf("no variants")
+	}
+
+	variant := variants[0]
+
+	if !utils.FileExists(filepath.Join(path, variant)) {
+		return "", fmt.Errorf("path doesn't exist " + filepath.Join(path, variant))
+	}
+
+	return variant, nil
 }
