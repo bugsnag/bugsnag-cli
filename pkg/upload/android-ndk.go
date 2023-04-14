@@ -70,6 +70,8 @@ func ProcessAndroidNDK(paths []string, androidNdkPath string, appManifest string
 					}
 
 					variant = variants[0]
+				} else {
+					fmt.Errorf("missing variant. Please specify using `--variant`")
 				}
 			}
 
