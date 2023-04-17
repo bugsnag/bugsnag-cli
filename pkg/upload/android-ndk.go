@@ -27,7 +27,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var mergeNativeLibPath string
 
 	if dryRun {
-		log.Info("Performing dry run")
+		log.Info("Performing dry run - no files will be uploaded")
 	}
 
 	// Check NDK path is set
