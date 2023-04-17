@@ -180,8 +180,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				fileFieldData := make(map[string]string)
 				fileFieldData["soFile"] = outputFile
 
-				var requestStatus error
-
 				if dryRun {
 					requestStatus = nil
 				} else {
