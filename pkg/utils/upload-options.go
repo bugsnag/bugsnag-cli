@@ -1,6 +1,9 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+)
 
 // BuildDartUploadOptions - Builds the upload options for processing dart files
 func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
@@ -44,30 +47,33 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
+		log.Info("API Key: " + apiKey)
 		uploadOptions["apiKey"] = apiKey
 	} else {
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
 	if applicationId != "" {
+		log.Info("Application ID: " + applicationId)
 		uploadOptions["appId"] = applicationId
 	} else {
 		return nil, fmt.Errorf("missing application id, please specify using `--application-id`")
 	}
 
 	if versionCode != "" {
+		log.Info("Version Code: " + versionCode)
 		uploadOptions["versionCode"] = versionCode
 	} else {
 		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
 	}
 
 	if versionName != "" {
+		log.Info("Version Name: " + versionName)
 		uploadOptions["versionName"] = versionName
-	} else {
-		return nil, fmt.Errorf("missing version name, please specify using `--version-name`")
 	}
 
 	if projectRoot != "" {
+		log.Info("Project root: " + projectRoot)
 		uploadOptions["projectRoot"] = projectRoot
 	}
 
@@ -83,20 +89,45 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 }
 
 // BuildAndroidProguardUploadOptions - Builds the upload options for processing dart files
-func BuildAndroidProguardUploadOptions(apiKey string, appId string, versionName string, versionCode string, uuid string, overwrite bool) map[string]string {
+func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, buildUuid string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = apiKey
-	uploadOptions["appId"] = appId
-	uploadOptions["versionName"] = versionName
-	uploadOptions["versionCode"] = versionCode
-	uploadOptions["buildUUID"] = uuid
+	if apiKey != "" {
+		log.Info("API Key: " + apiKey)
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if applicationId != "" {
+		log.Info("Application ID: " + applicationId)
+		uploadOptions["appId"] = applicationId
+	} else {
+		return nil, fmt.Errorf("missing application id, please specify using `--application-id`")
+	}
+
+	if versionCode != "" {
+		log.Info("Version Code: " + versionCode)
+		uploadOptions["versionCode"] = versionCode
+	} else {
+		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
+	}
+
+	if versionName != "" {
+		log.Info("Version Name: " + versionName)
+		uploadOptions["versionName"] = versionName
+	}
+
+	if buildUuid != "" {
+		log.Info("Build UUID: " + buildUuid)
+		uploadOptions["buildUuid"] = buildUuid
+	}
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 
-	return uploadOptions
+	return uploadOptions, nil
 }
 
 func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) map[string]string {

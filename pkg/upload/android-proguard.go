@@ -22,7 +22,6 @@ type AndroidProguardMapping struct {
 func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath string, buildUuid string, paths []string, variant string, versionCode string, versionName string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var mappingFile string
-	var requestStatus error
 	var err error
 
 	for _, path := range paths {
@@ -31,7 +30,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			mappingPath := filepath.Join(path, "app", "build", "outputs", "mapping")
 
 			if !utils.FileExists(mappingPath) {
-				return fmt.Errorf("unable to find the merged_native_libs in " + path)
+				return fmt.Errorf("unable to find the mapping directory in " + path)
 			}
 
 			if variant == "" {
@@ -44,11 +43,15 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 			mappingFile = filepath.Join(mappingPath, variant, "mapping.txt")
 
+			if !utils.FileExists(mappingFile) {
+				return fmt.Errorf(mappingFile + " does not exist on the system")
+			}
+
 			if appManifestPath == "" {
 				//	Get the expected path to the manifest using variant name from the given path
 				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			}
-		} else if filepath.Base(path) == "mapping.txt" {
+		} else {
 			mappingFile = path
 
 			if appManifestPath == "" {
@@ -58,10 +61,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 					if filepath.Base(mergedManifestPath) == "merged_manifests" {
 						variant, err = android.GetVariant(mergedManifestPath)
-
-						log.Info(mergedManifestPath)
-						log.Info(variant)
-
 						if err == nil {
 							appManifestPath = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 						}
@@ -73,10 +72,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 		// Check to see if we need to read the manifest file due to missing options
 		if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
-
-			if variant == "" {
-				return fmt.Errorf("missing variant. Please specify using `--variant`")
-			}
 
 			log.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
@@ -129,19 +124,23 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 		log.Info("Uploading debug information for " + mappingFile)
 
-		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
+		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
+
+		if err != nil {
+			return nil
+		}
 
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
 		if dryRun {
-			requestStatus = nil
+			err = nil
 		} else {
-			requestStatus = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 		}
 
-		if requestStatus != nil {
-			return requestStatus
+		if err != nil {
+			return err
 		} else {
 			log.Success(mappingFile + " uploaded")
 		}
