@@ -25,27 +25,30 @@ func BuildVariantsList(path string) ([]string, error) {
 	return variants, nil
 }
 
-// GetVariantPath - Builds and checks a path with a variant and a file
-func GetVariantPath(path string, variant string, file string) (string, string, error) {
-	if variant == "" {
-		variants, err := BuildVariantsList(path)
+func GetVariant(path string) (string, error) {
+	var variants []string
 
-		if err != nil {
-			return "", "", fmt.Errorf("unable to build list of variants from " + path + " : " + err.Error())
-		}
+	fileInfo, err := ioutil.ReadDir(path)
 
-		if len(variants) > 1 {
-			return "", "", fmt.Errorf("more than one variant")
-		} else {
-			variant = variants[0]
-		}
+	if err != nil {
+		return "", err
 	}
 
-	fullPath := filepath.Join(path, variant, file)
-
-	if utils.FileExists(fullPath) {
-		return fullPath, variant, nil
+	for _, file := range fileInfo {
+		variants = append(variants, file.Name())
 	}
 
-	return fullPath, variant, fmt.Errorf(fullPath + " does not exist on the system")
+	if len(variants) > 1 {
+		return "", fmt.Errorf("more than one variant found. Please specify using `--variant` ")
+	} else if len(variants) < 1 {
+		return "", fmt.Errorf("no variants found. Please specify using `--variant`")
+	}
+
+	variant := variants[0]
+
+	if !utils.FileExists(filepath.Join(path, variant)) {
+		return "", fmt.Errorf("variant path " + filepath.Join(path, variant) + " doesn't exist on the system")
+	}
+
+	return variant, nil
 }

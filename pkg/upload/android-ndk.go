@@ -6,13 +6,12 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"io/ioutil"
 	"path/filepath"
 	"strings"
 )
 
 type AndroidNdkMapping struct {
-	Package        string            `help:"Module application identifier"`
+	ApplicationId  string            `help:"Module application identifier"`
 	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
 	AppManifest    string            `help:"Path to app manifest file" type:"path"`
 	Path           utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
@@ -22,7 +21,7 @@ type AndroidNdkMapping struct {
 	VersionName    string            `help:"Module version name"`
 }
 
-func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var fileList []string
 	var mergeNativeLibPath string
@@ -61,7 +60,7 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 			}
 
 			if variant == "" {
-				variant, err = GetVariant(mergeNativeLibPath)
+				variant, err = android.GetVariant(mergeNativeLibPath)
 
 				if err != nil {
 					return err
@@ -74,9 +73,9 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 				return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
 			}
 
-			if appManifest == "" {
+			if appManifestPath == "" {
 				//	Get the expected path to the manifest using variant name from the given path
-				appManifest = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			}
 
 			if projectRoot == "" {
@@ -86,20 +85,19 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 		} else if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
 			fileList = []string{path}
 
-			if appManifest == "" {
+			if appManifestPath == "" {
 				if variant == "" {
 					//	Set the mergeNativeLibPath based off the file location e.g. merged_native_libs/<variant/out/lib/<arch>/
 					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
 
 					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
-						variant, err = GetVariant(mergeNativeLibPath)
+						variant, err = android.GetVariant(mergeNativeLibPath)
 
-						if err != nil {
-							return err
+						if err == nil {
+							appManifestPath = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 						}
 					}
 				}
-				appManifest = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 
 				if utils.FileExists(mergeNativeLibPath) {
 					if projectRoot == "" {
@@ -113,10 +111,14 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 		log.Info("Using " + projectRoot + " as the project root")
 
 		// Check to see if we need to read the manifest file due to missing options
-		if apiKey == "" || _package == "" || versionCode == "" || versionName == "" {
+		if apiKey == "" || applicationId == "" || versionCode == "" || versionName == "" {
+
+			if variant == "" {
+				return fmt.Errorf("missing variant. Please specify using `--variant``")
+			}
 
 			log.Info("Reading data from AndroidManifest.xml")
-			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
 				return err
@@ -131,9 +133,9 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 				}
 			}
 
-			if _package == "" {
+			if applicationId == "" {
 				log.Info("Setting application ID from AndroidManifest.xml")
-				_package = manifestData.Package
+				applicationId = manifestData.Package
 			}
 
 			if versionCode == "" {
@@ -169,7 +171,7 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 				if !dryRun {
 					log.Info("Uploading debug information for " + filepath.Base(file))
 
-					uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, _package, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+					uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 					if err != nil {
 						return err
@@ -195,32 +197,4 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 	}
 
 	return nil
-}
-
-func GetVariant(path string) (string, error) {
-	var variants []string
-
-	fileInfo, err := ioutil.ReadDir(path)
-
-	if err != nil {
-		return "", err
-	}
-
-	for _, file := range fileInfo {
-		variants = append(variants, file.Name())
-	}
-
-	if len(variants) > 1 {
-		return "", fmt.Errorf("too many variants")
-	} else if len(variants) < 1 {
-		return "", fmt.Errorf("no variants")
-	}
-
-	variant := variants[0]
-
-	if !utils.FileExists(filepath.Join(path, variant)) {
-		return "", fmt.Errorf("path doesn't exist " + filepath.Join(path, variant))
-	}
-
-	return variant, nil
 }
