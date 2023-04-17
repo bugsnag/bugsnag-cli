@@ -142,20 +142,18 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidProguard(
-			commands.Upload.AndroidProguard.Path,
-			commands.Upload.AndroidProguard.AppManifestPath,
-			commands.Upload.AndroidProguard.MappingPath,
-			commands.Upload.AndroidProguard.BuildUuid,
-			commands.Upload.AndroidProguard.Configuration,
+			commands.ApiKey,
 			commands.Upload.AndroidProguard.ApplicationId,
+			commands.Upload.AndroidProguard.AppManifest,
+			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.Path,
+			commands.Upload.AndroidProguard.Variant,
 			commands.Upload.AndroidProguard.VersionCode,
 			commands.Upload.AndroidProguard.VersionName,
 			endpoint,
-			commands.Upload.Timeout,
 			commands.Upload.Retries,
+			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.Upload.DryRun,
 		)
 

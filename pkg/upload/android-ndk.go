@@ -25,6 +25,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 	var fileList []string
 	var mergeNativeLibPath string
+	var requestStatus error
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -178,8 +179,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 				fileFieldData := make(map[string]string)
 				fileFieldData["soFile"] = outputFile
-
-				var requestStatus error
 
 				if dryRun {
 					requestStatus = nil
