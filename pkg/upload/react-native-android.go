@@ -10,7 +10,7 @@ import (
 )
 
 type ReactNativeAndroid struct {
-	Path            utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path" default:"."`
+	Path            utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 	AppManifestPath string            `help:"(required) Path to directory or file to upload" type:"path"`
 	CodeBundleId    string            `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
 	Dev             bool              `help:"Indicates whether the application is a debug or release build"`
@@ -22,7 +22,6 @@ type ReactNativeAndroid struct {
 func ProcessReactNativeAndroid(paths []string, appManifestPath string, appVersion string, appVersionCode string, codeBundleId string, dev bool, sourceMapPath string, bundlePath string, projectRoot string, endpoint string, timeout int, retries int, overwrite bool, apiKey string) error {
 
 	for _, path := range paths {
-		log.Info(path)
 
 		if projectRoot == "" {
 			projectRoot = path

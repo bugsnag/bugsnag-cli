@@ -2,42 +2,44 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-	"strconv"
-	"strings"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"path/filepath"
+	"strings"
 )
 
 type AndroidNdkMapping struct {
-	AndroidNdkRoot  string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
-	AppManifestPath string            `help:"(required) Path to directory or file to upload" type:"path"`
-	Configuration   string            `help:"Build type, like 'debug' or 'release'"`
-	Path            utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	ProjectRoot     string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	VersionCode     string            `help:"Module version code"`
-	VersionName     string            `help:"Module version name"`
+	ApplicationId  string            `help:"Module application identifier"`
+	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
+	AppManifest    string            `help:"Path to app manifest file" type:"path"`
+	Path           utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	ProjectRoot    string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	Variant        string            `help:"Build type, like 'debug' or 'release'"`
+	VersionCode    string            `help:"Module version code"`
+	VersionName    string            `help:"Module version name"`
 }
 
-// ProcessAndroidNDK - Processes Android NDK symbol files
-func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath string, configuration string, projectRoot string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
-	// Check if we have project root
-	if projectRoot == "" {
-		return fmt.Errorf("`--project-root` missing from options")
+	var fileList []string
+	var mergeNativeLibPath string
+
+	if dryRun {
+		log.Info("Performing dry run - no files will be uploaded")
 	}
 
+	// Check NDK path is set
 	androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
 
 	if err != nil {
 		return err
 	}
 
-	log.Info("Using Android NDK located here: " + androidNdkRoot)
+	log.Info("Android NDK Path: " + androidNdkRoot)
 
+	// Find objcopy within NDK path
 	log.Info("Locating objcopy within Android NDK path")
 
 	objCopyPath, err := android.BuildObjcopyPath(androidNdkRoot)
@@ -46,117 +48,154 @@ func ProcessAndroidNDK(paths []string, androidNdkRoot string, appManifestPath st
 		return err
 	}
 
-	log.Info("Using objcopy located: " + objCopyPath)
-
-	uploadFileOptions := make(map[string]map[string]string)
-	soFileList := make(map[string][]string)
+	log.Info("Objcopy Path: " + objCopyPath)
 
 	for _, path := range paths {
 		if utils.IsDir(path) {
-			if filepath.Base(path) == "merged_native_libs" {
-				log.Info("Building variants list")
+			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")
 
-				variants, err := android.BuildVariantsList(path)
+			// Check to see if we can find app/build/intermediates/merged_native_libs from the given path
+			if !utils.FileExists(mergeNativeLibPath) {
+				return fmt.Errorf("unable to find the merged_native_libs in " + path)
+			}
+
+			if variant == "" {
+				variant, err = android.GetVariant(mergeNativeLibPath)
 
 				if err != nil {
-					log.Error(err.Error(), 1)
+					return err
 				}
+			}
 
-				for _, variant := range variants {
-					log.Info("Building file list for variant: " + variant)
-					fileList, err := utils.BuildFileList([]string{filepath.Join(path, variant)})
-					if err != nil {
-						log.Error("error building file list for variant: "+variant, 1)
-					}
+			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
 
-					var soFiles []string
+			if err != nil {
+				return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
+			}
 
-					for _, file := range fileList {
-						if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".sym.so") {
-							uploadFileOptions[variant] = map[string]string{}
-							uploadFileOptions[variant]["androidManifestPath"] = filepath.Join(path, "..", "merged_manifests", variant, "AndroidManifest.xml")
-							uploadFileOptions[variant]["outputMetadataPath"] = filepath.Join(path, "..", "merged_manifests", variant, "output-metadata.json")
-							soFiles = append(soFiles, file)
-							soFileList[variant] = soFiles
+			if appManifestPath == "" {
+				//	Get the expected path to the manifest using variant name from the given path
+				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+			}
+
+			if projectRoot == "" {
+				projectRoot = path
+			}
+
+		} else if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
+			fileList = []string{path}
+
+			if appManifestPath == "" {
+				if variant == "" {
+					//	Set the mergeNativeLibPath based off the file location e.g. merged_native_libs/<variant/out/lib/<arch>/
+					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
+
+					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
+						variant, err = android.GetVariant(mergeNativeLibPath)
+
+						if err == nil {
+							appManifestPath = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 						}
 					}
 				}
 
-			} else {
-				log.Error("unsupported folder structure provided, expected /path/to/merged_native_libs. Actual: "+path, 1)
+				if utils.FileExists(mergeNativeLibPath) {
+					if projectRoot == "" {
+						// Setting projectRoot to the suspected root of the project
+						projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+					}
+				}
 			}
-		} else if filepath.Ext(path) == ".so" {
-			if configuration == "" {
-				log.Warn("`--configuration` missing from options for " + path)
-				log.Info("Skipping " + path)
-				continue
-			}
-			if appManifestPath == "" {
-				log.Warn("`--app-manifest-path` missing from options for " + path)
-				log.Info("Skipping " + path)
-				continue
-			}
-
-			uploadFileOptions[configuration] = map[string]string{}
-			uploadFileOptions[configuration]["androidManifestPath"] = appManifestPath
-			uploadFileOptions[configuration]["outputMetadataPath"] = filepath.Join(appManifestPath, "../output-metadata.json")
-			var soFiles []string
-			soFiles = append(soFiles, path)
-			soFileList[configuration] = soFiles
-		}
-	}
-
-	numberOfVariants := len(uploadFileOptions)
-
-	if numberOfVariants < 1 {
-		log.Info("No variants to process")
-		return nil
-	}
-
-	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
-
-	for variant, config := range uploadFileOptions {
-		log.Info("Processing files for variant: " + variant)
-
-		log.Info("Gathering information from AndroidManifest.xml")
-		androidManifestData, err := android.ParseAndroidManifestXML(config["androidManifestPath"])
-
-		if err != nil {
-			return err
 		}
 
-		numberOfFiles := len(soFileList[variant])
+		log.Info("Using " + projectRoot + " as the project root")
 
-		if numberOfFiles < 1 {
-			log.Info("No files to process for variant: " + variant)
-			continue
-		}
+		// Check to see if we need to read the manifest file due to missing options
+		if apiKey == "" || applicationId == "" || versionCode == "" || versionName == "" {
 
-		for _, file := range soFileList[variant] {
-			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
-			outputFile, err := android.Objcopy(objCopyPath, file)
+			if variant == "" {
+				return fmt.Errorf("missing variant. Please specify using `--variant``")
+			}
+
+			log.Info("Reading data from AndroidManifest.xml")
+			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
-				log.Error("failed to process file, "+file+" using objcopy. "+err.Error(), 1)
+				return err
 			}
 
-			log.Info("Uploading debug information for " + filepath.Base(file))
-
-			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, androidManifestData.AppId, androidManifestData.VersionName, androidManifestData.VersionCode, projectRoot, filepath.Base(file), overwrite)
-
-			fileFieldData := make(map[string]string)
-			fileFieldData["soFile"] = outputFile
-
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
-
-			if requestStatus != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return requestStatus
-				} else {
-					log.Warn(requestStatus.Error())
+			if apiKey == "" {
+				log.Info("Setting API key from AndroidManifest.xml")
+				for key, value := range manifestData.Application.MetaData.Name {
+					if value == "com.bugsnag.android.API_KEY" {
+						apiKey = manifestData.Application.MetaData.Value[key]
+					}
 				}
-			} else {
-				log.Success(filepath.Base(file) + " uploaded")
+			}
+
+			if applicationId == "" {
+				log.Info("Setting application ID from AndroidManifest.xml")
+				applicationId = manifestData.ApplicationId
+			}
+
+			if versionCode == "" {
+				log.Info("Setting version code from AndroidManifest.xml")
+				versionCode = manifestData.VersionCode
+			}
+
+			if versionName == "" {
+				log.Info("Setting version name from AndroidManifest.xml")
+				versionName = manifestData.VersionName
+			}
+		}
+
+		// Upload .so file(s)
+		for _, file := range fileList {
+			if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".sym.so") {
+
+				numberOfFiles := len(fileList)
+
+				if numberOfFiles < 1 {
+					log.Info("No files found to process")
+					continue
+				}
+
+				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
+
+				outputFile, err := android.Objcopy(objCopyPath, file)
+
+				if err != nil {
+					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
+				}
+
+				log.Info("Uploading debug information for " + filepath.Base(file))
+
+				uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+
+				if err != nil {
+					return err
+				}
+
+				fileFieldData := make(map[string]string)
+				fileFieldData["soFile"] = outputFile
+
+				var requestStatus error
+
+				if dryRun {
+					requestStatus = nil
+				} else {
+					requestStatus = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+				}
+
+				if requestStatus != nil {
+					if numberOfFiles > 1 && failOnUploadError {
+						return requestStatus
+					} else {
+						log.Warn(requestStatus.Error())
+					}
+				} else {
+					log.Success(filepath.Base(file) + " uploaded")
+				}
 			}
 		}
 	}

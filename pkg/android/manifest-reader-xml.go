@@ -9,7 +9,7 @@ import (
 
 type Manifest struct {
 	XMLName     xml.Name    `xml:"manifest"`
-	AppId       string      `xml:"package,attr"`
+	ApplicationId     string      `xml:"package,attr"`
 	VersionCode string      `xml:"versionCode,attr"`
 	VersionName string      `xml:"versionName,attr"`
 	Application Application `xml:"application"`
