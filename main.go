@@ -110,7 +110,7 @@ func main() {
 
 		err := upload.ProcessAndroidNDK(
 			commands.ApiKey,
-			commands.Upload.AndroidNdk.ApplicationId,
+			commands.Upload.AndroidNdk.Package,
 			commands.Upload.AndroidNdk.AndroidNdkRoot,
 			commands.Upload.AndroidNdk.AppManifest,
 			commands.Upload.AndroidNdk.Path,
@@ -152,6 +152,7 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
+			commands.FailOnUploadError,
 			commands.Upload.AndroidProguard.DryRun)
 
 		if err != nil {
