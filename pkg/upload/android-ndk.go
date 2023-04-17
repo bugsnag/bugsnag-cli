@@ -149,7 +149,7 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 
 		// Upload .so file(s)
 		for _, file := range fileList {
-			if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
+			if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".sym.so") {
 
 				numberOfFiles := len(fileList)
 
