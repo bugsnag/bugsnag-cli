@@ -34,12 +34,12 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 		return err
 	}
 
-	log.Info("Android NDK Path: " + androidNdkPath)
+	log.Info("Android NDK Path: " + androidNdkRoot)
 
 	// Find objcopy within NDK path
 	log.Info("Locating objcopy within Android NDK path")
 
-	objCopyPath, err := android.BuildObjcopyPath(androidNdkPath)
+	objCopyPath, err := android.BuildObjcopyPath(androidNdkRoot)
 
 	if err != nil {
 		return err
@@ -120,7 +120,7 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 
 			if _package == "" {
 				log.Info("Setting application ID from AndroidManifest.xml")
-				_package = manifestData._package
+				_package = manifestData.Package
 			}
 
 			if versionCode == "" {

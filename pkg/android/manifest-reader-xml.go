@@ -8,11 +8,11 @@ import (
 )
 
 type Manifest struct {
-	XMLName       xml.Name    `xml:"manifest"`
-	ApplicationId string      `xml:"package,attr"`
-	VersionCode   string      `xml:"versionCode,attr"`
-	VersionName   string      `xml:"versionName,attr"`
-	Application   Application `xml:"application"`
+	XMLName     xml.Name    `xml:"manifest"`
+	Package     string      `xml:"package,attr"`
+	VersionCode string      `xml:"versionCode,attr"`
+	VersionName string      `xml:"versionName,attr"`
+	Application Application `xml:"application"`
 }
 
 type Application struct {
