@@ -135,7 +135,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 			if applicationId == "" {
 				log.Info("Setting application ID from AndroidManifest.xml")
-				applicationId = manifestData.Package
+				applicationId = manifestData.ApplicationId
 			}
 
 			if versionCode == "" {

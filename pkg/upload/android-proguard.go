@@ -105,7 +105,7 @@ func ProcessAndroidProguard(paths []string, applicationId string, appManifestPat
 
 		log.Info("Uploading debug information for " + config["mappingPath"])
 
-		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, androidManifestData.Package, androidManifestData.VersionName, androidManifestData.VersionCode, buildUuid, overwrite)
+		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, androidManifestData.ApplicationId, androidManifestData.VersionName, androidManifestData.VersionCode, buildUuid, overwrite)
 
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
