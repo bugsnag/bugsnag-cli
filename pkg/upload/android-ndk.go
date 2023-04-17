@@ -168,29 +168,33 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
 				}
 
-				if !dryRun {
-					log.Info("Uploading debug information for " + filepath.Base(file))
+				log.Info("Uploading debug information for " + filepath.Base(file))
 
-					uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+				uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
-					if err != nil {
-						return err
-					}
+				if err != nil {
+					return err
+				}
 
-					fileFieldData := make(map[string]string)
-					fileFieldData["soFile"] = outputFile
+				fileFieldData := make(map[string]string)
+				fileFieldData["soFile"] = outputFile
 
-					requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+				var requestStatus error
 
-					if requestStatus != nil {
-						if numberOfFiles > 1 && failOnUploadError {
-							return requestStatus
-						} else {
-							log.Warn(requestStatus.Error())
-						}
+				if dryRun {
+					requestStatus = nil
+				} else {
+					requestStatus = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+				}
+
+				if requestStatus != nil {
+					if numberOfFiles > 1 && failOnUploadError {
+						return requestStatus
 					} else {
-						log.Success(filepath.Base(file) + " uploaded")
+						log.Warn(requestStatus.Error())
 					}
+				} else {
+					log.Success(filepath.Base(file) + " uploaded")
 				}
 			}
 		}
