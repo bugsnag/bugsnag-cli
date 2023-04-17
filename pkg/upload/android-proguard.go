@@ -18,7 +18,6 @@ type AndroidProguardMapping struct {
 	Path            utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	VersionCode     string            `help:"Module version code"`
 	VersionName     string            `help:"Module version name"`
-	DryRun          bool              `help:"Validate but do not upload"`
 }
 
 func ProcessAndroidProguard(paths []string, applicationId string, appManifestPath string, buildUuid string, configuration string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {

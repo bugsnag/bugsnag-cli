@@ -25,6 +25,7 @@ func main() {
 			Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
 			Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
 			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
+			DryRun    bool `help:"Validate but do not upload"`
 
 			// required options
 			AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
@@ -123,6 +124,7 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
+			commands.Upload.DryRun,
 		)
 
 		if err != nil {
@@ -153,7 +155,8 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.FailOnUploadError,
-			commands.Upload.AndroidProguard.DryRun)
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

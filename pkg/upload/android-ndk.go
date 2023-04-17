@@ -22,10 +22,14 @@ type AndroidNdkMapping struct {
 	VersionName    string            `help:"Module version name"`
 }
 
-func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool) error {
+func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, appManifest string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var fileList []string
 	var mergeNativeLibPath string
+
+	if dryRun {
+		log.Info("Performing dry run")
+	}
 
 	// Check NDK path is set
 	androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
@@ -96,8 +100,17 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 					}
 				}
 				appManifest = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+
+				if utils.FileExists(mergeNativeLibPath) {
+					if projectRoot == "" {
+						// Setting projectRoot to the suspected root of the project
+						projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+					}
+				}
 			}
 		}
+
+		log.Info("Using " + projectRoot + " as the project root")
 
 		// Check to see if we need to read the manifest file due to missing options
 		if apiKey == "" || _package == "" || versionCode == "" || versionName == "" {
@@ -153,27 +166,29 @@ func ProcessAndroidNDK(apiKey string, _package string, androidNdkRoot string, ap
 					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
 				}
 
-				log.Info("Uploading debug information for " + filepath.Base(file))
+				if !dryRun {
+					log.Info("Uploading debug information for " + filepath.Base(file))
 
-				uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, _package, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+					uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, _package, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
-				if err != nil {
-					return err
-				}
-
-				fileFieldData := make(map[string]string)
-				fileFieldData["soFile"] = outputFile
-
-				requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
-
-				if requestStatus != nil {
-					if numberOfFiles > 1 && failOnUploadError {
-						return requestStatus
-					} else {
-						log.Warn(requestStatus.Error())
+					if err != nil {
+						return err
 					}
-				} else {
-					log.Success(filepath.Base(file) + " uploaded")
+
+					fileFieldData := make(map[string]string)
+					fileFieldData["soFile"] = outputFile
+
+					requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+
+					if requestStatus != nil {
+						if numberOfFiles > 1 && failOnUploadError {
+							return requestStatus
+						} else {
+							log.Warn(requestStatus.Error())
+						}
+					} else {
+						log.Success(filepath.Base(file) + " uploaded")
+					}
 				}
 			}
 		}
