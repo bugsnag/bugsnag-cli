@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 // BuildDartUploadOptions - Builds the upload options for processing dart files
 func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
 	uploadOptions := make(map[string]string)
@@ -38,21 +40,46 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 }
 
 // BuildAndroidNDKUploadOptions - Builds the upload options for processing dart files
-func BuildAndroidNDKUploadOptions(apiKey string, appId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) map[string]string {
+func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = apiKey
-	uploadOptions["appId"] = appId
-	uploadOptions["versionName"] = versionName
-	uploadOptions["versionCode"] = versionCode
-	uploadOptions["projectRoot"] = projectRoot
-	uploadOptions["sharedObjectName"] = sharedObjectName
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if applicationId != "" {
+		uploadOptions["appId"] = applicationId
+	} else {
+		return nil, fmt.Errorf("missing application id, please specify using `--application-id`")
+	}
+
+	if versionCode != "" {
+		uploadOptions["versionCode"] = versionCode
+	} else {
+		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
+	}
+
+	if versionName != "" {
+		uploadOptions["versionName"] = versionName
+	} else {
+		return nil, fmt.Errorf("missing version name, please specify using `--version-name`")
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if sharedObjectName != "" {
+		uploadOptions["sharedObjectName"] = sharedObjectName
+	}
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 
-	return uploadOptions
+	return uploadOptions, nil
 }
 
 // BuildAndroidProguardUploadOptions - Builds the upload options for processing dart files

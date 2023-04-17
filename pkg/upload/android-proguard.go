@@ -18,7 +18,6 @@ type AndroidProguardMapping struct {
 	Path            utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 	VersionCode     string            `help:"Module version code"`
 	VersionName     string            `help:"Module version name"`
-	DryRun          bool              `help:"Validate but do not upload"`
 }
 
 func ProcessAndroidProguard(paths []string, appManifestPath string, mappingPath string, buildUuid string, configuration string, appId string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
@@ -58,9 +57,26 @@ func ProcessAndroidProguard(paths []string, appManifestPath string, mappingPath 
 			appManifestPath = filepath.Join(appManifestPath, configuration, "AndroidManifest.xml")
 		}
 
-		if mappingPath == "" {
-			if utils.FileExists(filepath.Join(path, "app", "build", "outputs", "mapping", configuration, "mapping.txt")) {
-				mappingPath = filepath.Join(path, "app", "build", "outputs", "mapping", configuration, "mapping.txt")
+		log.Info("Compressing " + config["mappingPath"])
+
+		outputFile, err := utils.GzipCompress(config["mappingPath"])
+
+		if err != nil {
+			return err
+		}
+
+		log.Info("Uploading debug information for " + config["mappingPath"])
+
+		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, androidManifestData.ApplicationId, androidManifestData.VersionName, androidManifestData.VersionCode, buildUuid, overwrite)
+
+		fileFieldData := make(map[string]string)
+		fileFieldData["proguard"] = outputFile
+
+		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+
+		if requestStatus != nil {
+			if numberOfVariants > 1 && failOnUploadError {
+				return requestStatus
 			} else {
 				return fmt.Errorf("unable to find mapping.txt. Please specify using `--mapping-path` ")
 			}

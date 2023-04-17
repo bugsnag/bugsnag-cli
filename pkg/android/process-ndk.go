@@ -46,7 +46,11 @@ func ProcessNdk(apiKey string, variant string, outputPath string, aabManifestDat
 
 			log.Info("Uploading debug information for " + filepath.Base(file))
 
-			uploadOptions := utils.BuildAndroidNDKUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
+			uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
+
+			if err != nil {
+				return nil
+			}
 
 			fileFieldData := make(map[string]string)
 			fileFieldData["soFile"] = outputFile
