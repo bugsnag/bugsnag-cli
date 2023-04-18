@@ -122,27 +122,28 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 			if apiKey == "" {
-				log.Info("Setting API key from AndroidManifest.xml")
 				for key, value := range manifestData.Application.MetaData.Name {
 					if value == "com.bugsnag.android.API_KEY" {
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
+
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 
 			if applicationId == "" {
-				log.Info("Setting application ID from AndroidManifest.xml")
 				applicationId = manifestData.ApplicationId
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 			}
 
 			if versionCode == "" {
-				log.Info("Setting version code from AndroidManifest.xml")
 				versionCode = manifestData.VersionCode
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 
 			if versionName == "" {
-				log.Info("Setting version name from AndroidManifest.xml")
 				versionName = manifestData.VersionName
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 			}
 		}
 
