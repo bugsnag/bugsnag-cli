@@ -44,7 +44,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			mappingFile = filepath.Join(mappingPath, variant, "mapping.txt")
 
 			if !utils.FileExists(mappingFile) {
-				return fmt.Errorf(mappingFile + " does not exist on the system")
+				return fmt.Errorf("unable to find mapping file in the specified project directory")
 			}
 
 			if appManifestPath == "" {
