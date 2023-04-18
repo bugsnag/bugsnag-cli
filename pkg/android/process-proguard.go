@@ -28,7 +28,11 @@ func ProcessProguard(apiKey string, configuration string, outputPath string, app
 
 	log.Info("Uploading debug information for " + mappingPath)
 
-	uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, appId, versionName, versionCode, buildUuid, overwrite)
+	uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, aabManifestData["package"], aabManifestData["versionName"], aabManifestData["versionCode"], aabManifestData["buildUuid"], overwrite)
+
+	if err != nil {
+		return err
+	}
 
 	fileFieldData := make(map[string]string)
 	fileFieldData["proguard"] = outputFile

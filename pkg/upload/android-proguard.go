@@ -22,7 +22,6 @@ type AndroidProguardMapping struct {
 func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath string, buildUuid string, paths []string, variant string, versionCode string, versionName string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var mappingFile string
-	var requestStatus error
 	var err error
 
 	for _, path := range paths {
@@ -31,7 +30,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			mappingPath := filepath.Join(path, "app", "build", "outputs", "mapping")
 
 			if !utils.FileExists(mappingPath) {
-				return fmt.Errorf("unable to find the merged_native_libs in " + path)
+				return fmt.Errorf("unable to find the mapping directory in " + path)
 			}
 
 			if variant == "" {
@@ -44,11 +43,15 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 			mappingFile = filepath.Join(mappingPath, variant, "mapping.txt")
 
+			if !utils.FileExists(mappingFile) {
+				return fmt.Errorf("unable to find mapping file in the specified project directory")
+			}
+
 			if appManifestPath == "" {
 				//	Get the expected path to the manifest using variant name from the given path
 				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			}
-		} else if filepath.Base(path) == "mapping.txt" {
+		} else {
 			mappingFile = path
 
 			if appManifestPath == "" {
@@ -58,10 +61,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 					if filepath.Base(mergedManifestPath) == "merged_manifests" {
 						variant, err = android.GetVariant(mergedManifestPath)
-
-						log.Info(mergedManifestPath)
-						log.Info(variant)
-
 						if err == nil {
 							appManifestPath = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 						}
@@ -74,10 +73,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		// Check to see if we need to read the manifest file due to missing options
 		if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
 
-			if variant == "" {
-				return fmt.Errorf("missing variant. Please specify using `--variant`")
-			}
-
 			log.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
@@ -86,36 +81,36 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			}
 
 			if apiKey == "" {
-				log.Info("Setting API key from AndroidManifest.xml")
 				for key, value := range manifestData.Application.MetaData.Name {
 					if value == "com.bugsnag.android.API_KEY" {
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 
 			if applicationId == "" {
-				log.Info("Setting application ID from AndroidManifest.xml")
 				applicationId = manifestData.ApplicationId
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 			}
 
 			if buildUuid == "" {
-				log.Info("Setting build UUID from AndroidManifest.xml")
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 						buildUuid = manifestData.Application.MetaData.Value[i]
 					}
 				}
+				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 			}
 
 			if versionCode == "" {
-				log.Info("Setting version code from AndroidManifest.xml")
 				versionCode = manifestData.VersionCode
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 
 			if versionName == "" {
-				log.Info("Setting version name from AndroidManifest.xml")
 				versionName = manifestData.VersionName
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 			}
 		}
 
@@ -129,19 +124,23 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 
 		log.Info("Uploading debug information for " + mappingFile)
 
-		uploadOptions := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
+		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
+
+		if err != nil {
+			return nil
+		}
 
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
 		if dryRun {
-			requestStatus = nil
+			err = nil
 		} else {
-			requestStatus = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 		}
 
-		if requestStatus != nil {
-			return requestStatus
+		if err != nil {
+			return err
 		} else {
 			log.Success(mappingFile + " uploaded")
 		}

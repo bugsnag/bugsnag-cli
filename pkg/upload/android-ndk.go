@@ -25,14 +25,14 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 	var fileList []string
 	var mergeNativeLibPath string
-	var requestStatus error
+	var err error
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
 	}
 
 	// Check NDK path is set
-	androidNdkRoot, err := android.GetAndroidNDKRoot(androidNdkRoot)
+	androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
 
 	if err != nil {
 		return err
@@ -114,10 +114,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		// Check to see if we need to read the manifest file due to missing options
 		if apiKey == "" || applicationId == "" || versionCode == "" || versionName == "" {
 
-			if variant == "" {
-				return fmt.Errorf("missing variant. Please specify using `--variant``")
-			}
-
 			log.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
@@ -126,27 +122,28 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 			if apiKey == "" {
-				log.Info("Setting API key from AndroidManifest.xml")
 				for key, value := range manifestData.Application.MetaData.Name {
 					if value == "com.bugsnag.android.API_KEY" {
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
+
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 
 			if applicationId == "" {
-				log.Info("Setting application ID from AndroidManifest.xml")
 				applicationId = manifestData.ApplicationId
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 			}
 
 			if versionCode == "" {
-				log.Info("Setting version code from AndroidManifest.xml")
 				versionCode = manifestData.VersionCode
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 
 			if versionName == "" {
-				log.Info("Setting version name from AndroidManifest.xml")
 				versionName = manifestData.VersionName
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 			}
 		}
 
@@ -181,16 +178,16 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				fileFieldData["soFile"] = outputFile
 
 				if dryRun {
-					requestStatus = nil
+					err = nil
 				} else {
-					requestStatus = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+					err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 				}
 
-				if requestStatus != nil {
+				if err != nil {
 					if numberOfFiles > 1 && failOnUploadError {
-						return requestStatus
+						return err
 					} else {
-						log.Warn(requestStatus.Error())
+						log.Warn(err.Error())
 					}
 				} else {
 					log.Success(filepath.Base(file) + " uploaded")
