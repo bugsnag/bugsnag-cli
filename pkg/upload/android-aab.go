@@ -20,7 +20,7 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, pro
 	var manifestData map[string]string
 
 	// Create temp directory
-	tempDir, err := os.MkdirTemp("", "")
+	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
 
 	if err != nil {
 		return err

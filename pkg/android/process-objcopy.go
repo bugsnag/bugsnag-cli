@@ -11,7 +11,7 @@ import (
 func Objcopy(objcopyPath string, file string) (string, error) {
 
 	// Create temp directory
-	tempDir, err := os.MkdirTemp("", "")
+	tempDir, err := os.MkdirTemp("", "bugsnag-cli-ndk-*")
 
 	if err != nil {
 		return "", err

@@ -148,7 +148,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 		}
 
-		// Process .so files
+		// Process .so files through objcopy to create .sym files, filtering any other file type
 		for _, file := range fileList {
 			if strings.HasSuffix(file, ".so.sym") {
 				processedFileList = append(processedFileList, file)
