@@ -169,8 +169,8 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 				processedFileList = append(processedFileList, outputFile)
 			} else if strings.HasSuffix(file, ".so.sym") {
+				processedFileList = append(processedFileList, file)
 			}
-			processedFileList = append(processedFileList, file)
 		}
 
 		// Upload processed .so.sym files
