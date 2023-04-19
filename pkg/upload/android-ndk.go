@@ -148,16 +148,11 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 		}
 
-		numberOfFiles := len(fileList)
-
-		if numberOfFiles < 1 {
-			log.Info("No files found to process")
-			continue
-		}
-
 		// Process .so files
 		for _, file := range fileList {
-			if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".so.sym") {
+			if strings.HasSuffix(file, ".so.sym") {
+				processedFileList = append(processedFileList, file)
+			} else if filepath.Ext(file) == ".so" {
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
@@ -168,9 +163,16 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				}
 
 				processedFileList = append(processedFileList, outputFile)
-			} else if strings.HasSuffix(file, ".so.sym") {
-				processedFileList = append(processedFileList, file)
+			} else {
+				log.Warn("")
 			}
+		}
+
+		numberOfFiles := len(processedFileList)
+
+		if numberOfFiles < 1 {
+			log.Info("No library files found to process")
+			continue
 		}
 
 		// Upload processed .so.sym files

@@ -55,8 +55,7 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, pro
 				return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
 			}
 		} else {
-			// Not an AAB file
-			return fmt.Errorf("")
+			return fmt.Errorf(path + " is not an AAB file")
 		}
 	}
 
@@ -79,26 +78,34 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, pro
 
 	soFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
-	fileList, err := utils.BuildFileList([]string{soFilePath})
+	if utils.FileExists(soFilePath) {
+		fileList, err := utils.BuildFileList([]string{soFilePath})
 
-	if err != nil {
-		return fmt.Errorf("error building `.so` file list. " + err.Error())
+		if err != nil {
+			return fmt.Errorf("error building `.so` file list. " + err.Error())
+		}
+
+		for _, file := range fileList {
+			err = ProcessAndroidNDK(apiKey, applicationId, androidNdkRoot, "", []string{file}, projectRoot, "", versionCode, versionName, endpoint+"/ndk-symbol", failOnUploadError, retries, timeout, overwrite, dryRun)
+
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		log.Info("Skipping NDK processing")
 	}
 
 	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
-	for _, file := range fileList {
-		err = ProcessAndroidNDK(apiKey, applicationId, androidNdkRoot, "", []string{file}, projectRoot, "", versionCode, versionName, endpoint+"/ndk-symbol", failOnUploadError, retries, timeout, overwrite, dryRun)
+	if utils.FileExists(mappingFilePath) {
+		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
 
 		if err != nil {
 			return err
 		}
-	}
-
-	err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
-
-	if err != nil {
-		return err
+	} else {
+		log.Info("Skipping Proguard processing")
 	}
 
 	return nil
