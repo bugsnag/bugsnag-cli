@@ -13,5 +13,5 @@ func TestAabManifestReader(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, map[string]string(map[string]string{"apiKey": "your-api-key", "buildUuid": "19ce65f2-3a0f-434d-bbea-142c3ff23c48", "package": "com.example.bugsnag.android", "versionCode": "1", "versionName": "1.0"}), results, "The map data should match")
+	assert.Equal(t, map[string]string(map[string]string{"apiKey": "your-api-key", "buildUuid": "19ce65f2-3a0f-434d-bbea-142c3ff23c48", "applicationId": "com.example.bugsnag.android", "versionCode": "1", "versionName": "1.0"}), results, "The map data should match")
 }

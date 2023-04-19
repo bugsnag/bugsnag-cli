@@ -30,7 +30,7 @@ func ReadAabManifest(path string) (map[string]string, error) {
 		}
 
 		if data.Name == "package" {
-			aabManifestData["package"] = data.Value
+			aabManifestData["applicationId"] = data.Value
 			continue
 		}
 
