@@ -164,7 +164,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 				processedFileList = append(processedFileList, outputFile)
 			} else {
-				log.Warn("")
+				log.Warn("Skipping unsupported file: " + file)
 			}
 		}
 
