@@ -25,6 +25,7 @@ func main() {
 			Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
 			Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
 			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
+			DryRun    bool `help:"Validate but do not upload"`
 
 			// required options
 			AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
@@ -83,18 +84,21 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidAab(
-			commands.Upload.AndroidAab.Path,
+			commands.ApiKey,
+			commands.Upload.AndroidAab.AndroidNdkRoot,
+			commands.Upload.AndroidAab.ApplicationId,
 			commands.Upload.AndroidAab.BuildUuid,
-			commands.Upload.AndroidAab.Configuration,
+			commands.Upload.AndroidAab.Path,
 			commands.Upload.AndroidAab.ProjectRoot,
 			commands.Upload.AndroidAab.VersionCode,
 			commands.Upload.AndroidAab.VersionName,
 			endpoint,
-			commands.Upload.Timeout,
+			commands.FailOnUploadError,
 			commands.Upload.Retries,
+			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.FailOnUploadError)
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
@@ -102,27 +106,29 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "upload android-ndk <path>":
+	case "upload android-ndk <path>", "upload android-ndk":
 
 		endpoint = endpoint + "/ndk-symbol"
 
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidNDK(
-			commands.Upload.AndroidNdk.Path,
-			commands.Upload.AndroidNdk.AndroidNdkRoot,
-			commands.Upload.AndroidNdk.AppManifestPath,
-			commands.Upload.AndroidNdk.Configuration,
-			commands.Upload.AndroidNdk.ProjectRoot,
+			commands.ApiKey,
 			commands.Upload.AndroidNdk.ApplicationId,
+			commands.Upload.AndroidNdk.AndroidNdkRoot,
+			commands.Upload.AndroidNdk.AppManifest,
+			commands.Upload.AndroidNdk.Path,
+			commands.Upload.AndroidNdk.ProjectRoot,
+			commands.Upload.AndroidNdk.Variant,
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
 			endpoint,
-			commands.Upload.Timeout,
+			commands.FailOnUploadError,
 			commands.Upload.Retries,
+			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.FailOnUploadError)
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
@@ -137,21 +143,20 @@ func main() {
 		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidProguard(
-			commands.Upload.AndroidProguard.Path,
-			commands.Upload.AndroidProguard.AppManifestPath,
-			commands.Upload.AndroidProguard.MappingPath,
-			commands.Upload.AndroidProguard.BuildUuid,
-			commands.Upload.AndroidProguard.Configuration,
+			commands.ApiKey,
 			commands.Upload.AndroidProguard.ApplicationId,
+			commands.Upload.AndroidProguard.AppManifest,
+			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.Path,
+			commands.Upload.AndroidProguard.Variant,
 			commands.Upload.AndroidProguard.VersionCode,
 			commands.Upload.AndroidProguard.VersionName,
 			endpoint,
-			commands.Upload.Timeout,
 			commands.Upload.Retries,
+			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.FailOnUploadError,
-			commands.Upload.AndroidProguard.DryRun)
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
