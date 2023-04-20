@@ -7,6 +7,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
+	"strings"
 )
 
 type AndroidProguardMapping struct {
@@ -66,13 +67,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 						}
 					}
 				}
-
-				if len(variants) > 1 {
-					fmt.Println(variants)
-					return fmt.Errorf("more than one variant found. Please specify using `--configuration`")
-				}
-
-				configuration = variants[0]
 			}
 
 		}
@@ -143,7 +137,12 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		if dryRun {
 			err = nil
 		} else {
-			err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			err = server.ProcessRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout)
+
+			if strings.Contains(err.Error(), "404 Not Found") {
+				log.Info("Trying " + endpoint)
+				err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			}
 		}
 
 		if err != nil {

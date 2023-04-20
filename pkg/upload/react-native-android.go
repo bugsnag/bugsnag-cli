@@ -122,7 +122,7 @@ func ProcessReactNativeAndroid(paths []string, appManifestPath string, appVersio
 	fileFieldData["sourceMap"] = sourceMapPath
 	fileFieldData["bundle"] = bundlePath
 
-	requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+	requestStatus := server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout)
 
 	if requestStatus != nil {
 		return requestStatus
