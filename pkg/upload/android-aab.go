@@ -102,9 +102,6 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 
 	fileList, err := utils.BuildFileList([]string{soFilePath})
 
-	if err != nil {
-	}
-
 	if len(fileList) > 0 && err == nil {
 		for _, file := range fileList {
 			err = ProcessAndroidNDK(apiKey, applicationId, androidNdkRoot, "", []string{file}, projectRoot, "", versionCode, versionName, endpoint+"/ndk-symbol", failOnUploadError, retries, timeout, overwrite, dryRun)
