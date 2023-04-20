@@ -7,7 +7,7 @@ import (
 )
 
 // Objcopy - Processes files using objcopy
-func Objcopy(objcopyPath string, file string) (string, error) {
+func Objcopy(objcopyPath string, file string, outputPath string) (string, error) {
 
 	objcopyLocation, err := exec.LookPath(objcopyPath)
 
@@ -15,7 +15,8 @@ func Objcopy(objcopyPath string, file string) (string, error) {
 		return "", err
 	}
 
-	outputFile := strings.ReplaceAll(file, filepath.Ext(file), ".sym.so")
+	outputFile := filepath.Join(outputPath, filepath.Base(file))
+	outputFile = strings.ReplaceAll(outputFile, filepath.Ext(outputFile), ".so.sym")
 
 	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, outputFile)
 

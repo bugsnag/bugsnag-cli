@@ -2,138 +2,128 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-	"strconv"
-	"strings"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
+	"path/filepath"
 )
 
 type AndroidAabMapping struct {
-	ApplicationId string            `help:"Module application identifier"`
-	BuildUuid     string            `help:"Module Build UUID"`
-	Configuration string            `help:"Build type, like 'debug' or 'release'"`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file"`
-	VersionCode   string            `help:"Module version code"`
-	VersionName   string            `help:"Module version name"`
+	ApplicationId  string            `help:"Module application identifier"`
+	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
+	BuildUuid      string            `help:"Module Build UUID"`
+	Path           utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	ProjectRoot    string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	VersionCode    string            `help:"Module version code"`
+	VersionName    string            `help:"Module version name"`
 }
 
-var getApiKeyFromManifest = false
-var variantConfig = make(map[string]map[string]string)
+func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
-func ProcessAndroidAab(paths []string, buildUuid string, configuration string, projectRoot string, versionCode string, versionName string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
-	// Check if we have project root
-	if projectRoot == "" {
-		return fmt.Errorf("`--project-root` missing from options")
+	var manifestData map[string]string
+	var aabManifestPath string
+
+	// Create temp working directory
+	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
+
+	if err != nil {
+		return fmt.Errorf("error creating temporary working directory " + err.Error())
 	}
 
-	// Check if we need to get the API key from the AndroidManifest.xml
-	if apiKey == "" {
-		getApiKeyFromManifest = true
+	defer os.RemoveAll(tempDir)
+
+	if dryRun {
+		log.Info("Performing dry run - no files will be uploaded")
 	}
 
-	// Loop through paths
 	for _, path := range paths {
-		log.Info("Building variants configuration")
+		if filepath.Ext(path) == ".aab" {
 
-		// Check to see if we're working with a directory
-		if utils.IsDir(path) {
-			// Build a list of variants from the directory
-			variants, err := android.BuildVariantsList(path)
+			log.Info("Extracting " + filepath.Base(path) + " to " + tempDir)
+
+			err = utils.Unzip(path, tempDir)
 
 			if err != nil {
 				return err
 			}
 
-			// For each variant build a map that has the path to the .aab file
-			for _, variant := range variants {
-				variantConfig[variant] = map[string]string{}
-				variantConfig[variant]["aabPath"] = filepath.Join(path, variant, "app-"+variant+".aab")
-			}
+			log.Success(filepath.Base(path) + " expanded")
 
-			// Check to see if we're working with a single AAB file
-		} else if filepath.Ext(path) == ".aab" {
-			variant := filepath.Base(strings.Replace(path, filepath.Base(path), "", -1))
-			variantConfig[variant] = map[string]string{}
-			variantConfig[variant]["aabPath"] = path
+			aabManifestPath = filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
+
 		} else {
-			return fmt.Errorf("unsupported file type for " + path)
+			return fmt.Errorf(path + " is not an AAB file")
 		}
 	}
 
-	numberOfVariants := len(variantConfig)
-
-	if numberOfVariants < 1 {
-		log.Info("No variants to process")
-		return nil
-	}
-
-	log.Info("Processing " + strconv.Itoa(numberOfVariants) + " variant(s)")
-
-	for variant, config := range variantConfig {
-		log.Info("Processing variant: " + variant)
-
-		if !utils.FileExists(config["aabPath"]) {
-			log.Info(variant + " does not have a valid .aab file")
-			continue
-		}
-
-		outputPath := filepath.Join(strings.Replace(config["aabPath"], filepath.Base(config["aabPath"]), "", -1), "raw")
-
-		log.Info("Expanding " + filepath.Base(config["aabPath"]))
-
-		err := utils.Unzip(config["aabPath"], outputPath)
-
-		if err != nil {
-			return err
-		}
-
-		log.Success(filepath.Base(config["aabPath"]) + " expanded")
+	// Check to see if we need to read the manifest file due to missing options
+	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		aabManifestData, err := android.ReadAabManifest(filepath.Join(outputPath, "base", "manifest", "AndroidManifest.xml"))
+		if utils.FileExists(aabManifestPath) {
+			manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
 
-		if err != nil {
-			return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
+			if err != nil {
+				return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
+			}
+		} else {
+			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
 		}
 
-		if getApiKeyFromManifest {
-			apiKey = aabManifestData["apiKey"]
+		if apiKey == "" {
+			apiKey = manifestData["apiKey"]
+			log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 		}
 
-		err = android.ProcessProguard(apiKey, variant, outputPath, aabManifestData, overwrite, timeout, numberOfVariants, endpoint, failOnUploadError)
-
-		if err != nil {
-			return fmt.Errorf("error processing Proguard mapping file. " + err.Error())
+		if applicationId == "" {
+			applicationId = manifestData["applicationId"]
+			log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 		}
 
-		androidNdkRoot, err := android.GetAndroidNDKRoot("")
+		if buildUuid == "" {
+			buildUuid = manifestData["buildUuid"]
+			log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+		}
+
+		if versionCode == "" {
+			versionCode = manifestData["versionCode"]
+			log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+		}
+
+		if versionName == "" {
+			versionName = manifestData["versionName"]
+			log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+		}
+	}
+
+	soFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
+
+	fileList, err := utils.BuildFileList([]string{soFilePath})
+
+	if len(fileList) > 0 && err == nil {
+		for _, file := range fileList {
+			err = ProcessAndroidNDK(apiKey, applicationId, androidNdkRoot, "", []string{file}, projectRoot, "", versionCode, versionName, endpoint+"/ndk-symbol", failOnUploadError, retries, timeout, overwrite, dryRun)
+
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		log.Info("No NDK (.so) files detected for upload. " + err.Error())
+	}
+
+	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
+
+	if utils.FileExists(mappingFilePath) {
+		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
 
 		if err != nil {
 			return err
 		}
-
-		log.Info("Using Android NDK located here: " + androidNdkRoot)
-
-		log.Info("Locating objcopy within Android NDK path")
-
-		objCopyPath, err := android.BuildObjcopyPath(androidNdkRoot)
-
-		if err != nil {
-			return err
-		}
-
-		log.Info("Using objcopy located: " + objCopyPath)
-
-		err = android.ProcessNdk(apiKey, variant, outputPath, aabManifestData, objCopyPath, projectRoot, overwrite, timeout, endpoint, failOnUploadError)
-
-		if err != nil {
-			return fmt.Errorf("error processing NDK symbol files. " + err.Error())
-		}
+	} else {
+		log.Info("No Proguard (mapping.txt) file detected for upload.")
 	}
 
 	return nil

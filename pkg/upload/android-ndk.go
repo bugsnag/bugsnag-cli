@@ -6,6 +6,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -24,8 +25,10 @@ type AndroidNdkMapping struct {
 func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var fileList []string
+	var symbolFileList []string
 	var mergeNativeLibPath string
 	var err error
+	var workingDir string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -83,7 +86,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				projectRoot = path
 			}
 
-		} else if filepath.Ext(path) == ".so" && !strings.HasSuffix(path, ".sym.so") {
+		} else {
 			fileList = []string{path}
 
 			if appManifestPath == "" {
@@ -97,19 +100,19 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 						if err == nil {
 							appManifestPath = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 						}
-					}
-				}
 
-				if utils.FileExists(mergeNativeLibPath) {
-					if projectRoot == "" {
-						// Setting projectRoot to the suspected root of the project
-						projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+						if projectRoot == "" {
+							// Setting projectRoot to the suspected root of the project
+							projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+						}
 					}
 				}
 			}
 		}
 
-		log.Info("Using " + projectRoot + " as the project root")
+		if projectRoot != "" {
+			log.Info("Using " + projectRoot + " as the project root")
+		}
 
 		// Check to see if we need to read the manifest file due to missing options
 		if apiKey == "" || applicationId == "" || versionCode == "" || versionName == "" {
@@ -147,52 +150,72 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 		}
 
-		// Upload .so file(s)
+		// Process .so files through objcopy to create .sym files, filtering any other file type
 		for _, file := range fileList {
-			if filepath.Ext(file) == ".so" && !strings.HasSuffix(file, ".sym.so") {
-
-				numberOfFiles := len(fileList)
-
-				if numberOfFiles < 1 {
-					log.Info("No files found to process")
-					continue
-				}
+			if strings.HasSuffix(file, ".so.sym") {
+				symbolFileList = append(symbolFileList, file)
+			} else if filepath.Ext(file) == ".so" {
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
-				outputFile, err := android.Objcopy(objCopyPath, file)
+				if workingDir == "" {
+					workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
+
+					if err != nil {
+						return fmt.Errorf("error creating temporary working directory " + err.Error())
+					}
+
+					defer os.RemoveAll(workingDir)
+				}
+
+				outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
 
 				if err != nil {
 					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
 				}
 
-				log.Info("Uploading debug information for " + filepath.Base(file))
-
-				uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
-
-				if err != nil {
-					return err
-				}
-
-				fileFieldData := make(map[string]string)
-				fileFieldData["soFile"] = outputFile
-
-				if dryRun {
-					err = nil
-				} else {
-					err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
-				}
-
-				if err != nil {
-					if numberOfFiles > 1 && failOnUploadError {
-						return err
-					} else {
-						log.Warn(err.Error())
-					}
-				} else {
-					log.Success(filepath.Base(file) + " uploaded")
-				}
+				symbolFileList = append(symbolFileList, outputFile)
+			} else {
+				log.Warn("Skipping unsupported file: " + file)
 			}
+		}
+
+		numberOfFiles := len(symbolFileList)
+
+		if numberOfFiles < 1 {
+			log.Info("No library files found to process")
+			continue
+		}
+
+		// Upload processed .so.sym files
+		for _, file := range symbolFileList {
+			log.Info("Uploading debug information for " + filepath.Base(file))
+
+			uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+
+			if err != nil {
+				return err
+			}
+
+			fileFieldData := make(map[string]string)
+			fileFieldData["soFile"] = file
+
+			if dryRun {
+				err = nil
+			} else {
+				err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			}
+
+			if err != nil {
+				if numberOfFiles > 1 && failOnUploadError {
+					return err
+				} else {
+					log.Warn(err.Error())
+				}
+			} else {
+				log.Success(filepath.Base(file) + " uploaded")
+			}
+
 		}
 	}
 
