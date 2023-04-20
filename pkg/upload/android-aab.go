@@ -131,7 +131,7 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 			return err
 		}
 	} else {
-		log.Info("Skipping Proguard processing")
+		log.Info("No Proguard (mapping.txt) file detected for upload.")
 	}
 
 	return nil
