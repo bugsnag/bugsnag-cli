@@ -103,10 +103,9 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 	fileList, err := utils.BuildFileList([]string{soFilePath})
 
 	if err != nil {
-		return fmt.Errorf("error building `.so` file list. " + err.Error())
 	}
 
-	if len(fileList) < 1 {
+	if len(fileList) > 0 && err == nil {
 		for _, file := range fileList {
 			err = ProcessAndroidNDK(apiKey, applicationId, androidNdkRoot, "", []string{file}, projectRoot, "", versionCode, versionName, endpoint+"/ndk-symbol", failOnUploadError, retries, timeout, overwrite, dryRun)
 
@@ -115,7 +114,7 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 			}
 		}
 	} else {
-		log.Info("No NDK (.so) files detected for upload.")
+		log.Info("No NDK (.so) files detected for upload. " + err.Error())
 	}
 
 	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
