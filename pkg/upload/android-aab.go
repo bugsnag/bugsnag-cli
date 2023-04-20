@@ -119,7 +119,7 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 			}
 		}
 	} else {
-		log.Info("Skipping NDK processing")
+		log.Info("No NDK (.so) files detected for upload.")
 	}
 
 	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
