@@ -25,17 +25,10 @@ type AndroidNdkMapping struct {
 func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var fileList []string
-	var processedFileList []string
+	var symbolFileList []string
 	var mergeNativeLibPath string
 	var err error
-
-	tempDir, err := os.MkdirTemp("", "bugsnag-cli-ndk-*")
-
-	if err != nil {
-		return fmt.Errorf("error creating temporary working directory " + err.Error())
-	}
-
-	defer os.RemoveAll(tempDir)
+	var workingDir string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -160,24 +153,34 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		// Process .so files through objcopy to create .sym files, filtering any other file type
 		for _, file := range fileList {
 			if strings.HasSuffix(file, ".so.sym") {
-				processedFileList = append(processedFileList, file)
+				symbolFileList = append(symbolFileList, file)
 			} else if filepath.Ext(file) == ".so" {
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
-				outputFile, err := android.Objcopy(objCopyPath, file, tempDir)
+				if workingDir == "" {
+					workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
+
+					if err != nil {
+						return fmt.Errorf("error creating temporary working directory " + err.Error())
+					}
+
+					defer os.RemoveAll(workingDir)
+				}
+
+				outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
 
 				if err != nil {
 					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
 				}
 
-				processedFileList = append(processedFileList, outputFile)
+				symbolFileList = append(symbolFileList, outputFile)
 			} else {
 				log.Warn("Skipping unsupported file: " + file)
 			}
 		}
 
-		numberOfFiles := len(processedFileList)
+		numberOfFiles := len(symbolFileList)
 
 		if numberOfFiles < 1 {
 			log.Info("No library files found to process")
@@ -185,7 +188,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		}
 
 		// Upload processed .so.sym files
-		for _, file := range processedFileList {
+		for _, file := range symbolFileList {
 			log.Info("Uploading debug information for " + filepath.Base(file))
 
 			uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)

@@ -72,10 +72,6 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
 		}
 
-		if err != nil {
-			return err
-		}
-
 		if apiKey == "" {
 			apiKey = manifestData["apiKey"]
 			log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
