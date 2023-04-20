@@ -10,14 +10,19 @@ import (
 )
 
 type AndroidAabMapping struct {
+	ApplicationId  string            `help:"Module application identifier"`
 	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
+	BuildUuid      string            `help:"Module Build UUID"`
 	Path           utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	ProjectRoot    string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	VersionCode    string            `help:"Module version code"`
+	VersionName    string            `help:"Module version name"`
 }
 
-func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, projectRoot string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var manifestData map[string]string
+	var aabManifestPath string
 
 	// Create temp working directory
 	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
@@ -45,38 +50,57 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, pro
 
 			log.Success(filepath.Base(path) + " expanded")
 
-			aabManifestPath := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
+			aabManifestPath = filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
 
-			if utils.FileExists(aabManifestPath) {
-				manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
-
-				if err != nil {
-					return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
-				}
-			} else {
-				return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
-			}
 		} else {
 			return fmt.Errorf(path + " is not an AAB file")
 		}
 	}
 
-	if apiKey == "" {
-		apiKey = manifestData["apiKey"]
-		log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+	// Check to see if we need to read the manifest file due to missing options
+	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
+
+		log.Info("Reading data from AndroidManifest.xml")
+
+		if utils.FileExists(aabManifestPath) {
+			manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+
+			if err != nil {
+				return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
+			}
+		} else {
+			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
+		}
+
+		if err != nil {
+			return err
+		}
+
+		if apiKey == "" {
+			apiKey = manifestData["apiKey"]
+			log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+		}
+
+		if applicationId == "" {
+			applicationId = manifestData["applicationId"]
+			log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+		}
+
+		if buildUuid == "" {
+			buildUuid = manifestData["buildUuid"]
+			log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+		}
+
+		if versionCode == "" {
+			versionCode = manifestData["versionCode"]
+			log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+		}
+
+		if versionName == "" {
+			versionName = manifestData["versionName"]
+			log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+		}
 	}
-
-	applicationId := manifestData["applicationId"]
-	log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-
-	versionCode := manifestData["versionCode"]
-	log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-
-	versionName := manifestData["versionName"]
-	log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-
-	buildUuid := manifestData["buildUuid"]
-	log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 
 	soFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
