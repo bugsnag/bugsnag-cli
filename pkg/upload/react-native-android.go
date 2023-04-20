@@ -22,9 +22,13 @@ type ReactNativeAndroid struct {
 	VersionCode  string            `help:"The version code for the application (Android only)."`
 }
 
-func ProcessReactNativeAndroid(apiKey string, appManifest string, bundle string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, version string, versionCode string, sourceMap string, endpoint string, timeout int, retries int, overwrite bool) error {
+func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, version string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
 
 	var err error
+
+	if dryRun {
+		log.Info("Performing dry run - no files will be uploaded")
+	}
 
 	for _, path := range paths {
 
@@ -32,26 +36,26 @@ func ProcessReactNativeAndroid(apiKey string, appManifest string, bundle string,
 			projectRoot = path
 		}
 
-		if appManifest == "" {
+		if appManifestPath == "" {
 			log.Info("Locating Android manifest")
 
 			if utils.FileExists(filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")) {
-				appManifest = filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")
+				appManifestPath = filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")
 			} else if utils.FileExists(filepath.Join(path, "app", "build", "intermediates", "merged_manifests")) {
-				appManifest = filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
+				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
 			} else {
 				return fmt.Errorf("unable to find AndroidManifest.xml. Please specify using `--app-manifest-path` ")
 			}
 
 			if variant == "" {
-				variant, err = android.GetVariant(appManifest)
+				variant, err = android.GetVariant(appManifestPath)
 
 				if err != nil {
 					return err
 				}
 			}
 
-			appManifest = filepath.Join(appManifest, variant, "AndroidManifest.xml")
+			appManifestPath = filepath.Join(appManifestPath, variant, "AndroidManifest.xml")
 
 		}
 
@@ -59,7 +63,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifest string, bundle string,
 		if apiKey == "" || versionCode == "" || version == "" {
 
 			log.Info("Reading data from AndroidManifest.xml")
-			manifestData, err := android.ParseAndroidManifestXML(appManifest)
+			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
 				return err
@@ -86,34 +90,34 @@ func ProcessReactNativeAndroid(apiKey string, appManifest string, bundle string,
 			}
 		}
 
-		if sourceMap == "" {
+		if sourceMapPath == "" {
 			if utils.FileExists(filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")) {
-				sourceMap = filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")
+				sourceMapPath = filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")
 			} else if utils.FileExists(filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")) {
-				sourceMap = filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")
+				sourceMapPath = filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")
 			} else {
 				return fmt.Errorf("unable to find the source map path. Please specify using `--source-map-path`")
 			}
 
-			sourceMap = filepath.Join(sourceMap, variant, "index.android.bundle.map")
+			sourceMapPath = filepath.Join(sourceMapPath, variant, "index.android.bundlePath.map")
 		}
 
-		if !utils.FileExists(sourceMap) {
-			return fmt.Errorf(sourceMap + " doesn't exist on the system")
+		if !utils.FileExists(sourceMapPath) {
+			return fmt.Errorf(sourceMapPath + " doesn't exist on the system")
 		}
 
-		if bundle == "" {
-			if utils.FileExists(filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")) {
-				bundle = filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
-			} else if utils.FileExists(filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")) {
-				bundle = filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+		if bundlePath == "" {
+			if utils.FileExists(filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")) {
+				bundlePath = filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")
+			} else if utils.FileExists(filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")) {
+				bundlePath = filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")
 			} else {
-				return fmt.Errorf("unable to find the bundle path. Please specify using `--bundle-path`")
+				return fmt.Errorf("unable to find the bundlePath path. Please specify using `--bundlePath-path`")
 			}
 		}
 
-		if !utils.FileExists(bundle) {
-			return fmt.Errorf(bundle + " doesn't exist on the system")
+		if !utils.FileExists(bundlePath) {
+			return fmt.Errorf(bundlePath + " doesn't exist on the system")
 		}
 	}
 
@@ -122,14 +126,17 @@ func ProcessReactNativeAndroid(apiKey string, appManifest string, bundle string,
 	uploadOptions := utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
 
 	fileFieldData := make(map[string]string)
-	fileFieldData["sourceMap"] = sourceMap
-	fileFieldData["bundle"] = bundle
+	fileFieldData["sourceMap"] = sourceMapPath
+	fileFieldData["bundle"] = bundlePath
 
-	requestStatus := server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout)
+	if dryRun {
+		err = nil
+	} else {
+		err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout)
+	}
 
-	if requestStatus != nil {
-		return requestStatus
-
+	if err != nil {
+		return err
 	}
 
 	return nil

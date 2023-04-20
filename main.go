@@ -198,6 +198,7 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
+			commands.Upload.DryRun,
 		)
 
 		if err != nil {
