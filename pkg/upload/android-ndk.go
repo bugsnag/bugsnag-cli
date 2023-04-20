@@ -203,7 +203,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			if dryRun {
 				err = nil
 			} else {
-				err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+				err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout)
 			}
 
 			if err != nil {

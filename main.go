@@ -61,8 +61,6 @@ func main() {
 			log.Error("no API key provided", 1)
 		}
 
-		log.Info("Uploading files to: " + endpoint)
-
 		err := upload.All(
 			commands.Upload.All.Path,
 			commands.Upload.All.UploadOptions,
@@ -80,8 +78,6 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-aab <path>":
-
-		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidAab(
 			commands.ApiKey,
@@ -108,10 +104,6 @@ func main() {
 
 	case "upload android-ndk <path>", "upload android-ndk":
 
-		endpoint = endpoint + "/ndk-symbol"
-
-		log.Info("Uploading files to: " + endpoint)
-
 		err := upload.ProcessAndroidNDK(
 			commands.ApiKey,
 			commands.Upload.AndroidNdk.ApplicationId,
@@ -137,12 +129,6 @@ func main() {
 		log.Success("Upload(s) completed")
 
 	case "upload android-proguard <path>", "upload android-proguard":
-
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
-		}
-
-		log.Info("Uploading files to: " + endpoint)
 
 		err := upload.ProcessAndroidProguard(
 			commands.ApiKey,
@@ -172,10 +158,6 @@ func main() {
 			log.Error("no API key provided", 1)
 		}
 
-		endpoint = endpoint + "/dart-symbol"
-
-		log.Info("Uploading files to: " + endpoint)
-
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
 			commands.AppVersion,
 			commands.AppVersionCode,
@@ -199,9 +181,6 @@ func main() {
 		if commands.ApiKey == "" {
 			log.Error("no API key provided", 1)
 		}
-
-		// Build endpoint URI
-		endpoint = endpoint + "/react-native-source-map"
 
 		err := upload.ProcessReactNativeAndroid(commands.Upload.ReactNativeAndroid.Path,
 			commands.Upload.ReactNativeAndroid.AppManifestPath,
