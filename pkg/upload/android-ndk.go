@@ -6,6 +6,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -27,6 +28,14 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var processedFileList []string
 	var mergeNativeLibPath string
 	var err error
+
+	tempDir, err := os.MkdirTemp("", "bugsnag-cli-ndk-*")
+
+	if err != nil {
+		return fmt.Errorf("error creating temporary working directory " + err.Error())
+	}
+
+	defer os.RemoveAll(tempDir)
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -156,7 +165,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
-				outputFile, err := android.Objcopy(objCopyPath, file)
+				outputFile, err := android.Objcopy(objCopyPath, file, tempDir)
 
 				if err != nil {
 					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())

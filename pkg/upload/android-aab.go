@@ -19,12 +19,14 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, paths []string, pro
 
 	var manifestData map[string]string
 
-	// Create temp directory
+	// Create temp working directory
 	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
 
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating temporary working directory " + err.Error())
 	}
+
+	defer os.RemoveAll(tempDir)
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
