@@ -23,7 +23,6 @@ type ReactNativeAndroid struct {
 }
 
 func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, version string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
-
 	var err error
 
 	if dryRun {
@@ -31,38 +30,65 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 	}
 
 	for _, path := range paths {
-
-		if projectRoot == "" {
-			projectRoot = path
+		if bundlePath == "" {
+			bundlePath = filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+			if !utils.FileExists(bundlePath) {
+				bundlePath = filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+				if !utils.FileExists(bundlePath) {
+					return fmt.Errorf("unable to find index.android.bundle within " + path)
+				}
+			}
 		}
 
-		if appManifestPath == "" {
-			log.Info("Locating Android manifest")
-
-			if utils.FileExists(filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")) {
-				appManifestPath = filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")
-			} else if utils.FileExists(filepath.Join(path, "app", "build", "intermediates", "merged_manifests")) {
-				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
-			} else {
-				return fmt.Errorf("unable to find AndroidManifest.xml. Please specify using `--app-manifest-path` ")
+		if sourceMapPath == "" {
+			sourceMapPath = filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")
+			if !utils.IsDir(sourceMapPath) {
+				sourceMapPath = filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")
+				if !utils.IsDir(sourceMapPath) {
+					return fmt.Errorf("unable to find index.android.bundle within " + path)
+				}
 			}
 
 			if variant == "" {
-				variant, err = android.GetVariant(appManifestPath)
+				variant, err = android.GetVariant(sourceMapPath)
 
 				if err != nil {
 					return err
 				}
 			}
 
-			appManifestPath = filepath.Join(appManifestPath, variant, "AndroidManifest.xml")
+			sourceMapPath = filepath.Join(sourceMapPath, variant, "index.android.bundle.map")
 
+			if !utils.FileExists(sourceMapPath) {
+				return fmt.Errorf("unable to find index.android.bundle within " + path)
+			}
 		}
 
-		// Check to see if we need to read the manifest file due to missing options
-		if apiKey == "" || versionCode == "" || version == "" {
+		if projectRoot == "" {
+			projectRoot = path
+		}
 
-			log.Info("Reading data from AndroidManifest.xml")
+		if apiKey == "" || version == "" || versionCode == "" {
+			if appManifestPath == "" {
+				appManifestPath = filepath.Join(path, "android", "app", "build", "intermediates", "merged_manifests")
+				if !utils.IsDir(appManifestPath) {
+					appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
+					if !utils.IsDir(appManifestPath) {
+						return fmt.Errorf("unable to find AndroidManfiest.xml within " + path)
+					}
+				}
+
+				if variant == "" {
+					variant, err = android.GetVariant(appManifestPath)
+
+					if err != nil {
+						return fmt.Errorf(err.Error())
+					}
+				}
+
+				appManifestPath = filepath.Join(appManifestPath, variant, "AndroidManifest.xml")
+			}
+
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
@@ -79,65 +105,37 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 
-			if versionCode == "" {
-				versionCode = manifestData.VersionCode
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-			}
-
 			if version == "" {
 				version = manifestData.VersionName
-				log.Info("Using " + version + " as version name from AndroidManifest.xml")
+				log.Info("Using " + version + " as version code from AndroidManifest.xml")
+			}
+
+			if versionCode == "" {
+				versionCode = manifestData.VersionCode
+				log.Info("Using " + versionCode + " as version name from AndroidManifest.xml")
 			}
 		}
 
-		if sourceMapPath == "" {
-			if utils.FileExists(filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")) {
-				sourceMapPath = filepath.Join(path, "android", "app", "build", "generated", "sourcemaps", "react")
-			} else if utils.FileExists(filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")) {
-				sourceMapPath = filepath.Join(path, "app", "build", "generated", "sourcemaps", "react")
-			} else {
-				return fmt.Errorf("unable to find the source map path. Please specify using `--source-map-path`")
-			}
+		log.Info("Uploading debug information for React Native Android")
 
-			sourceMapPath = filepath.Join(sourceMapPath, variant, "index.android.bundlePath.map")
+		uploadOptions := utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
+
+		fileFieldData := make(map[string]string)
+		fileFieldData["sourceMap"] = sourceMapPath
+		fileFieldData["bundle"] = bundlePath
+
+		if dryRun {
+			err = nil
+		} else {
+			err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout)
 		}
 
-		if !utils.FileExists(sourceMapPath) {
-			return fmt.Errorf(sourceMapPath + " doesn't exist on the system")
+		if err != nil {
+			return err
 		}
-
-		if bundlePath == "" {
-			if utils.FileExists(filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")) {
-				bundlePath = filepath.Join(path, "android", "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")
-			} else if utils.FileExists(filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")) {
-				bundlePath = filepath.Join(path, "app", "build", "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundlePath")
-			} else {
-				return fmt.Errorf("unable to find the bundlePath path. Please specify using `--bundlePath-path`")
-			}
-		}
-
-		if !utils.FileExists(bundlePath) {
-			return fmt.Errorf(bundlePath + " doesn't exist on the system")
-		}
-	}
-
-	log.Info("Uploading debug information for React Native Android")
-
-	uploadOptions := utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
-
-	fileFieldData := make(map[string]string)
-	fileFieldData["sourceMap"] = sourceMapPath
-	fileFieldData["bundle"] = bundlePath
-
-	if dryRun {
-		err = nil
-	} else {
-		err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout)
-	}
-
-	if err != nil {
-		return err
 	}
 
 	return nil
 }
+
+//./bin/arm64-macos/bugsnag-cli upload react-native-android --source-map=test/testdata/react-native/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map --api-key=676341688653c170796009e05430fc60 --overwrite
