@@ -2,13 +2,14 @@ package upload
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
 type AndroidNdkMapping struct {
@@ -78,8 +79,11 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 			if appManifestPath == "" {
-				//	Get the expected path to the manifest using variant name from the given path
-				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				appManifestPathExpected := filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				if utils.FileExists(appManifestPathExpected) {
+					appManifestPath = appManifestPathExpected
+					log.Info("Found app manifest at: " + appManifestPath)
+				}
 			}
 
 			if projectRoot == "" {
@@ -99,6 +103,10 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 						if err == nil {
 							appManifestPath = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+
+							if utils.FileExists(appManifestPath) {
+								log.Info("Found app manifest at: " + appManifestPath)
+							}
 						}
 
 						if projectRoot == "" {
