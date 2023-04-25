@@ -59,21 +59,19 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		if utils.FileExists(aabManifestPath) {
 			aabManifestPath = aabManifestPathExpected
 			log.Info("Found app manifest at: " + aabManifestPath)
+		} else {
+			log.Warn("AndroidManifest.xml not found in AAB file")
 		}
 	}
 
 	// Check to see if we need to read the manifest file due to missing options
-	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
+	if aabManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		if utils.FileExists(aabManifestPath) {
-			manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+		manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
 
-			if err != nil {
-				return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
-			}
-		} else {
+		if err != nil {
 			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
 		}
 

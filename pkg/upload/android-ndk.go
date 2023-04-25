@@ -33,7 +33,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var appManifestPathExpected string
 	var objCopyPath string
 
-
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
 	}
