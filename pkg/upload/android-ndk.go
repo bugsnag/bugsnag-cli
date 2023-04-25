@@ -30,6 +30,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var mergeNativeLibPath string
 	var err error
 	var workingDir string
+	var appManifestPathExpected string
 	var objCopyPath string
 
 	if dryRun {
@@ -60,8 +61,11 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 			if appManifestPath == "" {
-				//	Get the expected path to the manifest using variant name from the given path
-				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				if utils.FileExists(appManifestPathExpected) {
+					appManifestPath = appManifestPathExpected
+					log.Info("Found app manifest at: " + appManifestPath)
+				}
 			}
 
 			if projectRoot == "" {
@@ -80,7 +84,11 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 						variant, err = android.GetVariant(mergeNativeLibPath)
 
 						if err == nil {
-							appManifestPath = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+							appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+							if utils.FileExists(appManifestPathExpected) {
+								appManifestPath = appManifestPathExpected
+								log.Info("Found app manifest at: " + appManifestPath)
+							}
 						}
 
 						if projectRoot == "" {
@@ -97,7 +105,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		}
 
 		// Check to see if we need to read the manifest file due to missing options
-		if apiKey == "" || applicationId == "" || versionCode == "" || versionName == "" {
+		if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
 
 			log.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
