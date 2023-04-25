@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
 )
 
 type ReactNativeAndroid struct {
@@ -23,7 +24,9 @@ type ReactNativeAndroid struct {
 }
 
 func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, version string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
+
 	var err error
+	var uploadOptions map[string]string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -113,13 +116,13 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		if apiKey == "" {
-			return fmt.Errorf("missing API key. Use the --api-key option or provide it in an AndroidManifest.xml file")
-		}
-
 		log.Info("Uploading debug information for React Native Android")
 
-		uploadOptions := utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
+		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
+
+		if err != nil {
+			return err
+		}
 
 		fileFieldData := make(map[string]string)
 		fileFieldData["sourceMap"] = sourceMapPath

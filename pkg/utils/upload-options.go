@@ -119,11 +119,18 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) map[string]string {
+func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = apiKey
-	uploadOptions["appVersion"] = appVersion
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if appVersion != "" {
+		uploadOptions["appVersion"] = appVersion
+	}
 
 	if appVersionCode != "" {
 		uploadOptions["appVersionCode"] = appVersionCode
@@ -145,5 +152,9 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		uploadOptions["overwrite"] = "true"
 	}
 
-	return uploadOptions
+	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" {
+		return nil, fmt.Errorf("you must set one at least the version or version code to uniquely identify the build")
+	}
+
+	return uploadOptions, nil
 }
