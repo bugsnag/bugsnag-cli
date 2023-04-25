@@ -76,7 +76,7 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 	}
 
 	if uploadOptions["appId"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
-		return nil, fmt.Errorf("missing application ID, version code or version name, please specify using `--application-id`, `--version-code` or `--version-name`")
+		return nil, fmt.Errorf("you must set one at least the application ID, version name or version code to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
