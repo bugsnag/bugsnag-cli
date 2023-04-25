@@ -81,7 +81,6 @@ func main() {
 
 		err := upload.ProcessAndroidAab(
 			commands.ApiKey,
-			commands.Upload.AndroidAab.AndroidNdkRoot,
 			commands.Upload.AndroidAab.ApplicationId,
 			commands.Upload.AndroidAab.BuildUuid,
 			commands.Upload.AndroidAab.Path,
