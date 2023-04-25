@@ -75,7 +75,7 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+	if uploadOptions["appId"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
 		return nil, fmt.Errorf("missing application ID, version code or version name, please specify using `--application-id`, `--version-code` or `--version-name`")
 	}
 
