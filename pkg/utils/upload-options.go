@@ -59,8 +59,6 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	if versionCode != "" {
 		uploadOptions["versionCode"] = versionCode
-	} else {
-		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
 	}
 
 	if versionName != "" {
@@ -77,6 +75,10 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
+	}
+
+	if uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("missing version code or version name, please specify using `--version-code` or `--version-name`")
 	}
 
 	return uploadOptions, nil
@@ -100,8 +102,6 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 
 	if versionCode != "" {
 		uploadOptions["versionCode"] = versionCode
-	} else {
-		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
 	}
 
 	if versionName != "" {
@@ -114,6 +114,10 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
+	}
+
+	if uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("missing build uuid, version code or version name, please specify using `--build-uuid`, `--version-code` or `--version-name`")
 	}
 
 	return uploadOptions, nil
