@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
-	"path/filepath"
 )
 
 type AndroidAabMapping struct {
@@ -48,26 +49,28 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 			}
 
 			log.Success(filepath.Base(path) + " expanded")
-
-			aabManifestPath = filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
-
 		} else {
 			return fmt.Errorf(path + " is not an AAB file")
 		}
 	}
 
+	if aabManifestPath == "" {
+		aabManifestPathExpected := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
+		if utils.FileExists(aabManifestPath) {
+			aabManifestPath = aabManifestPathExpected
+		} else {
+			log.Warn("AndroidManifest.xml not found in AAB file")
+		}
+	}
+
 	// Check to see if we need to read the manifest file due to missing options
-	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
+	if aabManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		if utils.FileExists(aabManifestPath) {
-			manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+		manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
 
-			if err != nil {
-				return fmt.Errorf("error reading raw AAB manifest data. " + err.Error())
-			}
-		} else {
+		if err != nil {
 			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
 		}
 

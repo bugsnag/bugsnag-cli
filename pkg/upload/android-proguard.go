@@ -2,12 +2,13 @@ package upload
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
-	"strings"
 )
 
 type AndroidProguardMapping struct {
@@ -23,6 +24,7 @@ type AndroidProguardMapping struct {
 func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath string, buildUuid string, paths []string, variant string, versionCode string, versionName string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var mappingFile string
+	var appManifestPathExpected string
 	var err error
 
 	for _, path := range paths {
@@ -49,9 +51,13 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			}
 
 			if appManifestPath == "" {
-				//	Get the expected path to the manifest using variant name from the given path
-				appManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				if utils.FileExists(appManifestPathExpected) {
+					appManifestPath = appManifestPathExpected
+					log.Info("Found app manifest at: " + appManifestPath)
+				}
 			}
+
 		} else {
 			mappingFile = path
 
@@ -63,7 +69,11 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 					if filepath.Base(mergedManifestPath) == "merged_manifests" {
 						variant, err = android.GetVariant(mergedManifestPath)
 						if err == nil {
-							appManifestPath = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
+							appManifestPathExpected = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
+							if utils.FileExists(appManifestPathExpected) {
+								appManifestPath = appManifestPathExpected
+								log.Info("Found app manifest at: " + appManifestPath)
+							}
 						}
 					}
 				}
@@ -72,7 +82,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		}
 
 		// Check to see if we need to read the manifest file due to missing options
-		if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
+		if appManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
 			log.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
