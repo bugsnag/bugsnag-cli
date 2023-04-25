@@ -75,8 +75,8 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
-		return nil, fmt.Errorf("missing application ID, version code or version name, please specify using `--application-id`, `--version-code` or `--version-name`")
+	if uploadOptions["appId"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("you must set one at least the application ID, version name or version code to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
@@ -112,8 +112,8 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
-		return nil, fmt.Errorf("missing application ID, build uuid, version code or version name, please specify using `--application-id`, `--build-uuid`, `--version-code` or `--version-name`")
+	if uploadOptions["appId"] == "" && uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("you must set one at least the application ID, version name, version code or build UUID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
