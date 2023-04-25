@@ -151,7 +151,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 						return err
 					}
 
-					log.Info("Located objcopy within Android NDK path:" + androidNdkRoot)
+					log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
 				}
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
