@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
-	"path/filepath"
 )
 
 type AndroidAabMapping struct {
@@ -49,11 +50,16 @@ func ProcessAndroidAab(apiKey string, androidNdkRoot string, applicationId strin
 			}
 
 			log.Success(filepath.Base(path) + " expanded")
-
-			aabManifestPath = filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
-
 		} else {
 			return fmt.Errorf(path + " is not an AAB file")
+		}
+	}
+
+	if aabManifestPath == "" {
+		aabManifestPathExpected := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
+		if utils.FileExists(aabManifestPath) {
+			aabManifestPath = aabManifestPathExpected
+			log.Info("Found app manifest at: " + aabManifestPath)
 		}
 	}
 
