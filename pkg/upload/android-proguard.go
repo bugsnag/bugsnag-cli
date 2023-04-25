@@ -2,12 +2,13 @@ package upload
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
-	"strings"
 )
 
 type AndroidProguardMapping struct {
@@ -99,9 +100,13 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 						buildUuid = manifestData.Application.MetaData.Value[i]
+						if buildUuid == "" {
+							log.Warn("No BUILD_UUID found in AndroidManifest.xml, defaulting to none")
+						} else {
+							log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+						}
 					}
 				}
-				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 			}
 
 			if versionCode == "" {

@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
-	"path/filepath"
 )
 
 type AndroidAabMapping struct {
@@ -83,7 +84,11 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 		if buildUuid == "" {
 			buildUuid = manifestData["buildUuid"]
-			log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+			if buildUuid == "" {
+				log.Warn("No BUILD_UUID found in AndroidManifest.xml, defaulting to none")
+			} else {
+				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+			}
 		}
 
 		if versionCode == "" {
