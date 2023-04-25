@@ -31,30 +31,12 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var err error
 	var workingDir string
 	var appManifestPathExpected string
+	var objCopyPath string
+
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
 	}
-
-	// Check NDK path is set
-	androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
-
-	if err != nil {
-		return err
-	}
-
-	log.Info("Android NDK Path: " + androidNdkRoot)
-
-	// Find objcopy within NDK path
-	log.Info("Locating objcopy within Android NDK path")
-
-	objCopyPath, err := android.BuildObjcopyPath(androidNdkRoot)
-
-	if err != nil {
-		return err
-	}
-
-	log.Info("Objcopy Path: " + objCopyPath)
 
 	for _, path := range paths {
 		if utils.IsDir(path) {
@@ -164,6 +146,22 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			if strings.HasSuffix(file, ".so.sym") {
 				symbolFileList = append(symbolFileList, file)
 			} else if filepath.Ext(file) == ".so" {
+				// Check NDK path is set
+				if objCopyPath == "" {
+					androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
+
+					if err != nil {
+						return err
+					}
+
+					objCopyPath, err = android.BuildObjcopyPath(androidNdkRoot)
+
+					if err != nil {
+						return err
+					}
+
+					log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
+				}
 
 				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
