@@ -76,7 +76,7 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 	}
 
 	if uploadOptions["appId"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
-		return nil, fmt.Errorf("you must set one at least the application ID, version name or version code to uniquely identify the build")
+		return nil, fmt.Errorf("you must set at least the application ID, version name or version code to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
@@ -113,7 +113,7 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	}
 
 	if uploadOptions["appId"] == "" && uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
-		return nil, fmt.Errorf("you must set one at least the application ID, version name, version code or build UUID to uniquely identify the build")
+		return nil, fmt.Errorf("you must set at least the application ID, version name, version code or build UUID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
@@ -152,8 +152,8 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" {
-		return nil, fmt.Errorf("you must set one at least the version or version code to uniquely identify the build")
+	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
+		return nil, fmt.Errorf("you must set at least the version, version code or code bundle ID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil
