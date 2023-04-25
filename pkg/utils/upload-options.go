@@ -112,7 +112,7 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+	if uploadOptions["appId"] == "" && uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
 		return nil, fmt.Errorf("you must set one at least the application ID, version name, version code or build UUID to uniquely identify the build")
 	}
 
