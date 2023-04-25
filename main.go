@@ -178,24 +178,24 @@ func main() {
 
 	case "upload react-native-android", "upload react-native-android <path>":
 
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
-		}
-
-		err := upload.ProcessReactNativeAndroid(commands.Upload.ReactNativeAndroid.Path,
-			commands.Upload.ReactNativeAndroid.AppManifestPath,
-			commands.AppVersion,
-			commands.AppVersionCode,
+		err := upload.ProcessReactNativeAndroid(
+			commands.ApiKey,
+			commands.Upload.ReactNativeAndroid.AppManifest,
+			commands.Upload.ReactNativeAndroid.Bundle,
 			commands.Upload.ReactNativeAndroid.CodeBundleId,
 			commands.Upload.ReactNativeAndroid.Dev,
-			commands.Upload.ReactNativeAndroid.SourceMapPath,
-			commands.Upload.ReactNativeAndroid.BundlePath,
+			commands.Upload.ReactNativeAndroid.Path,
 			commands.Upload.ReactNativeAndroid.ProjectRoot,
+			commands.Upload.ReactNativeAndroid.Variant,
+			commands.Upload.ReactNativeAndroid.Version,
+			commands.Upload.ReactNativeAndroid.VersionCode,
+			commands.Upload.ReactNativeAndroid.SourceMap,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
-			commands.ApiKey)
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
