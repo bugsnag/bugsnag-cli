@@ -76,27 +76,37 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 		if apiKey == "" {
 			apiKey = manifestData["apiKey"]
-			log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+			if apiKey != "" {
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+			}
 		}
 
 		if applicationId == "" {
 			applicationId = manifestData["applicationId"]
-			log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+			if applicationId != "" {
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+			}
 		}
 
 		if buildUuid == "" {
 			buildUuid = manifestData["buildUuid"]
-			log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+			if buildUuid != "" {
+				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+			}
 		}
 
 		if versionCode == "" {
 			versionCode = manifestData["versionCode"]
-			log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+			if versionCode != "" {
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+			}
 		}
 
 		if versionName == "" {
 			versionName = manifestData["versionName"]
-			log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+			if versionName != "" {
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+			}
 		}
 	}
 

@@ -53,14 +53,10 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	if applicationId != "" {
 		uploadOptions["appId"] = applicationId
-	} else {
-		return nil, fmt.Errorf("missing application id, please specify using `--application-id`")
 	}
 
 	if versionCode != "" {
 		uploadOptions["versionCode"] = versionCode
-	} else {
-		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
 	}
 
 	if versionName != "" {
@@ -79,6 +75,10 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 		uploadOptions["overwrite"] = "true"
 	}
 
+	if uploadOptions["appId"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("you must set at least the application ID, version name or version code to uniquely identify the build")
+	}
+
 	return uploadOptions, nil
 }
 
@@ -94,14 +94,10 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 
 	if applicationId != "" {
 		uploadOptions["appId"] = applicationId
-	} else {
-		return nil, fmt.Errorf("missing application id, please specify using `--application-id`")
 	}
 
 	if versionCode != "" {
 		uploadOptions["versionCode"] = versionCode
-	} else {
-		return nil, fmt.Errorf("missing version code, please specify using `--version-code`")
 	}
 
 	if versionName != "" {
@@ -116,14 +112,25 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 		uploadOptions["overwrite"] = "true"
 	}
 
+	if uploadOptions["appId"] == "" && uploadOptions["buildUuid"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+		return nil, fmt.Errorf("you must set at least the application ID, version name, version code or build UUID to uniquely identify the build")
+	}
+
 	return uploadOptions, nil
 }
 
-func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) map[string]string {
+func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = apiKey
-	uploadOptions["appVersion"] = appVersion
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if appVersion != "" {
+		uploadOptions["appVersion"] = appVersion
+	}
 
 	if appVersionCode != "" {
 		uploadOptions["appVersionCode"] = appVersionCode
@@ -145,5 +152,9 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		uploadOptions["overwrite"] = "true"
 	}
 
-	return uploadOptions
+	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
+		return nil, fmt.Errorf("you must set at least the version, version code or code bundle ID to uniquely identify the build")
+	}
+
+	return uploadOptions, nil
 }
