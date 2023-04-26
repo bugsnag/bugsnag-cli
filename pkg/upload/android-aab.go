@@ -86,11 +86,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 		if buildUuid == "" {
 			buildUuid = manifestData["buildUuid"]
-			if buildUuid == "" {
-				log.Warn("No BUILD_UUID found in AndroidManifest.xml, defaulting to none")
-			} else {
-				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
-			}
+			log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 		}
 
 		if versionCode == "" {
