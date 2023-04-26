@@ -20,6 +20,7 @@ type CreateBuild struct {
 	Provider     string            `help:"The name of the source control provider that contains the source code for the build."`
 	Repository   string            `help:"The URL of the repository containing the source code being deployed."`
 	Revision     string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
+	Path         utils.UploadPaths `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 }
 
 type Payload struct {
@@ -39,7 +40,7 @@ type SourceControl struct {
 	Revision   string `json:"revision,omitempty"`
 }
 
-func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, appVersion string, appVersionCode string, appBundleVersion string, metadata map[string]string, endpoint string) error {
+func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, appVersion string, appVersionCode string, appBundleVersion string, metadata map[string]string, paths []string, endpoint string) error {
 	if appVersion == "" {
 		log.Error("Missing app version, please provide this via the command line options", 1)
 	}
@@ -50,7 +51,7 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 		log.Error("Failed to set builder name from system. Please provide this via the command line options. "+err.Error(), 1)
 	}
 
-	repoInfo := GetRepoInfo(provider, repository, revision)
+	repoInfo := GetRepoInfo(paths[0], provider, repository, revision)
 
 	payload := Payload{
 		ApiKey:       apiKey,
@@ -102,11 +103,11 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	return nil
 }
 
-func GetRepoInfo(repoProvider string, repoUrl string, repoHash string) map[string]string {
+func GetRepoInfo(repoPath string, repoProvider string, repoUrl string, repoHash string) map[string]string {
 	repoInfo := make(map[string]string)
 
 	if repoUrl == "" {
-		repoUrl = utils.GetRepoUrl()
+		repoUrl = utils.GetRepoUrl(repoPath)
 	}
 
 	repoInfo["repository"] = repoUrl

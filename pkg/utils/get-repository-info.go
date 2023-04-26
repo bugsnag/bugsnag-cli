@@ -6,24 +6,24 @@ import (
 )
 
 // GetRepoUrl - Gets the URl of a git repo.
-func GetRepoUrl() string {
+func GetRepoUrl(repoPath string) string {
 	gitLocation, err := exec.LookPath("git")
 
 	if err != nil {
 		return ""
 	}
 
-	remoteOriginCmd := exec.Command(gitLocation, "config", "--get", "remote.origin.url")
+	remoteOriginCmd := exec.Command(gitLocation, "-C", repoPath, "config", "--get", "remote.origin.url")
 	remoteOriginCmdOutput, err := remoteOriginCmd.CombinedOutput()
 
 	if err != nil {
-		remoteCmd := exec.Command(gitLocation, "remote")
+		remoteCmd := exec.Command(gitLocation, "-C", repoPath, "remote")
 		remoteCmdOutput, err := remoteCmd.CombinedOutput()
 		if err != nil {
 			return ""
 		}
 		remotes := strings.Split(string(remoteCmdOutput), "\n")
-		remoteOriginCmd = exec.Command(gitLocation, "config", "--get", "remote."+remotes[0]+".url")
+		remoteOriginCmd = exec.Command(gitLocation, "-C", repoPath, "config", "--get", "remote."+remotes[0]+".url")
 		remoteOriginCmdOutput, err = remoteOriginCmd.CombinedOutput()
 		if err != nil {
 			return ""

@@ -1,12 +1,13 @@
 package main
 
 import (
+	"os"
+
 	"github.com/alecthomas/kong"
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
 )
 
 func main() {
@@ -202,7 +203,7 @@ func main() {
 
 		log.Success("Upload(s) completed")
 
-	case "create-build":
+	case "create-build", "create-build <path>":
 
 		if commands.ApiKey == "" {
 			log.Error("no API key provided", 1)
@@ -227,6 +228,7 @@ func main() {
 			commands.AppVersionCode,
 			commands.AppBundleVersion,
 			commands.CreateBuild.Metadata,
+			commands.CreateBuild.Path,
 			endpoint)
 		if buildUploadError != nil {
 			log.Error(buildUploadError.Error(), 1)
