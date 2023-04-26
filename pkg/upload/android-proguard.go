@@ -97,31 +97,46 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+
+				if apiKey != "" {
+					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				}
 			}
 
 			if applicationId == "" {
 				applicationId = manifestData.ApplicationId
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+
+				if applicationId != "" {
+					log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+				}
 			}
 
 			if buildUuid == "" {
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 						buildUuid = manifestData.Application.MetaData.Value[i]
-						log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 					}
+				}
+
+				if buildUuid != "" {
+					log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 				}
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+
+				if versionCode != "" {
+					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				}
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+
+				if versionName != "" {
+					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				}
 			}
 		}
 
