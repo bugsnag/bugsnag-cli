@@ -82,7 +82,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 				projectRoot = path
 			}
 		}
-		
+
 		if appManifestPath == "" {
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
