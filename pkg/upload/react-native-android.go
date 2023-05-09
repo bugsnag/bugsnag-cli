@@ -79,14 +79,6 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			return fmt.Errorf("unable to find index.android.bundle at " + sourceMapPath)
 		}
 
-		if projectRoot == "" {
-			if filepath.Base(path) == "android" {
-				projectRoot = filepath.Join(path, "..")
-			} else {
-				projectRoot = path
-			}
-		}
-
 		if appManifestPath == "" {
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
