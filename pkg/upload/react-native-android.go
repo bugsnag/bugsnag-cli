@@ -38,10 +38,11 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		rootDirPath := path
 		if !utils.FileExists(buildDirPath) {
 			buildDirPath = filepath.Join(path, "app", "build")
-			if utils.FileExists(buildDirPath) {
-				rootDirPath = filepath.Join(path, "..")
-			} else if bundlePath == "" || sourceMapPath == "" {
-				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+			rootDirPath = filepath.Join(path, "..")
+			if !utils.FileExists(buildDirPath) {
+				if bundlePath == "" || sourceMapPath == "" {
+					return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+				}
 			}
 		}
 
