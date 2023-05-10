@@ -1,7 +1,18 @@
-# Bugsnag CLI
+<div align="center">
+  <a href="https://docs.bugsnag.com/build-integrations/bugsnag-cli">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://assets.smartbear.com/m/3dab7e6cf880aa2b/original/BugSnag-Repository-Header-Dark.svg">
+      <img alt="SmartBear BugSnag logo" src="https://assets.smartbear.com/m/3945e02cdc983893/original/BugSnag-Repository-Header-Light.svg">
+    </picture>
+  </a>
+  <h1>CLI</h1>
+</div>
+
+
+[![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://docs.bugsnag.com/build-integrations/bugsnag-cli/)
 [![Build status](https://badge.buildkite.com/4c42f3d6345b14ecdc243abcf974cad0cfd9844e1b0e5f2418.svg)](https://buildkite.com/bugsnag/bugsnag-cli)
 
-Upload your Flutter app's Dart symbol files to [Bugsnag](https://www.bugsnag.com/platforms/flutter) using our CLI.
+Simplify the process of creating releases on the BugSnag dashboard and uploading files to improve the stacktraces in your errors with our command line tool.
 
 ## Installation
 
@@ -18,33 +29,61 @@ wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/main/install.sh 
 
 The script downloads the appropriate binary and attempts to install it to `~/.local/bugsnag`.
 
-## Usage
+## Supported commands
 
-See the our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/) for full usage information.
+This tool is currently being developed. It currently supports the following commands:
 
-```
-Usage: bugsnag-cli <command>
+### Create builds
 
-Flags:
-  -h, --help                                                Show context-sensitive help.
-      --upload-api-root-url="https://upload.bugsnag.com"    Bugsnag On-Premise upload server URL. Can contain port number
-      --port=443                                            Port number for the upload server
-      --api-key=STRING                                      Bugsnag integration API key for this application
-      --fail-on-upload-error                                Stops the upload when a mapping file fails to upload to Bugsnag successfully
+Allows you to create a build within BugSnag to enrich releases shown in the BugSnag dashboard.
 
-Commands:
-  upload all <path>
-    Upload any symbol/mapping files
+    $ bugsnag-cli create-build --api-key=YOUR_API_KEY --app-version=YOUR_APP_VERSION
 
-  upload dart <path>
-    Process and upload symbol files for Flutter
+See the [`create-build`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/create-build/) command reference for full usage information.
 
-Run "bugsnag-cli <command> --help" for more information on a command.
-```
+### Android NDK mapping files
 
-## Bugsnag On-Premise
+For apps that use the [NDK](https://developer.android.com/ndk/), this command extracts symbols from `.so` files and uploads them along with version information.
 
-If you are using Bugsnag On-premise, you should use the `--upload-api-root-url` option to set the url of your [upload server](https://docs.bugsnag.com/on-premise/single-machine/service-ports/#bugsnag-upload-server), for example:
+    $ bugsnag-cli upload android-ndk \
+        app/build/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libMyApp.so
+
+See the [`upload android-ndk`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/) command reference for full usage information.
+
+### Android Proguard mapping flies
+
+If you are using [ProGuard](https://developer.android.com/studio/build/shrink-code.html), [DexGuard](https://www.guardsquare.com/en/dexguard), or [R8](https://r8.googlesource.com/r8#d8-dexer-and-r8-shrinker) to minify and optimize your app, this command uploads the mapping file along with version information from your project directory:
+
+    $ bugsnag-cli upload android-proguard app/build/outputs/proguard/release/mapping.txt
+
+See the [`upload android-proguard`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-proguard/) command reference for full usage information.
+
+### Android App Bundle (AAB) files
+
+If you distribute your app as an [Android App Bundle](https://developer.android.com/guide/app-bundle) (AAB), they contain all required files and so can be uploaded in a single command:
+
+    $ bugsnag-cli upload android-aab app/build/outputs/bundle/release/app-release.aab
+
+See the [`upload android-aab`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/) command reference for full usage information.
+
+### React Native JavaScript source maps (Android only)
+
+To get unminified stack traces for JavaScript code in your React Native app built for Android, source maps must be generated and can be uploaded to BugSnag using the following command from the root of your project:
+
+    $ bugsnag-cli upload react-native-android
+
+See the [`upload react-native-android`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-android/) command reference for full usage information.
+
+### Dart symbols for Flutter
+
+If you are stripping debug symbols from your Dart code when building your Flutter apps, you will need to upload symbol files in order to see full stacktraces using the following command:
+
+    $ bugsnag-cli upload dart --api-key=YOUR_API_KEY app-debug-info/
+
+
+## BugSnag On-Premise
+
+If you are using BugSnag On-premise, you should use the `--build-api-root-url` and `--upload-api-root-url` options to set the URL of your [build](https://docs.bugsnag.com/on-premise/single-machine/service-ports/#bugsnag-build-api) and [upload](https://docs.bugsnag.com/on-premise/single-machine/service-ports/#bugsnag-upload-server) servers, for example:
 
 ```sh
 bugsnag-cli upload \

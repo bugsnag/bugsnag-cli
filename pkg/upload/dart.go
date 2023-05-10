@@ -17,11 +17,8 @@ import (
 )
 
 type DartSymbol struct {
-	Path             utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
-	AppVersion       string            `help:"(optional) the version of the application."`
-	AppVersionCode   string            `help:"(optional) the version code for the application (Android only)."`
-	AppBundleVersion string            `help:"(optional) the bundle version for the application (iOS only)."`
-	IosAppPath       string            `help:"(optional) the path to the built iOS app."`
+	Path       utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	IosAppPath string            `help:"(optional) the path to the built iOS app."`
 }
 
 func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
@@ -53,9 +50,12 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := BuildUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["symbolFile"] = file
+
+			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {
@@ -95,9 +95,12 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := BuildUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, "symbolFile", file, timeout)
+			fileFieldData := make(map[string]string)
+			fileFieldData["symbolFile"] = file
+
+			requestStatus := server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {
@@ -115,43 +118,6 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 	}
 
 	return nil
-}
-
-// BuildUploadOptions - Builds the upload options for processing dart files
-func BuildUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
-	uploadOptions := make(map[string]string)
-
-	uploadOptions["apiKey"] = apiKey
-
-	uploadOptions["buildId"] = uuid
-
-	uploadOptions["platform"] = platform
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
-
-	if platform == "ios" {
-		if appVersion != "" {
-			uploadOptions["appVersion"] = appVersion
-		}
-
-		if appExtraVersion != "" {
-			uploadOptions["AppBundleVersion"] = appExtraVersion
-		}
-	}
-
-	if platform == "android" {
-		if appVersion != "" {
-			uploadOptions["appVersion"] = appVersion
-		}
-
-		if appExtraVersion != "" {
-			uploadOptions["appVersionCode"] = appExtraVersion
-		}
-	}
-
-	return uploadOptions
 }
 
 // ReadElfFile - Gets all data from the symbol file

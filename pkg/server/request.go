@@ -9,31 +9,39 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 )
 
 // BuildFileRequest - Create a multi-part form request adding a file as a parameter
-func BuildFileRequest(url string, fieldData map[string]string, fileFieldName string, fileName string) (*http.Request, error) {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
+func BuildFileRequest(url string, fieldData map[string]string, fileFieldData map[string]string) (*http.Request, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
+
+	for key, value := range fileFieldData {
+		file, err := os.Open(value)
+
+		if err != nil {
+			return nil, err
+		}
+
+		//defer file.Close()
+
+		part, err := writer.CreateFormFile(key, filepath.Base(file.Name()))
+
+		if err != nil {
+			return nil, err
+		}
+
+		io.Copy(part, file)
+	}
 
 	for key, value := range fieldData {
 		writer.WriteField(key, value)
 	}
 
-	part, err := writer.CreateFormFile(fileFieldName, filepath.Base(file.Name()))
-
-	if err != nil {
-		return nil, err
-	}
-
-	io.Copy(part, file)
 	writer.Close()
+
 	request, err := http.NewRequest("POST", url, body)
 
 	if err != nil {
@@ -41,6 +49,7 @@ func BuildFileRequest(url string, fieldData map[string]string, fileFieldName str
 	}
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
+
 	return request, nil
 }
 
@@ -60,8 +69,11 @@ func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 }
 
 // ProcessRequest - Builds and sends file requests to the API
-func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldName string, file string, timeout int) error {
-	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldName, file)
+func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int) error {
+
+	log.Info("Uploading to " + endpoint)
+
+	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldData)
 
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
@@ -79,7 +91,9 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldN
 		return fmt.Errorf("error reading body from response: %w", err)
 	}
 
-	if res.StatusCode != 202 {
+	statusOK := res.StatusCode >= 200 && res.StatusCode < 300
+
+	if !statusOK {
 		return fmt.Errorf("%s : %s", res.Status, string(b))
 	}
 

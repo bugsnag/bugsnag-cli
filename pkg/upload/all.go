@@ -7,14 +7,12 @@ import (
 )
 
 type DiscoverAndUploadAny struct {
-	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path"`
-	UploadOptions map[string]string `help:"(optional) additional arguments to pass to the upload request" mapsep:","`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	UploadOptions map[string]string `help:"Additional arguments to pass to the upload request" mapsep:","`
 }
 
 func All(paths []string, options map[string]string, endpoint string, timeout int, retries int, overwrite bool,
 	apiKey string, failOnUploadError bool) error {
-
-	var fileFieldName string
 
 	// Build the file list from the path(s)
 	log.Info("building file list...")
@@ -41,15 +39,18 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 		uploadOptions[key] = value
 	}
 
-	if uploadOptions["fileNameField"] != "" {
-		fileFieldName = uploadOptions["fileNameField"]
-		delete(uploadOptions, "fileNameField")
-	} else {
-		fileFieldName = "file"
-	}
-
 	for _, file := range fileList {
-		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldName, file, timeout)
+
+		fileFieldData := make(map[string]string)
+
+		if uploadOptions["fileNameField"] != "" {
+			fileFieldData[uploadOptions["fileNameField"]] = file
+			delete(uploadOptions, "fileNameField")
+		} else {
+			fileFieldData["file"] = file
+		}
+
+		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
 
 		if requestStatus != nil {
 			if numberOfFiles > 1 && failOnUploadError {

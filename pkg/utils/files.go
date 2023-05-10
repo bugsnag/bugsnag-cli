@@ -46,3 +46,10 @@ func BuildFileList(paths []string) ([]string, error) {
 
 	return fileList, nil
 }
+
+func FileExists(path string) bool {
+	if _, err := os.Stat(path); err != nil {
+		return false
+	}
+	return true
+}

@@ -1,7 +1,10 @@
 require 'rbconfig'
+require 'etc'
 
 os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
+user = Etc.getlogin
+commit_hash = `git rev-parse HEAD`
 
 case
 when os.downcase.include?('windows_nt'), ENV['WSL_DISTRO_NAME'] != nil
@@ -33,8 +36,20 @@ end
 
 Then(/^I should see the missing path error$/) do
   run_output.include?("error: expected \"<path>\"")
+  end
+
+Then(/^I should see the missing app version error$/) do
+  run_output.include?("[ERROR] Missing app version, please provide this via the command line options")
 end
 
 Then(/^I should see the no such file or directory error$/) do
   run_output.include?("error: <path>: stat /path/to/no/file: no such file or directory")
+end
+
+Then(/^the payload should match local information$/) do
+  run_output.include?("\"appVersion\": \"1.2.3\"")
+  run_output.include?("\"apiKey\": \"1234567890ABCDEF1234567890ABCDEF\"")
+  run_output.include?("\"builderName\": \"#{user}\"")
+  run_output.include?("\"revision\": \"#{commit_hash}\"")
+  run_output.include?("\"repository\": \"git@github.com:bugsnag/bugsnag-cli\"")
 end
