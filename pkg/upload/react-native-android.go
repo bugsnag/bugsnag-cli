@@ -46,7 +46,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		projectRoot = rootDirPath
+		if projectRoot == "" {
+			projectRoot = rootDirPath
+		}
 
 		if bundlePath == "" {
 			bundlePath = filepath.Join(buildDirPath, "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
