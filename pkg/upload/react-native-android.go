@@ -27,6 +27,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 	var err error
 	var uploadOptions map[string]string
+	var rootDirPath string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -35,13 +36,18 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 	for _, path := range paths {
 
 		buildDirPath := filepath.Join(path, "android", "app", "build")
+		rootDirPath = path
 		if !utils.FileExists(buildDirPath) {
 			buildDirPath = filepath.Join(path, "app", "build")
-			if !utils.FileExists(buildDirPath) {
-				if bundlePath == "" || sourceMapPath == "" {
-					return fmt.Errorf("unable to find bundle files or source maps in within " + path)
-				}
+			if utils.FileExists(buildDirPath) {
+				rootDirPath = filepath.Join(path, "..")
+			} else if bundlePath == "" || sourceMapPath == "" {
+				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
 			}
+		}
+
+		if projectRoot == "" {
+			projectRoot = rootDirPath
 		}
 
 		if bundlePath == "" {
@@ -73,10 +79,6 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 		if !utils.FileExists(sourceMapPath) {
 			return fmt.Errorf("unable to find index.android.bundle at " + sourceMapPath)
-		}
-
-		if projectRoot == "" {
-			projectRoot = path
 		}
 
 		if appManifestPath == "" {
