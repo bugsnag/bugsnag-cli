@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2023-05-25)
+
+Fix how we check for the AndroidManifest.xml file for Android AAB - [37](https://github.com/bugsnag/bugsnag-cli/pull/37)
+
 ## 1.1.0 (2023-05-10)
 
 Add support for:
