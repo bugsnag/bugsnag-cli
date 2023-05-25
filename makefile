@@ -21,20 +21,20 @@ build-all: build-windows build-linux build-macos
 .PHONY: build-windows
 build-windows:
 	[ -d bin ] || mkdir -p bin
-	GOOS=windows GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-windows/bugsnag-cli.exe main.go
-	GOOS=windows GOARCH=386 go build -ldflags '-s' -o bin/i386-windows/bugsnag-cli.exe main.go
+	GOOS=windows GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-windows-bugsnag-cli.exe main.go
+	GOOS=windows GOARCH=386 go build -ldflags '-s' -o bin/i386-windows-bugsnag-cli.exe main.go
 
 .PHONY: build-linux
 build-linux:
 	[ -d bin ] || mkdir -p bin
-	GOOS=linux GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-linux/bugsnag-cli main.go
-	GOOS=linux GOARCH=386 go build -ldflags '-s' -o bin/i386-linux/bugsnag-cli main.go
+	GOOS=linux GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-linux-bugsnag-cli main.go
+	GOOS=linux GOARCH=386 go build -ldflags '-s' -o bin/i386-linux-bugsnag-cli main.go
 
 .PHONY: build-macos
 build-macos:
 	[ -d bin ] || mkdir -p bin
-	GOOS=darwin GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-macos/bugsnag-cli main.go
-	GOOS=darwin GOARCH=arm64 go build -ldflags '-s' -o bin/arm64-macos/bugsnag-cli main.go
+	GOOS=darwin GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-macos-bugsnag-cli main.go
+	GOOS=darwin GOARCH=arm64 go build -ldflags '-s' -o bin/arm64-macos-bugsnag-cli main.go
 
 .PHONY: unit-test
 unit-test:
