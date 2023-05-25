@@ -19,11 +19,11 @@ when os.downcase.include?('darwin')
 end
 
 When(/^I run bugsnag-cli on mac$/) do
-  @output = `bin/#{arch}-#{os}/#{binary} 2>&1`
+  @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/#{arch}-#{os}/#{binary} #{flags}`
+  @output = `bin/#{arch}-#{os}-#{binary} #{flags}`
 end
 
 Then(/^I should see the help banner$/) do
