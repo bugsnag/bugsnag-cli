@@ -56,7 +56,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 	if aabManifestPath == "" {
 		aabManifestPathExpected := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
-		if utils.FileExists(aabManifestPath) {
+		if utils.FileExists(aabManifestPathExpected) {
 			aabManifestPath = aabManifestPathExpected
 		} else {
 			log.Warn("AndroidManifest.xml not found in AAB file")
