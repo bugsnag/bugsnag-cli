@@ -1,11 +1,11 @@
 {
   "name": "bugsnag-cli",
-  "version": "v1.1.1",
+  "version": "1.1.1",
   "description": "BugSnag CLI",
   "main": "install.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bugsnag/bugsnag-cli.git"
+    "url": "https://github.com/bugsnag/bugsnag-cli"
   },
   "author": "BugSnag",
   "license": "ISC",
@@ -14,6 +14,16 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
+    "axios": "^1.4.0",
     "console.table": "^0.10.0"
+  },
+  "files": [
+    "install.js"
+  ],
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "bin": {
+    "bugsnag-cli": "./node_modules/.bin/bugsnag-cli"
   }
 }
