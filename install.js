@@ -100,9 +100,20 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     }
 };
 
+const writeToPackageJson = (packageJsonPath) => {
+    const packageJson = require(packageJsonPath);
+
+    packageJson.scripts.bugsnagCreateBuild = './node_modules/.bin/bugsnag-cli create-build';
+    packageJson.scripts.bugsnagUpload = './node_modules/.bin/bugsnag-cli upload react-native-android';
+
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+}
+
 const platformMetadata = getPlatformMetadata();
 const repoUrl = removeGitPrefixAndSuffix(repository.url);
 const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`;
 const binaryOutputPath = path.join(__dirname, '..', '.bin', platformMetadata.BINARY_NAME);
+const projectPackageJsonPath = path.join(__dirname, '..', '..', 'package.json');
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath);
+writeToPackageJson(projectPackageJsonPath)

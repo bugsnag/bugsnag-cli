@@ -22,8 +22,5 @@
   ],
   "scripts": {
     "postinstall": "node install.js"
-  },
-  "bin": {
-    "bugsnag-cli": "./node_modules/.bin/bugsnag-cli"
   }
 }
