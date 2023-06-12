@@ -3,3 +3,7 @@ Gemfile.lock
 bin/*
 bin/**/**
 .DS_Store
+
+# NodeJS
+node_modules/
+package-lock.json
