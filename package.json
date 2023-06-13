@@ -1,16 +1,19 @@
 {
-  "name": "bugsnag-cli",
+  "name": "@bugsnag/cli",
   "version": "1.1.1",
   "description": "BugSnag CLI",
   "main": "install.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bugsnag/bugsnag-cli"
+    "url": "git+https://github.com/bugsnag/bugsnag-cli.git"
   },
   "author": "BugSnag",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-cli/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {

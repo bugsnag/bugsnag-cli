@@ -85,7 +85,7 @@ const getPlatformMetadata = () => {
 
 const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     try {
-        const binDir = path.resolve(__dirname, '..', '.bin');
+        const binDir = path.resolve(process.cwd(),'node_modules','.bin');
         if (!fs.existsSync(binDir)) {
             fs.mkdirSync(binDir, { recursive: true });
         }
@@ -112,8 +112,8 @@ const writeToPackageJson = (packageJsonPath) => {
 const platformMetadata = getPlatformMetadata();
 const repoUrl = removeGitPrefixAndSuffix(repository.url);
 const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`;
-const binaryOutputPath = path.join(__dirname, '..', '.bin', platformMetadata.BINARY_NAME);
-const projectPackageJsonPath = path.join(__dirname, '..', '..', 'package.json');
+const binaryOutputPath = path.join(process.cwd(),'node_modules','.bin', platformMetadata.BINARY_NAME);
+const projectPackageJsonPath = path.join(process.cwd(),'package.json');
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath);
 writeToPackageJson(projectPackageJsonPath)
