@@ -51,7 +51,20 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		}
 
 		if bundlePath == "" {
-			bundlePath = filepath.Join(buildDirPath, "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+			bundleDirPath := filepath.Join(buildDirPath, "generated", "assets", "react")
+
+			if utils.IsDir(bundleDirPath) {
+				if variant == "" {
+					variant, err = android.GetVariant(bundleDirPath)
+					if err != nil {
+						return err
+					}
+				}
+
+				bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
+			} else {
+				bundlePath = filepath.Join(buildDirPath, "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+			}
 		}
 
 		if !utils.FileExists(bundlePath) {
@@ -63,6 +76,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 			if variant == "" {
 				variant, err = android.GetVariant(sourceMapDirPath)
+				if err != nil {
+					return err
+				}
 			}
 
 			sourceMapPath = filepath.Join(sourceMapDirPath, variant, "index.android.bundle.map")
@@ -73,6 +89,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 				if filepath.Base(sourceMapDirPath) == "react" {
 					variant, err = android.GetVariant(sourceMapDirPath)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}
