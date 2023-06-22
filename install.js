@@ -19,32 +19,32 @@ const removeGitPrefixAndSuffix = (input) => {
 
 const supportedPlatforms = [
     {
-        TYPE: 'windows',
-        ARCHITECTURE: 'x86_64',
+        TYPE: 'Windows',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-windows-bugsnag-cli.exe',
         BINARY_NAME: 'bugsnag-cli.exe'
     },
     {
-        TYPE: 'windows',
+        TYPE: 'Windows',
         ARCHITECTURE: 'i386',
         ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe',
         BINARY_NAME: 'bugsnag-cli.exe'
     },
     {
-        TYPE: 'linux',
-        ARCHITECTURE: 'x86_64',
+        TYPE: 'Linux',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-linux-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
     {
-        TYPE: 'linux',
+        TYPE: 'Linux',
         ARCHITECTURE: 'i386',
         ARTIFACT_NAME: 'i386-linux-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
     {
         TYPE: 'Darwin',
-        ARCHITECTURE: 'x86_64',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-macos-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
