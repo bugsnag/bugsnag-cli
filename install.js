@@ -101,12 +101,33 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
 };
 
 const writeToPackageJson = (packageJsonPath) => {
-    const packageJson = require(packageJsonPath);
+    fs.readFile(packageJsonPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading package.json: ${err}`);
+            return;
+        }
 
-    packageJson.scripts.bugsnagCreateBuild = './node_modules/.bin/bugsnag-cli create-build';
-    packageJson.scripts.bugsnagUpload = './node_modules/.bin/bugsnag-cli upload react-native-android';
+        try {
+            const packageJson = JSON.parse(data);
 
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+            packageJson.scripts = {
+                ...packageJson.scripts,
+                "bugsnag:create-build": "./node_modules/.bin/bugsnag-cli create-build",
+                "bugsnag:upload-android": "./node_modules/.bin/bugsnag-cli upload react-native-android"
+            };
+
+            const updatedPackageJson = JSON.stringify(packageJson, null, 2);
+
+            fs.writeFile(packageJsonPath, updatedPackageJson, 'utf8', (err) => {
+                if (err) {
+                    console.error(`Error writing package.json: ${err}`);
+                    return;
+                }
+            });
+        } catch (err) {
+            console.error(`Error parsing package.json: ${err}`);
+        }
+    })
 }
 
 const platformMetadata = getPlatformMetadata();
