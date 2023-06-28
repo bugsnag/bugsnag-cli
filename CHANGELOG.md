@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 (2023-06-13)
+
+Add support for installing the CLI via NPM - [42](https://github.com/bugsnag/bugsnag-cli/pull/41)
+
 ## 1.1.1 (2023-05-25)
 
 Fix how we check for the AndroidManifest.xml file for Android AAB - [37](https://github.com/bugsnag/bugsnag-cli/pull/37)

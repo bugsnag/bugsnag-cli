@@ -19,32 +19,32 @@ const removeGitPrefixAndSuffix = (input) => {
 
 const supportedPlatforms = [
     {
-        TYPE: 'windows',
-        ARCHITECTURE: 'x86_64',
+        TYPE: 'Windows',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-windows-bugsnag-cli.exe',
         BINARY_NAME: 'bugsnag-cli.exe'
     },
     {
-        TYPE: 'windows',
+        TYPE: 'Windows',
         ARCHITECTURE: 'i386',
         ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe',
         BINARY_NAME: 'bugsnag-cli.exe'
     },
     {
-        TYPE: 'linux',
-        ARCHITECTURE: 'x86_64',
+        TYPE: 'Linux',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-linux-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
     {
-        TYPE: 'linux',
+        TYPE: 'Linux',
         ARCHITECTURE: 'i386',
         ARTIFACT_NAME: 'i386-linux-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
     {
         TYPE: 'Darwin',
-        ARCHITECTURE: 'x86_64',
+        ARCHITECTURE: 'x64',
         ARTIFACT_NAME: 'x86_64-macos-bugsnag-cli',
         BINARY_NAME: 'bugsnag-cli'
     },
@@ -85,7 +85,7 @@ const getPlatformMetadata = () => {
 
 const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     try {
-        const binDir = path.resolve(__dirname, '..', '.bin');
+        const binDir = path.resolve(process.cwd(),'..','..','.bin');
         if (!fs.existsSync(binDir)) {
             fs.mkdirSync(binDir, { recursive: true });
         }
@@ -101,19 +101,40 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
 };
 
 const writeToPackageJson = (packageJsonPath) => {
-    const packageJson = require(packageJsonPath);
+    fs.readFile(packageJsonPath, 'utf8', (err, data) => {
+        if (err) {
+            console.error(`Error reading package.json: ${err}`);
+            return;
+        }
 
-    packageJson.scripts.bugsnagCreateBuild = './node_modules/.bin/bugsnag-cli create-build';
-    packageJson.scripts.bugsnagUpload = './node_modules/.bin/bugsnag-cli upload react-native-android';
+        try {
+            const packageJson = JSON.parse(data);
 
-    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+            packageJson.scripts = {
+                ...packageJson.scripts,
+                "bugsnag:create-build": "./node_modules/.bin/bugsnag-cli create-build",
+                "bugsnag:upload-android": "./node_modules/.bin/bugsnag-cli upload react-native-android"
+            };
+
+            const updatedPackageJson = JSON.stringify(packageJson, null, 2);
+
+            fs.writeFile(packageJsonPath, updatedPackageJson, 'utf8', (err) => {
+                if (err) {
+                    console.error(`Error writing package.json: ${err}`);
+                    return;
+                }
+            });
+        } catch (err) {
+            console.error(`Error parsing package.json: ${err}`);
+        }
+    })
 }
 
 const platformMetadata = getPlatformMetadata();
 const repoUrl = removeGitPrefixAndSuffix(repository.url);
 const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`;
-const binaryOutputPath = path.join(__dirname, '..', '.bin', platformMetadata.BINARY_NAME);
-const projectPackageJsonPath = path.join(__dirname, '..', '..', 'package.json');
+const binaryOutputPath = path.join(process.cwd(),'..','..','.bin', platformMetadata.BINARY_NAME);
+const projectPackageJsonPath = path.join(process.cwd(),'..','..', '..','package.json');
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath);
 writeToPackageJson(projectPackageJsonPath)
