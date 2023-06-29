@@ -8,6 +8,8 @@ Move global `appVersion`, `appVersionCode` and `appBundleVersion` flags to sub c
 
 Correct `buildUUID` name in server requests for Android Proguard - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
+Get values from Android AAB manifest via resource ID - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
+
 ## 1.1.1 (2023-05-25)   
 
 Fix how we check for the AndroidManifest.xml file for Android AAB - [37](https://github.com/bugsnag/bugsnag-cli/pull/37)
