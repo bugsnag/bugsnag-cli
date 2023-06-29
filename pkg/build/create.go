@@ -21,9 +21,9 @@ type CreateBuild struct {
 	Repository    string            `help:"The URL of the repository containing the source code being deployed."`
 	Revision      string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
-	Version       string            `help:"The version of the application."`
-	VersionCode   string            `help:"The version code for the application (Android only)."`
-	BundleVersion string            `help:"The bundle version for the application (iOS only)."`
+	Version       string            `help:"The version of the application." aliases:"app-version"`
+	VersionCode   string            `help:"The version code for the application (Android only)." aliases:"app-version-code"`
+	BundleVersion string            `help:"The bundle version for the application (iOS only)." aliases:"app-bundle-version"`
 }
 
 type Payload struct {
