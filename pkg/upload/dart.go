@@ -30,10 +30,6 @@ type DartSymbol struct {
 func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 	log.Info("Building file list from path")
 
-	log.Info(version)
-	log.Info(versionCode)
-	log.Info(bundleVersion)
-
 	fileList, err := utils.BuildFileList(paths)
 	numberOfFiles := len(fileList)
 
