@@ -153,7 +153,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
 
 		if err != nil {
-			return nil
+			return err
 		}
 
 		fileFieldData := make(map[string]string)
