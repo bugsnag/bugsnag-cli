@@ -24,18 +24,18 @@ func ReadAabManifest(path string) (map[string]string, error) {
 	}
 
 	for _, data := range rawAabManifestData.GetElement().GetAttribute() {
-		if data.Name == "versionCode" {
-			aabManifestData["versionCode"] = data.Value
+		if data.ResourceId == 16843291 || data.Name == "versionCode" {
+			aabManifestData["versionCode"] = data.GetValue()
 			continue
 		}
 
 		if data.Name == "package" {
-			aabManifestData["applicationId"] = data.Value
+			aabManifestData["applicationId"] = data.GetValue()
 			continue
 		}
 
-		if data.Name == "versionName" {
-			aabManifestData["versionName"] = data.Value
+		if data.ResourceId == 16843292 || data.Name == "versionName" {
+			aabManifestData["versionName"] = data.GetValue()
 			continue
 		}
 	}

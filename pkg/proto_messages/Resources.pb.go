@@ -25,6 +25,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+	"strconv"
 	sync "sync"
 )
 
@@ -3147,6 +3148,9 @@ func (x *XmlAttribute) GetName() string {
 
 func (x *XmlAttribute) GetValue() string {
 	if x != nil {
+		if x.Value == "" {
+			return strconv.Itoa(int(x.CompiledItem.GetPrim().GetIntDecimalValue()))
+		}
 		return x.Value
 	}
 	return ""

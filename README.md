@@ -18,6 +18,8 @@ Simplify the process of creating releases on the BugSnag dashboard and uploading
 
 The binaries are available on our [GitHub releases page](https://github.com/bugsnag/bugsnag-cli/releases) for macOS, Linux and Windows.
 
+### cURL / Wget
+
 To install or upgrade to the latest binary for your architecture, you can also run the following `cURL` or `Wget` commands:
 
 ```sh
@@ -28,6 +30,12 @@ wget -qO- https://raw.githubusercontent.com/bugsnag/bugsnag-cli/main/install.sh 
 ```
 
 The script downloads the appropriate binary and attempts to install it to `~/.local/bugsnag`.
+
+### NPM
+
+To install or upgrade the BugSnag CLI via `npm`, you can run the following command:
+
+`npm install @bugsnag/cli`
 
 ## Supported commands
 
