@@ -108,7 +108,7 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["appId"] == "" && uploadOptions["buildUUID"] == "" && uploadOptions["versionName"] == "" && uploadOptions["versionCode"] == "" {
+	if uploadOptions["appId"] == "" || uploadOptions["buildUUID"] == "" || uploadOptions["versionName"] == "" || uploadOptions["versionCode"] == "" {
 		return nil, fmt.Errorf("you must set at least the application ID, version name, version code or build UUID to uniquely identify the build")
 	}
 
@@ -148,7 +148,7 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		uploadOptions["overwrite"] = "true"
 	}
 
-	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
+	if uploadOptions["appVersion"] == "" || uploadOptions["appVersionCode"] == "" || uploadOptions["codeBundleId"] == "" {
 		return nil, fmt.Errorf("you must set at least the version, version code or code bundle ID to uniquely identify the build")
 	}
 
