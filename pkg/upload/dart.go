@@ -17,15 +17,22 @@ import (
 )
 
 type DartSymbol struct {
-	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	IosAppPath    string            `help:"(optional) the path to the built iOS app."`
-	Version       string            `help:"The version of the application." aliases:"app-version"`
-	VersionCode   string            `help:"The version code for the application (Android only)." aliases:"app-version-code"`
-	BundleVersion string            `help:"The bundle version for the application (iOS only)." aliases:"app-bundle-version"`
+	Path             utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	IosAppPath       string            `help:"(optional) the path to the built iOS app."`
+	Version          string            `help:"The version of the application." xor:"app-version,version"`
+	AppVersion       string            `help:"(deprecated) The version of the application." xor:"app-version,version"`
+	VersionCode      string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
+	AppVersionCode   string            `help:"(deprecated) The version code for the application (Android only)." xor:"app-version-code,version-code"`
+	BundleVersion    string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
+	AppBundleVersion string            `help:"(deprecated) The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 }
 
 func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 	log.Info("Building file list from path")
+
+	log.Info(version)
+	log.Info(versionCode)
+	log.Info(bundleVersion)
 
 	fileList, err := utils.BuildFileList(paths)
 	numberOfFiles := len(fileList)
@@ -58,7 +65,7 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+			requestStatus := server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 && failOnUploadError {
