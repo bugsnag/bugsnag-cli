@@ -156,7 +156,7 @@ func main() {
 		}
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			utils.XorString(commands.Upload.DartSymbol.Version, commands.Upload.DartSymbol.AppVersion),
+			utils.XorString(commands.Upload.DartSymbol.VersionName, commands.Upload.DartSymbol.AppVersion),
 			utils.XorString(commands.Upload.DartSymbol.VersionCode, commands.Upload.DartSymbol.AppVersionCode),
 			utils.XorString(commands.Upload.DartSymbol.BundleVersion, commands.Upload.DartSymbol.AppBundleVersion),
 			commands.Upload.DartSymbol.IosAppPath,
@@ -221,7 +221,7 @@ func main() {
 			commands.CreateBuild.Provider,
 			commands.CreateBuild.Repository,
 			commands.CreateBuild.Revision,
-			utils.XorString(commands.CreateBuild.Version, commands.CreateBuild.AppVersion),
+			utils.XorString(commands.CreateBuild.VersionName, commands.CreateBuild.AppVersion),
 			utils.XorString(commands.CreateBuild.VersionCode, commands.CreateBuild.AppVersionCode),
 			utils.XorString(commands.CreateBuild.BundleVersion, commands.CreateBuild.AppBundleVersion),
 			commands.CreateBuild.Metadata,
