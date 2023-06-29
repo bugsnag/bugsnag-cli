@@ -17,9 +17,6 @@ func main() {
 		Port              int    `help:"Port number for the upload server" default:"443"`
 		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
 		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
-		AppVersion        string `help:"The version of the application."`
-		AppVersionCode    string `help:"The version code for the application (Android only)."`
-		AppBundleVersion  string `help:"The bundle version for the application (iOS only)."`
 		Upload            struct {
 
 			// shared options
@@ -159,9 +156,9 @@ func main() {
 		}
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			commands.AppVersion,
-			commands.AppVersionCode,
-			commands.AppBundleVersion,
+			commands.Upload.DartSymbol.Version,
+			commands.Upload.DartSymbol.VersionCode,
+			commands.Upload.DartSymbol.BundleVersion,
 			commands.Upload.DartSymbol.IosAppPath,
 			endpoint,
 			commands.Upload.Timeout,
@@ -224,9 +221,9 @@ func main() {
 			commands.CreateBuild.Provider,
 			commands.CreateBuild.Repository,
 			commands.CreateBuild.Revision,
-			commands.AppVersion,
-			commands.AppVersionCode,
-			commands.AppBundleVersion,
+			commands.CreateBuild.Version,
+			commands.CreateBuild.VersionCode,
+			commands.CreateBuild.BundleVersion,
 			commands.CreateBuild.Metadata,
 			commands.CreateBuild.Path,
 			endpoint)

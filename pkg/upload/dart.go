@@ -17,11 +17,14 @@ import (
 )
 
 type DartSymbol struct {
-	Path       utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	IosAppPath string            `help:"(optional) the path to the built iOS app."`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	IosAppPath    string            `help:"(optional) the path to the built iOS app."`
+	Version       string            `help:"The version of the application."`
+	VersionCode   string            `help:"The version code for the application (Android only)."`
+	BundleVersion string            `help:"The bundle version for the application (iOS only)."`
 }
 
-func Dart(paths []string, appVersion string, appVersionCode string, appBundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
 	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
@@ -50,7 +53,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, appVersion, appVersionCode)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, version, versionCode)
 
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
@@ -95,7 +98,7 @@ func Dart(paths []string, appVersion string, appVersionCode string, appBundleVer
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, appVersion, appBundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, version, bundleVersion)
 
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file

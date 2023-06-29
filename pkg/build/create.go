@@ -14,13 +14,16 @@ import (
 )
 
 type CreateBuild struct {
-	BuilderName  string            `help:"The name of the entity that triggered the build. Could be a user, system etc."`
-	Metadata     map[string]string `help:"Additional build information"`
-	ReleaseStage string            `help:"The release stage (eg, production, staging) that is being released (if applicable)."`
-	Provider     string            `help:"The name of the source control provider that contains the source code for the build."`
-	Repository   string            `help:"The URL of the repository containing the source code being deployed."`
-	Revision     string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
-	Path         utils.UploadPaths `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
+	BuilderName   string            `help:"The name of the entity that triggered the build. Could be a user, system etc."`
+	Metadata      map[string]string `help:"Additional build information"`
+	ReleaseStage  string            `help:"The release stage (eg, production, staging) that is being released (if applicable)."`
+	Provider      string            `help:"The name of the source control provider that contains the source code for the build."`
+	Repository    string            `help:"The URL of the repository containing the source code being deployed."`
+	Revision      string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
+	Version       string            `help:"The version of the application."`
+	VersionCode   string            `help:"The version code for the application (Android only)."`
+	BundleVersion string            `help:"The bundle version for the application (iOS only)."`
 }
 
 type Payload struct {
@@ -40,8 +43,8 @@ type SourceControl struct {
 	Revision   string `json:"revision,omitempty"`
 }
 
-func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, appVersion string, appVersionCode string, appBundleVersion string, metadata map[string]string, paths []string, endpoint string) error {
-	if appVersion == "" {
+func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, version string, versionCode string, bundleVersion string, metadata map[string]string, paths []string, endpoint string) error {
+	if version == "" {
 		log.Error("Missing app version, please provide this via the command line options", 1)
 	}
 
@@ -63,9 +66,9 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 			Revision:   repoInfo["revision"],
 		},
 		Metadata:         metadata,
-		AppVersion:       appVersion,
-		AppVersionCode:   appVersionCode,
-		AppBundleVersion: appBundleVersion,
+		AppVersion:       version,
+		AppVersionCode:   versionCode,
+		AppBundleVersion: bundleVersion,
 	}
 
 	buildPayload, err := json.Marshal(payload)
