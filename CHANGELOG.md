@@ -1,10 +1,12 @@
 # Changelog
 
-## 1.2.0 (TBD)
+## 1.2.0 (2023-06-29)
 
 Add support for installing the CLI via NPM - [40](https://github.com/bugsnag/bugsnag-cli/pull/40)
 
 Move global `appVersion`, `appVersionCode` and `appBundleVersion` flags to sub commands for `dart` and `create-build` - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
+
+Correct `buildUUID` name in server requests - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
 ## 1.1.1 (2023-05-25)   
 
