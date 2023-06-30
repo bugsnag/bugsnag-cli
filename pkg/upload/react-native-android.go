@@ -121,39 +121,36 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 				appManifestPath = appManifestPathExpected
 				log.Info("Found app manifest at: " + appManifestPath)
 			} else {
-				appManifestPath = ""
+				log.Info("No app manifest found at: " + appManifestPathExpected)
 			}
 		}
 
-		if apiKey == "" || versionName == "" || versionCode == "" {
-			if appManifestPath != "" {
-				manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
+		if appManifestPath != "" && (apiKey == "" || versionName == "" || versionCode == "") {
 
-				if err != nil {
-					return err
-				}
+			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
-				if apiKey == "" {
-					for key, value := range manifestData.Application.MetaData.Name {
-						if value == "com.bugsnag.android.API_KEY" {
-							apiKey = manifestData.Application.MetaData.Value[key]
-						}
+			if err != nil {
+				return err
+			}
+
+			if apiKey == "" {
+				for key, value := range manifestData.Application.MetaData.Name {
+					if value == "com.bugsnag.android.API_KEY" {
+						apiKey = manifestData.Application.MetaData.Value[key]
 					}
-
-					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 				}
 
-				if versionName == "" {
-					versionName = manifestData.VersionName
-					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-				}
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+			}
 
-				if versionCode == "" {
-					versionCode = manifestData.VersionCode
-					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-				}
-			} else {
-				return fmt.Errorf("unable to open AndroidManifest.xml to retrieve missing api key, version name, version code or code bundle ID")
+			if versionName == "" {
+				versionName = manifestData.VersionName
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+			}
+
+			if versionCode == "" {
+				versionCode = manifestData.VersionCode
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 		}
 
