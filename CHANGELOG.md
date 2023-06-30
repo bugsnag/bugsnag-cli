@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 (2023-06-30)
+
+Allow non-standard variants when not providing the bundle path as a flag to the CLI. [44](https://github.com/bugsnag/bugsnag-cli/pull/44)
+
 ## 1.2.0 (2023-06-29)
 
 Add support for installing the CLI via NPM - [40](https://github.com/bugsnag/bugsnag-cli/pull/40)

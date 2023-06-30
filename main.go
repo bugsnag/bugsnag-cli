@@ -184,7 +184,7 @@ func main() {
 			commands.Upload.ReactNativeAndroid.Path,
 			commands.Upload.ReactNativeAndroid.ProjectRoot,
 			commands.Upload.ReactNativeAndroid.Variant,
-			commands.Upload.ReactNativeAndroid.Version,
+			utils.XorString(commands.Upload.ReactNativeAndroid.VersionName, commands.Upload.ReactNativeAndroid.Version),
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
 			endpoint,
