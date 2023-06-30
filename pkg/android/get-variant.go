@@ -25,7 +25,7 @@ func BuildVariantsList(path string) ([]string, error) {
 	return variants, nil
 }
 
-func GetVariant(path string) (string, error) {
+func GetVariantDirectory(path string) (string, error) {
 	var variants []string
 
 	fileInfo, err := ioutil.ReadDir(path)

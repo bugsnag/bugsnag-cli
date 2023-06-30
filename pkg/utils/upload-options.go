@@ -149,7 +149,7 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 	}
 
 	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
-		return nil, fmt.Errorf("you must set at least the version, version code or code bundle ID to uniquely identify the build")
+		return nil, fmt.Errorf("you must set at least the version name, version code or code bundle ID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil

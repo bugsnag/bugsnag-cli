@@ -47,7 +47,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 			if variant == "" {
-				variant, err = android.GetVariant(mergeNativeLibPath)
+				variant, err = android.GetVariantDirectory(mergeNativeLibPath)
 
 				if err != nil {
 					return err
@@ -81,7 +81,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
 
 					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
-						variant, err = android.GetVariant(mergeNativeLibPath)
+						variant, err = android.GetVariantDirectory(mergeNativeLibPath)
 
 						if err == nil {
 							appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
