@@ -53,11 +53,12 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		}
 
 		if bundlePath == "" {
+			// Check the path for RN version <= 0.69 - generated/assets/react/<variant>/index.android.bundle
 			bundleDirPath := filepath.Join(buildDirPath, "generated", "assets", "react")
 
 			if utils.IsDir(bundleDirPath) {
 				if variant == "" {
-					variant, err = android.GetVariant(bundleDirPath)
+					variant, err = android.GetVariantDirectory(bundleDirPath)
 					if err != nil {
 						return err
 					}
@@ -65,16 +66,17 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 				bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
 			} else {
+				// Check the path for RN versions >= 0.70 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
 				bundleDirPath := filepath.Join(buildDirPath, "ASSETS")
 
 				if utils.IsDir(bundleDirPath) {
 					if variant == "" {
-						variant, err = android.GetVariant(bundleDirPath)
+						variantDirName, err := android.GetVariantDirectory(bundleDirPath)
 						if err != nil {
 							return err
 						}
 
-						bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
+						bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
 					} else {
 						bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
 					}
@@ -90,7 +92,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			sourceMapDirPath := filepath.Join(buildDirPath, "generated", "sourcemaps", "react")
 
 			if variant == "" {
-				variant, err = android.GetVariant(sourceMapDirPath)
+				variant, err = android.GetVariantDirectory(sourceMapDirPath)
 				if err != nil {
 					return err
 				}
@@ -103,7 +105,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 				sourceMapDirPath := filepath.Join(sourceMapPath, "..", "..")
 
 				if filepath.Base(sourceMapDirPath) == "react" {
-					variant, err = android.GetVariant(sourceMapDirPath)
+					variant, err = android.GetVariantDirectory(sourceMapDirPath)
 					if err != nil {
 						return err
 					}

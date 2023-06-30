@@ -37,7 +37,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			}
 
 			if variant == "" {
-				variant, err = android.GetVariant(mappingPath)
+				variant, err = android.GetVariantDirectory(mappingPath)
 
 				if err != nil {
 					return err
@@ -67,7 +67,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 					mergedManifestPath := filepath.Join(path, "..", "..", "..", "..", "intermediates", "merged_manifests")
 
 					if filepath.Base(mergedManifestPath) == "merged_manifests" {
-						variant, err = android.GetVariant(mergedManifestPath)
+						variant, err = android.GetVariantDirectory(mergedManifestPath)
 						if err == nil {
 							appManifestPathExpected = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 							if utils.FileExists(appManifestPathExpected) {
