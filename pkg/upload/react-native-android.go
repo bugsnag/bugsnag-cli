@@ -3,6 +3,7 @@ package upload
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -19,11 +20,11 @@ type ReactNativeAndroid struct {
 	ProjectRoot  string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	SourceMap    string            `help:"Path to the source map file" type:"path"`
 	Variant      string            `help:"Build type, like 'debug' or 'release'"`
-	Version      string            `help:"The version of the application."`
+	VersionName  string            `help:"The version name of the application."`
 	VersionCode  string            `help:"The version code for the application (Android only)."`
 }
 
-func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, version string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
+func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, versionName string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
 
 	var err error
 	var uploadOptions map[string]string
@@ -63,7 +64,20 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 				bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
 			} else {
-				bundlePath = filepath.Join(buildDirPath, "ASSETS", "createBundleReleaseJsAndAssets", "index.android.bundle")
+				bundleDirPath := filepath.Join(buildDirPath, "ASSETS")
+
+				if utils.IsDir(bundleDirPath) {
+					if variant == "" {
+						variant, err = android.GetVariant(bundleDirPath)
+						if err != nil {
+							return err
+						}
+
+						bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
+					} else {
+						bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
+					}
+				}
 			}
 		}
 
@@ -105,41 +119,46 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
 				log.Info("Found app manifest at: " + appManifestPath)
+			} else {
+				appManifestPath = ""
 			}
 		}
 
-		if appManifestPath != "" && (apiKey == "" || version == "" || versionCode == "") {
+		if apiKey == "" || versionName == "" || versionCode == "" {
+			if appManifestPath != "" {
+				manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
-			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
-
-			if err != nil {
-				return err
-			}
-
-			if apiKey == "" {
-				for key, value := range manifestData.Application.MetaData.Name {
-					if value == "com.bugsnag.android.API_KEY" {
-						apiKey = manifestData.Application.MetaData.Value[key]
-					}
+				if err != nil {
+					return err
 				}
 
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
-			}
+				if apiKey == "" {
+					for key, value := range manifestData.Application.MetaData.Name {
+						if value == "com.bugsnag.android.API_KEY" {
+							apiKey = manifestData.Application.MetaData.Value[key]
+						}
+					}
 
-			if version == "" {
-				version = manifestData.VersionName
-				log.Info("Using " + version + " as version code from AndroidManifest.xml")
-			}
+					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				}
 
-			if versionCode == "" {
-				versionCode = manifestData.VersionCode
-				log.Info("Using " + versionCode + " as version name from AndroidManifest.xml")
+				if versionName == "" {
+					versionName = manifestData.VersionName
+					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				}
+
+				if versionCode == "" {
+					versionCode = manifestData.VersionCode
+					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				}
+			} else {
+				return fmt.Errorf("unable to open AndroidManifest.xml to retrieve missing api key, version name, version code or code bundle ID")
 			}
 		}
 
 		log.Info("Uploading debug information for React Native Android")
 
-		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, version, versionCode, codeBundleId, dev, projectRoot, overwrite)
+		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite)
 
 		if err != nil {
 			return err
