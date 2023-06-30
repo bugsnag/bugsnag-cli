@@ -20,7 +20,7 @@ type ReactNativeAndroid struct {
 	ProjectRoot  string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	SourceMap    string            `help:"Path to the source map file" type:"path"`
 	Variant      string            `help:"Build type, like 'debug' or 'release'"`
-	Version      string            `help:"(depricated) The version name of the application."`
+	Version      string            `help:"(deprecated) The version name of the application."`
 	VersionName  string            `help:"The version name of the application."`
 	VersionCode  string            `help:"The version code for the application (Android only)."`
 }
