@@ -53,33 +53,44 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		}
 
 		if bundlePath == "" {
+			switch true {
 			// Check the path for RN version <= 0.69 - generated/assets/react/<variant>/index.android.bundle
-			bundleDirPath := filepath.Join(buildDirPath, "generated", "assets", "react")
-
-			if utils.IsDir(bundleDirPath) {
+			case utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")):
+				bundleDirPath := filepath.Join(buildDirPath, "generated", "assets", "react")
 				if variant == "" {
 					variant, err = android.GetVariantDirectory(bundleDirPath)
 					if err != nil {
 						return err
 					}
 				}
-
 				bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
-			} else {
-				// Check the path for RN versions >= 0.70 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
-				bundleDirPath := filepath.Join(buildDirPath, "ASSETS")
 
-				if utils.IsDir(bundleDirPath) {
-					if variant == "" {
-						variantDirName, err := android.GetVariantDirectory(bundleDirPath)
-						if err != nil {
-							return err
-						}
-
-						bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
-					} else {
-						bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
+			// Check the path for RN versions >= 0.72 - generated/assets/<variant>/index.android.bundle
+			case utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")):
+				bundleDirPath := filepath.Join(buildDirPath, "generated", "assets")
+				if variant == "" {
+					variantDirName, err := android.GetVariantDirectory(bundleDirPath)
+					if err != nil {
+						return err
 					}
+
+					bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
+				} else {
+					bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
+				}
+
+			// Check the path for RN versions >= 0.70 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
+			case utils.IsDir(filepath.Join(buildDirPath, "ASSETS")):
+				bundleDirPath := filepath.Join(buildDirPath, "ASSETS")
+				if variant == "" {
+					variantDirName, err := android.GetVariantDirectory(bundleDirPath)
+					if err != nil {
+						return err
+					}
+
+					bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
+				} else {
+					bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
 				}
 			}
 		}
