@@ -32,6 +32,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 	var rootDirPath string
 	var variantDirName string
 	var bundleDirPath string
+	var variantFileFormat string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -56,14 +57,18 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 		if bundlePath == "" {
 			if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")) {
-				// RN versions >= 0.72 - generated/assets/createBundle<variant>JsAndAssets/index.android.bundle
+				// RN versions >= 0.72 - generated/assets/<variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets")
+				variantFileFormat = "createBundle%sJsAndAssets"
 			} else if utils.IsDir(filepath.Join(buildDirPath, "ASSETS")) {
 				// RN versions < 0.72 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "ASSETS")
+				variantFileFormat = "createBundle%sJsAndAssets"
 			} else if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")) {
 				// RN version < 0.70 - generated/assets/react/<variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets", "react")
+			} else {
+				return fmt.Errorf("unable to find path containing the index.android.bundle")
 			}
 
 			if bundleDirPath != "" {
@@ -72,14 +77,14 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 					if err != nil {
 						return err
 					}
-					bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
 				} else {
-					if filepath.Base(bundleDirPath) == "react" {
-						bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
+					if variantFileFormat != "" {
+						variantDirName = fmt.Sprintf(variantFileFormat, strings.Title(variant))
 					} else {
-						bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
+						variantDirName = variant
 					}
 				}
+				bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
 			}
 		}
 
