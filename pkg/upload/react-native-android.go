@@ -68,7 +68,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 				// RN version < 0.70 - generated/assets/react/<variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets", "react")
 			} else {
-				return fmt.Errorf("unable to find path containing the index.android.bundle")
+				return fmt.Errorf("unable to find index.android.bundle in your project, please specify the path using --bundle-path")
 			}
 
 			if bundleDirPath != "" {
