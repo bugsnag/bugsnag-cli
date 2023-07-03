@@ -1,8 +1,10 @@
 # Changelog
 
-## 1.2.1 (2023-06-30)
+## 1.2.1 (2023-07-03)
 
 Allow non-standard variants when not providing the bundle path as a flag to the CLI. [44](https://github.com/bugsnag/bugsnag-cli/pull/44)
+
+Add bundle path support for React Native 0.72. [46](https://github.com/bugsnag/bugsnag-cli/pull/46)
 
 ## 1.2.0 (2023-06-29)
 
