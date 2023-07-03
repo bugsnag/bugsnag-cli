@@ -30,6 +30,8 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 	var err error
 	var uploadOptions map[string]string
 	var rootDirPath string
+	var variantDirName string
+	var bundleDirPath string
 
 	if dryRun {
 		log.Info("Performing dry run - no files will be uploaded")
@@ -53,44 +55,30 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		}
 
 		if bundlePath == "" {
-			switch true {
-			// Check the path for RN version <= 0.69 - generated/assets/react/<variant>/index.android.bundle
-			case utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")):
-				bundleDirPath := filepath.Join(buildDirPath, "generated", "assets", "react")
+			if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")) {
+				// RN versions >= 0.72 - generated/assets/createBundle<variant>JsAndAssets/index.android.bundle
+				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets")
+			} else if utils.IsDir(filepath.Join(buildDirPath, "ASSETS")) {
+				// RN versions < 0.72 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
+				bundleDirPath = filepath.Join(buildDirPath, "ASSETS")
+			} else if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")) {
+				// RN version < 0.70 - generated/assets/react/<variant>/index.android.bundle
+				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets", "react")
+			}
+
+			if bundleDirPath != "" {
 				if variant == "" {
-					variant, err = android.GetVariantDirectory(bundleDirPath)
+					variantDirName, err = android.GetVariantDirectory(bundleDirPath)
 					if err != nil {
 						return err
 					}
-				}
-				bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
-
-			// Check the path for RN versions >= 0.72 - generated/assets/<variant>/index.android.bundle
-			case utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")):
-				bundleDirPath := filepath.Join(buildDirPath, "generated", "assets")
-				if variant == "" {
-					variantDirName, err := android.GetVariantDirectory(bundleDirPath)
-					if err != nil {
-						return err
-					}
-
 					bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
 				} else {
-					bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
-				}
-
-			// Check the path for RN versions >= 0.70 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
-			case utils.IsDir(filepath.Join(buildDirPath, "ASSETS")):
-				bundleDirPath := filepath.Join(buildDirPath, "ASSETS")
-				if variant == "" {
-					variantDirName, err := android.GetVariantDirectory(bundleDirPath)
-					if err != nil {
-						return err
+					if filepath.Base(bundleDirPath) == "react" {
+						bundlePath = filepath.Join(bundleDirPath, variant, "index.android.bundle")
+					} else {
+						bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
 					}
-
-					bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
-				} else {
-					bundlePath = filepath.Join(bundleDirPath, "createBundle"+strings.Title(variant)+"JsAndAssets", "index.android.bundle")
 				}
 			}
 		}
