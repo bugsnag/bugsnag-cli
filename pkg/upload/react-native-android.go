@@ -73,7 +73,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 			if bundleDirPath != "" {
 				if variant == "" {
-					variantDirName, err = android.GetVariantDirectory(bundleDirPath)
+					variant, err = android.GetVariantDirectory(bundleDirPath)
 					if err != nil {
 						return err
 					}
