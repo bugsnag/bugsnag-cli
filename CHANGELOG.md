@@ -8,7 +8,7 @@ Add bundle path support for React Native 0.72. [46](https://github.com/bugsnag/b
 
 ## 1.2.0 (2023-06-29)
 
-Add support for installing the CLI via NPM - [40](https://github.com/bugsnag/bugsnag-cli/pull/40)
+Add support for installing the CLI via NPM - [39](https://github.com/bugsnag/bugsnag-cli/pull/39)
 
 Move global `appVersion`, `appVersionCode` and `appBundleVersion` flags to sub commands for `dart` and `create-build` - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
