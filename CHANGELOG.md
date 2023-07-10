@@ -2,7 +2,7 @@
 
 ## 1.2.2 (TBD)
 
-Add missing variant to `index.android.bundle` path for React Native versions lower than 0.70. [47](https://github.com/bugsnag/bugsnag-cli/pull/44)
+Add missing variant to `index.android.bundle` path for React Native versions lower than 0.70. [49](https://github.com/bugsnag/bugsnag-cli/pull/49)
 
 ## 1.2.1 (2023-07-03)
 
