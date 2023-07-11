@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2 (TBD)
+
+Adjust `index.android.bundle` path checking for React Native Android to ensure that paths are tested correctly. [49](https://github.com/bugsnag/bugsnag-cli/pull/49)
+
 ## 1.2.1 (2023-07-03)
 
 Allow non-standard variants when not providing the bundle path as a flag to the CLI. [44](https://github.com/bugsnag/bugsnag-cli/pull/44)
