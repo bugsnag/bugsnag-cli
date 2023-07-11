@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.2 (TBD)
+## 1.2.2 (2023-07-11)
 
 Do not modify the projects package.json when installing the CLI via NPM. [50](https://github.com/bugsnag/bugsnag-cli/pull/50)
 
