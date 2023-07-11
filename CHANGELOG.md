@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.2.2 (TBD)
+## 1.2.2 (2023-07-11)
+
+Do not modify the projects package.json when installing the CLI via NPM. [50](https://github.com/bugsnag/bugsnag-cli/pull/50)
 
 Adjust `index.android.bundle` path checking for React Native Android to ensure that paths are tested correctly. [49](https://github.com/bugsnag/bugsnag-cli/pull/49)
 

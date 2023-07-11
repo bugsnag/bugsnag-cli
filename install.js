@@ -100,41 +100,9 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     }
 };
 
-const writeToPackageJson = (packageJsonPath) => {
-    fs.readFile(packageJsonPath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(`Error reading package.json: ${err}`);
-            return;
-        }
-
-        try {
-            const packageJson = JSON.parse(data);
-
-            packageJson.scripts = {
-                ...packageJson.scripts,
-                "bugsnag:create-build": "./node_modules/.bin/bugsnag-cli create-build",
-                "bugsnag:upload-android": "./node_modules/.bin/bugsnag-cli upload react-native-android"
-            };
-
-            const updatedPackageJson = JSON.stringify(packageJson, null, 2);
-
-            fs.writeFile(packageJsonPath, updatedPackageJson, 'utf8', (err) => {
-                if (err) {
-                    console.error(`Error writing package.json: ${err}`);
-                    return;
-                }
-            });
-        } catch (err) {
-            console.error(`Error parsing package.json: ${err}`);
-        }
-    })
-}
-
 const platformMetadata = getPlatformMetadata();
 const repoUrl = removeGitPrefixAndSuffix(repository.url);
 const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`;
 const binaryOutputPath = path.join(process.cwd(),'..','..','.bin', platformMetadata.BINARY_NAME);
-const projectPackageJsonPath = path.join(process.cwd(),'..','..', '..','package.json');
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath);
-writeToPackageJson(projectPackageJsonPath)
