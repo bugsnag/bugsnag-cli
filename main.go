@@ -25,7 +25,7 @@ type Globals struct {
 // Unique CLI options
 type CLI struct {
 	Globals
-	
+
 	Upload struct {
 		// shared options
 		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
