@@ -1,8 +1,8 @@
-# 1.3.0 (TBD)
+# 2.0.0 (TBD)
 
 ## Enhancements
-
-- Add `--version` flag to the cli options to retrieve the version of the Bugsnag CLI. [51](https://github.com/bugsnag/bugsnag-cli/pull/51)
+ 
+- Remove deprecated CLI options - `appVersion`, `appVersionCode` and `appBundleVersion`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
 
 # 1.2.2 (2023-07-11)
 
@@ -34,7 +34,7 @@
 
 - Correct `buildUUID` name in server requests for Android Proguard - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
-# 1.1.1 (2023-05-25)   
+# 1.1.1 (2023-05-25)
 
 ## Fixes
 

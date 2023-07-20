@@ -173,9 +173,9 @@ func main() {
 		}
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			utils.XorString(commands.Upload.DartSymbol.VersionName, commands.Upload.DartSymbol.AppVersion),
-			utils.XorString(commands.Upload.DartSymbol.VersionCode, commands.Upload.DartSymbol.AppVersionCode),
-			utils.XorString(commands.Upload.DartSymbol.BundleVersion, commands.Upload.DartSymbol.AppBundleVersion),
+			commands.Upload.DartSymbol.VersionName,
+			commands.Upload.DartSymbol.VersionCode,
+			commands.Upload.DartSymbol.BundleVersion,
 			commands.Upload.DartSymbol.IosAppPath,
 			endpoint,
 			commands.Upload.Timeout,
@@ -202,7 +202,6 @@ func main() {
 			commands.Upload.ReactNativeAndroid.ProjectRoot,
 			commands.Upload.ReactNativeAndroid.Variant,
 			commands.Upload.ReactNativeAndroid.VersionName,
-			//utils.XorString(commands.Upload.ReactNativeAndroid.VersionName, commands.Upload.ReactNativeAndroid.Version),
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
 			endpoint,
@@ -239,9 +238,9 @@ func main() {
 			commands.CreateBuild.Provider,
 			commands.CreateBuild.Repository,
 			commands.CreateBuild.Revision,
-			utils.XorString(commands.CreateBuild.VersionName, commands.CreateBuild.AppVersion),
-			utils.XorString(commands.CreateBuild.VersionCode, commands.CreateBuild.AppVersionCode),
-			utils.XorString(commands.CreateBuild.BundleVersion, commands.CreateBuild.AppBundleVersion),
+			commands.CreateBuild.VersionName,
+			commands.CreateBuild.VersionCode,
+			commands.CreateBuild.BundleVersion,
 			commands.CreateBuild.Metadata,
 			commands.CreateBuild.Path,
 			endpoint)
