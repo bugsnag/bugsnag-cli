@@ -1,4 +1,4 @@
-# 1.2.3 (TBD)
+# 1.3.0 (TBD)
 
 ## Enhancements
 
