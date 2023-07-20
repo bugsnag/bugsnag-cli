@@ -17,14 +17,11 @@ import (
 )
 
 type DartSymbol struct {
-	Path             utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	IosAppPath       string            `help:"(optional) the path to the built iOS app."`
-	VersionName      string            `help:"The version of the application." xor:"app-version,version-name"`
-	AppVersion       string            `help:"(deprecated) The version of the application." xor:"app-version,version-name"`
-	VersionCode      string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
-	AppVersionCode   string            `help:"(deprecated) The version code for the application (Android only)." xor:"app-version-code,version-code"`
-	BundleVersion    string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
-	AppBundleVersion string            `help:"(deprecated) The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	IosAppPath    string            `help:"(optional) the path to the built iOS app."`
+	VersionName   string            `help:"The version of the application." xor:"app-version,version-name"`
+	VersionCode   string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
+	BundleVersion string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 }
 
 func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
