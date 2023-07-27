@@ -24,6 +24,7 @@ steps:
       - bundle exec maze-runner features/android
     env:
       ANDROID_NDK_ROOT: "/Users/administrator/Library/Android/sdk/ndk/25.1.8937393"
+      DEBUG: 1
     plugins:
       artifacts#v1.5.0:
         download:
