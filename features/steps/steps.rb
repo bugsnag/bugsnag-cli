@@ -75,6 +75,13 @@ Then('the sourcemap is valid for the Dart Build API') do
   )
 end
 
+Then('the sourcemap is valid for the React Native Build API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "appVersion" is not null
+  )
+end
+
 Then('the sourcemaps Content-Type header is valid multipart form-data') do
   expected = /^multipart\/form-data; boundary=([^;]+)/
   actual = Maze::Server.sourcemaps.current[:request]['content-type']

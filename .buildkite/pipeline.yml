@@ -43,12 +43,12 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: React Native Integration Tests
+  - label: React Native Android Integration Tests
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner features/dart
+      - bundle exec maze-runner features/react-native-android
     plugins:
       artifacts#v1.5.0:
         download:
