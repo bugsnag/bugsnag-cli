@@ -91,7 +91,13 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		if buildUuid == "" {
 			buildUuid = manifestData["buildUuid"]
 			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
+			} else {
+				buildUuid = android.GetDexBuildId(filepath.Join(tempDir, "base", "dex"))
+
+				if buildUuid != "" {
+					log.Info("Using " + buildUuid + " as build ID from dex signatures")
+				}
 			}
 		}
 
