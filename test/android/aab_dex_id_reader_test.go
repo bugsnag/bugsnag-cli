@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAabManifestReader(t *testing.T) {
+func TestAabDexFileReader(t *testing.T) {
 	t.Log("Testing reading the BuildID from an AAB dex files")
 	results, err := android.GetAppSignature("../testdata/android/aab/")
 	if err != nil {
