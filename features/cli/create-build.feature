@@ -15,4 +15,4 @@ Feature: Bugsnag CLI create-build behavior
 
     And the builds payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the builds payload field "appVersion" equals "1.2.3"
-    And the builds payload field "sourceControl.repository" equals "git@github.com:bugsnag/bugsnag-cli"
+    And the builds payload field "sourceControl.repository" equals "git@github.com:bugsnag/bugsnag-cli.git"
