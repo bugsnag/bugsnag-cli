@@ -3,8 +3,6 @@ require 'etc'
 
 os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
-user = Etc.getlogin
-commit_hash = `git rev-parse HEAD`
 
 case
 when os.downcase.include?('windows_nt'), ENV['WSL_DISTRO_NAME'] != nil
@@ -18,12 +16,12 @@ when os.downcase.include?('darwin')
   binary = 'bugsnag-cli'
 end
 
-When('I run bugsnag-cli on mac') do
+When('I run bugsnag-cli') do
   @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/#{arch}-#{os}-#{binary} #{flags}`
+  @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
 end
 
 Then('I should see the help banner') do
@@ -44,14 +42,6 @@ end
 
 Then('I should see the no such file or directory error') do
   Maze.check.include(run_output, "error: <path>: stat /path/to/no/file: no such file or directory")
-end
-
-Then('the payload should match local information') do
-  Maze.check.include(run_output, "\"appVersion\": \"1.2.3\"")
-  Maze.check.include(run_output, "\"apiKey\": \"1234567890ABCDEF1234567890ABCDEF\"")
-  Maze.check.include(run_output, "\"builderName\": \"#{user}\"")
-  Maze.check.include(run_output, "\"revision\": \"#{commit_hash}\"")
-  Maze.check.include(run_output, "\"repository\": \"git@github.com:bugsnag/bugsnag-cli\"")
 end
 
 Then('the sourcemap is valid for the Proguard Build API') do
@@ -84,6 +74,13 @@ Then('the sourcemap is valid for the Android Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appId" is not null
+  )
+end
+
+Then('the build is valid for the Builds API') do
+  steps %(
+    And the build payload field "apiKey" equals "#{$api_key}"
+    And the build payload field "appVersion" is not null
   )
 end
 
