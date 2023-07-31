@@ -56,15 +56,13 @@ end
 
 Then('the sourcemap is valid for the Proguard Build API') do
   steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appId" is not null
+    Then the sourcemap is valid for the Android Build API
   )
 end
 
 Then('the sourcemap is valid for the NDK Build API') do
   steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appId" is not null
+    Then the sourcemap is valid for the Android Build API
   )
 end
 
@@ -79,6 +77,13 @@ Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
+  )
+end
+
+Then('the sourcemap is valid for the Android Build API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "appId" is not null
   )
 end
 
