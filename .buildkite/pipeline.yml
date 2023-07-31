@@ -16,6 +16,20 @@ steps:
     commands:
       - make unit-test
 
+  - label: CLI Integration Tests
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - env
+      - bundle exec maze-runner features/cli
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
   - label: Android Integration Tests
     depends_on: build
     commands:
