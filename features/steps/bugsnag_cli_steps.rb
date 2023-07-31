@@ -53,3 +53,7 @@ Then(/^the payload should match local information$/) do
   run_output.include?("\"revision\": \"#{commit_hash}\"")
   run_output.include?("\"repository\": \"git@github.com:bugsnag/bugsnag-cli\"")
 end
+
+Then('{string} should be used as {string}') do |value, field|
+    Maze.check.include(run_output, "Using #{value} as #{field} from")
+end
