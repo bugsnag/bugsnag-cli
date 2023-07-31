@@ -1,6 +1,6 @@
 Feature: React Native Integration Tests
 
-  Scenario: Upload React Native 0.69
+  Scenario: Locate and Upload React Native 0.69
     When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/fixtures/react-native/rn0_69/
     And I wait to receive 1 sourcemaps
 
@@ -13,7 +13,7 @@ Feature: React Native Integration Tests
     And the sourcemap payload field "platform" equals "android"
     And the sourcemap payload field "overwrite" equals "true"
 
-  Scenario: Upload React Native 0.70
+  Scenario: Locate and Upload React Native 0.70
     When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/fixtures/react-native/rn0_70/
     And I wait to receive 1 sourcemaps
 
