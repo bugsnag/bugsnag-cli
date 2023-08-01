@@ -89,3 +89,7 @@ Then('the sourcemaps Content-Type header is valid multipart form-data') do
   actual = Maze::Server.sourcemaps.current[:request]['content-type']
   Maze.check.match(expected, actual)
 end
+
+Then('{string} should be used as {string}') do |value, field|
+  Maze.check.include(run_output, "Using #{value} as #{field} from")
+end

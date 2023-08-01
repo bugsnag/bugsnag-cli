@@ -23,3 +23,8 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "3.0"
     And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Uploading AAB with no overrides
+    When I run bugsnag-cli with upload android-aab features/fixtures/min-app-release.aab
+    Then "decafbaddecafbaddecafbaddecafbad" should be used as "API key"
+    And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
