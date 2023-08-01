@@ -12,7 +12,7 @@ import (
 
 type AndroidAabMapping struct {
 	ApplicationId string            `help:"Module application identifier"`
-	BuildUuid     string            `help:"Module Build UUID"`
+	BuildUuid     string            `help:"Module Build UUID ('none' to opt-out)"`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string            `help:"Module version code"`
@@ -91,8 +91,17 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		if buildUuid == "" {
 			buildUuid = manifestData["buildUuid"]
 			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
+			} else {
+				buildUuid = android.GetDexBuildId(filepath.Join(tempDir, "base", "dex"))
+
+				if buildUuid != "" {
+					log.Info("Using " + buildUuid + " as build ID from dex signatures")
+				}
 			}
+		} else if buildUuid == "none" {
+			log.Info("No build ID will be used")
+			buildUuid = ""
 		}
 
 		if versionCode == "" {
