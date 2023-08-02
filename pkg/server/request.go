@@ -3,14 +3,13 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 )
 
 // BuildFileRequest - Create a multi-part form request adding a file as a parameter
@@ -24,8 +23,6 @@ func BuildFileRequest(url string, fieldData map[string]string, fileFieldData map
 		if err != nil {
 			return nil, err
 		}
-
-		//defer file.Close()
 
 		part, err := writer.CreateFormFile(key, filepath.Base(file.Name()))
 
@@ -69,32 +66,33 @@ func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 }
 
 // ProcessRequest - Builds and sends file requests to the API
-func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int) error {
-
-	log.Info("Uploading to " + endpoint)
-
+func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, dryRun bool) error {
 	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldData)
 
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
 	}
 
-	res, err := SendRequest(req, timeout)
+	if !dryRun {
+		log.Info("Uploading " + fileName + " to " + endpoint)
 
-	if err != nil {
-		return fmt.Errorf("error sending file request: %w", err)
-	}
+		res, err := SendRequest(req, timeout)
 
-	b, err := io.ReadAll(res.Body)
+		if err != nil {
+			return fmt.Errorf("error sending file request: %w", err)
+		}
 
-	if err != nil {
-		return fmt.Errorf("error reading body from response: %w", err)
-	}
+		b, err := io.ReadAll(res.Body)
 
-	statusOK := res.StatusCode >= 200 && res.StatusCode < 300
+		if err != nil {
+			return fmt.Errorf("error reading body from response: %w", err)
+		}
 
-	if !statusOK {
-		return fmt.Errorf("%s : %s", res.Status, string(b))
+		statusOK := res.StatusCode >= 200 && res.StatusCode < 300
+
+		if !statusOK {
+			return fmt.Errorf("%s : %s", res.Status, string(b))
+		}
 	}
 
 	return nil

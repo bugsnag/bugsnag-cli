@@ -214,11 +214,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			fileFieldData := make(map[string]string)
 			fileFieldData["soFile"] = file
 
-			if dryRun {
-				err = nil
-			} else {
-				err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout)
-			}
+			err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, dryRun)
 
 			if err != nil {
 				if numberOfFiles > 1 && failOnUploadError {

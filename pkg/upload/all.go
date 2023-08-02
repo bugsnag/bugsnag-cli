@@ -12,7 +12,7 @@ type DiscoverAndUploadAny struct {
 }
 
 func All(paths []string, options map[string]string, endpoint string, timeout int, retries int, overwrite bool,
-	apiKey string, failOnUploadError bool) error {
+	apiKey string, failOnUploadError bool, dryRun bool) error {
 
 	// Build the file list from the path(s)
 	log.Info("building file list...")
@@ -50,7 +50,7 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 			fileFieldData["file"] = file
 		}
 
-		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout)
+		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout, dryRun)
 
 		if requestStatus != nil {
 			if numberOfFiles > 1 && failOnUploadError {
