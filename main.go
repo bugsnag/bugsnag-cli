@@ -69,7 +69,7 @@ func main() {
 	}
 
 	if commands.Upload.DryRun {
-		log.Info("Performing dry run - no files will be uploaded")
+		log.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
 	switch ctx.Command() {
@@ -88,7 +88,9 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError)
+			commands.FailOnUploadError,
+			commands.Upload.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
