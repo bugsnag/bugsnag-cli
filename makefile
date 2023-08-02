@@ -13,6 +13,7 @@ endif
 endif
 endif
 
+
 build: build-$(PLATFORM) # Build for PLATFORM or the host OS
 
 .PHONY: build-all
@@ -44,3 +45,10 @@ unit-test:
 .PHONY: fmt
 fmt:
 	gofmt -w ./
+
+bump:
+ifneq ($(shell git diff --staged),)
+	@git diff --staged
+	@$(error You have uncommitted changes. Push or discard them to continue)
+endif
+	@./scripts/bump-version.sh $(VERSION)
