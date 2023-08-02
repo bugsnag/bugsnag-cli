@@ -68,6 +68,10 @@ func main() {
 		log.Error("Failed to build upload url: "+err.Error(), 1)
 	}
 
+	if commands.Upload.DryRun {
+		log.Info("Performing dry run - no files will be uploaded")
+	}
+
 	switch ctx.Command() {
 
 	case "upload all <path>":

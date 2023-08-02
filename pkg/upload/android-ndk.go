@@ -33,10 +33,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var appManifestPathExpected string
 	var objCopyPath string
 
-	if dryRun {
-		log.Info("Performing dry run - no files will be uploaded")
-	}
-
 	for _, path := range paths {
 		if utils.IsDir(path) {
 			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")

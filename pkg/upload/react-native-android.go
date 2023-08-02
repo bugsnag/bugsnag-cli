@@ -33,10 +33,6 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 	var bundleDirPath string
 	var variantFileFormat string
 
-	if dryRun {
-		log.Info("Performing dry run - no files will be uploaded")
-	}
-
 	for _, path := range paths {
 
 		buildDirPath := filepath.Join(path, "android", "app", "build")

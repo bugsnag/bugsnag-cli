@@ -25,10 +25,6 @@ type DartSymbol struct {
 }
 
 func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
-	
-	if dryRun {
-		log.Info("Performing dry run - no files will be uploaded")
-	}
 
 	log.Info("Building file list from path")
 
