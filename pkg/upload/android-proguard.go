@@ -27,6 +27,10 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 	var appManifestPathExpected string
 	var err error
 
+	if dryRun {
+		log.Info("Performing dry run - no files will be uploaded")
+	}
+
 	for _, path := range paths {
 		if utils.IsDir(path) {
 

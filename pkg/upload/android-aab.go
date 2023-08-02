@@ -33,10 +33,6 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 	defer os.RemoveAll(tempDir)
 
-	if dryRun {
-		log.Info("Performing dry run - no files will be uploaded")
-	}
-
 	for _, path := range paths {
 		if filepath.Ext(path) == ".aab" {
 

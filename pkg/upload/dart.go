@@ -24,7 +24,12 @@ type DartSymbol struct {
 	BundleVersion string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 }
 
-func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool) error {
+func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
+	
+	if dryRun {
+		log.Info("Performing dry run - no files will be uploaded")
+	}
+
 	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
@@ -103,13 +108,17 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout)
+			if dryRun {
+				err = nil
+			} else {
+				err = server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout)
+			}
 
-			if requestStatus != nil {
+			if err != nil {
 				if numberOfFiles > 1 && failOnUploadError {
-					return requestStatus
+					return err
 				} else {
-					log.Warn(requestStatus.Error())
+					log.Warn(err.Error())
 				}
 			} else {
 				log.Success(file)
