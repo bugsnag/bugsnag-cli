@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"strings"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"io"
+	"net/http"
+	"strings"
 )
 
 type CreateBuild struct {
@@ -43,7 +42,7 @@ type SourceControl struct {
 	Revision   string `json:"revision,omitempty"`
 }
 
-func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, version string, versionCode string, bundleVersion string, metadata map[string]string, paths []string, endpoint string) error {
+func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, version string, versionCode string, bundleVersion string, metadata map[string]string, paths []string, endpoint string, dryRun bool) error {
 	if version == "" {
 		log.Error("Missing app version, please provide this via the command line options", 1)
 	}
@@ -84,25 +83,30 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 
 	req.Header.Add("Content-Type", "application/json")
 
-	res, err := server.SendRequest(req, 300)
+	if !dryRun {
+		res, err := server.SendRequest(req, 300)
 
-	if err != nil {
-		return fmt.Errorf("error sending file request: %w", err)
+		if err != nil {
+			return fmt.Errorf("error sending file request: %w", err)
+		}
+
+		b, err := io.ReadAll(res.Body)
+
+		if strings.Contains(string(b), "Source control provider is missing") {
+			log.Info("Source control provider is missing and could not be inferred. Please resend using one of: [github-enterprise, github, gitlab-onpremise, gitlab, bitbucket-server, bitbucket]. Request was still processed but source control information was ignored.")
+		}
+
+		if err != nil {
+			return fmt.Errorf("error reading body from response: %w", err)
+		}
+
+		if res.StatusCode != 200 {
+			return fmt.Errorf("%s : %s", res.Status, string(b))
+		}
+	} else {
+		log.Success("(dryrun) Skipping sending build information to " + endpoint)
 	}
 
-	b, err := io.ReadAll(res.Body)
-
-	if strings.Contains(string(b), "Source control provider is missing") {
-		log.Info("Source control provider is missing and could not be inferred. Please resend using one of: [github-enterprise, github, gitlab-onpremise, gitlab, bitbucket-server, bitbucket]. Request was still processed but source control information was ignored.")
-	}
-
-	if err != nil {
-		return fmt.Errorf("error reading body from response: %w", err)
-	}
-
-	if res.StatusCode != 200 {
-		return fmt.Errorf("%s : %s", res.Status, string(b))
-	}
 	return nil
 }
 
