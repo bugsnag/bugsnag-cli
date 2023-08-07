@@ -20,6 +20,7 @@ type Globals struct {
 	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
 	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
 	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
+	DryRun            bool              `help:"Validate but do not process"`
 }
 
 // Unique CLI options
@@ -31,7 +32,6 @@ type CLI struct {
 		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
 		Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
 		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
-		DryRun    bool `help:"Validate but do not upload"`
 
 		// required options
 		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
@@ -68,6 +68,10 @@ func main() {
 		log.Error("Failed to build upload url: "+err.Error(), 1)
 	}
 
+	if commands.DryRun {
+		log.Info("Performing dry run - no data will be sent to BugSnag")
+	}
+
 	switch ctx.Command() {
 
 	case "upload all <path>":
@@ -84,13 +88,13 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError)
+			commands.FailOnUploadError,
+			commands.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload android-aab <path>":
 
@@ -107,14 +111,12 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.Upload.DryRun,
+			commands.DryRun,
 		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload android-ndk <path>", "upload android-ndk":
 
@@ -133,14 +135,12 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.Upload.DryRun,
+			commands.DryRun,
 		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload android-proguard <path>", "upload android-proguard":
 
@@ -157,14 +157,12 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
-			commands.Upload.DryRun,
+			commands.DryRun,
 		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload dart <path>":
 
@@ -182,13 +180,13 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError)
+			commands.FailOnUploadError,
+			commands.DryRun,
+		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload react-native-android", "upload react-native-android <path>":
 
@@ -208,14 +206,12 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
-			commands.Upload.DryRun,
+			commands.DryRun,
 		)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "create-build", "create-build <path>":
 
@@ -243,7 +239,10 @@ func main() {
 			commands.CreateBuild.BundleVersion,
 			commands.CreateBuild.Metadata,
 			commands.CreateBuild.Path,
-			endpoint)
+			endpoint,
+			commands.DryRun,
+		)
+
 		if buildUploadError != nil {
 			log.Error(buildUploadError.Error(), 1)
 		}
