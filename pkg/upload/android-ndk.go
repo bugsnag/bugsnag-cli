@@ -33,10 +33,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 	var appManifestPathExpected string
 	var objCopyPath string
 
-	if dryRun {
-		log.Info("Performing dry run - no files will be uploaded")
-	}
-
 	for _, path := range paths {
 		if utils.IsDir(path) {
 			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")
@@ -218,11 +214,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			fileFieldData := make(map[string]string)
 			fileFieldData["soFile"] = file
 
-			if dryRun {
-				err = nil
-			} else {
-				err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout)
-			}
+			err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
 
 			if err != nil {
 				if numberOfFiles > 1 && failOnUploadError {
