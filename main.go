@@ -10,31 +10,42 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
+var package_version = "2.0.0"
+
+// Global CLI options
+type Globals struct {
+	UploadAPIRootUrl  string            `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
+	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
+	Port              int               `help:"Port number for the upload server" default:"443"`
+	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
+	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
+	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
+}
+
+// Unique CLI options
+type CLI struct {
+	Globals
+
+	Upload struct {
+		// shared options
+		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
+		Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
+		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
+		DryRun    bool `help:"Validate but do not upload"`
+
+		// required options
+		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
+		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
+		DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+	} `cmd:"" help:"Upload symbol/mapping files"`
+	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
+}
+
 func main() {
-	var commands struct {
-		UploadAPIRootUrl  string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-		BuildApiRootUrl   string `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
-		Port              int    `help:"Port number for the upload server" default:"443"`
-		ApiKey            string `help:"(required) Bugsnag integration API key for this application"`
-		FailOnUploadError bool   `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
-		Upload            struct {
-
-			// shared options
-			Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
-			Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
-			Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
-			DryRun    bool `help:"Validate but do not upload"`
-
-			// required options
-			AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-			All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-			AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
-			AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-			DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-			ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		} `cmd:"" help:"Upload symbol/mapping files"`
-		CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
-	}
+	commands := CLI{}
 
 	// If running without any extra arguments, default to the --help flag
 	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
@@ -42,7 +53,13 @@ func main() {
 		os.Args = append(os.Args, "--help")
 	}
 
-	ctx := kong.Parse(&commands)
+	ctx := kong.Parse(&commands,
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+		}),
+		kong.Vars{
+			"version": package_version,
+		})
 
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
