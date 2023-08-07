@@ -104,7 +104,7 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 			return fmt.Errorf("%s : %s", res.Status, string(b))
 		}
 	} else {
-		log.Success("(dryrun) Skipping sending build information to " + endpoint)
+		log.Info("(dryrun) Skipping sending build information to " + endpoint)
 	}
 
 	return nil

@@ -96,7 +96,7 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldD
 
 		log.Success("Uploaded " + filepath.Base(fileName))
 	} else {
-		log.Success("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
+		log.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
 	}
 
 	return nil
