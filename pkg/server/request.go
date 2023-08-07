@@ -74,7 +74,7 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldD
 	}
 
 	if !dryRun {
-		log.Info("Uploading " + fileName + " to " + endpoint)
+		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
 
 		res, err := SendRequest(req, timeout)
 
@@ -94,7 +94,7 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldD
 			return fmt.Errorf("%s : %s", res.Status, string(b))
 		}
 
-		log.Success("Uploaded " + fileName)
+		log.Success("Uploaded " + filepath.Base(fileName))
 	} else {
 		log.Success("(dryrun) Uploaded " + filepath.Base(fileName))
 	}
