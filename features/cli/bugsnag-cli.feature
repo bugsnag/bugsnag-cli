@@ -16,4 +16,6 @@ Feature: Basic CLI behavior
     When I run bugsnag-cli with upload all --api-key=1234567890ABCDEF1234567890ABCDEF /path/to/no/file
     Then I should see the no such file or directory error
 
-
+  Scenario: Starting bugsnag-cli and checking the version
+    When I run bugsnag-cli with --version
+    Then the version number should match the version set in main.go

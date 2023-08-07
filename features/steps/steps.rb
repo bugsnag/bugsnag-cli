@@ -93,3 +93,23 @@ end
 Then('{string} should be used as {string}') do |value, field|
   Maze.check.include(run_output, "Using #{value} as #{field} from")
 end
+
+def get_version_number(file_path)
+  package_version = nil
+
+  file_content = File.read(file_path)
+
+  file_content.each_line do |line|
+    if line =~ /\bpackage_version\s*=\s*(['"])(.*?)\1/
+      package_version = $2
+      break
+    end
+  end
+
+  package_version
+end
+
+Then(/^the version number should match the version set in main\.go$/) do
+  version_number = get_version_number "main.go"
+  Maze.check.include(run_output, version_number)
+end
