@@ -96,8 +96,6 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
-		log.Success("Upload(s) completed")
-
 	case "upload android-aab <path>":
 
 		err := upload.ProcessAndroidAab(
@@ -119,8 +117,6 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload android-ndk <path>", "upload android-ndk":
 
@@ -146,8 +142,6 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
-		log.Success("Upload(s) completed")
-
 	case "upload android-proguard <path>", "upload android-proguard":
 
 		err := upload.ProcessAndroidProguard(
@@ -169,8 +163,6 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "upload dart <path>":
 
@@ -196,8 +188,6 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
-		log.Success("Upload(s) completed")
-
 	case "upload react-native-android", "upload react-native-android <path>":
 
 		err := upload.ProcessReactNativeAndroid(
@@ -222,8 +212,6 @@ func main() {
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
-
-		log.Success("Upload(s) completed")
 
 	case "create-build", "create-build <path>":
 

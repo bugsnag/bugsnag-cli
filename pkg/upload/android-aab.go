@@ -43,8 +43,6 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 			if err != nil {
 				return err
 			}
-
-			log.Success(filepath.Base(path) + " expanded")
 		} else {
 			return fmt.Errorf(path + " is not an AAB file")
 		}

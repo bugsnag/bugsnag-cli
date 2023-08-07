@@ -159,12 +159,12 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
-		err = server.ProcessRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, dryRun)
+		err = server.ProcessRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, outputFile, dryRun)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "404 Not Found") {
 				log.Info("Trying " + endpoint)
-				err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout, dryRun)
+				err = server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout, outputFile, dryRun)
 			}
 		}
 

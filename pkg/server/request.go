@@ -66,7 +66,7 @@ func SendRequest(request *http.Request, timeout int) (*http.Response, error) {
 }
 
 // ProcessRequest - Builds and sends file requests to the API
-func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, dryRun bool) error {
+func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, fileName string, dryRun bool) error {
 	req, err := BuildFileRequest(endpoint, uploadOptions, fileFieldData)
 
 	if err != nil {
@@ -93,6 +93,10 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldD
 		if !statusOK {
 			return fmt.Errorf("%s : %s", res.Status, string(b))
 		}
+
+		log.Success(fileName + " Processed")
+	} else {
+		log.Success("(dryrun) " + fileName + " Processed")
 	}
 
 	return nil
