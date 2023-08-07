@@ -94,9 +94,9 @@ func ProcessRequest(endpoint string, uploadOptions map[string]string, fileFieldD
 			return fmt.Errorf("%s : %s", res.Status, string(b))
 		}
 
-		log.Success(fileName + " Processed")
+		log.Success("Uploaded " + fileName)
 	} else {
-		log.Success("(dryrun) " + fileName + " Processed")
+		log.Success("(dryrun) Uploaded " + filepath.Base(fileName))
 	}
 
 	return nil
