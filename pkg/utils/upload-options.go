@@ -24,7 +24,7 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 		}
 
 		if appExtraVersion != "" {
-			uploadOptions["AppBundleVersion"] = appExtraVersion
+			uploadOptions["appBundleVersion"] = appExtraVersion
 		}
 	}
 
