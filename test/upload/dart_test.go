@@ -10,7 +10,7 @@ import (
 
 func TestReadElfBuildId(t *testing.T) {
 	t.Log("Testing getting a build ID from an ELF file")
-	results, err := upload.GetBuildIdFromElfFile("../../features/fixtures/dart/app-debug-info/app.android-arm64.symbols")
+	results, err := upload.GetBuildIdFromElfFile("../../features/dart/fixtures//app-debug-info/app.android-arm64.symbols")
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,7 +21,7 @@ func TestReadElfBuildId(t *testing.T) {
 func TestGetArchFromElfFile(t *testing.T) {
 	t.Log("Testing getting arch from symbol file")
 
-	results, err := upload.GetArchFromElfFile("../../features/fixtures/dart/app-debug-info/app.ios-arm64.symbols")
+	results, err := upload.GetArchFromElfFile("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
 
 	t.Log(results)
 	if err != nil {
@@ -33,7 +33,7 @@ func TestGetArchFromElfFile(t *testing.T) {
 
 func TestReadElfFile(t *testing.T) {
 	t.Log("Testing reading an elf file")
-	results, err := upload.ReadElfFile("../../features/fixtures/dart/app-debug-info/app.ios-arm64.symbols")
+	results, err := upload.ReadElfFile("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
 
 	if err != nil {
 		t.Error(err)
@@ -46,7 +46,7 @@ func TestReadElfFile(t *testing.T) {
 
 func TestDwarfDumpUuid(t *testing.T) {
 	t.Log("Testing getting a build ID from a Dwarf file")
-	results, err := upload.DwarfDumpUuid("../../features/fixtures/dart/app-debug-info/app.ios-arm64.symbols", "../../features/fixtures/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "arm64")
+	results, err := upload.DwarfDumpUuid("../../features/dart/fixtures/app-debug-info/app.ios-arm64.symbols", "../../features/dart/fixtures/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "arm64")
 
 	if err != nil {
 		t.Error(err)
@@ -57,11 +57,11 @@ func TestDwarfDumpUuid(t *testing.T) {
 
 func TestGetIosAppPath(t *testing.T) {
 	t.Log("Testing getting the IOS app path from a given symbols path")
-	results, err := upload.GetIosAppPath("../../features/fixtures/dart/app-debug-info/app.android-arm64.symbols")
+	results, err := upload.GetIosAppPath("../../features/dart/fixtures/app-debug-info/app.android-arm64.symbols")
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	assert.Equal(t, results, "../../features/fixtures/dart/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "They should match")
+	assert.Equal(t, results, "../../features/dart/fixtures/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App", "They should match")
 }
