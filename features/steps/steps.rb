@@ -113,3 +113,11 @@ Then(/^the version number should match the version set in main\.go$/) do
   version_number = get_version_number "main.go"
   Maze.check.include(run_output, version_number)
 end
+
+And(/^I wait for the build to succeed$/) do
+  Maze.check.include(run_output, "BUILD SUCCESSFUL")
+end
+
+When(/^I build the react native "([^"]*)" test fixture$/) do |arg|
+  @output = `make rn#{arg}-test-fixture 2>&1`
+end

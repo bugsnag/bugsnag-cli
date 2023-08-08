@@ -1,6 +1,6 @@
 Feature: Android AAB Integration Test
 
-  Scenario: Uploading AAB file
+  Scenario: Uploading Android AAB file
     When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/aab/app-release.aab
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Android Build API
@@ -11,7 +11,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "versionName" equals "1.0"
     And the sourcemap payload field "overwrite" equals "true"
 
-  Scenario: Uploading AAB file with Dexguard
+  Scenario: Uploading Android AAB file with Dexguard
     When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/aab/app-release-dexguard.aab
     And I wait to receive 5 sourcemaps
     Then the sourcemap is valid for the Android Build API
