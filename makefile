@@ -52,3 +52,21 @@ ifneq ($(shell git diff --staged),)
 	@$(error You have uncommitted changes. Push or discard them to continue)
 endif
 	@./scripts/bump-version.sh $(VERSION)
+
+
+test-fixtures: android-test-fixture dart-test-fixture rn0-69-test-fixture rn0-70-test-fixture rn0-72-test-fixture
+
+android-test-fixture:
+	cd features/base-fixtures/android && ./gradlew bundleRelease
+
+dart-test-fixture:
+	cd features/base-fixtures/dart && flutter build apk --split-debug-info=app-debug-info && flutter build ipa --split-debug-info=app-debug-info
+
+rn0-69-test-fixture:
+	cd features/base-fixtures/rn0_69/android && ./gradlew bundleRelease
+
+rn0-70-test-fixture:
+	cd features/base-fixtures/rn0_70/android && ./gradlew bundleRelease
+
+rn0-72-test-fixture:
+	cd features/base-fixtures/rn0_72/android && ./gradlew bundleRelease
