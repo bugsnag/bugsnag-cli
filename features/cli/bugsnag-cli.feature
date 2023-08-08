@@ -9,7 +9,7 @@ Feature: Basic CLI behavior
     Then I should see the missing path error
 
   Scenario: Starting bugsnag-cli upload all on mac without a path
-    When I run bugsnag-cli with upload all features/fixtures/dart/app-debug-info/app.android-arm.symbols
+    When I run bugsnag-cli with upload all features/dart/fixtures/app-debug-info/app.android-arm.symbols
     Then I should see the API Key error
 
   Scenario: Starting bugsnag-cli upload all with an invalid path
