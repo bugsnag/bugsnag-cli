@@ -4,8 +4,10 @@
 
 ### Enhancements
  
+- Add `--version` flag to the command to retrieve the version of the installed CLI. [51](https://github.com/bugsnag/bugsnag-cli/pull/51)
 - Remove deprecated CLI options - `appVersion`, `appVersionCode` and `appBundleVersion`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
 - Android Build IDs can be calculated automatically for `.aab` files when none are specified in the `AndroidManifest` or on the command-line. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)  
+- Add `--dry-run` flag to all upload commands to validate but not upload source maps. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
 
 ## 1.2.2 (2023-07-11)
 
