@@ -49,12 +49,12 @@ steps:
   - label: Dart Integration Tests
     depends_on: build
     commands:
-      - echo $JAVA_HOME
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/dart
     env:
       FLUTTER_BIN: "/opt/flutter/3.10.0/bin/flutter"
+      JAVA_VERSION: 17
     plugins:
       artifacts#v1.5.0:
         download:
