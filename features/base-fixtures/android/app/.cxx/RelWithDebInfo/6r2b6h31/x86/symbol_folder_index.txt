@@ -1,1 +1,0 @@
-/Users/josh.edney/repos/bugsnag-cli/features/base-fixtures/android/app/build/intermediates/cxx/RelWithDebInfo/6r2b6h31/obj/x86
