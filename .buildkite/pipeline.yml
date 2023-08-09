@@ -49,6 +49,7 @@ steps:
   - label: Dart Integration Tests
     depends_on: build
     commands:
+      - echo $JAVA_HOME
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/dart
