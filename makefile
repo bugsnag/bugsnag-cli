@@ -13,6 +13,7 @@ endif
 endif
 endif
 
+FLUTTER_BIN?=flutter
 
 build: build-$(PLATFORM) # Build for PLATFORM or the host OS
 
@@ -60,7 +61,7 @@ android-test-fixture:
 	cd features/base-fixtures/android && ./gradlew bundleRelease
 
 dart-test-fixture:
-	cd features/base-fixtures/dart && flutter build apk --split-debug-info=app-debug-info && flutter build ipa --split-debug-info=app-debug-info
+	cd features/base-fixtures/dart && $(FLUTTER_BIN) pub get && $(FLUTTER_BIN) build apk  --suppress-analytics --split-debug-info=app-debug-info && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
 
 rn0-69-test-fixture:
 	cd features/base-fixtures/rn0_69 && npm i && cd android && ./gradlew bundleRelease

@@ -115,9 +115,10 @@ Then(/^the version number should match the version set in main\.go$/) do
 end
 
 And(/^I wait for the build to succeed$/) do
-  Maze.check.include(run_output, "BUILD SUCCESSFUL")
+  Maze.check.include(exit_status, "0")
 end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
+  @exit_code = `echo $?`
 end

@@ -30,3 +30,15 @@ Feature: Dart Integration Tests
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "buildId" equals "1dacae8b2a346d3dc6271a742f5d5210"
     And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Build and Upload Dart sourcemaps
+    When I make the "dart-test-fixture"
+    And I wait for the build to succeed
+
+    When I run bugsnag-cli with upload dart --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/dart/app-debug-info
+    And I wait to receive 4 sourcemaps
+    Then the sourcemap is valid for the Dart Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "buildId" equals "76162c8d0c0a7924d841697d8750fe7f"
+    And the sourcemap payload field "overwrite" equals "true"
