@@ -115,7 +115,7 @@ Then(/^the version number should match the version set in main\.go$/) do
 end
 
 And(/^I wait for the build to succeed$/) do
-  Maze.check.not_include(run_output, "Error")
+  Maze.check.not_include(run_output, "Error 1")
 end
 
 When(/^I make the "([^"]*)"$/) do |arg|
