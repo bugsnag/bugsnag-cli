@@ -1,0 +1,3 @@
+/Users/josh.edney/repos/bugsnag-cli/features/base-fixtures/android/app/.cxx/RelWithDebInfo/6r2b6h31/armeabi-v7a/CMakeFiles/picoapp.dir
+/Users/josh.edney/repos/bugsnag-cli/features/base-fixtures/android/app/.cxx/RelWithDebInfo/6r2b6h31/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/josh.edney/repos/bugsnag-cli/features/base-fixtures/android/app/.cxx/RelWithDebInfo/6r2b6h31/armeabi-v7a/CMakeFiles/rebuild_cache.dir

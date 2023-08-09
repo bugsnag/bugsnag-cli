@@ -35,3 +35,17 @@ Feature: Android Proguard Integration Test
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
     And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Build and Upload Android Proguard sourcemaps
+    When I make the "android-test-fixture"
+    And I wait for the build to succeed
+
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/android
+    And I wait to receive 1 sourcemaps
+    Then the sourcemap is valid for the Proguard Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "appId" equals "com.example.picoapp"
+    And the sourcemap payload field "versionCode" equals "1"
+    And the sourcemap payload field "versionName" equals "1.0"
+    And the sourcemap payload field "overwrite" equals "true"

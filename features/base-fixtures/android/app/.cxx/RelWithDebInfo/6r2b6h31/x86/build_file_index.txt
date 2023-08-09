@@ -1,0 +1,1 @@
+/Users/josh.edney/repos/bugsnag-cli/features/base-fixtures/android/app/src/main/cpp/CMakeLists.txt

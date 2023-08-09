@@ -118,6 +118,6 @@ And(/^I wait for the build to succeed$/) do
   Maze.check.include(run_output, "BUILD SUCCESSFUL")
 end
 
-When(/^I build the react native "([^"]*)" test fixture$/) do |arg|
-  @output = `make rn#{arg}-test-fixture 2>&1`
+When(/^I make the "([^"]*)"$/) do |arg|
+  @output = `make #{arg} 2>&1`
 end
