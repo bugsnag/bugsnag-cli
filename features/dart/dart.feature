@@ -32,7 +32,7 @@ Feature: Dart Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Build and Upload Dart sourcemaps
-    When I make the "dart-test-fixture"
+    When I make the "features/base-fixtures/dart"
     And I wait for the build to succeed
 
     When I run bugsnag-cli with upload dart --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/dart/app-debug-info

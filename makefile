@@ -15,6 +15,7 @@ endif
 
 FLUTTER_BIN?=flutter
 
+.PHONY: build
 build: build-$(PLATFORM) # Build for PLATFORM or the host OS
 
 .PHONY: build-all
@@ -47,6 +48,7 @@ unit-test:
 fmt:
 	gofmt -w ./
 
+.PHONY: bump
 bump:
 ifneq ($(shell git diff --staged),)
 	@git diff --staged
@@ -54,20 +56,30 @@ ifneq ($(shell git diff --staged),)
 endif
 	@./scripts/bump-version.sh $(VERSION)
 
+.PHONY: test-fixtures
+test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
 
-test-fixtures: android-test-fixture dart-test-fixture rn0-69-test-fixture rn0-70-test-fixture rn0-72-test-fixture
+.PHONY: features/base-fixtures/android
+features/base-fixtures/android:
+	cd $@ && ./gradlew bundleRelease
 
-android-test-fixture:
-	cd features/base-fixtures/android && ./gradlew bundleRelease
+.PHONY: features/base-fixtures/dart
+features/base-fixtures/dart:
+	cd $@ && $(FLUTTER_BIN) pub get
+	cd $@ && $(FLUTTER_BIN) build apk  --suppress-analytics --split-debug-info=app-debug-info
+	cd $@ && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
 
-dart-test-fixture:
-	cd features/base-fixtures/dart && $(FLUTTER_BIN) pub get && $(FLUTTER_BIN) build apk  --suppress-analytics --split-debug-info=app-debug-info && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
+.PHONY: features/base-fixtures/rn0_69
+features/base-fixtures/rn0_69:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease
 
-rn0-69-test-fixture:
-	cd features/base-fixtures/rn0_69 && npm i && cd android && ./gradlew bundleRelease
+.PHONY: features/base-fixtures/rn0_70
+features/base-fixtures/rn0_70:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease
 
-rn0-70-test-fixture:
-	cd features/base-fixtures/rn0_70 && npm i && cd android && ./gradlew bundleRelease
-
-rn0-72-test-fixture:
-	cd features/base-fixtures/rn0_72 && npm i && cd android && ./gradlew bundleRelease
+.PHONY: features/base-fixtures/rn0_72
+features/base-fixtures/rn0_72:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease

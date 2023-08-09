@@ -23,7 +23,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Build and Upload Android AAB file
-    When I make the "android-test-fixture"
+    When I make the "features/base-fixtures/android"
     And I wait for the build to succeed
 
     When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/android/app/build/outputs/bundle/release/app-release.aab
