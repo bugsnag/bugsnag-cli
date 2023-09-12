@@ -41,8 +41,8 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 	return uploadOptions
 }
 
-// BuildAndroidNDKUploadOptions - Builds the upload options for processing dart files
-func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+// BuildUnityAndroidNDKUploadOptions - Builds the upload options for processing dart files
+func BuildUnityAndroidNDKUploadOptions(apiKey string, applicationId string, arch string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
@@ -53,6 +53,10 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	if applicationId != "" {
 		uploadOptions["appId"] = applicationId
+	}
+
+	if arch != "" {
+		uploadOptions["arch"] = arch
 	}
 
 	if versionCode != "" {
@@ -150,6 +154,43 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 
 	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
 		return nil, fmt.Errorf("you must set at least the version name, version code or code bundle ID to uniquely identify the build")
+	}
+
+	return uploadOptions, nil
+}
+
+// BuildAndroidNDKUploadOptions - Builds the upload options for processing dart files
+func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if applicationId != "" {
+		uploadOptions["appId"] = applicationId
+	}
+
+	if versionCode != "" {
+		uploadOptions["versionCode"] = versionCode
+	}
+
+	if versionName != "" {
+		uploadOptions["versionName"] = versionName
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if sharedObjectName != "" {
+		uploadOptions["sharedObjectName"] = sharedObjectName
+	}
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
 	}
 
 	return uploadOptions, nil

@@ -40,6 +40,7 @@ type CLI struct {
 		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+		Unity              upload.UnityOptions           `cmd:"" help:""`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 }
@@ -202,6 +203,30 @@ func main() {
 			commands.Upload.ReactNativeAndroid.VersionName,
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload unity <path>":
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
+		err := upload.ProcessUnity(
+			commands.ApiKey,
+			commands.Upload.Unity.AppId,
+			commands.Upload.Unity.VersionCode,
+			commands.Upload.Unity.Arch,
+			commands.Upload.Unity.VersionName,
+			commands.Upload.Unity.ProjectRoot,
+			commands.Upload.Unity.Path,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

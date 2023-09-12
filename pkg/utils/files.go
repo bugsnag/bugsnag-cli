@@ -47,6 +47,28 @@ func BuildFileList(paths []string) ([]string, error) {
 	return fileList, nil
 }
 
+func BuildFolderList(paths []string) ([]string, error) {
+	var folderList []string
+
+	for _, folder := range paths {
+		if IsDir(folder) {
+			err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+				if err == nil && info.IsDir() {
+					if folder != path {
+						folderList = append(folderList, filepath.Base(path))
+					}
+				}
+				return nil
+			})
+
+			if err != nil {
+				return folderList, err
+			}
+		}
+	}
+	return folderList, nil
+}
+
 func FileExists(path string) bool {
 	if _, err := os.Stat(path); err != nil {
 		return false

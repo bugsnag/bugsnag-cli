@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"strings"
 )
 
 type UploadPaths []string
@@ -22,4 +23,13 @@ func XorString(string1 string, string2 string) string {
 		return string1
 	}
 	return string2
+}
+
+func ContainsString(slice []string, target string) bool {
+	for _, element := range slice {
+		if strings.Contains(element, target) {
+			return true
+		}
+	}
+	return false
 }
