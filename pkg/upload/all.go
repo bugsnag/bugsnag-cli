@@ -4,6 +4,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"path/filepath"
 )
 
 type DiscoverAndUploadAny struct {
@@ -59,7 +60,7 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 				log.Warn(requestStatus.Error())
 			}
 		} else {
-			log.Success(file)
+			log.Success("Uploaded " + filepath.Base(file))
 		}
 	}
 

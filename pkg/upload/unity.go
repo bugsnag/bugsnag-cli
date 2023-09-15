@@ -11,31 +11,24 @@ import (
 )
 
 type UnityOptions struct {
-	AppId       string            `help:"the Android applicationId for this application."`
-	Arch        string            `help:"the architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
-	Path        utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	ProjectRoot string            `help:"path to remove from the beginning of the filenames in the mapping file"`
-	VersionCode string            `help:"the Android versionCode for this application release."`
-	VersionName string            `help:"the Android versionName for this application release."`
+	ApplicationId string            `help:"Module application identifier"`
+	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	VersionCode   string            `help:"The version code for the application (Android only)."`
+	VersionName   string            `help:"The version name of the application."`
 }
 
-func ProcessUnity(apiKey string, applicationId string, versionCode string, arch string, versionName string, projectRoot string, paths []string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessUnity(apiKey string, applicationId string, versionCode string, arch string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 	var archList []string
 	var symbolFileList []string
 
-	if applicationId == "" {
-		return fmt.Errorf("Application ID not provided.")
-	}
-
-	if versionCode == "" {
-		return fmt.Errorf("Version Code not provided")
-	}
-
-	if projectRoot == "" {
-		return fmt.Errorf("Project Root not provided")
-	}
-
 	for _, path := range paths {
+
+		if projectRoot == "" {
+			projectRoot, _ = filepath.Split(path)
+		}
+
 		if strings.HasSuffix(path, ".symbols.zip") {
 			tempDir, err := os.MkdirTemp("", "bugsnag-cli-unity-unpacking-*")
 
@@ -86,9 +79,40 @@ func ProcessUnity(apiKey string, applicationId string, versionCode string, arch 
 		}
 	}
 
-	for _, file := range symbolFileList {
-		log.Info("Uploading debug information for " + filepath.Base(file))
+	if apiKey != "" {
+		log.Info("Using " + apiKey + " as the API key")
+	}
 
+	if applicationId == "" {
+		return fmt.Errorf("Application ID not provided, please specify using `--application-id`")
+	} else {
+		log.Info("Using " + applicationId + " as the application ID")
+	}
+
+	if versionName == "" && versionName == "" {
+		return fmt.Errorf("Version Code or version name not provided, please specify using `--version-code` or `--version-name`")
+	}
+
+	if versionCode != "" {
+		log.Info("Using " + versionCode + " as the version code")
+	}
+
+	if versionName != "" {
+		log.Info("Using " + versionName + " as the version Name")
+	}
+
+	if projectRoot != "" {
+		log.Info("Using " + projectRoot + " as the project root")
+	}
+
+	numberOfFiles := len(symbolFileList)
+
+	if numberOfFiles < 1 {
+		log.Info("No symbol files found to process")
+		return nil
+	}
+
+	for _, file := range symbolFileList {
 		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 		if err != nil {
@@ -101,11 +125,14 @@ func ProcessUnity(apiKey string, applicationId string, versionCode string, arch 
 		err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
 
 		if err != nil {
-			return err
+			if numberOfFiles > 1 && failOnUploadError {
+				return err
+			} else {
+				log.Warn(err.Error())
+			}
 		} else {
-			log.Success(filepath.Base(file) + " uploaded")
+			log.Success("Uploaded " + filepath.Base(file))
 		}
-
 	}
 
 	return nil

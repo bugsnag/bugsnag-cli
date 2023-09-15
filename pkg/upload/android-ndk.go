@@ -203,8 +203,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 
 		// Upload processed .so.sym files
 		for _, file := range symbolFileList {
-			log.Info("Uploading debug information for " + filepath.Base(file))
-
 			uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 			if err != nil {
@@ -223,7 +221,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 					log.Warn(err.Error())
 				}
 			} else {
-				log.Success(filepath.Base(file) + " uploaded")
+				log.Success("Uploaded " + filepath.Base(file))
 			}
 
 		}

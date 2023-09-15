@@ -221,13 +221,14 @@ func main() {
 
 		err := upload.ProcessUnity(
 			commands.ApiKey,
-			commands.Upload.Unity.AppId,
+			commands.Upload.Unity.ApplicationId,
 			commands.Upload.Unity.VersionCode,
 			commands.Upload.Unity.Arch,
 			commands.Upload.Unity.VersionName,
 			commands.Upload.Unity.ProjectRoot,
 			commands.Upload.Unity.Path,
 			endpoint,
+			commands.FailOnUploadError,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
