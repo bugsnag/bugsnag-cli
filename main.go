@@ -10,7 +10,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.0.0"
+var package_version = "1.3.0"
 
 // Global CLI options
 type Globals struct {

@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (TBD)
+## 1.3.0 (TBD)
 
 ### Enhancements
  
@@ -8,6 +8,7 @@
 - Remove deprecated CLI options - `appVersion`, `appVersionCode` and `appBundleVersion`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
 - Android Build IDs can be calculated automatically for `.aab` files when none are specified in the `AndroidManifest` or on the command-line. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)  
 - Add `--dry-run` flag to all upload commands to validate but not upload source maps. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
+- Add support for Unity Android symbol files. [56](https://github.com/bugsnag/bugsang-cli/pull/56)
 
 ## 1.2.2 (2023-07-11)
 
