@@ -108,3 +108,21 @@ func FindFileWithSuffix(directory string, targetSuffix string) (string, error) {
 
 	return newestFile, err
 }
+
+func ExtractFile(file string, slug string) (string, error) {
+	tempDir, err := os.MkdirTemp("", "bugsnag-cli-"+slug+"-unpacking-*")
+
+	if err != nil {
+		return "", fmt.Errorf("error creating temporary working directory " + err.Error())
+	}
+
+	log.Info("Extracting " + filepath.Base(file) + " to " + tempDir)
+
+	err = Unzip(file, tempDir)
+
+	if err != nil {
+		return "", err
+	}
+
+	return tempDir, nil
+}

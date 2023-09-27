@@ -23,33 +23,30 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 	var manifestData map[string]string
 	var aabManifestPath string
+	var aabDir string
+	var err error
 
 	// Create temp working directory
-	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
-
-	if err != nil {
-		return fmt.Errorf("error creating temporary working directory " + err.Error())
-	}
-
-	defer os.RemoveAll(tempDir)
-
 	for _, path := range paths {
 		if filepath.Ext(path) == ".aab" {
 
-			log.Info("Extracting " + filepath.Base(path) + " to " + tempDir)
+			aabDir, err = utils.ExtractFile(path, "aab")
 
-			err = utils.Unzip(path, tempDir)
+			defer os.RemoveAll(aabDir)
 
 			if err != nil {
 				return err
 			}
+		} else if utils.IsDir(path) && utils.IsDir(filepath.Join(path, "BUNDLE-METADATA")) {
+			aabDir = path
 		} else {
 			return fmt.Errorf(path + " is not an AAB file")
 		}
 	}
 
 	if aabManifestPath == "" {
-		aabManifestPathExpected := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
+		aabManifestPathExpected := filepath.Join(aabDir, "base", "manifest", "AndroidManifest.xml")
+		log.Info(aabManifestPathExpected)
 		if utils.FileExists(aabManifestPathExpected) {
 			aabManifestPath = aabManifestPathExpected
 		} else {
@@ -87,7 +84,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 			if buildUuid != "" {
 				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
 			} else {
-				buildUuid = android.GetDexBuildId(filepath.Join(tempDir, "base", "dex"))
+				buildUuid = android.GetDexBuildId(filepath.Join(aabDir, "base", "dex"))
 
 				if buildUuid != "" {
 					log.Info("Using " + buildUuid + " as build ID from dex signatures")
@@ -113,7 +110,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 	}
 
-	soFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
+	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
 	fileList, err := utils.BuildFileList([]string{soFilePath})
 
@@ -129,7 +126,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		log.Info("No NDK (.so) files detected for upload. " + err.Error())
 	}
 
-	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
+	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
 		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)

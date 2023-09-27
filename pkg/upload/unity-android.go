@@ -66,28 +66,22 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	log.Info("Using " + zipPath + " as the Unity Android symbols zip file")
 
-	tempAabDir, err := os.MkdirTemp("", "bugsnag-cli-unity-android-aab-unpacking-*")
-
-	if err != nil {
-		return fmt.Errorf("error creating temporary working directory " + err.Error())
-	}
-
-	defer os.RemoveAll(tempAabDir)
-
-	log.Info("Extracting " + filepath.Base(aabPath) + " to " + tempAabDir)
-
-	err = utils.Unzip(aabPath, tempAabDir)
+	aabDir, err := utils.ExtractFile(aabPath, "aab")
 
 	if err != nil {
 		return err
 	}
 
-	aabManifestPathExpected := filepath.Join(tempAabDir, "base", "manifest", "AndroidManifest.xml")
+	defer os.RemoveAll(aabDir)
+
+	aabManifestPathExpected := filepath.Join(aabDir, "base", "manifest", "AndroidManifest.xml")
 	if utils.FileExists(aabManifestPathExpected) {
 		aabManifestPath = aabManifestPathExpected
 	} else {
 		log.Warn("AndroidManifest.xml not found in AAB file")
 	}
+
+	fmt.Println(aabManifestPath)
 
 	if aabManifestPath != "" && (applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
@@ -111,7 +105,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 			if buildUuid != "" {
 				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
 			} else {
-				buildUuid = android.GetDexBuildId(filepath.Join(tempAabDir, "base", "dex"))
+				buildUuid = android.GetDexBuildId(filepath.Join(aabDir, "base", "dex"))
 
 				if buildUuid != "" {
 					log.Info("Using " + buildUuid + " as build ID from dex signatures")
@@ -137,54 +131,22 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	soFilePath := filepath.Join(tempAabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
-
-	fileList, err := utils.BuildFileList([]string{soFilePath})
-
-	if len(fileList) > 0 && err == nil {
-		for _, file := range fileList {
-			err = ProcessAndroidNDK(apiKey, applicationId, "", "", []string{file}, projectRoot, "", versionCode, versionName, endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
-
-			if err != nil {
-				return err
-			}
-		}
-	} else {
-		log.Info("No NDK (.so) files detected for upload. " + err.Error())
-	}
-
-	mappingFilePath := filepath.Join(tempAabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
-
-	if utils.FileExists(mappingFilePath) {
-		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
-
-		if err != nil {
-			return err
-		}
-	} else {
-		log.Info("No Proguard (mapping.txt) file detected for upload.")
-	}
-
-	log.Info("Processing Unity Android symbol files")
-
-	tempDir, err := os.MkdirTemp("", "bugsnag-cli-unity-android-*")
-
-	if err != nil {
-		return fmt.Errorf("error creating temporary working directory " + err.Error())
-	}
-
-	defer os.RemoveAll(tempDir)
-
-	log.Info("Extracting " + filepath.Base(zipPath) + " to " + tempDir)
-
-	err = utils.Unzip(zipPath, tempDir)
+	err = ProcessAndroidAab(apiKey, applicationId, buildUuid, []string{aabDir}, projectRoot, versionCode, versionName, endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
 	if err != nil {
 		return err
 	}
 
+	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
+
+	if err != nil {
+		return err
+	}
+
+	defer os.RemoveAll(unityDir)
+
 	if arch == "" {
-		archList, err = utils.BuildFolderList([]string{tempDir})
+		archList, err = utils.BuildFolderList([]string{unityDir})
 		if err != nil {
 			return err
 		}
@@ -193,7 +155,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	}
 
 	for _, arch := range archList {
-		soPath := filepath.Join(tempDir, arch)
+		soPath := filepath.Join(unityDir, arch)
 		fileList, err := utils.BuildFileList([]string{soPath})
 		if err != nil {
 			return err
