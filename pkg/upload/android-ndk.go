@@ -189,8 +189,6 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				}
 
 				symbolFileList = append(symbolFileList, outputFile)
-			} else {
-				log.Warn("Skipping unsupported file: " + file)
 			}
 		}
 

@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 // FilePathWalkDir - finds files within a given directory
@@ -74,4 +77,34 @@ func FileExists(path string) bool {
 		return false
 	}
 	return true
+}
+
+func FindFileWithSuffix(directory string, targetSuffix string) (string, error) {
+	var newestFile string
+	var newestModTime time.Time
+
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() && strings.HasSuffix(path, targetSuffix) {
+			if info.ModTime().After(newestModTime) {
+				newestModTime = info.ModTime()
+				newestFile = path
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if newestFile == "" {
+		return "", fmt.Errorf("Unable to find " + targetSuffix + " files in " + directory)
+	}
+
+	return newestFile, err
 }
