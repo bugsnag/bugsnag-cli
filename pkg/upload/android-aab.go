@@ -59,54 +59,10 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+		manifestData, err = android.ProcessAabUploadOptions(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
-			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
-		}
-
-		if apiKey == "" {
-			apiKey = manifestData["apiKey"]
-			if apiKey != "" {
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
-			}
-		}
-
-		if applicationId == "" {
-			applicationId = manifestData["applicationId"]
-			if applicationId != "" {
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-			}
-		}
-
-		if buildUuid == "" {
-			buildUuid = manifestData["buildUuid"]
-			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
-			} else {
-				buildUuid = android.GetDexBuildId(filepath.Join(aabDir, "base", "dex"))
-
-				if buildUuid != "" {
-					log.Info("Using " + buildUuid + " as build ID from dex signatures")
-				}
-			}
-		} else if buildUuid == "none" {
-			log.Info("No build ID will be used")
-			buildUuid = ""
-		}
-
-		if versionCode == "" {
-			versionCode = manifestData["versionCode"]
-			if versionCode != "" {
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-			}
-		}
-
-		if versionName == "" {
-			versionName = manifestData["versionName"]
-			if versionName != "" {
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-			}
+			return err
 		}
 	}
 
@@ -116,7 +72,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 	if len(fileList) > 0 && err == nil {
 		for _, file := range fileList {
-			err = ProcessAndroidNDK(apiKey, applicationId, "", "", []string{file}, projectRoot, "", versionCode, versionName, endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+			err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
 			if err != nil {
 				return err
@@ -129,7 +85,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
-		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
+		err = ProcessAndroidProguard(manifestData["apiKey"], manifestData["applicationId"], "", manifestData["buildUuid"], []string{mappingFilePath}, "", manifestData["versionCode"], manifestData["versionName"], endpoint, retries, timeout, overwrite, dryRun)
 
 		if err != nil {
 			return err

@@ -82,54 +82,16 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	}
 
 	if aabManifestPath != "" && (applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
-
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+		manifestData, err = android.ProcessAabUploadOptions(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
-			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
-		}
-
-		if applicationId == "" {
-			applicationId = manifestData["applicationId"]
-			if applicationId != "" {
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-			}
-		}
-
-		if buildUuid == "" {
-			buildUuid = manifestData["buildUuid"]
-			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
-			} else {
-				buildUuid = android.GetDexBuildId(filepath.Join(aabDir, "base", "dex"))
-
-				if buildUuid != "" {
-					log.Info("Using " + buildUuid + " as build ID from dex signatures")
-				}
-			}
-		} else if buildUuid == "none" {
-			log.Info("No build ID will be used")
-			buildUuid = ""
-		}
-
-		if versionCode == "" {
-			versionCode = manifestData["versionCode"]
-			if versionCode != "" {
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-			}
-		}
-
-		if versionName == "" {
-			versionName = manifestData["versionName"]
-			if versionName != "" {
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-			}
+			return err
 		}
 	}
 
-	err = ProcessAndroidAab(apiKey, applicationId, buildUuid, []string{aabDir}, projectRoot, versionCode, versionName, endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+	err = ProcessAndroidAab(manifestData["apiKey"], manifestData["applicationId"], manifestData["buildUuid"], []string{aabDir}, projectRoot, manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
 	if err != nil {
 		return err
@@ -174,7 +136,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	}
 
 	for _, file := range symbolFileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(manifestData["apiKey"], manifestData["applicationId"], manifestData["versionName"], manifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
 
 		if err != nil {
 			return err
