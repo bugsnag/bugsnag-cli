@@ -81,8 +81,6 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		log.Warn("AndroidManifest.xml not found in AAB file")
 	}
 
-	fmt.Println(aabManifestPath)
-
 	if aabManifestPath != "" && (applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
 		log.Info("Reading data from AndroidManifest.xml")
