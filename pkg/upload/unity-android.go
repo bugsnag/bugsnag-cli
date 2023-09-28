@@ -28,7 +28,6 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	var archList []string
 	var symbolFileList []string
 	var manifestData map[string]string
-	var aabManifestPath string
 
 	for _, path := range paths {
 		if utils.IsDir(path) {
@@ -62,10 +61,6 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	log.Info("Using " + aabPath + " as the Unity Android AAB file")
-
-	log.Info("Using " + zipPath + " as the Unity Android symbols zip file")
-
 	log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
 
 	aabDir, err := utils.ExtractFile(aabPath, "aab")
@@ -76,17 +71,10 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	defer os.RemoveAll(aabDir)
 
-	aabManifestPathExpected := filepath.Join(aabDir, "base", "manifest", "AndroidManifest.xml")
-	if utils.FileExists(aabManifestPathExpected) {
-		aabManifestPath = aabManifestPathExpected
-	} else {
-		log.Warn("AndroidManifest.xml not found in AAB file")
-	}
-
-	if aabManifestPath != "" && (applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
+	if applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.GetUploadOptionsFromAabManifest(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
 			return err

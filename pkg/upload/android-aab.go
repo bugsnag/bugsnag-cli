@@ -22,9 +22,9 @@ type AndroidAabMappingOptions struct {
 func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var manifestData map[string]string
-	var aabManifestPath string
 	var aabDir string
 	var err error
+	var soFileList []string
 
 	for _, path := range paths {
 		// Check to see if we are dealing with a .aab file and extract it into a temp directory
@@ -38,28 +38,19 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 			if err != nil {
 				return err
 			}
-		} else if utils.IsDir(path) && utils.IsDir(filepath.Join(path, "BUNDLE-METADATA")) {
+		} else if utils.IsDir(path) {
 			aabDir = path
 		} else {
 			return fmt.Errorf(path + " is not an AAB file/directory")
 		}
 	}
 
-	if aabManifestPath == "" {
-		aabManifestPathExpected := filepath.Join(aabDir, "base", "manifest", "AndroidManifest.xml")
-		if utils.FileExists(aabManifestPathExpected) {
-			aabManifestPath = aabManifestPathExpected
-		} else {
-			log.Warn("AndroidManifest.xml not found in AAB file")
-		}
-	}
-
 	// Check to see if we need to read the manifest file due to missing options
-	if aabManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
+	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.GetUploadOptionsFromAabManifest(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
 			return err
@@ -68,10 +59,16 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
-	fileList, err := utils.BuildFileList([]string{soFilePath})
+	if utils.FileExists(soFilePath) {
+		soFileList, err = utils.BuildFileList([]string{soFilePath})
 
-	if len(fileList) > 0 && err == nil {
-		for _, file := range fileList {
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(soFileList) > 0 {
+		for _, file := range soFileList {
 			err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
 			if err != nil {

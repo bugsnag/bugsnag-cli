@@ -3,6 +3,7 @@ package android
 import (
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
 )
 
@@ -10,9 +11,18 @@ func GetUploadOptionsFromAabManifest(path string, apiKey string, applicationId s
 
 	var manifestData map[string]string
 	var err error
+	var aabManifestPath string
 	aabUploadOptions := make(map[string]string)
 
-	manifestData, err = ReadAabManifest(filepath.Join(path))
+	aabManifestPathExpected := filepath.Join(path, "base", "manifest", "AndroidManifest.xml")
+
+	if utils.FileExists(aabManifestPathExpected) {
+		aabManifestPath = aabManifestPathExpected
+	} else {
+		log.Warn("AndroidManifest.xml not found in AAB file")
+	}
+
+	manifestData, err = ReadAabManifest(filepath.Join(aabManifestPath))
 
 	if err != nil {
 		return nil, fmt.Errorf("unable to read data from " + path + " " + err.Error())
