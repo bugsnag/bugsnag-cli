@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,7 +33,6 @@ func BuildFileList(paths []string) ([]string, error) {
 
 	for _, path := range paths {
 		if IsDir(path) {
-			log.Info("Searching " + path + " for files")
 			files, err := FilePathWalkDir(path)
 			if err != nil {
 				return nil, err
@@ -119,8 +117,6 @@ func ExtractFile(file string, slug string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error creating temporary working directory " + err.Error())
 	}
-
-	log.Info("Extracting " + filepath.Base(file) + " to " + tempDir)
 
 	err = Unzip(file, tempDir)
 

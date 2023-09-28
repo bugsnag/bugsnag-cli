@@ -30,6 +30,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		// Check to see if we are dealing with a .aab file and extract it into a temp directory
 		if filepath.Ext(path) == ".aab" {
 
+			log.Info("Extracting " + filepath.Base(path) + " into a temporary directory")
 			aabDir, err = utils.ExtractFile(path, "aab")
 
 			defer os.RemoveAll(aabDir)

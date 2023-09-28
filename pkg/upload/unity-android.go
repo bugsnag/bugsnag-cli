@@ -66,6 +66,8 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	log.Info("Using " + zipPath + " as the Unity Android symbols zip file")
 
+	log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
+
 	aabDir, err := utils.ExtractFile(aabPath, "aab")
 
 	if err != nil {
@@ -96,6 +98,8 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	if err != nil {
 		return err
 	}
+
+	log.Info("Extracting " + filepath.Base(zipPath) + " into a temporary directory")
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
 
