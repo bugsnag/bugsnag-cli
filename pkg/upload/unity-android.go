@@ -17,9 +17,9 @@ type UnityAndroidOptions struct {
 	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
 	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	VersionCode   string            `help:"The version code for the application (Android only)."`
-	VersionName   string            `help:"The version name of the application."`
-	BuildUuid     string            `help:"The version name of the application."`
+	VersionCode   string            `help:"Module version code"`
+	VersionName   string            `help:"Module version name"`
+	BuildUuid     string            `help:"Module Build UUID"`
 }
 
 func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, versionCode string, buildUuid string, arch string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
@@ -57,7 +57,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 				}
 			}
 		} else {
-			return fmt.Errorf("unsupported files. Please specify the unity `symbols.zip` file.")
+			return fmt.Errorf("unsupported file paths provided. Please specify the Unity `symbols.zip` file or build directory.")
 		}
 	}
 
