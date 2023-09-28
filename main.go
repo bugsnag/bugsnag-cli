@@ -40,7 +40,7 @@ type CLI struct {
 		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		UnityAndroid       upload.UnityAndroidOptions    `cmd:"" help:""`
+		UnityAndroid       upload.UnityAndroidOptions    `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 }
