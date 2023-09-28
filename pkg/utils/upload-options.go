@@ -41,47 +41,6 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 	return uploadOptions
 }
 
-// BuildUnityAndroidNDKUploadOptions - Builds the upload options for processing dart files
-func BuildUnityAndroidNDKUploadOptions(apiKey string, applicationId string, arch string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
-	uploadOptions := make(map[string]string)
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
-	}
-
-	if applicationId != "" {
-		uploadOptions["appId"] = applicationId
-	}
-
-	if arch != "" {
-		uploadOptions["arch"] = arch
-	}
-
-	if versionCode != "" {
-		uploadOptions["versionCode"] = versionCode
-	}
-
-	if versionName != "" {
-		uploadOptions["versionName"] = versionName
-	}
-
-	if projectRoot != "" {
-		uploadOptions["projectRoot"] = projectRoot
-	}
-
-	if sharedObjectName != "" {
-		uploadOptions["sharedObjectName"] = sharedObjectName
-	}
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
-
-	return uploadOptions, nil
-}
-
 // BuildAndroidProguardUploadOptions - Builds the upload options for processing dart files
 func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, buildUuid string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
