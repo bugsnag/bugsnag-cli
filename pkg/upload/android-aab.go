@@ -10,7 +10,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidAabMapping struct {
+type AndroidAabMappingOptions struct {
 	ApplicationId string            `help:"Module application identifier"`
 	BuildUuid     string            `help:"Module Build UUID ('none' to opt-out)"`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
@@ -26,8 +26,8 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 	var aabDir string
 	var err error
 
-	// Create temp working directory
 	for _, path := range paths {
+		// Check to see if we are dealing with a .aab file and extract it into a temp directory
 		if filepath.Ext(path) == ".aab" {
 
 			aabDir, err = utils.ExtractFile(path, "aab")
@@ -59,7 +59,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.ProcessAabUploadOptions(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.GetUploadOptionsFromAabManifest(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
 			return err

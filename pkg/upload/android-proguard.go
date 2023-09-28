@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidProguardMapping struct {
+type AndroidProguardMappingOptions struct {
 	ApplicationId string            `help:"Module application identifier"`
 	AppManifest   string            `help:"Path to app manifest file" type:"path"`
 	BuildUuid     string            `help:"Module Build UUID"`

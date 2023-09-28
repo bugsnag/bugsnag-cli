@@ -34,13 +34,13 @@ type CLI struct {
 		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
 
 		// required options
-		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
-		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		UnityAndroid       upload.UnityAndroidOptions    `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		AndroidAab         upload.AndroidAabMappingOptions      `cmd:"" help:"Process and upload application bundle files for Android"`
+		All                upload.DiscoverAndUploadAnyOptions   `cmd:"" help:"Upload any symbol/mapping files"`
+		AndroidNdk         upload.AndroidNdkMappingOptions      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
+		AndroidProguard    upload.AndroidProguardMappingOptions `cmd:"" help:"Process and upload NDK symbol files for Android"`
+		DartSymbolOptions  upload.DartSymbolOptions             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+		ReactNativeAndroid upload.ReactNativeAndroidOptions     `cmd:"" help:"Upload source maps for React Native Android"`
+		UnityAndroid       upload.UnityAndroidOptions           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 }
@@ -171,11 +171,11 @@ func main() {
 			log.Error("no API key provided", 1)
 		}
 
-		err := upload.Dart(commands.Upload.DartSymbol.Path,
-			commands.Upload.DartSymbol.VersionName,
-			commands.Upload.DartSymbol.VersionCode,
-			commands.Upload.DartSymbol.BundleVersion,
-			commands.Upload.DartSymbol.IosAppPath,
+		err := upload.Dart(commands.Upload.DartSymbolOptions.Path,
+			commands.Upload.DartSymbolOptions.VersionName,
+			commands.Upload.DartSymbolOptions.VersionCode,
+			commands.Upload.DartSymbolOptions.BundleVersion,
+			commands.Upload.DartSymbolOptions.IosAppPath,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

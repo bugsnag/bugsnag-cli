@@ -32,14 +32,14 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	for _, path := range paths {
 		if utils.IsDir(path) {
-			zipPath, err = utils.FindFileWithSuffix(path, ".symbols.zip")
+			zipPath, err = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
 			if err != nil {
 				return err
 			}
 
 			if aabPath == "" {
-				aabPath, err = utils.FindFileWithSuffix(path, ".aab")
+				aabPath, err = utils.FindLatestFileWithSuffix(path, ".aab")
 
 				if err != nil {
 					return err
@@ -51,7 +51,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 			if aabPath == "" {
 				buildDirectory := filepath.Dir(path)
 
-				aabPath, err = utils.FindFileWithSuffix(buildDirectory, ".aab")
+				aabPath, err = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
 
 				if err != nil {
 					return err
@@ -84,7 +84,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	if aabManifestPath != "" && (applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 		log.Info("Reading data from AndroidManifest.xml")
 
-		manifestData, err = android.ProcessAabUploadOptions(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.GetUploadOptionsFromAabManifest(aabManifestPath, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 		if err != nil {
 			return err

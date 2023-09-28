@@ -12,7 +12,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidNdkMapping struct {
+type AndroidNdkMappingOptions struct {
 	ApplicationId  string            `help:"Module application identifier"`
 	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
 	AppManifest    string            `help:"Path to app manifest file" type:"path"`

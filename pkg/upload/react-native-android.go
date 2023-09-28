@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type ReactNativeAndroid struct {
+type ReactNativeAndroidOptions struct {
 	AppManifest  string            `help:"(required) Path to directory or file to upload" type:"path"`
 	Bundle       string            `help:"Path to the bundle file" type:"path"`
 	CodeBundleId string            `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`

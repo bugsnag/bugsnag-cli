@@ -50,6 +50,7 @@ func BuildFileList(paths []string) ([]string, error) {
 	return fileList, nil
 }
 
+// BuildFolderList - Builds a list of folders from a given path(s)
 func BuildFolderList(paths []string) ([]string, error) {
 	var folderList []string
 
@@ -72,6 +73,7 @@ func BuildFolderList(paths []string) ([]string, error) {
 	return folderList, nil
 }
 
+// FileExists - Checks if a given file exists on the system
 func FileExists(path string) bool {
 	if _, err := os.Stat(path); err != nil {
 		return false
@@ -79,7 +81,8 @@ func FileExists(path string) bool {
 	return true
 }
 
-func FindFileWithSuffix(directory string, targetSuffix string) (string, error) {
+// FindLatestFileWithSuffix - Finds the latest file with a given suffix
+func FindLatestFileWithSuffix(directory string, targetSuffix string) (string, error) {
 	var newestFile string
 	var newestModTime time.Time
 
@@ -89,6 +92,7 @@ func FindFileWithSuffix(directory string, targetSuffix string) (string, error) {
 		}
 
 		if !info.IsDir() && strings.HasSuffix(path, targetSuffix) {
+			// Check to see if the file that we have found is newer than the previous file
 			if info.ModTime().After(newestModTime) {
 				newestModTime = info.ModTime()
 				newestFile = path

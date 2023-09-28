@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func ProcessAabUploadOptions(path string, apiKey string, applicationId string, buildUuid string, versionCode string, versionName string) (map[string]string, error) {
+func GetUploadOptionsFromAabManifest(path string, apiKey string, applicationId string, buildUuid string, versionCode string, versionName string) (map[string]string, error) {
 
 	var manifestData map[string]string
 	var err error

@@ -16,7 +16,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type DartSymbol struct {
+type DartSymbolOptions struct {
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	IosAppPath    string            `help:"(optional) the path to the built iOS app."`
 	VersionName   string            `help:"The version of the application." xor:"app-version,version-name"`
