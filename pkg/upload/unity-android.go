@@ -15,7 +15,7 @@ type UnityAndroidOptions struct {
 	AabPath       string            `help:"Path to Android AAB file"`
 	ApplicationId string            `help:"Module application identifier"`
 	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
 	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string            `help:"The version code for the application (Android only)."`
 	VersionName   string            `help:"The version name of the application."`
