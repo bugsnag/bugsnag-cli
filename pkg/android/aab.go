@@ -41,7 +41,7 @@ func GetUploadOptionsFromAabManifest(path string, apiKey string, applicationId s
 		if buildUuid != "" {
 			log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
 		} else {
-			buildUuid = GetDexBuildId(filepath.Join(path, "base", "dex"))
+			buildUuid = GetDexBuildId(filepath.Join(path, "..", "..", "dex"))
 
 			if buildUuid != "" {
 				log.Info("Using " + buildUuid + " as build ID from dex signatures")
