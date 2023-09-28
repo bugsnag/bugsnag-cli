@@ -135,7 +135,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	numberOfFiles := len(symbolFileList)
 
 	if numberOfFiles < 1 {
-		log.Info("No symbol files found to process")
+		log.Info("No symbol files found in " + zipPath)
 		return nil
 	}
 
