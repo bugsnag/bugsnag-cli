@@ -40,7 +40,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		} else if utils.IsDir(path) && utils.IsDir(filepath.Join(path, "BUNDLE-METADATA")) {
 			aabDir = path
 		} else {
-			return fmt.Errorf(path + " is not an AAB file")
+			return fmt.Errorf(path + " is not an AAB file/directory")
 		}
 	}
 
