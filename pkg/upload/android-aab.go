@@ -24,7 +24,6 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 	var manifestData map[string]string
 	var aabDir string
 	var err error
-	var soFileList []string
 
 	for _, path := range paths {
 		// Check to see if we are dealing with a .aab file and extract it into a temp directory
@@ -60,23 +59,23 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
 	if utils.FileExists(soFilePath) {
-		soFileList, err = utils.BuildFileList([]string{soFilePath})
+		soFileList, err := utils.BuildFileList([]string{soFilePath})
 
 		if err != nil {
 			return err
 		}
-	}
 
-	if len(soFileList) > 0 {
-		for _, file := range soFileList {
-			err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+		if len(soFileList) > 0 {
+			for _, file := range soFileList {
+				err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
 			}
+		} else {
+			log.Info("No NDK (.so) files detected for upload.")
 		}
-	} else {
-		log.Info("No NDK (.so) files detected for upload. " + err.Error())
 	}
 
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
