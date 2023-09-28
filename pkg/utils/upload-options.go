@@ -41,7 +41,7 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 	return uploadOptions
 }
 
-// BuildAndroidProguardUploadOptions - Builds the upload options for processing dart files
+// BuildAndroidProguardUploadOptions - Builds the upload options for processing Proguard files
 func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, buildUuid string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
@@ -118,7 +118,7 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 	return uploadOptions, nil
 }
 
-// BuildAndroidNDKUploadOptions - Builds the upload options for processing dart files
+// BuildAndroidNDKUploadOptions - Builds the upload options for processing NDK files
 func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
