@@ -98,7 +98,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 	defer os.RemoveAll(unityDir)
 
 	if arch == "" {
-		archList, err = utils.BuildFolderList([]string{unityDir})
+		archList, err = utils.BuildDirectoryList([]string{unityDir})
 		if err != nil {
 			return err
 		}
