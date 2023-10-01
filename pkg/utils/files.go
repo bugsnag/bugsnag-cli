@@ -48,27 +48,27 @@ func BuildFileList(paths []string) ([]string, error) {
 	return fileList, nil
 }
 
-// BuildFolderList - Builds a list of folders from a given path(s)
-func BuildFolderList(paths []string) ([]string, error) {
-	var folderList []string
+// BuildDirectoryList - Builds a list of directories from a given path(s)
+func BuildDirectoryList(paths []string) ([]string, error) {
+	var directoryList []string
 
-	for _, folder := range paths {
-		if IsDir(folder) {
-			err := filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
+	for _, directory := range paths {
+		if IsDir(directory) {
+			err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
 				if err == nil && info.IsDir() {
-					if folder != path {
-						folderList = append(folderList, filepath.Base(path))
+					if directory != path {
+						directoryList = append(directoryList, filepath.Base(path))
 					}
 				}
 				return nil
 			})
 
 			if err != nil {
-				return folderList, err
+				return directoryList, err
 			}
 		}
 	}
-	return folderList, nil
+	return directoryList, nil
 }
 
 // FileExists - Checks if a given file exists on the system
