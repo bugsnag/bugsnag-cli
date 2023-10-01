@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"path/filepath"
@@ -120,34 +119,10 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	numberOfFiles := len(symbolFileList)
+	err = utils.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
 
-	if numberOfFiles < 1 {
-		log.Info("No symbol files found in " + zipPath)
-		return nil
-	}
-
-	for _, file := range symbolFileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(manifestData["apiKey"], manifestData["applicationId"], manifestData["versionName"], manifestData["versionCode"], projectRoot, filepath.Base(file), overwrite)
-
-		if err != nil {
-			return err
-		}
-
-		fileFieldData := make(map[string]string)
-		fileFieldData["soFile"] = file
-
-		err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
-
-		if err != nil {
-			if numberOfFiles > 1 && failOnUploadError {
-				return err
-			} else {
-				log.Warn(err.Error())
-			}
-		} else {
-			log.Success("Uploaded " + filepath.Base(file))
-		}
+	if err != nil {
+		return err
 	}
 
 	return nil

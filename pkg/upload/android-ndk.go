@@ -8,7 +8,6 @@ import (
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -192,36 +191,10 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 		}
 
-		numberOfFiles := len(symbolFileList)
+		err = utils.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
 
-		if numberOfFiles < 1 {
-			log.Info("No library files found to process")
-			continue
-		}
-
-		// Upload processed .so.sym files
-		for _, file := range symbolFileList {
-			uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
-
-			if err != nil {
-				return err
-			}
-
-			fileFieldData := make(map[string]string)
-			fileFieldData["soFile"] = file
-
-			err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
-
-			if err != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return err
-				} else {
-					log.Warn(err.Error())
-				}
-			} else {
-				log.Success("Uploaded " + filepath.Base(file))
-			}
-
+		if err != nil {
+			return err
 		}
 	}
 
