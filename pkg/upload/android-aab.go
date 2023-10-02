@@ -76,6 +76,8 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		} else {
 			log.Info("No NDK (.so) files detected for upload.")
 		}
+	} else {
+		log.Info("No NDK (.so) files detected for upload.")
 	}
 
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
