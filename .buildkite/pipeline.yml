@@ -39,6 +39,7 @@ steps:
       - bundle exec maze-runner features/android
     env:
       JAVA_VERSION: 17
+      ANDROID_NDK_ROOT: "/Users/administrator/Library/Android/sdk/ndk/25.1.8937393"
     plugins:
       artifacts#v1.5.0:
         download:
