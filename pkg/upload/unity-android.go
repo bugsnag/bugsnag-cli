@@ -11,7 +11,7 @@ import (
 )
 
 type UnityAndroidOptions struct {
-	AabPath       string            `help:"Path to Android AAB file"`
+	AabPath       string            `help:"Path to Android AAB file to upload with your Unity symbols"`
 	ApplicationId string            `help:"Module application identifier"`
 	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
