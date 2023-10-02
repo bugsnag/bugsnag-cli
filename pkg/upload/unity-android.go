@@ -56,7 +56,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 				}
 			}
 		} else {
-			return fmt.Errorf("unsupported file paths provided. Please specify the Unity `symbols.zip` file or build directory.")
+			return fmt.Errorf(path + " is not a .symbols.zip file or containing directory")
 		}
 	}
 
