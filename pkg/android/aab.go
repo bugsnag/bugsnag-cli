@@ -78,7 +78,6 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 				log.Info("Using " + aabUploadOptions["versionName"] + " as version name from AndroidManifest.xml")
 			}
 		}
-		return aabUploadOptions, nil
 	}
 	return aabUploadOptions, nil
 }
