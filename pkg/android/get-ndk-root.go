@@ -9,16 +9,15 @@ import (
 func GetAndroidNDKRoot(path string) (string, error) {
 
 	if path == "" {
-
 		envValue, envPresent := os.LookupEnv("ANDROID_NDK_ROOT")
 
 		if envPresent {
 
-			path = envValue
-
 		} else {
 			return "", fmt.Errorf("environment variable 'ANDROID_NDK_ROOT' not defined")
 		}
+
+		path = envValue
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {

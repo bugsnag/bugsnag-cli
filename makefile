@@ -13,7 +13,9 @@ endif
 endif
 endif
 
+FLUTTER_BIN?=flutter
 
+.PHONY: build
 build: build-$(PLATFORM) # Build for PLATFORM or the host OS
 
 .PHONY: build-all
@@ -46,9 +48,38 @@ unit-test:
 fmt:
 	gofmt -w ./
 
+.PHONY: bump
 bump:
 ifneq ($(shell git diff --staged),)
 	@git diff --staged
 	@$(error You have uncommitted changes. Push or discard them to continue)
 endif
 	@./scripts/bump-version.sh $(VERSION)
+
+.PHONY: test-fixtures
+test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
+
+.PHONY: features/base-fixtures/android
+features/base-fixtures/android:
+	cd $@ && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/dart
+features/base-fixtures/dart:
+	cd $@ && $(FLUTTER_BIN) pub get
+	cd $@ && $(FLUTTER_BIN) build apk  --suppress-analytics --split-debug-info=app-debug-info
+	cd $@ && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
+
+.PHONY: features/base-fixtures/rn0_69
+features/base-fixtures/rn0_69:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/rn0_70
+features/base-fixtures/rn0_70:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/rn0_72
+features/base-fixtures/rn0_72:
+	cd $@ && npm i
+	cd $@/android && ./gradlew bundleRelease

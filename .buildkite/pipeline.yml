@@ -16,12 +16,13 @@ steps:
     commands:
       - make unit-test
 
-  - label: Mac E2E Test
+  - label: CLI Integration Tests
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner
+      - env
+      - bundle exec maze-runner features/cli
     plugins:
       artifacts#v1.5.0:
         download:
@@ -29,17 +30,45 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: Windows E2E Test
+  - label: Android Integration Tests
     depends_on: build
     commands:
-      - chmod +x bin/x86_64-windows-bugsnag-cli.exe
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner
-    agents:
-      queue: windows-general-wsl
+      - bundle exec maze-runner features/android
+    env:
+      JAVA_VERSION: 17
     plugins:
       artifacts#v1.5.0:
         download:
-          - bin/x86_64-windows-bugsnag-cli.exe
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - label: Dart Integration Tests
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/dart
+    env:
+      FLUTTER_BIN: "/opt/flutter/3.10.0/bin/flutter"
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - label: React Native Android Integration Tests
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/react-native-android
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
