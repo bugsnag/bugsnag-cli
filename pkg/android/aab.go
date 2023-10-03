@@ -57,8 +57,7 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			if aabUploadOptions["buildUuid"] != "" {
 				log.Info("Using " + aabUploadOptions["buildUuid"] + " as build ID from AndroidManifest.xml")
 			} else {
-				aabUploadOptions["buildUuid"] = GetDexBuildId(filepath.Join(path, "..", "..", "dex"))
-
+				aabUploadOptions["buildUuid"] = GetDexBuildId(filepath.Join(path, "base", "dex"))
 				if aabUploadOptions["buildUuid"] != "" {
 					log.Info("Using " + aabUploadOptions["buildUuid"] + " as build ID from dex signatures")
 				}
