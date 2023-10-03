@@ -10,7 +10,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidAabMappingOptions struct {
+type AndroidAabMapping struct {
 	ApplicationId string            `help:"Module application identifier"`
 	BuildUuid     string            `help:"Module Build UUID ('none' to opt-out)"`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
@@ -44,16 +44,10 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 	}
 
-	// Check to see if we need to read the manifest file due to missing options
-	if apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
+	manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
-		log.Info("Reading data from AndroidManifest.xml")
-
-		manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
-
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
 	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")

@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidNdkMappingOptions struct {
+type AndroidNdkMapping struct {
 	ApplicationId  string            `help:"Module application identifier"`
 	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
 	AppManifest    string            `help:"Path to app manifest file" type:"path"`
@@ -191,7 +191,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 		}
 
-		err = utils.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
+		err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
 
 		if err != nil {
 			return err

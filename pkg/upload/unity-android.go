@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-type UnityAndroidOptions struct {
+type UnityAndroid struct {
 	AabPath       string            `help:"Path to Android AAB file to upload with your Unity symbols"`
 	ApplicationId string            `help:"Module application identifier"`
 	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
@@ -70,14 +70,10 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	defer os.RemoveAll(aabDir)
 
-	if applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "" {
-		log.Info("Reading data from AndroidManifest.xml")
+	manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
-		manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
-
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
 	err = ProcessAndroidAab(manifestData["apiKey"], manifestData["applicationId"], manifestData["buildUuid"], []string{aabDir}, projectRoot, manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
@@ -119,7 +115,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	err = utils.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
+	err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
 
 	if err != nil {
 		return err

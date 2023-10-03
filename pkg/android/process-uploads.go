@@ -1,8 +1,9 @@
-package utils
+package android
 
 import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
 )
 
@@ -17,7 +18,7 @@ func UploadAndroidNdk(fileList []string, apiKey string, applicationId string, ve
 	}
 
 	for _, file := range fileList {
-		uploadOptions, err := BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 		if err != nil {
 			return err

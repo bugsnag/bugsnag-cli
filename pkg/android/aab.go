@@ -22,65 +22,71 @@ func GetUploadOptionsFromAabManifest(path string, apiKey string, applicationId s
 		log.Warn("AndroidManifest.xml not found in AAB file")
 	}
 
-	manifestData, err = ReadAabManifest(filepath.Join(aabManifestPath))
+	if aabManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
-	if err != nil {
-		return nil, fmt.Errorf("unable to read data from " + path + " " + err.Error())
-	}
+		log.Info("Reading data from AndroidManifest.xml")
 
-	if apiKey == "" {
-		apiKey = manifestData["apiKey"]
-		if apiKey != "" {
-			log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+		manifestData, err = ReadAabManifest(filepath.Join(aabManifestPath))
+
+		if err != nil {
+			return nil, fmt.Errorf("unable to read data from " + path + " " + err.Error())
 		}
-	}
 
-	aabUploadOptions["apiKey"] = apiKey
-
-	if applicationId == "" {
-		applicationId = manifestData["applicationId"]
-		if applicationId != "" {
-			log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-		}
-	}
-
-	aabUploadOptions["applicationId"] = applicationId
-
-	if buildUuid == "" {
-		buildUuid = manifestData["buildUuid"]
-		if buildUuid != "" {
-			log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
-		} else {
-			buildUuid = GetDexBuildId(filepath.Join(path, "..", "..", "dex"))
-
-			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build ID from dex signatures")
+		if apiKey == "" {
+			apiKey = manifestData["apiKey"]
+			if apiKey != "" {
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 		}
-	} else if buildUuid == "none" {
-		log.Info("No build ID will be used")
-		buildUuid = ""
-	}
 
-	aabUploadOptions["buildUuid"] = buildUuid
+		aabUploadOptions["apiKey"] = apiKey
 
-	if versionCode == "" {
-		versionCode = manifestData["versionCode"]
-		if versionCode != "" {
-			log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+		if applicationId == "" {
+			applicationId = manifestData["applicationId"]
+			if applicationId != "" {
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+			}
 		}
-	}
 
-	aabUploadOptions["versionCode"] = versionCode
+		aabUploadOptions["applicationId"] = applicationId
 
-	if versionName == "" {
-		versionName = manifestData["versionName"]
-		if versionName != "" {
-			log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+		if buildUuid == "" {
+			buildUuid = manifestData["buildUuid"]
+			if buildUuid != "" {
+				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
+			} else {
+				buildUuid = GetDexBuildId(filepath.Join(path, "..", "..", "dex"))
+
+				if buildUuid != "" {
+					log.Info("Using " + buildUuid + " as build ID from dex signatures")
+				}
+			}
+		} else if buildUuid == "none" {
+			log.Info("No build ID will be used")
+			buildUuid = ""
 		}
+
+		aabUploadOptions["buildUuid"] = buildUuid
+
+		if versionCode == "" {
+			versionCode = manifestData["versionCode"]
+			if versionCode != "" {
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+			}
+		}
+
+		aabUploadOptions["versionCode"] = versionCode
+
+		if versionName == "" {
+			versionName = manifestData["versionName"]
+			if versionName != "" {
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+			}
+		}
+
+		aabUploadOptions["versionName"] = versionName
+
+		return aabUploadOptions, nil
 	}
-
-	aabUploadOptions["versionName"] = versionName
-
-	return aabUploadOptions, nil
+	return nil, nil
 }
