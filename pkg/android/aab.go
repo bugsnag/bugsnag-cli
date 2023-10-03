@@ -38,11 +38,9 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			return nil, fmt.Errorf("unable to read data from " + path + " " + err.Error())
 		}
 
-		if aabUploadOptions["apiKey"] == "" {
+		if aabUploadOptions["apiKey"] == "" && manifestData["apiKey"] != "" {
 			aabUploadOptions["apiKey"] = manifestData["apiKey"]
-			if aabUploadOptions["apiKey"] != "" {
-				log.Info("Using " + aabUploadOptions["apiKey"] + " as API key from AndroidManifest.xml")
-			}
+			log.Info("Using " + manifestData["apiKey"] + " as API key from AndroidManifest.xml")
 		}
 
 		if aabUploadOptions["applicationId"] == "" {
