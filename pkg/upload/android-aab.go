@@ -44,7 +44,7 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 	}
 
-	manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 	if err != nil {
 		return err

@@ -70,7 +70,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	defer os.RemoveAll(aabDir)
 
-	manifestData, err = android.GetUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
 	if err != nil {
 		return err
