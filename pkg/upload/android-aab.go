@@ -22,117 +22,62 @@ type AndroidAabMapping struct {
 func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 
 	var manifestData map[string]string
-	var aabManifestPath string
-
-	// Create temp working directory
-	tempDir, err := os.MkdirTemp("", "bugsnag-cli-aab-unpacking-*")
-
-	if err != nil {
-		return fmt.Errorf("error creating temporary working directory " + err.Error())
-	}
-
-	defer os.RemoveAll(tempDir)
+	var aabDir string
+	var err error
 
 	for _, path := range paths {
+		// Check to see if we are dealing with a .aab file and extract it into a temp directory
 		if filepath.Ext(path) == ".aab" {
 
-			log.Info("Extracting " + filepath.Base(path) + " to " + tempDir)
+			log.Info("Extracting " + filepath.Base(path) + " into a temporary directory")
+			aabDir, err = utils.ExtractFile(path, "aab")
 
-			err = utils.Unzip(path, tempDir)
+			defer os.RemoveAll(aabDir)
 
 			if err != nil {
 				return err
 			}
+		} else if utils.IsDir(path) {
+			aabDir = path
 		} else {
-			return fmt.Errorf(path + " is not an AAB file")
+			return fmt.Errorf(path + " is not an AAB file/directory")
 		}
 	}
 
-	if aabManifestPath == "" {
-		aabManifestPathExpected := filepath.Join(tempDir, "base", "manifest", "AndroidManifest.xml")
-		if utils.FileExists(aabManifestPathExpected) {
-			aabManifestPath = aabManifestPathExpected
-		} else {
-			log.Warn("AndroidManifest.xml not found in AAB file")
-		}
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+
+	if err != nil {
+		return err
 	}
 
-	// Check to see if we need to read the manifest file due to missing options
-	if aabManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
+	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
-		log.Info("Reading data from AndroidManifest.xml")
-
-		manifestData, err = android.ReadAabManifest(filepath.Join(aabManifestPath))
+	if utils.FileExists(soFilePath) {
+		soFileList, err := utils.BuildFileList([]string{soFilePath})
 
 		if err != nil {
-			return fmt.Errorf("unable to read data from " + aabManifestPath + " " + err.Error())
+			return err
 		}
 
-		if apiKey == "" {
-			apiKey = manifestData["apiKey"]
-			if apiKey != "" {
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
-			}
-		}
+		if len(soFileList) > 0 {
+			for _, file := range soFileList {
+				err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
-		if applicationId == "" {
-			applicationId = manifestData["applicationId"]
-			if applicationId != "" {
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-			}
-		}
-
-		if buildUuid == "" {
-			buildUuid = manifestData["buildUuid"]
-			if buildUuid != "" {
-				log.Info("Using " + buildUuid + " as build ID from AndroidManifest.xml")
-			} else {
-				buildUuid = android.GetDexBuildId(filepath.Join(tempDir, "base", "dex"))
-
-				if buildUuid != "" {
-					log.Info("Using " + buildUuid + " as build ID from dex signatures")
+				if err != nil {
+					return err
 				}
 			}
-		} else if buildUuid == "none" {
-			log.Info("No build ID will be used")
-			buildUuid = ""
-		}
-
-		if versionCode == "" {
-			versionCode = manifestData["versionCode"]
-			if versionCode != "" {
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-			}
-		}
-
-		if versionName == "" {
-			versionName = manifestData["versionName"]
-			if versionName != "" {
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-			}
-		}
-	}
-
-	soFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
-
-	fileList, err := utils.BuildFileList([]string{soFilePath})
-
-	if len(fileList) > 0 && err == nil {
-		for _, file := range fileList {
-			err = ProcessAndroidNDK(apiKey, applicationId, "", "", []string{file}, projectRoot, "", versionCode, versionName, endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
-
-			if err != nil {
-				return err
-			}
+		} else {
+			log.Info("No NDK (.so) files detected for upload.")
 		}
 	} else {
-		log.Info("No NDK (.so) files detected for upload. " + err.Error())
+		log.Info("No NDK (.so) files detected for upload.")
 	}
 
-	mappingFilePath := filepath.Join(tempDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
+	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
-		err = ProcessAndroidProguard(apiKey, applicationId, "", buildUuid, []string{mappingFilePath}, "", versionCode, versionName, endpoint, retries, timeout, overwrite, dryRun)
+		err = ProcessAndroidProguard(manifestData["apiKey"], manifestData["applicationId"], "", manifestData["buildUuid"], []string{mappingFilePath}, "", manifestData["versionCode"], manifestData["versionName"], endpoint, retries, timeout, overwrite, dryRun)
 
 		if err != nil {
 			return err

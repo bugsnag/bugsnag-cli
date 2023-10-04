@@ -155,8 +155,6 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		log.Info("Uploading debug information for React Native Android")
-
 		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite)
 
 		if err != nil {
@@ -171,6 +169,8 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 
 		if err != nil {
 			return err
+		} else {
+			log.Success("Uploaded " + filepath.Base(sourceMapPath))
 		}
 	}
 

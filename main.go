@@ -38,8 +38,9 @@ type CLI struct {
 		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
 		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
 		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		DartSymbol         upload.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 }
@@ -203,6 +204,34 @@ func main() {
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
 			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload unity-android <path>":
+
+		if commands.ApiKey == "" {
+			log.Error("no API key provided", 1)
+		}
+
+		err := upload.ProcessUnityAndroid(
+			commands.ApiKey,
+			commands.Upload.UnityAndroid.AabPath,
+			commands.Upload.UnityAndroid.ApplicationId,
+			commands.Upload.UnityAndroid.VersionCode,
+			commands.Upload.UnityAndroid.BuildUuid,
+			commands.Upload.UnityAndroid.Arch,
+			commands.Upload.UnityAndroid.VersionName,
+			commands.Upload.UnityAndroid.ProjectRoot,
+			commands.Upload.UnityAndroid.Path,
+			endpoint,
+			commands.FailOnUploadError,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,

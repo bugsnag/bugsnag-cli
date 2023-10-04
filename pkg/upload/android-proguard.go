@@ -148,8 +148,6 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 			return err
 		}
 
-		log.Info("Uploading debug information for " + mappingFile)
-
 		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
 
 		if err != nil {
@@ -171,7 +169,7 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 		if err != nil {
 			return err
 		} else {
-			log.Success(mappingFile + " uploaded")
+			log.Success("Uploaded " + filepath.Base(mappingFile))
 		}
 	}
 	return nil
