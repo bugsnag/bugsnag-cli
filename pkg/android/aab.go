@@ -43,11 +43,9 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			log.Info("Using " + manifestData["apiKey"] + " as API key from AndroidManifest.xml")
 		}
 
-		if aabUploadOptions["applicationId"] == "" {
+		if aabUploadOptions["applicationId"] == "" && manifestData["applicationId"] != "" {
 			aabUploadOptions["applicationId"] = manifestData["applicationId"]
-			if aabUploadOptions["applicationId"] != "" {
-				log.Info("Using " + aabUploadOptions["applicationId"] + " as application ID from AndroidManifest.xml")
-			}
+			log.Info("Using " + aabUploadOptions["applicationId"] + " as application ID from AndroidManifest.xml")
 		}
 
 		if aabUploadOptions["buildUuid"] == "" {
@@ -65,18 +63,14 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			aabUploadOptions["buildUuid"] = ""
 		}
 
-		if aabUploadOptions["versionCode"] == "" {
+		if aabUploadOptions["versionCode"] == "" && manifestData["versionCode"] != "" {
 			aabUploadOptions["versionCode"] = manifestData["versionCode"]
-			if aabUploadOptions["versionCode"] != "" {
-				log.Info("Using " + aabUploadOptions["versionCode"] + " as version code from AndroidManifest.xml")
-			}
+			log.Info("Using " + aabUploadOptions["versionCode"] + " as version code from AndroidManifest.xml")
 		}
 
-		if aabUploadOptions["versionName"] == "" {
+		if aabUploadOptions["versionName"] == "" && manifestData["versionName"] != "" {
 			aabUploadOptions["versionName"] = manifestData["versionName"]
-			if aabUploadOptions["versionName"] != "" {
-				log.Info("Using " + aabUploadOptions["versionName"] + " as version name from AndroidManifest.xml")
-			}
+			log.Info("Using " + aabUploadOptions["versionName"] + " as version name from AndroidManifest.xml")
 		}
 	}
 	return aabUploadOptions, nil
