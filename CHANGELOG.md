@@ -3,13 +3,17 @@
 ## 2.0.0 (TBD)
 
 ### Breaking Changes
-- Remove deprecated CLI options - `appVersion`, `appVersionCode` and `appBundleVersion`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
+
+- Remove deprecated (renamed) CLI options - `--version`, `--app-version`, `--app-version-code` and `--app-bundle-version`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
+
+See [Upgrading Guide](./UPGRADING.md) for full details.
 
 ### Enhancements
-- Android Build IDs can be calculated automatically for `.aab` files when none are specified in the `AndroidManifest` or on the command-line. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
+
+- Add support for Unity Android symbol files. [56](https://github.com/bugsnag/bugsnag-cli/pull/56)
 - Add `--version` flag to the command to retrieve the version of the installed CLI. [51](https://github.com/bugsnag/bugsnag-cli/pull/51)
 - Add `--dry-run` flag to all upload commands to validate but not upload source maps. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
-- Add support for Unity Android symbol files. [56](https://github.com/bugsnag/bugsang-cli/pull/56)
+- Automatically generate a unique value for the `buildUUID` parameter from `.aab` files when not specified in the `AndroidManifest` or `--build-uuid` option. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
 
 ## 1.2.2 (2023-07-11)
 
