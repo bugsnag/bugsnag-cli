@@ -91,12 +91,12 @@ display_help() {
 EOS
 }
 
-VERSION="1.2.2"
+VERSION="2.0.0"
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
     --version=*)
-      VERSION="${1#*=}"
+      VERSION=${1#*=}
       ;;
     --help)
       display_help
