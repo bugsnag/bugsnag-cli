@@ -19,7 +19,7 @@ type CreateBuild struct {
 	Provider      string            `help:"The name of the source control provider that contains the source code for the build."`
 	Repository    string            `help:"The URL of the repository containing the source code being deployed."`
 	Revision      string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
+	Path          utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 	VersionName   string            `help:"The version of the application." xor:"app-version,version-name"`
 	VersionCode   string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
 	BundleVersion string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
