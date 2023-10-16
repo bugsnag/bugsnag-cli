@@ -77,7 +77,22 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
-		err = ProcessAndroidProguard(manifestData["apiKey"], manifestData["applicationId"], "", manifestData["buildUuid"], []string{mappingFilePath}, "", manifestData["versionCode"], manifestData["versionName"], endpoint, retries, timeout, overwrite, dryRun)
+		err = ProcessAndroidProguard(
+			manifestData["apiKey"],
+			manifestData["applicationId"],
+			"",
+			manifestData["buildUuid"],
+			nil,
+			[]string{mappingFilePath},
+			"",
+			manifestData["versionCode"],
+			manifestData["versionName"],
+			endpoint,
+			retries,
+			timeout,
+			overwrite,
+			dryRun,
+		)
 
 		if err != nil {
 			return err

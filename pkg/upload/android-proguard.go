@@ -15,13 +15,29 @@ type AndroidProguardMapping struct {
 	ApplicationId string      `help:"Module application identifier"`
 	AppManifest   string      `help:"Path to app manifest file" type:"path"`
 	BuildUuid     string      `help:"Module Build UUID"`
+	DexFiles      []string    `help:"Path to classes.dex files or directory" type:"path" default:""`
 	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 	Variant       string      `help:"Build type, like 'debug' or 'release'"`
 	VersionCode   string      `help:"Module version code"`
 	VersionName   string      `help:"Module version name"`
 }
 
-func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath string, buildUuid string, paths []string, variant string, versionCode string, versionName string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidProguard(
+	apiKey string,
+	applicationId string,
+	appManifestPath string,
+	buildUuid string,
+	dexFiles []string,
+	paths []string,
+	variant string,
+	versionCode string,
+	versionName string,
+	endpoint string,
+	retries int,
+	timeout int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var mappingFile string
 	var appManifestPathExpected string
@@ -118,7 +134,23 @@ func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath
 					}
 				}
 
-				if buildUuid != "" {
+				if buildUuid == "" && len(dexFiles) > 0 {
+					safeDexFile, err := android.GetDexFiles(dexFiles)
+					if err != nil {
+						return err
+					}
+
+					signature, err := android.GetAppSignatureFromFiles(safeDexFile)
+					if err != nil {
+						return err
+					}
+
+					buildUuid = fmt.Sprintf("%x", signature)
+
+					if buildUuid != "" {
+						log.Info("Using " + buildUuid + " as build ID from classes.dex")
+					}
+				} else {
 					log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 				}
 			}

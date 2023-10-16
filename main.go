@@ -150,6 +150,7 @@ func main() {
 			commands.Upload.AndroidProguard.ApplicationId,
 			commands.Upload.AndroidProguard.AppManifest,
 			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.DexFiles,
 			commands.Upload.AndroidProguard.Path,
 			commands.Upload.AndroidProguard.Variant,
 			commands.Upload.AndroidProguard.VersionCode,
