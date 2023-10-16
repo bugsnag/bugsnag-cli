@@ -226,7 +226,6 @@ func main() {
 			commands.Upload.UnityAndroid.ApplicationId,
 			commands.Upload.UnityAndroid.VersionCode,
 			commands.Upload.UnityAndroid.BuildUuid,
-			commands.Upload.UnityAndroid.Arch,
 			commands.Upload.UnityAndroid.VersionName,
 			commands.Upload.UnityAndroid.ProjectRoot,
 			commands.Upload.UnityAndroid.Path,

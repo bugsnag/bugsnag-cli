@@ -13,7 +13,6 @@ import (
 type UnityAndroid struct {
 	AabPath       string            `help:"Path to Android AAB file to upload with your Unity symbols"`
 	ApplicationId string            `help:"Module application identifier"`
-	Arch          string            `help:"The architecture of the shared object that the symbols are for (e.g. x86, armeabi-v7a)."`
 	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
 	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string            `help:"Module version code"`
@@ -21,7 +20,7 @@ type UnityAndroid struct {
 	BuildUuid     string            `help:"Module Build UUID"`
 }
 
-func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, versionCode string, buildUuid string, arch string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, versionCode string, buildUuid string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
 	var err error
 	var zipPath string
 	var archList []string
@@ -37,11 +36,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 			}
 
 			if aabPath == "" {
-				aabPath, err = utils.FindLatestFileWithSuffix(path, ".aab")
-
-				if err != nil {
-					return err
-				}
+				aabPath, _ = utils.FindLatestFileWithSuffix(path, ".aab")
 			}
 		} else if strings.HasSuffix(path, ".symbols.zip") {
 			zipPath = path
@@ -49,40 +44,44 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 			if aabPath == "" {
 				buildDirectory := filepath.Dir(path)
 
-				aabPath, err = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
-
-				if err != nil {
-					return err
-				}
+				aabPath, _ = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
 			}
 		} else {
 			return fmt.Errorf(path + " is not a .symbols.zip file or containing directory")
 		}
 	}
 
-	log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
+	if utils.FileExists(aabPath) {
+		log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
 
-	aabDir, err := utils.ExtractFile(aabPath, "aab")
+		aabDir, err := utils.ExtractFile(aabPath, "aab")
 
-	if err != nil {
-		return err
-	}
+		if err != nil {
+			return err
+		}
 
-	defer os.RemoveAll(aabDir)
+		defer os.RemoveAll(aabDir)
 
-	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
 
-	if err != nil {
-		return err
-	}
+		if err != nil {
+			return err
+		}
 
-	err = ProcessAndroidAab(manifestData["apiKey"], manifestData["applicationId"], manifestData["buildUuid"], []string{aabDir}, projectRoot, manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+		err = ProcessAndroidAab(manifestData["apiKey"], manifestData["applicationId"], manifestData["buildUuid"], []string{aabDir}, projectRoot, manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Info("No AAB files to process.")
 	}
 
 	log.Info("Extracting " + filepath.Base(zipPath) + " into a temporary directory")
+
+	if manifestData == nil {
+		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, versionCode, versionName)
+	}
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
 
@@ -92,13 +91,10 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 
 	defer os.RemoveAll(unityDir)
 
-	if arch == "" {
-		archList, err = utils.BuildDirectoryList([]string{unityDir})
-		if err != nil {
-			return err
-		}
-	} else {
-		archList = []string{arch}
+	archList, err = utils.BuildDirectoryList([]string{unityDir})
+
+	if err != nil {
+		return err
 	}
 
 	for _, arch := range archList {
