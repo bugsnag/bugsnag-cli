@@ -80,7 +80,36 @@ file_not_grpowned() {
   [[ " $(id -G "${USER}") " != *" $(get_group "$1") "* ]]
 }
 
-BUGSNAG_CLI_GIT_REMOTE="https://api.github.com/repos/bugsnag/bugsnag-cli/releases/latest"
+display_help() {
+  echo ""
+  cat <<EOS
+  Usage: ./install.sh
+
+  Flags:
+    --help                          Display help and usage information
+    --version=<VERSION_NUMBER>      Specify the version to install
+EOS
+}
+
+VERSION="2.0.0"
+
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --version=*)
+      VERSION=${1#*=}
+      ;;
+    --help)
+      display_help
+      exit 0
+      ;;
+    *)
+      ohai "Invalid argument: $1"
+      display_help
+      exit 1
+      ;;
+  esac
+  shift
+done
 
 # USER isn't always set so provide a fall back for the installer and subprocesses.
 if [[ -z "${USER-}" ]]; then
@@ -136,18 +165,18 @@ ohai "Downloading and installing Bugsnag CLI..."
 (
   cd "${BUGSNAG_CLI_PREFIX}" >/dev/null || return
 
-  DOWNLOAD_URL=$(curl -sS ${BUGSNAG_CLI_GIT_REMOTE} |
-    grep "${UNAME_MACHINE}-${OS_NAME}-bugsnag-cli*" |
-    grep "browser_download_url" |
-    cut -d : -f 2,3 |
-    tr -d \" |
-    xargs)
+  url="https://github.com/bugsnag/bugsnag-cli/releases"
+  output_file="${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
-  if [[ ! -n ${DOWNLOAD_URL} ]]; then
-    abort "Failed to get download URL from ${BUGSNAG_CLI_GIT_REMOTE}"
+  http_status_code=$(execute "curl" "-s" "-o" "/dev/null" "-w" "%{http_code}" "-#" "-L" "$url/tag/v${VERSION}")
+
+  if [ "${http_status_code}" -eq 404 ]; then
+      abort "Unable to download bugsnag-cli v${VERSION}. Please check https://github.com/bugsnag/bugsnag-cli/releases for a list of releases."
+  elif [ "${http_status_code}" -ne 200 ]; then
+      abort "The URL returned a non-404 error with status code ${http_status_code}."
+  else
+      execute "curl" "-#" "-L" "$url/download/v${VERSION}/${UNAME_MACHINE}-${OS_NAME}-bugsnag-cli" "-o" "$output_file"
   fi
-
-  execute "curl" "-#" "-L" "${DOWNLOAD_URL}" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
   execute "chmod" "ug=rwx" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
