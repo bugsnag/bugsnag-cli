@@ -12,14 +12,14 @@ import (
 )
 
 type AndroidNdkMapping struct {
-	ApplicationId  string            `help:"Module application identifier"`
-	AndroidNdkRoot string            `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
-	AppManifest    string            `help:"Path to app manifest file" type:"path"`
-	Path           utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	ProjectRoot    string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	Variant        string            `help:"Build type, like 'debug' or 'release'"`
-	VersionCode    string            `help:"Module version code"`
-	VersionName    string            `help:"Module version name"`
+	ApplicationId  string      `help:"Module application identifier"`
+	AndroidNdkRoot string      `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
+	AppManifest    string      `help:"Path to app manifest file" type:"path"`
+	Path           utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	ProjectRoot    string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	Variant        string      `help:"Build type, like 'debug' or 'release'"`
+	VersionCode    string      `help:"Module version code"`
+	VersionName    string      `help:"Module version name"`
 }
 
 func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {

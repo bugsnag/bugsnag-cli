@@ -12,13 +12,13 @@ import (
 )
 
 type AndroidProguardMapping struct {
-	ApplicationId string            `help:"Module application identifier"`
-	AppManifest   string            `help:"Path to app manifest file" type:"path"`
-	BuildUuid     string            `help:"Module Build UUID"`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	Variant       string            `help:"Build type, like 'debug' or 'release'"`
-	VersionCode   string            `help:"Module version code"`
-	VersionName   string            `help:"Module version name"`
+	ApplicationId string      `help:"Module application identifier"`
+	AppManifest   string      `help:"Path to app manifest file" type:"path"`
+	BuildUuid     string      `help:"Module Build UUID"`
+	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	Variant       string      `help:"Build type, like 'debug' or 'release'"`
+	VersionCode   string      `help:"Module version code"`
+	VersionName   string      `help:"Module version name"`
 }
 
 func ProcessAndroidProguard(apiKey string, applicationId string, appManifestPath string, buildUuid string, paths []string, variant string, versionCode string, versionName string, endpoint string, retries int, timeout int, overwrite bool, dryRun bool) error {

@@ -11,12 +11,12 @@ import (
 )
 
 type AndroidAabMapping struct {
-	ApplicationId string            `help:"Module application identifier"`
-	BuildUuid     string            `help:"Module Build UUID ('none' to opt-out)"`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	VersionCode   string            `help:"Module version code"`
-	VersionName   string            `help:"Module version name"`
+	ApplicationId string      `help:"Module application identifier"`
+	BuildUuid     string      `help:"Module Build UUID ('none' to opt-out)"`
+	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	VersionCode   string      `help:"Module version code"`
+	VersionName   string      `help:"Module version name"`
 }
 
 func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {

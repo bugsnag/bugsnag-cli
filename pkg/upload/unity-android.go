@@ -11,13 +11,13 @@ import (
 )
 
 type UnityAndroid struct {
-	AabPath       string            `help:"Path to Android AAB file to upload with your Unity symbols"`
-	ApplicationId string            `help:"Module application identifier"`
-	Path          utils.UploadPaths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
-	ProjectRoot   string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	VersionCode   string            `help:"Module version code"`
-	VersionName   string            `help:"Module version name"`
-	BuildUuid     string            `help:"Module Build UUID"`
+	AabPath       utils.Path  `help:"Path to Android AAB file to upload with your Unity symbols"`
+	ApplicationId string      `help:"Module application identifier"`
+	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
+	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	VersionCode   string      `help:"Module version code"`
+	VersionName   string      `help:"Module version name"`
+	BuildUuid     string      `help:"Module Build UUID"`
 }
 
 func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, versionCode string, buildUuid string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
@@ -51,7 +51,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	if utils.FileExists(aabPath) {
+	if aabPath != "" {
 		log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
 
 		aabDir, err := utils.ExtractFile(aabPath, "aab")
@@ -73,8 +73,6 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		if err != nil {
 			return err
 		}
-	} else {
-		log.Info("No AAB files to process.")
 	}
 
 	log.Info("Extracting " + filepath.Base(zipPath) + " into a temporary directory")
