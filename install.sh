@@ -83,7 +83,7 @@ file_not_grpowned() {
 display_help() {
   echo ""
   cat <<EOS
-  Usage: ./$0
+  Usage: ./install.sh
 
   Flags:
     --help                          Display help and usage information
@@ -165,7 +165,18 @@ ohai "Downloading and installing Bugsnag CLI..."
 (
   cd "${BUGSNAG_CLI_PREFIX}" >/dev/null || return
 
-  execute "curl" "-#" "-L" "https://github.com/bugsnag/bugsnag-cli/releases/download/v${VERSION}/${UNAME_MACHINE}-${OS_NAME}-bugsnag-cli" "-o" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
+  url="https://github.com/bugsnag/bugsnag-cli/releases"
+  output_file="${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
+
+  http_status_code=$(execute "curl" "-s" "-o" "/dev/null" "-w" "%{http_code}" "-#" "-L" "$url/tag/v${VERSION}")
+
+  if [ "${http_status_code}" -eq 404 ]; then
+      abort "Unable to download bugsnag-cli v${VERSION}. Please check https://github.com/bugsnag/bugsnag-cli/releases for a list of releases."
+  elif [ "${http_status_code}" -ne 200 ]; then
+      abort "The URL returned a non-404 error with status code ${http_status_code}."
+  else
+      execute "curl" "-#" "-L" "$url/download/v${VERSION}/${UNAME_MACHINE}-${OS_NAME}-bugsnag-cli" "-o" "$output_file"
+  fi
 
   execute "chmod" "ug=rwx" "${BUGSNAG_CLI_PREFIX}/bin/bugsnag-cli"
 
