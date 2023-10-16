@@ -12,16 +12,16 @@ import (
 )
 
 type ReactNativeAndroid struct {
-	AppManifest  string            `help:"(required) Path to directory or file to upload" type:"path"`
-	Bundle       string            `help:"Path to the bundle file" type:"path"`
-	CodeBundleId string            `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
-	Dev          bool              `help:"Indicates whether the application is a debug or release build"`
-	Path         utils.UploadPaths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	ProjectRoot  string            `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	SourceMap    string            `help:"Path to the source map file" type:"path"`
-	Variant      string            `help:"Build type, like 'debug' or 'release'"`
-	VersionName  string            `help:"The version name of the application."`
-	VersionCode  string            `help:"The version code for the application (Android only)."`
+	AppManifest  string      `help:"(required) Path to directory or file to upload" type:"path"`
+	Bundle       string      `help:"Path to the bundle file" type:"path"`
+	CodeBundleId string      `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
+	Dev          bool        `help:"Indicates whether the application is a debug or release build"`
+	Path         utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	ProjectRoot  string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	SourceMap    string      `help:"Path to the source map file" type:"path"`
+	Variant      string      `help:"Build type, like 'debug' or 'release'"`
+	VersionName  string      `help:"The version name of the application."`
+	VersionCode  string      `help:"The version code for the application (Android only)."`
 }
 
 func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, versionName string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
