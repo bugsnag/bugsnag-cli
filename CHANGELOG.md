@@ -14,6 +14,7 @@ See [Upgrading Guide](./UPGRADING.md) for full details.
 - Add `--version` flag to the command to retrieve the version of the installed CLI. [51](https://github.com/bugsnag/bugsnag-cli/pull/51)
 - Add `--dry-run` flag to all upload commands to validate but not upload source maps. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
 - Automatically generate a unique value for the `buildUUID` parameter from `.aab` files when not specified in the `AndroidManifest` or `--build-uuid` option. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
+- Add `--dex-files` flag to `upload android-proguard` to generate a unique value for the `buildUUID` from `classes.dex` files when uploading a `mapping.txt` [61](https://github.com/bugsnag/bugsnag-cli/pull/61)
 
 ## 1.2.2 (2023-07-11)
 
