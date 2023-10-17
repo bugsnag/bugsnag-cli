@@ -42,7 +42,8 @@ type CLI struct {
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
-	CreateBuild build.CreateBuild `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
+	CreateBuild          build.CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
+	CreateAndroidBuildId build.CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
 }
 
 func main() {
@@ -150,6 +151,7 @@ func main() {
 			commands.Upload.AndroidProguard.ApplicationId,
 			commands.Upload.AndroidProguard.AppManifest,
 			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.DexFiles,
 			commands.Upload.AndroidProguard.Path,
 			commands.Upload.AndroidProguard.Variant,
 			commands.Upload.AndroidProguard.VersionCode,
@@ -276,6 +278,14 @@ func main() {
 		}
 
 		log.Success("Build created")
+
+	case "create-android-build-id", "create-android-build-id <path>":
+		err := build.PrintAndroidBuildId(commands.CreateAndroidBuildId.Path)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
 	default:
 		println(ctx.Command())
 	}
