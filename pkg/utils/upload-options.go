@@ -78,8 +78,13 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
+
+	// Return early if all three of these are empty/undefined
+	if appVersion == "" && versionCode == "" && codeBundleId == "" {
+		return nil, fmt.Errorf("you must set at least the version name, version code or code bundle ID to uniquely identify the build")
+	}
 
 	if apiKey != "" {
 		uploadOptions["apiKey"] = apiKey
@@ -87,17 +92,16 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	if appVersion != "" {
-		uploadOptions["appVersion"] = appVersion
+	uploadOptions["appVersion"] = appVersion
+
+	if platform == "android" {
+		uploadOptions["appVersionCode"] = versionCode
+
+	} else if platform == "cocoa" {
+		uploadOptions["appBundleVersion"] = versionCode
 	}
 
-	if appVersionCode != "" {
-		uploadOptions["appVersionCode"] = appVersionCode
-	}
-
-	if codeBundleId != "" {
-		uploadOptions["codeBundleId"] = codeBundleId
-	}
+	uploadOptions["codeBundleId"] = codeBundleId
 
 	if dev {
 		uploadOptions["dev"] = "true"
@@ -105,14 +109,10 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 
 	uploadOptions["projectRoot"] = projectRoot
 
-	uploadOptions["platform"] = "android"
+	uploadOptions["platform"] = platform
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
-	}
-
-	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
-		return nil, fmt.Errorf("you must set at least the version name, version code or code bundle ID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil

@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
@@ -40,6 +41,7 @@ type CLI struct {
 		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+		ReactNativeCocoa   upload.ReactNativeCocoa       `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild          build.CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
@@ -205,6 +207,32 @@ func main() {
 			commands.Upload.ReactNativeAndroid.VersionName,
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload react-native-cocoa", "upload react-native-cocoa <path>":
+
+		err := upload.ProcessReactNativeCocoa(
+			commands.ApiKey,
+			commands.Upload.ReactNativeCocoa.AppVersion,
+			commands.Upload.ReactNativeCocoa.AppBundleVersion,
+			commands.Upload.ReactNativeCocoa.Scheme,
+			commands.Upload.ReactNativeCocoa.SourceMap,
+			commands.Upload.ReactNativeCocoa.Bundle,
+			commands.Upload.ReactNativeCocoa.Plist,
+			commands.Upload.ReactNativeCocoa.Xcworkspace,
+			commands.Upload.ReactNativeCocoa.CodeBundleID,
+			commands.Upload.ReactNativeCocoa.Dev,
+			commands.Upload.ReactNativeCocoa.ProjectRoot,
+			commands.Upload.ReactNativeCocoa.Path,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
