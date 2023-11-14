@@ -126,3 +126,26 @@ func ExtractFile(file string, slug string) (string, error) {
 
 	return tempDir, nil
 }
+
+func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
+	var matchingFolder string
+
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() && strings.HasSuffix(info.Name(), targetSuffix) {
+			matchingFolder = path
+			return filepath.SkipDir
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return matchingFolder, nil
+}

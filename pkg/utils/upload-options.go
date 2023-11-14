@@ -97,11 +97,13 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 	if platform == "android" {
 		uploadOptions["appVersionCode"] = versionCode
 
-	} else if platform == "cocoa" {
+	} else if platform == "ios" {
 		uploadOptions["appBundleVersion"] = versionCode
 	}
 
-	uploadOptions["codeBundleId"] = codeBundleId
+	if codeBundleId != "" {
+		uploadOptions["codeBundleId"] = codeBundleId
+	}
 
 	if dev {
 		uploadOptions["dev"] = "true"
