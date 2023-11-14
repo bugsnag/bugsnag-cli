@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
+// XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
 type XcodeBuildSettings struct {
 	ConfigurationBuildDir string `mapstructure:"CONFIGURATION_BUILD_DIR"`
 	InfoPlistPath         string `mapstructure:"INFOPLIST_PATH"`

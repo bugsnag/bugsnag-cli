@@ -11,13 +11,14 @@ import (
 
 const plutilPath = "/usr/bin/plutil"
 
+// PlistData contains the relevant content of a plist file for uploading to bugsnag
 type PlistData struct {
 	AppVersion            string                `json:"CFBundleShortVersionString"`
 	BundleVersion         string                `json:"CFBundleVersion"`
-	BugsnagProjectDetails BugsnagProjectDetails `json:"bugsnag"`
+	BugsnagProjectDetails bugsnagProjectDetails `json:"bugsnag"`
 }
 
-type BugsnagProjectDetails struct {
+type bugsnagProjectDetails struct {
 	ApiKey string `json:"apiKey"`
 }
 
