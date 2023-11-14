@@ -67,7 +67,6 @@ func ProcessReactNativeCocoa(
 ) error {
 
 	var err error
-	var xcodeSchemes map[string]bool
 	var buildSettings BuildSettings
 	var plistData PlistData
 
@@ -89,7 +88,7 @@ func ProcessReactNativeCocoa(
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
 		if sourceMapPath == "" {
-			sourceMapPath = filepath.Join(projectRoot, "build", "sourcemaps", "main.jsbundle.map")
+			sourceMapPath = filepath.Join(projectRoot, "ios", "build", "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
 				return errors.New("Could not find a suitable source map file, " +
 					"please specify the path by using `--source-map`")
@@ -189,7 +188,7 @@ func GetPlistData(path string) (PlistData, error) {
 }
 
 func isSchemeInWorkspace(workspacePath, schemeName string) bool {
-	for _, scheme := range GetXcodeSchemes(workspacePath) {
+	for _, scheme := range getXcodeSchemes(workspacePath) {
 		if scheme == schemeName {
 			return true
 		}
@@ -198,7 +197,7 @@ func isSchemeInWorkspace(workspacePath, schemeName string) bool {
 	return false
 }
 
-func GetXcodeSchemes(path string) []string {
+func getXcodeSchemes(path string) []string {
 	cmd := exec.Command("xcodebuild", "-workspace", path, "-list")
 	output, err := cmd.Output()
 	if err != nil {
@@ -240,25 +239,19 @@ func GetXcodeBuildSettings(path, schemeName string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	buildSettings := make(map[string]string)
-	var currentKey string
-	lines := strings.Split(string(output), "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-		if strings.HasPrefix(line, "    ") {
-			buildSettings[currentKey] += line
-		} else {
-			parts := strings.SplitN(line, "=", 2)
-			if len(parts) == 2 {
-				key := strings.TrimSpace(parts[0])
-				value := strings.TrimSpace(parts[1])
-				buildSettings[key] = value
-				currentKey = key
-			}
+
+	buildSettings := strings.SplitAfterN(string(output), "Build settings for action build and target ", 2)[1]
+	buildSettingsSlice := strings.Split(strings.ReplaceAll(buildSettings, " ", ""), "\n")
+
+	buildSettingsMap := make(map[string]string)
+	for _, line := range buildSettingsSlice {
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			buildSettingsMap[key] = value
 		}
 	}
-	return buildSettings, nil
+
+	return buildSettingsMap, nil
 }
