@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -35,10 +36,14 @@ type BuildSettings struct {
 }
 
 type PlistData struct {
-	AppVersion    string `mapstructure:"CFBundleShortVersionString"`
-	BundleVersion string `mapstructure:"CFBundleVersion"`
-	CodeBundleId  string `mapstructure:"CFBundleIdentifier"`
-	ApiKey        string `mapstructure:"apiKey"`
+	AppVersion            string                `json:"CFBundleShortVersionString"`
+	BundleVersion         string                `json:"CFBundleVersion"`
+	CodeBundleId          string                `json:"CFBundleIdentifier"`
+	BugsnagProjectDetails BugsnagProjectDetails `json:"bugsnag"`
+}
+
+type BugsnagProjectDetails struct {
+	ApiKey string `json:"apiKey"`
 }
 
 func ProcessReactNativeCocoa(
@@ -94,9 +99,7 @@ func ProcessReactNativeCocoa(
 		// If the scheme is not defined, work out what the possible name is and retrieve all xcode schemes based on the xcworkspacePath
 		if scheme == "" {
 			possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-
-			xcodeSchemes, err = GetXcodeSchemes(xcworkspacePath)
-			if xcodeSchemes[possibleSchemeName] {
+			if isSchemeInWorkspace(xcworkspacePath, possibleSchemeName) {
 				// We can deduce that possibleSchemeName is the scheme name at this point, and can default to using it's value
 				scheme = possibleSchemeName
 				buildSettingsMap, err := GetXcodeBuildSettings(xcworkspacePath, possibleSchemeName)
@@ -116,18 +119,18 @@ func ProcessReactNativeCocoa(
 				if plistPath == "" {
 					plistPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				}
-				// TODO: Check Plistbuddy etc exists as well either within this func call or just before it
-				plistDataMap, err := GetPlistData("/usr/libexec/Plistbuddy", plistPath)
+
+				// Fetch the plist data with the provided plistPath
+				plistData, err = GetPlistData(plistPath)
 				if err != nil {
 					return err
 				}
-				err = mapstructure.Decode(plistDataMap, &plistData)
 
 				// Set a default value for the relevant plist data needed for creating the upload options
 				appBundleVersion = plistData.BundleVersion
 				appVersion = plistData.AppVersion
 				codeBundleId = plistData.CodeBundleId
-				apiKey = plistData.ApiKey
+				apiKey = plistData.BugsnagProjectDetails.ApiKey
 
 			} else {
 				return errors.New("Could not find a suitable scheme, " +
@@ -162,49 +165,50 @@ func ProcessReactNativeCocoa(
 	return nil
 }
 
-func GetPlistData(binary string, path string) (map[string]string, error) {
-	cmd := exec.Command(binary, "-c", "Print :", path)
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, err
+func GetPlistData(path string) (PlistData, error) {
+	var plistData PlistData
+	var cmd *exec.Cmd
+
+	if utils.FileExists("/usr/bin/plutil") {
+		cmd = exec.Command("/usr/bin/plutil", "-convert", "json", "-o", "-", path)
+
+		output, err := cmd.Output()
+		if err != nil {
+			return plistData, err
+		}
+
+		err = json.Unmarshal(output, &plistData)
+		if err != nil {
+			return plistData, err
+		}
+	} else {
+		return plistData, errors.New("Unable to locate plutil in it's default location `/usr/bin/plutil` on this system.")
 	}
 
-	lines := strings.Split(string(output), "\n")
+	return plistData, nil
+}
 
-	variables := make(map[string]string)
-
-	for _, line := range lines {
-		parts := strings.SplitN(line, " = ", 2)
-		if len(parts) == 2 {
-			key := strings.TrimSpace(parts[0])
-			value := strings.TrimSpace(parts[1])
-			variables[key] = value
+func isSchemeInWorkspace(workspacePath, schemeName string) bool {
+	for _, scheme := range GetXcodeSchemes(workspacePath) {
+		if scheme == schemeName {
+			return true
 		}
 	}
 
-	return variables, nil
+	return false
 }
 
-func GetXcodeSchemes(path string) (map[string]bool, error) {
+func GetXcodeSchemes(path string) []string {
 	cmd := exec.Command("xcodebuild", "-workspace", path, "-list")
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	schemes := make(map[string]bool)
-	lines := strings.Split(string(output), "\n")
-	isParsingSchemes := false
-	for _, line := range lines {
-		if isParsingSchemes {
-			if strings.TrimSpace(line) == "" {
-				break
-			}
-			schemes[strings.TrimSpace(line)] = true
-		} else if strings.Contains(line, "Schemes:") {
-			isParsingSchemes = true
-		}
-	}
-	return schemes, nil
+
+	schemes := strings.SplitAfterN(string(output), "Schemes:", 2)[1]
+	schemesSlice := strings.Split(strings.ReplaceAll(schemes, " ", ""), "\n")
+
+	return schemesSlice
 }
 
 func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
