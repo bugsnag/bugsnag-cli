@@ -82,6 +82,15 @@ func ProcessReactNativeCocoa(
 			}
 		}
 
+		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
+		if sourceMapPath == "" {
+			sourceMapPath = filepath.Join(projectRoot, "build", "sourcemaps", "main.jsbundle.map")
+			if !utils.FileExists(sourceMapPath) {
+				return errors.New("Could not find a suitable source map file, " +
+					"please specify the path by using `--source-map`")
+			}
+		}
+
 		// If the scheme is not defined, work out what the possible name is and retrieve all xcode schemes based on the xcworkspacePath
 		if scheme == "" {
 			possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
@@ -96,8 +105,12 @@ func ProcessReactNativeCocoa(
 				}
 				err = mapstructure.Decode(buildSettingsMap, &buildSettings)
 
-				// TODO: To be used as part of the actual upload process
-				//bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+				// Set a default value for bundlePath if it's not defined and check that it exists before proceeding
+				bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+				if !utils.FileExists(bundleFilePath) {
+					return errors.New("Could not find a suitable bundle file, " +
+						"please specify the path by using `--bundlePath`")
+				}
 
 				// Set a default value for plistPath if it's not defined
 				if plistPath == "" {
@@ -117,8 +130,8 @@ func ProcessReactNativeCocoa(
 				apiKey = plistData.ApiKey
 
 			} else {
-				return errors.New("no scheme defined and could not fallback to using a default value, " +
-					"specify the scheme by including `--scheme` to your command.")
+				return errors.New("Could not find a suitable scheme, " +
+					"please specify the scheme by using `--scheme`")
 			}
 
 			if err != nil {
