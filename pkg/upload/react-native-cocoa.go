@@ -107,10 +107,18 @@ func ProcessReactNativeCocoa(
 					return err
 				}
 
-				// Set a default value for the relevant plist data needed for creating the upload options
-				appBundleVersion = plistData.BundleVersion
-				appVersion = plistData.AppVersion
-				apiKey = plistData.BugsnagProjectDetails.ApiKey
+				// Set a default value for the relevant plist data needed for creating the upload options if they aren't already defined
+				if appBundleVersion == "" {
+					appBundleVersion = plistData.BundleVersion
+				}
+
+				if appVersion == "" {
+					appVersion = plistData.AppVersion
+				}
+
+				if apiKey == "" {
+					apiKey = plistData.BugsnagProjectDetails.ApiKey
+				}
 
 			} else {
 				return errors.New("Could not find a suitable scheme, " +
