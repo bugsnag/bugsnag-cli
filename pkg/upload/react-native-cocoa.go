@@ -68,10 +68,9 @@ func ProcessReactNativeCocoa(
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
 		if sourceMapPath == "" {
-			sourceMapPath = filepath.Join(projectRoot, "ios", "build", "sourcemaps", "main.jsbundle.map")
+			sourceMapPath = filepath.Join(path, "ios", "build", "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
-				return errors.New("Could not find a suitable source map file, " +
-					"please specify the path by using `--source-map`")
+				return errors.New("Could not find a suitable source map file, please specify the path by using `--source-map`")
 			}
 		}
 
@@ -95,8 +94,7 @@ func ProcessReactNativeCocoa(
 				if bundlePath == "" {
 					bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
 					if !utils.FileExists(bundleFilePath) {
-						return errors.New("Could not find a suitable bundle file, " +
-							"please specify the path by using `--bundlePath`")
+						return errors.New("Could not find a suitable bundle file, please specify the path by using `--bundlePath`")
 					}
 					bundlePath = bundleFilePath
 				}
