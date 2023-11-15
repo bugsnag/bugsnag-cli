@@ -46,7 +46,6 @@ func ProcessReactNativeCocoa(
 	dryRun bool,
 ) error {
 
-	var err error
 	var buildSettings *cocoa.XcodeBuildSettings
 	var plistData *cocoa.PlistData
 
@@ -60,10 +59,11 @@ func ProcessReactNativeCocoa(
 		// Set a default value for xcworkspacePath if it's not defined
 		if xcworkspacePath == "" {
 			iosPath := filepath.Join(path, "ios")
-			xcworkspacePath, err = utils.FindFolderWithSuffix(iosPath, ".xcworkspace")
+			workspacePath, err := utils.FindFolderWithSuffix(iosPath, ".xcworkspace")
 			if err != nil {
 				return err
 			}
+			xcworkspacePath = workspacePath
 		}
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
@@ -126,8 +126,7 @@ func ProcessReactNativeCocoa(
 				}
 
 			} else {
-				return errors.New("Could not find a suitable scheme, " +
-					"please specify the scheme by using `--scheme`")
+				return errors.New("Could not find a suitable scheme, please specify the scheme by using `--scheme`")
 			}
 
 			if err != nil {
