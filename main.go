@@ -222,8 +222,8 @@ func main() {
 
 		err := upload.ProcessReactNativeCocoa(
 			commands.ApiKey,
-			commands.Upload.ReactNativeCocoa.AppVersion,
-			commands.Upload.ReactNativeCocoa.AppBundleVersion,
+			commands.Upload.ReactNativeCocoa.VersionName,
+			commands.Upload.ReactNativeCocoa.BundleVersion,
 			commands.Upload.ReactNativeCocoa.Scheme,
 			commands.Upload.ReactNativeCocoa.SourceMap,
 			commands.Upload.ReactNativeCocoa.Bundle,
