@@ -78,7 +78,12 @@ func ProcessReactNativeCocoa(
 		// If the scheme is not defined, work out what the possible name is and retrieve all xcode schemes based on the xcworkspacePath
 		if scheme == "" {
 			possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-			if cocoa.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName) {
+			schemeExists, err := cocoa.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+			if err != nil {
+				return err
+			}
+
+			if schemeExists {
 				// We can deduce that possibleSchemeName is the scheme name at this point, and can default to using it's value
 				scheme = possibleSchemeName
 				buildSettings, err = cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)

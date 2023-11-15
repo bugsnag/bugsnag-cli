@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
 )
 
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
@@ -15,28 +16,39 @@ type XcodeBuildSettings struct {
 }
 
 // IsSchemeInWorkspace checks if a scheme is in a given workspace
-func IsSchemeInWorkspace(workspacePath, schemeToFind string) bool {
-	for _, scheme := range getXcodeSchemes(workspacePath) {
+func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
+	schemes, err := getXcodeSchemes(workspacePath)
+	if err != nil {
+		return false, err
+	}
+
+	for _, scheme := range schemes {
 		if scheme == schemeToFind {
-			return true
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given workspace path to return a slice of schemes
-func getXcodeSchemes(workspacePath string) []string {
-	cmd := exec.Command("xcodebuild", "-workspace", workspacePath, "-list")
+func getXcodeSchemes(workspacePath string) ([]string, error) {
+	var cmd *exec.Cmd
+	if isXcodebuildInstalled() {
+		cmd = exec.Command("xcodebuild", "-workspace", workspacePath, "-list")
+	} else {
+		return nil, errors.New("Unable to locate xcodebuild on this system.")
+	}
+
 	output, err := cmd.Output()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:", 2)[1]
 	schemesSlice := strings.Split(strings.ReplaceAll(schemes, " ", ""), "\n")
 
-	return schemesSlice
+	return schemesSlice, nil
 }
 
 // GetXcodeBuildSettings returns a struct of the relevant build settings for a given workspace and scheme
@@ -53,7 +65,13 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 
 // getXcodeBuildSettings parses the xcodebuild output for a given workspace and scheme to return a map of all build settings
 func getXcodeBuildSettings(workspacePath, schemeName string) (map[string]string, error) {
-	cmd := exec.Command("xcodebuild", "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
+	var cmd *exec.Cmd
+	if isXcodebuildInstalled() {
+		cmd = exec.Command("xcodebuild", "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
+	} else {
+		return nil, errors.New("Unable to locate xcodebuild on this system.")
+	}
+
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -73,4 +91,15 @@ func getXcodeBuildSettings(workspacePath, schemeName string) (map[string]string,
 	}
 
 	return buildSettingsMap, nil
+}
+
+// isXcodebuildInstalled checks if xcodebuild is installed
+func isXcodebuildInstalled() bool {
+	cmd := exec.Command("xcodebuild", "-version")
+	err := cmd.Run()
+	if err != nil {
+		return false
+	}
+
+	return true
 }
