@@ -1,6 +1,10 @@
 package build
 
-import "github.com/bugsnag/bugsnag-cli/pkg/utils"
+import (
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/carlmjohnson/truthy"
+)
 
 type GeneralInfo struct {
 	ApiKey string
@@ -28,30 +32,78 @@ type CreateBuildInfo struct {
 	BuilderName       string
 	ReleaseStage      string
 	AppVersion        string
-	AutoAssignRelease bool
+	AutoAssignRelease *bool
 	MetaData          map[string]string
 }
 
 func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
+	var apiKey string
+
+	if truthy.Value(opts.GeneralInfo.ApiKey) {
+		apiKey = opts.GeneralInfo.ApiKey
+	} else {
+		apiKey = base.GeneralInfo.ApiKey
+	}
+
 	return CreateBuildInfo{
 		GeneralInfo: GeneralInfo{
-			ApiKey: utils.Xor(opts.GeneralInfo.ApiKey, base.GeneralInfo.ApiKey).(string),
+			ApiKey: apiKey,
 		},
 		AndroidInfo: AndroidInfo{
-			AppVersionCode: utils.Xor(opts.AndroidInfo.AppVersionCode, base.AndroidInfo.AppVersionCode).(string),
+			AppVersionCode: utils.ThisOrThat(opts.AndroidInfo.AppVersionCode, base.AndroidInfo.AppVersionCode).(string),
 		},
 		IosInfo: IosInfo{
-			AppBundleVersion: utils.Xor(opts.IosInfo.AppBundleVersion, base.IosInfo.AppBundleVersion).(string),
+			AppBundleVersion: utils.ThisOrThat(opts.IosInfo.AppBundleVersion, base.IosInfo.AppBundleVersion).(string),
 		},
 		SourceControl: SourceControl{
-			Provider:   utils.Xor(opts.SourceControl.Provider, base.SourceControl.Provider).(string),
-			Repository: utils.Xor(opts.SourceControl.Repository, base.SourceControl.Repository).(string),
-			Revision:   utils.Xor(opts.SourceControl.Revision, base.SourceControl.Revision).(string),
+			Provider:   utils.ThisOrThat(opts.SourceControl.Provider, base.SourceControl.Provider).(string),
+			Repository: utils.ThisOrThat(opts.SourceControl.Repository, base.SourceControl.Repository).(string),
+			Revision:   utils.ThisOrThat(opts.SourceControl.Revision, base.SourceControl.Revision).(string),
 		},
-		BuilderName:       utils.Xor(opts.BuilderName, base.BuilderName).(string),
-		ReleaseStage:      utils.Xor(opts.ReleaseStage, base.ReleaseStage).(string),
-		AppVersion:        utils.Xor(opts.AppVersion, base.AppVersion).(string),
-		AutoAssignRelease: utils.Xor(opts.AutoAssignRelease, base.AutoAssignRelease).(bool),
-		MetaData:          utils.Xor(opts.MetaData, base.MetaData).(map[string]string),
+		BuilderName:       utils.ThisOrThat(opts.BuilderName, base.BuilderName).(string),
+		ReleaseStage:      utils.ThisOrThat(opts.ReleaseStage, base.ReleaseStage).(string),
+		AppVersion:        utils.ThisOrThat(opts.AppVersion, base.AppVersion).(string),
+		AutoAssignRelease: utils.ThisOrThatBool(opts.AutoAssignRelease, base.AutoAssignRelease),
+		MetaData:          utils.ThisOrThat(opts.MetaData, base.MetaData).(map[string]string),
 	}
+}
+
+func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
+	return CreateBuildInfo{
+		GeneralInfo: GeneralInfo{ApiKey: opts.ApiKey},
+		AndroidInfo: AndroidInfo{AppVersionCode: opts.CreateBuild.VersionCode},
+		IosInfo:     IosInfo{AppBundleVersion: opts.CreateBuild.BundleVersion},
+		SourceControl: SourceControl{
+			Provider:   opts.CreateBuild.Provider,
+			Repository: opts.CreateBuild.Repository,
+			Revision:   opts.CreateBuild.Revision,
+		},
+		BuilderName:       opts.CreateBuild.BuilderName,
+		ReleaseStage:      opts.CreateBuild.ReleaseStage,
+		AppVersion:        opts.CreateBuild.VersionName,
+		AutoAssignRelease: &opts.CreateBuild.AutoAssignRelease,
+		MetaData:          opts.CreateBuild.Metadata,
+	}
+}
+
+func PopulateFromPath(path string) CreateBuildInfo {
+	return CreateBuildInfo{
+		GeneralInfo: GeneralInfo{ApiKey: "foobar"},
+		AndroidInfo: AndroidInfo{AppVersionCode: ""},
+		IosInfo:     IosInfo{AppBundleVersion: ""},
+		SourceControl: SourceControl{
+			Provider:   "",
+			Repository: utils.GetRepoUrl(path),
+			Revision:   utils.GetCommitHash(),
+		},
+		BuilderName:       utils.GetSystemUser(),
+		ReleaseStage:      "",
+		AppVersion:        "",
+		AutoAssignRelease: nil,
+		MetaData:          nil,
+	}
+}
+
+func TheGreatMerge(p1 CreateBuildInfo, p2 CreateBuildInfo) CreateBuildInfo {
+	return p1.Override(p2)
 }

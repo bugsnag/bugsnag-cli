@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -12,42 +14,8 @@ import (
 
 var package_version = "2.0.0"
 
-// Global CLI options
-type Globals struct {
-	UploadAPIRootUrl  string            `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
-	Port              int               `help:"Port number for the upload server" default:"443"`
-	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
-	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
-	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
-	DryRun            bool              `help:"Validate but do not process"`
-}
-
-// Unique CLI options
-type CLI struct {
-	Globals
-
-	Upload struct {
-		// shared options
-		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
-		Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
-		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
-
-		// required options
-		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
-		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-	} `cmd:"" help:"Upload symbol/mapping files"`
-	CreateBuild          build.CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
-	CreateAndroidBuildId build.CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
-}
-
 func main() {
-	commands := CLI{}
+	commands := options.CLI{}
 
 	// If running without any extra arguments, default to the --help flag
 	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
@@ -245,37 +213,45 @@ func main() {
 
 	case "create-build", "create-build <path>":
 
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
-		}
+		UserBuildOptions := build.PopulateFromCliOpts(commands)
+		PathBuildOptions := build.PopulateFromPath(commands.CreateBuild.Path[0])
+		FinalBuildOptions := build.TheGreatMerge(UserBuildOptions, PathBuildOptions)
 
-		// Build connection URI
-		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
-
-		if err != nil {
-			log.Error("Failed to build upload url: "+err.Error(), 1)
-		}
-
-		log.Info("Creating build on: " + endpoint)
-
-		buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
-			commands.CreateBuild.BuilderName,
-			commands.CreateBuild.ReleaseStage,
-			commands.CreateBuild.Provider,
-			commands.CreateBuild.Repository,
-			commands.CreateBuild.Revision,
-			commands.CreateBuild.VersionName,
-			commands.CreateBuild.VersionCode,
-			commands.CreateBuild.BundleVersion,
-			commands.CreateBuild.Metadata,
-			commands.CreateBuild.Path,
-			endpoint,
-			commands.DryRun,
-		)
-
-		if buildUploadError != nil {
-			log.Error(buildUploadError.Error(), 1)
-		}
+		fmt.Println(UserBuildOptions)
+		fmt.Println(PathBuildOptions)
+		fmt.Println(FinalBuildOptions)
+		//
+		//if commands.ApiKey == "" {
+		//	log.Error("no API key provided", 1)
+		//}
+		//
+		//// Build connection URI
+		//endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
+		//
+		//if err != nil {
+		//	log.Error("Failed to build upload url: "+err.Error(), 1)
+		//}
+		//
+		//log.Info("Creating build on: " + endpoint)
+		//
+		//buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
+		//	commands.CreateBuild.BuilderName,
+		//	commands.CreateBuild.ReleaseStage,
+		//	commands.CreateBuild.Provider,
+		//	commands.CreateBuild.Repository,
+		//	commands.CreateBuild.Revision,
+		//	commands.CreateBuild.VersionName,
+		//	commands.CreateBuild.VersionCode,
+		//	commands.CreateBuild.BundleVersion,
+		//	commands.CreateBuild.Metadata,
+		//	commands.CreateBuild.Path,
+		//	endpoint,
+		//	commands.DryRun,
+		//)
+		//
+		//if buildUploadError != nil {
+		//	log.Error(buildUploadError.Error(), 1)
+		//}
 
 		log.Success("Build created")
 
