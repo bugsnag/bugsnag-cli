@@ -28,7 +28,7 @@ func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
 		}
 	}
 
-	return false, nil
+	return false, errors.New("Unable to locate a suitable .xcworkspace file")
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given workspace path to return a slice of schemes
@@ -64,7 +64,7 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 }
 
 // getXcodeBuildSettings parses the xcodebuild output for a given workspace and scheme to return a map of all build settings
-func getXcodeBuildSettings(workspacePath, schemeName string) (map[string]string, error) {
+func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
 		cmd = exec.Command("xcodebuild", "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
@@ -80,17 +80,17 @@ func getXcodeBuildSettings(workspacePath, schemeName string) (map[string]string,
 	buildSettings := strings.SplitAfterN(string(output), "Build settings for action build and target ", 2)[1]
 	buildSettingsSlice := strings.Split(strings.ReplaceAll(buildSettings, " ", ""), "\n")
 
-	buildSettingsMap := make(map[string]string)
+	buildSettingsMap := make(map[string]*string)
 	for _, line := range buildSettingsSlice {
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) == 2 {
 			key := strings.TrimSpace(parts[0])
 			value := strings.TrimSpace(parts[1])
-			buildSettingsMap[key] = value
+			buildSettingsMap[key] = &value
 		}
 	}
 
-	return buildSettingsMap, nil
+	return &buildSettingsMap, nil
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed

@@ -24,7 +24,7 @@ type bugsnagProjectDetails struct {
 
 // GetPlistData returns the relevant content of a plist file as a PlistData struct
 func GetPlistData(plistFilePath string) (*PlistData, error) {
-	var plistData PlistData
+	var plistData *PlistData
 	var cmd *exec.Cmd
 
 	if utils.FileExists(plutilPath) {
@@ -43,5 +43,5 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 		return nil, errors.New("Unable to locate plutil in it's default location `/usr/bin/plutil` on this system.")
 	}
 
-	return &plistData, nil
+	return plistData, nil
 }
