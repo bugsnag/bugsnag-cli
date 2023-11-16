@@ -54,7 +54,7 @@
 	<key>bugsnag</key>
 	<dict>
 		<key>apiKey</key>
-		<string>b505868af9ae59596d7a5d9ea426f344</string>
+		<string>1234567890ABCDEF1234567890ABCDEF</string>
 	</dict>
 </dict>
 </plist>
