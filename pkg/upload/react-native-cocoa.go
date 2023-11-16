@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -28,8 +29,8 @@ type ReactNativeCocoa struct {
 
 func ProcessReactNativeCocoa(
 	apiKey string,
-	appVersion string,
-	appBundleVersion string,
+	versionName string,
+	bundleVersion string,
 	scheme string,
 	sourceMapPath string,
 	bundlePath string,
@@ -46,88 +47,124 @@ func ProcessReactNativeCocoa(
 	dryRun bool,
 ) error {
 
-	//var buildSettings *cocoa.XcodeBuildSettings
-	var plistData *cocoa.PlistData
+	var rootDirPath string
+	var buildSettings *cocoa.XcodeBuildSettings
 
 	for _, path := range paths {
+		// Check/Set the build folder
+		buildDirPath := filepath.Join(path, "ios", "build")
+		rootDirPath = path
+		if !utils.FileExists(buildDirPath) {
+			buildDirPath = filepath.Join(path, "build")
+
+			if utils.FileExists(buildDirPath) {
+				rootDirPath = filepath.Join(path, "..")
+
+			} else if bundlePath == "" || sourceMapPath == "" {
+				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+			}
+		}
 
 		// Set a default value for projectRoot if it's not defined
 		if projectRoot == "" {
-			projectRoot = path
+			projectRoot = rootDirPath
 		}
 
-		// Set a default value for xcworkspacePath if it's not defined
-		if xcworkspacePath == "" {
-			iosPath := filepath.Join(path, "ios")
-			workspacePath, err := utils.FindFolderWithSuffix(iosPath, ".xcworkspace")
+		// Check if we've got the bundle file path
+		if bundlePath == "" {
+			// Check to see if we have the xcworkspacePath
+			if xcworkspacePath == "" {
+				// If not, attempt to locate it in the path/ios/ folder
+				if utils.IsDir(filepath.Join(path, "ios")) {
+					workspacePath, err := utils.FindFolderWithSuffix(filepath.Join(path, "ios"), ".xcworkspace")
+					if err != nil {
+						return err
+					}
+					xcworkspacePath = workspacePath
+				} else {
+					return fmt.Errorf("unable to find xcworkspace file in your project, please specify the path using --xcworkspace")
+				}
+
+			}
+
+			// Check to see if we have a scheme
+			if scheme == "" {
+				// If not, work it out from the xcworkspace file
+				possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
+				schemeExists, err := cocoa.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+				if err != nil {
+					return err
+				}
+
+				if schemeExists {
+					scheme = possibleSchemeName
+				}
+			}
+
+			// Pull build settings from the xcworkspace file
+			buildSettings, err := cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
 			if err != nil {
 				return err
 			}
-			xcworkspacePath = workspacePath
+
+			// Build bundle path from CONFIGURATION_BUILD_DIR/main.jsbundle
+			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+			if !utils.FileExists(bundleFilePath) {
+				return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
+			}
+			bundlePath = bundleFilePath
+
 		}
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
 		if sourceMapPath == "" {
-			sourceMapPath = filepath.Join(path, "ios", "build", "sourcemaps", "main.jsbundle.map")
+			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
-				return errors.New("Could not find a suitable source map file, please specify the path by using `--source-map`")
+				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
 			}
 		}
 
-		// If the scheme is not defined, work out what the possible name is and retrieve all xcode schemes based on the xcworkspacePath
-		if scheme == "" {
-			possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-			schemeExists, err := cocoa.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+		// Check to see if we have the Info.Plist path
+		if plistPath == "" {
+			// If not, we need to build it from the build settings BUILT_PRODUCTS_DIR/INFOPLIST_PATH
+			plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+			if utils.FileExists(plistPathExpected) {
+				plistPath = plistPathExpected
+				log.Info("Found Info.plist at: " + plistPath)
+			} else {
+				log.Info("No Info.plist found at: " + plistPathExpected)
+			}
+		}
+
+		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
+			// Read data from the plist
+			plistData, err := cocoa.GetPlistData(plistPath)
 			if err != nil {
 				return err
 			}
 
-			if schemeExists {
-				scheme = possibleSchemeName
+			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+			if bundleVersion == "" {
+				bundleVersion = plistData.BundleVersion
+				log.Info("Using bundle version from Info.plist: " + bundleVersion)
 			}
-		}
 
-		buildSettings, err := cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
-		if err != nil {
-			return err
-		}
+			if versionName == "" {
+				versionName = plistData.VersionName
+				log.Info("Using version name from Info.plist: " + versionName)
 
-		// Set a default value for bundlePath if it's not defined and check that it exists before proceeding
-		if bundlePath == "" {
-			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
-			if !utils.FileExists(bundleFilePath) {
-				return errors.New("Could not find a suitable bundle file, please specify the path by using `--bundlePath`")
 			}
-			bundlePath = bundleFilePath
-		}
 
-		// Set a default value for plistPath if it's not defined
-		if plistPath == "" {
-			plistPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-		}
+			if apiKey == "" {
+				apiKey = plistData.BugsnagProjectDetails.ApiKey
+				log.Info("Using API key from Info.plist: " + apiKey)
+			}
 
-		// Fetch the plist data with the provided plistPath
-		plistData, err = cocoa.GetPlistData(plistPath)
-		if err != nil {
-			return err
-		}
-
-		// Set a default value for the relevant plist data needed for creating the upload options if they aren't already defined
-		if appBundleVersion == "" {
-			appBundleVersion = plistData.BundleVersion
-		}
-
-		if appVersion == "" {
-			appVersion = plistData.AppVersion
-		}
-
-		if apiKey == "" {
-			apiKey = plistData.BugsnagProjectDetails.ApiKey
 		}
 
 	}
 
-	uploadOptions, err := utils.BuildReactNativeUploadOptions(apiKey, appVersion, appBundleVersion, codeBundleId, dev, projectRoot, overwrite, "ios")
+	uploadOptions, err := utils.BuildReactNativeUploadOptions(apiKey, versionName, bundleVersion, codeBundleId, dev, projectRoot, overwrite, "ios")
 
 	if err != nil {
 		return err
