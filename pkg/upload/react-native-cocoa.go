@@ -46,7 +46,7 @@ func ProcessReactNativeCocoa(
 	dryRun bool,
 ) error {
 
-	var buildSettings *cocoa.XcodeBuildSettings
+	//var buildSettings *cocoa.XcodeBuildSettings
 	var plistData *cocoa.PlistData
 
 	for _, path := range paths {
@@ -83,53 +83,46 @@ func ProcessReactNativeCocoa(
 			}
 
 			if schemeExists {
-				// We can deduce that possibleSchemeName is the scheme name at this point, and can default to using it's value
 				scheme = possibleSchemeName
-				buildSettings, err = cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
-				if err != nil {
-					return err
-				}
-
-				// Set a default value for bundlePath if it's not defined and check that it exists before proceeding
-				if bundlePath == "" {
-					bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
-					if !utils.FileExists(bundleFilePath) {
-						return errors.New("Could not find a suitable bundle file, please specify the path by using `--bundlePath`")
-					}
-					bundlePath = bundleFilePath
-				}
-
-				// Set a default value for plistPath if it's not defined
-				if plistPath == "" {
-					plistPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-				}
-
-				// Fetch the plist data with the provided plistPath
-				plistData, err = cocoa.GetPlistData(plistPath)
-				if err != nil {
-					return err
-				}
-
-				// Set a default value for the relevant plist data needed for creating the upload options if they aren't already defined
-				if appBundleVersion == "" {
-					appBundleVersion = plistData.BundleVersion
-				}
-
-				if appVersion == "" {
-					appVersion = plistData.AppVersion
-				}
-
-				if apiKey == "" {
-					apiKey = plistData.BugsnagProjectDetails.ApiKey
-				}
-
-			} else {
-				return errors.New("Could not find a suitable scheme, please specify the scheme by using `--scheme`")
 			}
+		}
 
-			if err != nil {
-				return err
+		buildSettings, err := cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
+		if err != nil {
+			return err
+		}
+
+		// Set a default value for bundlePath if it's not defined and check that it exists before proceeding
+		if bundlePath == "" {
+			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+			if !utils.FileExists(bundleFilePath) {
+				return errors.New("Could not find a suitable bundle file, please specify the path by using `--bundlePath`")
 			}
+			bundlePath = bundleFilePath
+		}
+
+		// Set a default value for plistPath if it's not defined
+		if plistPath == "" {
+			plistPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+		}
+
+		// Fetch the plist data with the provided plistPath
+		plistData, err = cocoa.GetPlistData(plistPath)
+		if err != nil {
+			return err
+		}
+
+		// Set a default value for the relevant plist data needed for creating the upload options if they aren't already defined
+		if appBundleVersion == "" {
+			appBundleVersion = plistData.BundleVersion
+		}
+
+		if appVersion == "" {
+			appVersion = plistData.AppVersion
+		}
+
+		if apiKey == "" {
+			apiKey = plistData.BugsnagProjectDetails.ApiKey
 		}
 
 	}
