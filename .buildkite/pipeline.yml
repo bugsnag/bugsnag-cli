@@ -73,7 +73,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: ":go::mag: Lint Code"
+  - label: ":golangci-lint: Lint Code"
     depends_on: build
     commands:
       - make lint-code
