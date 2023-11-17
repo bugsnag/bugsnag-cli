@@ -48,6 +48,11 @@ unit-test:
 fmt:
 	gofmt -w ./
 
+.PHONY: lint-code
+lint-code:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	golangci-lint run
+
 .PHONY: bump
 bump:
 ifneq ($(shell git diff --staged),)
