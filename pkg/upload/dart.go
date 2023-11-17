@@ -4,7 +4,6 @@ import (
 	"debug/elf"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,8 +29,6 @@ type DartSymbolOptions struct {
 func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
 
 	log.Info("Building fileName list from path")
-
-	ioutil.ReadFile("delete me")
 
 	fileList, err := utils.BuildFileList(paths)
 	numberOfFiles := len(fileList)
