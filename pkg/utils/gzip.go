@@ -29,9 +29,11 @@ func GzipCompress(file string) (string, error) {
 	}
 
 	w := gzip.NewWriter(gzipFile)
-	io.Copy(w, read)
-
-	w.Close()
+	defer w.Close()
+	_, err = io.Copy(w, read)
+	if err != nil {
+		return "", err
+	}
 
 	return newFile, nil
 }

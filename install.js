@@ -2,7 +2,9 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const yaml = require('js-yaml');
 
+const supportedPlatformsConfig = fs.readFileSync(path.join(__dirname, 'supported-platforms.yml'), 'utf8');
 const { name, repository, version } = require('./package.json');
 
 const handleError = (msg) => {
@@ -17,44 +19,8 @@ const removeGitPrefixAndSuffix = (input) => {
     return result;
 };
 
-const supportedPlatforms = [
-    {
-        TYPE: 'Windows',
-        ARCHITECTURE: 'x64',
-        ARTIFACT_NAME: 'x86_64-windows-bugsnag-cli.exe',
-        BINARY_NAME: 'bugsnag-cli.exe'
-    },
-    {
-        TYPE: 'Windows',
-        ARCHITECTURE: 'i386',
-        ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe',
-        BINARY_NAME: 'bugsnag-cli.exe'
-    },
-    {
-        TYPE: 'Linux',
-        ARCHITECTURE: 'x64',
-        ARTIFACT_NAME: 'x86_64-linux-bugsnag-cli',
-        BINARY_NAME: 'bugsnag-cli'
-    },
-    {
-        TYPE: 'Linux',
-        ARCHITECTURE: 'i386',
-        ARTIFACT_NAME: 'i386-linux-bugsnag-cli',
-        BINARY_NAME: 'bugsnag-cli'
-    },
-    {
-        TYPE: 'Darwin',
-        ARCHITECTURE: 'x64',
-        ARTIFACT_NAME: 'x86_64-macos-bugsnag-cli',
-        BINARY_NAME: 'bugsnag-cli'
-    },
-    {
-        TYPE: 'Darwin',
-        ARCHITECTURE: 'arm64',
-        ARTIFACT_NAME: 'arm64-macos-bugsnag-cli',
-        BINARY_NAME: 'bugsnag-cli'
-    }
-];
+// Parse supported-platforms.yml into an iterable array
+const supportedPlatforms = yaml.load(supportedPlatformsConfig);
 
 const getPlatformMetadata = () => {
     const type = os.type();

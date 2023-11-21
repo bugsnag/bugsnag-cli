@@ -59,6 +59,9 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 		return nil, err
 	}
 	err = mapstructure.Decode(allBuildSettings, &buildSettings)
+	if err != nil {
+		return nil, err
+	}
 
 	return &buildSettings, nil
 }
@@ -97,9 +100,5 @@ func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*strin
 func isXcodebuildInstalled() bool {
 	cmd := exec.Command("xcodebuild", "-version")
 	err := cmd.Run()
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
