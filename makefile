@@ -51,7 +51,7 @@ fmt:
 
 .PHONY: npm-lint
 npm-lint:
-	npm pack
+	npm i && npm pack
 	npm install -g npm-check
 	npm-check
 
