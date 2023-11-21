@@ -23,7 +23,7 @@
   },
   "files": [
     "install.js",
-    "yml"
+    "supported-platforms.yml"
   ],
   "scripts": {
     "postinstall": "node install.js"
