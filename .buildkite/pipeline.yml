@@ -73,6 +73,10 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: ":golangci-lint: Lint Code"
+  - label: ":lint-roller::go: Lint Go Code"
     commands:
-      - make lint-code
+      - make go-lint
+
+  - label: ":lint-roller::js: Lint JS Code"
+    commands:
+      - make js-lint

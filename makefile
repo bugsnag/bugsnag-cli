@@ -48,8 +48,15 @@ unit-test:
 fmt:
 	gofmt -w ./
 
-.PHONY: lint-code
-lint-code:
+
+.PHONY: js-lint
+js-lint:
+	npm pack
+	npm install -g npm-check
+	npm-check
+
+.PHONY: go-lint
+go-lint:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
 	golangci-lint run
 
