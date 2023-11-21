@@ -3,7 +3,9 @@ package upload
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -74,7 +76,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 					}
 				} else {
 					if variantFileFormat != "" {
-						variantDirName = fmt.Sprintf(variantFileFormat, strings.Title(variant))
+						variantDirName = fmt.Sprintf(variantFileFormat,
+							cases.Title(language.Und, cases.NoLower).String(variant))
+
 					} else {
 						variantDirName = variant
 					}
