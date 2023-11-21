@@ -22,7 +22,8 @@
     "js-yaml": "^4.1.0"
   },
   "files": [
-    "install.js"
+    "install.js",
+    "yml"
   ],
   "scripts": {
     "postinstall": "node install.js"
