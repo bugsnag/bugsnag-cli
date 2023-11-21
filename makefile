@@ -49,8 +49,8 @@ fmt:
 	gofmt -w ./
 
 
-.PHONY: js-lint
-js-lint:
+.PHONY: npm-lint
+npm-lint:
 	npm pack
 	npm install -g npm-check
 	npm-check
