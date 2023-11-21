@@ -48,7 +48,7 @@ func ProcessReactNativeCocoa(
 ) error {
 
 	var rootDirPath string
-	//var buildSettings *cocoa.XcodeBuildSettings
+	var buildSettings *cocoa.XcodeBuildSettings
 
 	for _, path := range paths {
 		// Check/Set the build folder
@@ -71,7 +71,8 @@ func ProcessReactNativeCocoa(
 		}
 
 		// Check if we're missing any of these parameters
-		if bundlePath == "" || sourceMapPath == "" || apiKey == "" || versionName == "" || bundleVersion == "" {
+		if bundlePath == "" || plistPath == "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
+
 			// Check to see if we have the xcworkspacePath
 			if xcworkspacePath == "" {
 				// If not, attempt to locate it in the path/ios/ folder
@@ -107,21 +108,6 @@ func ProcessReactNativeCocoa(
 				return err
 			}
 
-			// Build bundle path from CONFIGURATION_BUILD_DIR/main.jsbundle
-			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
-			if !utils.FileExists(bundleFilePath) {
-				return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
-			}
-			bundlePath = bundleFilePath
-
-			// Set a sourceMapPath if it's not defined and check that it exists before proceeding
-			if sourceMapPath == "" {
-				sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
-				if !utils.FileExists(sourceMapPath) {
-					return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
-				}
-			}
-
 			// Check to see if we have the Info.Plist path
 			if plistPath == "" {
 				// If not, we need to build it from the build settings BUILT_PRODUCTS_DIR/INFOPLIST_PATH
@@ -133,6 +119,23 @@ func ProcessReactNativeCocoa(
 					log.Info("No Info.plist found at: " + plistPathExpected)
 				}
 			}
+		}
+
+		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
+		if sourceMapPath == "" {
+			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
+			if !utils.FileExists(sourceMapPath) {
+				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
+			}
+		}
+
+		if bundlePath == "" {
+			// Build bundle path from CONFIGURATION_BUILD_DIR/main.jsbundle
+			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+			if !utils.FileExists(bundleFilePath) {
+				return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
+			}
+			bundlePath = bundleFilePath
 		}
 
 		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
