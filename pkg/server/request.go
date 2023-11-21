@@ -3,13 +3,14 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 )
 
 // BuildFileRequest - Create a multi-part form request adding a file as a parameter
@@ -30,11 +31,17 @@ func BuildFileRequest(url string, fieldData map[string]string, fileFieldData map
 			return nil, err
 		}
 
-		io.Copy(part, file)
+		_, err = io.Copy(part, file)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for key, value := range fieldData {
-		writer.WriteField(key, value)
+		err := writer.WriteField(key, value)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	writer.Close()

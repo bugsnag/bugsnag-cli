@@ -37,9 +37,7 @@ func BuildFileList(paths []string) ([]string, error) {
 			if err != nil {
 				return nil, err
 			}
-			for _, s := range files {
-				fileList = append(fileList, s)
-			}
+			fileList = append(fileList, files...)
 		} else {
 			fileList = append(fileList, path)
 		}
