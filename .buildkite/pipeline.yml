@@ -74,6 +74,5 @@ steps:
           - maze_output/**/*
 
   - label: ":golangci-lint: Lint Code"
-    depends_on: build
     commands:
       - make lint-code
