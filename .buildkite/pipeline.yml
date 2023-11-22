@@ -16,6 +16,14 @@ steps:
     commands:
       - make unit-test
 
+  - label: ":lint-roller::go: Lint Go Code"
+    commands:
+      - make go-lint
+
+  - label: ":lint-roller::npm: Lint NPM Dependencies"
+    commands:
+      - make npm-lint
+
   - label: CLI Integration Tests
     depends_on: build
     commands:
@@ -85,11 +93,3 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
-
-  - label: ":lint-roller::go: Lint Go Code"
-    commands:
-      - make go-lint
-
-  - label: ":lint-roller::npm: Lint NPM Dependencies"
-    commands:
-      - make npm-lint
