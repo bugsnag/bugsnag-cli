@@ -95,7 +95,6 @@ features/base-fixtures/rn0_69/android:
 
 .PHONY: features/base-fixtures/rn0_69/ios
 features/base-fixtures/rn0_69/ios:
-	env
 	cd $@/../ && npm i && bundle install
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build

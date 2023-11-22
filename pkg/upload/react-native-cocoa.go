@@ -2,6 +2,7 @@ package upload
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -103,7 +104,8 @@ func ProcessReactNativeCocoa(
 			}
 
 			// Pull build settings from the xcworkspace file
-			buildSettings, err := cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
+			var err error
+			buildSettings, err = cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
 			if err != nil {
 				return err
 			}
@@ -123,9 +125,14 @@ func ProcessReactNativeCocoa(
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
 		if sourceMapPath == "" {
+			// If this environment variable is set, use it to override default path 'buildDirPath'
+			sourceMapFileEnvVar := os.Getenv("SOURCEMAP_FILE")
+			if sourceMapFileEnvVar != "" {
+				buildDirPath = sourceMapFileEnvVar
+			}
 			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
-				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
+				return errors.Errorf("Could not find a suitable source map file in %s, please specify the path by using --source-map", sourceMapPath)
 			}
 		}
 
