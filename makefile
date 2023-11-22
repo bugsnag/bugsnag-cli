@@ -95,14 +95,15 @@ features/base-fixtures/rn0_69/android:
 
 .PHONY: features/base-fixtures/rn0_69/ios
 features/base-fixtures/rn0_69/ios:
+	env
 	cd $@/../ && npm i && bundle install
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
 
 .PHONY: features/base-fixtures/rn0_70/android
 features/base-fixtures/rn0_70/android:
-	cd $@ && npm i
-	cd $@/android && ./gradlew bundleRelease
+	cd $@/../ && npm i
+	cd $@ && ./gradlew bundleRelease
 
 .PHONY: features/base-fixtures/rn0_70/ios
 features/base-fixtures/rn0_70/ios:
@@ -112,8 +113,8 @@ features/base-fixtures/rn0_70/ios:
 
 .PHONY: features/base-fixtures/rn0_72/android
 features/base-fixtures/rn0_72/android:
-	cd $@ && npm i
-	cd $@/android && ./gradlew bundleRelease
+	cd $@/../ && npm i
+	cd $@ && ./gradlew bundleRelease
 
 .PHONY: features/base-fixtures/rn0_72/ios
 features/base-fixtures/rn0_72/ios:
