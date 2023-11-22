@@ -114,6 +114,10 @@ func ProcessReactNativeCocoa(
 			if plistPath == "" {
 				// If not, we need to build it from the build settings BUILT_PRODUCTS_DIR/INFOPLIST_PATH
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+				entries, _ := os.ReadDir(buildSettings.ConfigurationBuildDir)
+				for _, e := range entries {
+					fmt.Println(e.Name())
+				}
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
 					log.Info("Found Info.plist at: " + plistPath)
