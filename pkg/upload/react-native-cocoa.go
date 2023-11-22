@@ -119,6 +119,8 @@ func ProcessReactNativeCocoa(
 					log.Info("Found Info.plist at: " + plistPath)
 				} else {
 					log.Info("No Info.plist found at: " + plistPathExpected)
+					plistPathExpected = buildSettings.ProductSettingsPath
+					log.Info("Using Info.plist found at: " + plistPathExpected)
 				}
 			}
 		}
@@ -132,7 +134,7 @@ func ProcessReactNativeCocoa(
 			}
 			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
-				return errors.Errorf("Could not find a suitable source map file in %s, please specify the path by using --source-map", sourceMapPath)
+				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
 			}
 		}
 
