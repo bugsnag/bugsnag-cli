@@ -119,8 +119,6 @@ func ProcessReactNativeCocoa(
 					log.Info("Found Info.plist at: " + plistPath)
 				} else {
 					log.Info("No Info.plist found at: " + plistPathExpected)
-					plistPathExpected = buildSettings.ProductSettingsPath
-					log.Info("Using Info.plist found at: " + plistPathExpected)
 				}
 			}
 		}
