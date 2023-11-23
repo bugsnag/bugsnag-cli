@@ -48,6 +48,16 @@ unit-test:
 fmt:
 	gofmt -w ./
 
+
+.PHONY: npm-lint
+npm-lint:
+	npm i && npm install -g npm-check && npm-check
+
+.PHONY: go-lint
+go-lint:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	golangci-lint run
+
 .PHONY: bump
 bump:
 ifneq ($(shell git diff --staged),)

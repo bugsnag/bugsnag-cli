@@ -36,6 +36,4 @@ func BuildObjcopyPath(path string) (string, error) {
 
 		return filepath.Join(directoryMatches[0], "llvm-objcopy"), nil
 	}
-
-	return "", nil
 }

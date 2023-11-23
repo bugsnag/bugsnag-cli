@@ -1,0 +1,29 @@
+- TYPE: 'Windows'
+  ARCHITECTURE: 'x64'
+  ARTIFACT_NAME: 'x86_64-windows-bugsnag-cli.exe'
+  BINARY_NAME: 'bugsnag-cli.exe'
+
+- TYPE: 'Windows'
+  ARCHITECTURE: 'i386'
+  ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe'
+  BINARY_NAME: 'bugsnag-cli.exe'
+
+- TYPE: 'Linux'
+  ARCHITECTURE: 'x64'
+  ARTIFACT_NAME: 'x86_64-linux-bugsnag-cli'
+  BINARY_NAME: 'bugsnag-cli'
+
+- TYPE: 'Linux'
+  ARCHITECTURE: 'i386'
+  ARTIFACT_NAME: 'i386-linux-bugsnag-cli'
+  BINARY_NAME: 'bugsnag-cli'
+
+- TYPE: 'Darwin'
+  ARCHITECTURE: 'x64'
+  ARTIFACT_NAME: 'x86_64-macos-bugsnag-cli'
+  BINARY_NAME: 'bugsnag-cli'
+
+- TYPE: 'Darwin'
+  ARCHITECTURE: 'arm64'
+  ARTIFACT_NAME: 'arm64-macos-bugsnag-cli'
+  BINARY_NAME: 'bugsnag-cli'
