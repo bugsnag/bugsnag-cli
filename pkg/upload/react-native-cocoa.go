@@ -112,7 +112,7 @@ func ProcessReactNativeCocoa(
 
 			// Check to see if we have the Info.Plist path
 			if plistPath == "" {
-				// If not, we need to build it from the build settings BUILT_PRODUCTS_DIR/INFOPLIST_PATH
+				// If not, we need to build it from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
@@ -136,8 +136,8 @@ func ProcessReactNativeCocoa(
 			}
 		}
 
+		// Set a bundlePath if it's not defined and check that it exists before proceeding
 		if bundlePath == "" {
-			// Build bundle path from CONFIGURATION_BUILD_DIR/main.jsbundle
 			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
 			if !utils.FileExists(bundleFilePath) {
 				return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
