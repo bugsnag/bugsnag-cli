@@ -2,7 +2,7 @@ package android
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -12,7 +12,7 @@ import (
 func BuildVariantsList(path string) ([]string, error) {
 	var variants []string
 
-	fileInfo, err := ioutil.ReadDir(path)
+	fileInfo, err := os.ReadDir(path)
 
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func BuildVariantsList(path string) ([]string, error) {
 func GetVariantDirectory(path string) (string, error) {
 	var variants []string
 
-	fileInfo, err := ioutil.ReadDir(path)
+	fileInfo, err := os.ReadDir(path)
 
 	if err != nil {
 		return "", err
