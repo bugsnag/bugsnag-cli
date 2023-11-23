@@ -132,7 +132,7 @@ func ProcessReactNativeCocoa(
 			}
 			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
-				return errors.Errorf("Could not find a suitable source map file in %s, please specify the path by using --source-map", sourceMapPath)
+				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
 			}
 		}
 
