@@ -125,12 +125,17 @@ func ProcessReactNativeIos(
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
 		if sourceMapPath == "" {
-			// If this environment variable is set, use it to override default path 'buildDirPath'
 			sourceMapFileEnvVar := os.Getenv("SOURCEMAP_FILE")
+
+			// Depending on the value of the SOURCEMAP_FILE environment variable, we will either use the build directory or the value of the environment variable to locate the source map file
+			var sourceMapPathToUse string
 			if sourceMapFileEnvVar != "" {
-				buildDirPath = sourceMapFileEnvVar
+				sourceMapPathToUse = buildDirPath
+			} else {
+				sourceMapPathToUse = sourceMapFileEnvVar
 			}
-			sourceMapPath = filepath.Join(buildDirPath, "sourcemaps", "main.jsbundle.map")
+
+			sourceMapPath = filepath.Join(sourceMapPathToUse, "sourcemaps", "main.jsbundle.map")
 			if !utils.FileExists(sourceMapPath) {
 				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
 			}

@@ -30,7 +30,7 @@ func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
 		}
 	}
 
-	return false, errors.New("Unable to locate a suitable .xcworkspace file")
+	return false, errors.Errorf("Unable to locate scheme '%s' in the workspace file located at '%s'", schemeToFind, workspacePath)
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given workspace path to return a slice of schemes
