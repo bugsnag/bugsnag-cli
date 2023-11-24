@@ -33,7 +33,7 @@ func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
 func getXcodeSchemes(workspacePath string) ([]string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
-		cmd = exec.Command("xcodebuild", "-workspace", workspacePath, "-list")
+		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", workspacePath, "-list")
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
 	}
@@ -68,7 +68,7 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
-		cmd = exec.Command("xcodebuild", "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
+		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
 	}
