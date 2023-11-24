@@ -90,7 +90,7 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 			platformSpecificTerminology = "bundle version"
 		}
 
-		return nil, fmt.Errorf("you must set at least the version name, %s or code bundle ID to uniquely identify the build", platformSpecificTerminology)
+		return nil, fmt.Errorf("you must set at least the version name, %s and code bundle ID to uniquely identify the build", platformSpecificTerminology)
 	}
 
 	if apiKey != "" {
