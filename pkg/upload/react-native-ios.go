@@ -129,10 +129,10 @@ func ProcessReactNativeIos(
 
 			// Depending on the value of the SOURCEMAP_FILE environment variable, we will either use the build directory or the value of the environment variable to locate the source map file
 			var sourceMapPathToUse string
-			if sourceMapFileEnvVar != "" {
-				sourceMapPathToUse = sourceMapFileEnvVar
-			} else {
+			if sourceMapFileEnvVar == "" {
 				sourceMapPathToUse = buildDirPath
+			} else {
+				sourceMapPathToUse = sourceMapFileEnvVar
 			}
 
 			sourceMapPath = filepath.Join(sourceMapPathToUse, "sourcemaps", "main.jsbundle.map")
