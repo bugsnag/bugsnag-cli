@@ -1,4 +1,4 @@
-package cocoa
+package ios
 
 import (
 	"encoding/json"

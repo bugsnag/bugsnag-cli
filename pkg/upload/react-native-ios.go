@@ -8,13 +8,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/bugsnag/bugsnag-cli/pkg/cocoa"
+	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type ReactNativeCocoa struct {
+type ReactNativeIos struct {
 	VersionName   string      `help:"The version of the application."`
 	BundleVersion string      `help:"Bundle version for the application. (iOS only)"`
 	Scheme        string      `help:"The name of the scheme to use when building the application."`
@@ -28,7 +28,7 @@ type ReactNativeCocoa struct {
 	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
-func ProcessReactNativeCocoa(
+func ProcessReactNativeIos(
 	apiKey string,
 	versionName string,
 	bundleVersion string,
@@ -49,7 +49,7 @@ func ProcessReactNativeCocoa(
 ) error {
 
 	var rootDirPath string
-	var buildSettings *cocoa.XcodeBuildSettings
+	var buildSettings *ios.XcodeBuildSettings
 
 	for _, path := range paths {
 		// Check/Set the build folder
@@ -93,7 +93,7 @@ func ProcessReactNativeCocoa(
 			if scheme == "" {
 				// If not, work it out from the xcworkspace file
 				possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-				schemeExists, err := cocoa.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+				schemeExists, err := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
 				if err != nil {
 					return err
 				}
@@ -105,7 +105,7 @@ func ProcessReactNativeCocoa(
 
 			// Pull build settings from the xcworkspace file
 			var err error
-			buildSettings, err = cocoa.GetXcodeBuildSettings(xcworkspacePath, scheme)
+			buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
 			if err != nil {
 				return err
 			}
@@ -147,7 +147,7 @@ func ProcessReactNativeCocoa(
 
 		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
 			// Read data from the plist
-			plistData, err := cocoa.GetPlistData(plistPath)
+			plistData, err := ios.GetPlistData(plistPath)
 			if err != nil {
 				return err
 			}

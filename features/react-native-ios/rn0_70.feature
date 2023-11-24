@@ -1,7 +1,7 @@
-Feature: React Native 0.70 Cocoa Integration Tests
+Feature: React Native 0.70 iOS Integration Tests
 
-  Scenario: Upload a single React Native 0.70 Cocoa sourcemap using all CLI flags
-    When I run bugsnag-cli with upload react-native-cocoa --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --source-map=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle.map --plist=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/Info.plist --xcworkspace=features/react-native-cocoa/fixtures/rn0_72/ios/bugsnag_cli_test.xcworkspace --scheme=bugsnag_cli_test --code-bundle-id=1.0-15 --version-name=1.0 --bundle-version=1
+  Scenario: Upload a single React Native 0.70 iOS sourcemap using all CLI flags
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --source-map=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle.map --plist=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/Info.plist --xcworkspace=features/react-native-ios/fixtures/rn0_72/ios/bugsnag_cli_test.xcworkspace --scheme=bugsnag_cli_test --code-bundle-id=1.0-15 --version-name=1.0 --bundle-version=1
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -13,8 +13,8 @@ Feature: React Native 0.70 Cocoa Integration Tests
     And the sourcemap payload field "platform" equals "ios"
     And the sourcemap payload field "overwrite" equals "true"
 
-  Scenario: Upload a single React Native 0.70 Cocoa sourcemap providing the bundle, source-map and plist flags
-    When I run bugsnag-cli with upload react-native-cocoa --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --source-map=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle.map --plist=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/Info.plist
+  Scenario: Upload a single React Native 0.70 iOS sourcemap providing the bundle, source-map and plist flags
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --source-map=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle.map --plist=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/Info.plist
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -24,8 +24,8 @@ Feature: React Native 0.70 Cocoa Integration Tests
     And the sourcemap payload field "platform" equals "ios"
     And the sourcemap payload field "overwrite" equals "true"
 
-  Scenario: Upload a single React Native 0.70 Cocoa sourcemap without a source-map flag
-    When I run bugsnag-cli with upload react-native-cocoa --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --plist=features/react-native-cocoa/fixtures/rn0_72/ios/build/sourcemaps/Info.plist --xcworkspace=features/react-native-cocoa/fixtures/rn0_72/ios/bugsnag_cli_test.xcworkspace --scheme=bugsnag_cli_test --code-bundle-id=1.0-15 --version-name=1.0 --bundle-version=1 features/react-native-cocoa/fixtures/rn0_72
+  Scenario: Upload a single React Native 0.70 iOS sourcemap without a source-map flag
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --bundle=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/main.jsbundle --plist=features/react-native-ios/fixtures/rn0_72/ios/build/sourcemaps/Info.plist --xcworkspace=features/react-native-ios/fixtures/rn0_72/ios/bugsnag_cli_test.xcworkspace --scheme=bugsnag_cli_test --code-bundle-id=1.0-15 --version-name=1.0 --bundle-version=1 features/react-native-ios/fixtures/rn0_72
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -35,11 +35,11 @@ Feature: React Native 0.70 Cocoa Integration Tests
     And the sourcemap payload field "platform" equals "ios"
     And the sourcemap payload field "overwrite" equals "true"
 
-  Scenario: Build and Upload React Native 0.70 Cocoa sourcemaps
+  Scenario: Build and Upload React Native 0.70 iOS sourcemaps
     When I make the "features/base-fixtures/rn0_70/ios"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload react-native-cocoa --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev features/base-fixtures/rn0_70
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev features/base-fixtures/rn0_70
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data

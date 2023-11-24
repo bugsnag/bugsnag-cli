@@ -81,12 +81,12 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: React Native Cocoa Integration Tests
+  - label: React Native iOS Integration Tests
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner features/react-native-cocoa
+      - bundle exec maze-runner features/react-native-ios
     plugins:
       artifacts#v1.5.0:
         download:
