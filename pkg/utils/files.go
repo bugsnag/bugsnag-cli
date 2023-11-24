@@ -131,6 +131,7 @@ func ExtractFile(file string, slug string) (string, error) {
 	return tempDir, nil
 }
 
+// FindFolderWithSuffix finds a folder with a given suffix
 func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
 	var matchingFolder string
 
