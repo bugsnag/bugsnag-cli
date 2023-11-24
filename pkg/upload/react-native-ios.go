@@ -111,7 +111,7 @@ func ProcessReactNativeIos(
 			}
 
 			// Check to see if we have the Info.Plist path
-			if plistPath == "" {
+			if plistPath == "" || !utils.FileExists(plistPath) {
 				// If not, we need to build it from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
@@ -130,9 +130,9 @@ func ProcessReactNativeIos(
 			// Depending on the value of the SOURCEMAP_FILE environment variable, we will either use the build directory or the value of the environment variable to locate the source map file
 			var sourceMapPathToUse string
 			if sourceMapFileEnvVar != "" {
-				sourceMapPathToUse = buildDirPath
-			} else {
 				sourceMapPathToUse = sourceMapFileEnvVar
+			} else {
+				sourceMapPathToUse = buildDirPath
 			}
 
 			sourceMapPath = filepath.Join(sourceMapPathToUse, "sourcemaps", "main.jsbundle.map")
