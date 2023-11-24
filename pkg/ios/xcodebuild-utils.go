@@ -100,5 +100,5 @@ func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*strin
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
 func isXcodebuildInstalled() bool {
-	return utils.FindLocationOf(utils.XCODEBUILD) != ""
+	return utils.LocationOf(utils.XCODEBUILD) != ""
 }

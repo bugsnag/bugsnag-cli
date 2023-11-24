@@ -10,8 +10,8 @@ const (
 	XCODEBUILD = "xcodebuild"
 )
 
-// FindLocationOf returns the path of the executable file associated with the given command.
-func FindLocationOf(something string) string {
+// LocationOf returns the path of the executable file associated with the given command.
+func LocationOf(something string) string {
 	cmd := exec.Command("which", something)
 	location, _ := cmd.Output()
 	return strings.TrimSpace(string(location))

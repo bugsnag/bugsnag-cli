@@ -26,7 +26,7 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 	var cmd *exec.Cmd
 
 	if isPlutilInstalled() {
-		cmd = exec.Command(utils.FindLocationOf(utils.PLUTIL), "-convert", "json", "-o", "-", plistFilePath)
+		cmd = exec.Command(utils.LocationOf(utils.PLUTIL), "-convert", "json", "-o", "-", plistFilePath)
 
 		output, err := cmd.Output()
 		if err != nil {
@@ -46,5 +46,5 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 
 // isPlutilInstalled checks if plutil is installed by checking if there is a path returned for it
 func isPlutilInstalled() bool {
-	return utils.FindLocationOf(utils.PLUTIL) != ""
+	return utils.LocationOf(utils.PLUTIL) != ""
 }
