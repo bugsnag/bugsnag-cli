@@ -83,10 +83,7 @@ func ProcessReactNativeIos(
 						return err
 					}
 					xcworkspacePath = workspacePath
-				} else {
-					return fmt.Errorf("unable to find xcworkspace file in your project, please specify the path using --xcworkspace")
 				}
-
 			}
 
 			// Check to see if we have a scheme

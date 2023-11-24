@@ -19,11 +19,7 @@ type XcodeBuildSettings struct {
 
 // IsSchemeInWorkspace checks if a scheme is in a given workspace
 func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
-	schemes, err := getXcodeSchemes(workspacePath)
-	if err != nil {
-		return false, err
-	}
-
+	schemes, _ := getXcodeSchemes(workspacePath)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
 			return true, nil
