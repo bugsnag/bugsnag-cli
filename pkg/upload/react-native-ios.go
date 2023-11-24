@@ -84,31 +84,38 @@ func ProcessReactNativeIos(
 					}
 					xcworkspacePath = workspacePath
 				}
+			} else {
+				if !utils.FileExists(xcworkspacePath) {
+					return errors.New("Could not find a suitable xcworkspace file, please specify the path by using --xcworkspace")
+				}
 			}
 
 			// Check to see if we have a scheme
 			if scheme == "" {
 				// If not, work it out from the xcworkspace file
 				possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-				schemeExists, err := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
-				if err != nil {
-					return err
-				}
-
+				schemeExists, _ := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
 				if schemeExists {
 					scheme = possibleSchemeName
+				}
+			} else {
+				_, err := ios.IsSchemeInWorkspace(xcworkspacePath, scheme)
+				if err != nil {
+					return err
 				}
 			}
 
 			// Pull build settings from the xcworkspace file
-			var err error
-			buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
-			if err != nil {
-				return err
+			if scheme != "" {
+				var err error
+				buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
+				if err != nil {
+					return err
+				}
 			}
 
 			// Check to see if we have the Info.Plist path
-			if plistPath == "" || !utils.FileExists(plistPath) {
+			if plistPath == "" {
 				// If not, we need to build it from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
@@ -117,7 +124,25 @@ func ProcessReactNativeIos(
 				} else {
 					log.Info("No Info.plist found at: " + plistPathExpected)
 				}
+			} else {
+				if !utils.FileExists(plistPath) {
+					return errors.New("Could not find a suitable Info.plist file, please specify the path by using --plist")
+				}
 			}
+
+			// Set a bundlePath if it's not defined and check that it exists before proceeding
+			if bundlePath == "" {
+				bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+				if !utils.FileExists(bundleFilePath) {
+					return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
+				}
+				bundlePath = bundleFilePath
+			}
+		}
+
+		// If we have a bundlePath provided, check that it exists and error out if it doesn't
+		if !utils.FileExists(bundlePath) {
+			return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
 		}
 
 		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
@@ -138,13 +163,9 @@ func ProcessReactNativeIos(
 			}
 		}
 
-		// Set a bundlePath if it's not defined and check that it exists before proceeding
-		if bundlePath == "" {
-			bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
-			if !utils.FileExists(bundleFilePath) {
-				return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
-			}
-			bundlePath = bundleFilePath
+		// If we have a sourceMapPath provided, check that it exists and error out if it doesn't
+		if !utils.FileExists(sourceMapPath) {
+			return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
 		}
 
 		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
