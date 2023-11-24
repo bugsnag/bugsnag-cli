@@ -22,11 +22,13 @@ type bugsnagProjectDetails struct {
 
 // GetPlistData returns the relevant content of a plist file as a PlistData struct
 func GetPlistData(plistFilePath string) (*PlistData, error) {
+	var plutilLocation string
 	var plistData *PlistData
 	var cmd *exec.Cmd
 
 	if isPlutilInstalled() {
-		cmd = exec.Command(utils.LocationOf(utils.PLUTIL), "-convert", "json", "-o", "-", plistFilePath)
+		plutilLocation = utils.LocationOf(utils.PLUTIL)
+		cmd = exec.Command(plutilLocation, "-convert", "json", "-o", "-", plistFilePath)
 
 		output, err := cmd.Output()
 		if err != nil {
@@ -38,7 +40,7 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 			return nil, err
 		}
 	} else {
-		return nil, errors.New("Unable to locate plutil in it's default location `/usr/bin/plutil` on this system.")
+		return nil, errors.Errorf("Unable to locate plutil in `%s` on this system.", plutilLocation)
 	}
 
 	return plistData, nil
