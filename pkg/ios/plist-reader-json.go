@@ -9,7 +9,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-const plutilPath = "/usr/bin/plutil"
+var plutilPath = utils.FindLocationOf(utils.PLUTIL)
 
 // PlistData contains the relevant content of a plist file for uploading to bugsnag
 type PlistData struct {

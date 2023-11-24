@@ -6,6 +6,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
@@ -96,9 +98,7 @@ func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*strin
 	return &buildSettingsMap, nil
 }
 
-// isXcodebuildInstalled checks if xcodebuild is installed
+// isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
 func isXcodebuildInstalled() bool {
-	cmd := exec.Command("xcodebuild", "-version")
-	err := cmd.Run()
-	return err == nil
+	return utils.FindLocationOf(utils.XCODEBUILD) != ""
 }
