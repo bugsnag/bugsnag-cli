@@ -10,17 +10,11 @@ import (
 
 func TestSetBuilderName(t *testing.T) {
 	t.Log("Test setting builders name")
-	results, err := build.SetBuilderName("foobar")
-	if err != nil {
-		t.Error(err)
-	}
+	results := build.SetBuilderName("foobar")
 	assert.Equal(t, "foobar", results, "They should be the same")
 
 	t.Log("Test not setting the builders name")
-	results, err = build.SetBuilderName("")
-	if err != nil {
-		t.Error(err)
-	}
+	results = build.SetBuilderName("")
 	assert.Equal(t, os.Getenv("USER"), results, "They should be the same")
 }
 
