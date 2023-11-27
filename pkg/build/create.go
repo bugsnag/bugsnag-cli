@@ -23,41 +23,16 @@ type Payload struct {
 	AppBundleVersion string            `json:"appBundleVersion,omitempty"`
 }
 
-//type SourceControl struct {
-//	Provider   string `json:"provider,omitempty"`
-//	Repository string `json:"repository,omitempty"`
-//	Revision   string `json:"revision,omitempty"`
-//}
+func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool) error {
 
-func ProcessBuildRequest(apiKey string, builderName string, releaseStage string, provider string, repository string, revision string, version string, versionCode string, bundleVersion string, metadata map[string]string, paths []string, endpoint string, dryRun bool) error {
-	if version == "" {
-		log.Error("Missing app version, please provide this via the command line options", 1)
+	// Validate the required options for the API
+	err := buildOptions.Validate()
+
+	if err != nil {
+		return err
 	}
 
-	builderName = SetBuilderName(builderName)
-
-	if builderName == "" {
-		log.Error("Failed to set builder name from system. Please provide this via the command line options.", 1)
-	}
-
-	repoInfo := GetRepoInfo(paths[0], provider, repository, revision)
-
-	payload := Payload{
-		ApiKey:       apiKey,
-		BuilderName:  builderName,
-		ReleaseStage: releaseStage,
-		SourceControl: SourceControl{
-			Provider:   repoInfo["provider"],
-			Repository: repoInfo["repository"],
-			Revision:   repoInfo["revision"],
-		},
-		Metadata:         metadata,
-		AppVersion:       version,
-		AppVersionCode:   versionCode,
-		AppBundleVersion: bundleVersion,
-	}
-
-	buildPayload, err := json.Marshal(payload)
+	buildPayload, err := json.Marshal(buildOptions)
 
 	if err != nil {
 		log.Error("Failed to create build information payload: "+err.Error(), 1)
@@ -95,34 +70,4 @@ func ProcessBuildRequest(apiKey string, builderName string, releaseStage string,
 	}
 
 	return nil
-}
-
-func GetRepoInfo(repoPath string, repoProvider string, repoUrl string, repoHash string) map[string]string {
-	repoInfo := make(map[string]string)
-
-	if repoUrl == "" {
-		repoUrl = utils.GetRepoUrl(repoPath)
-	}
-
-	repoInfo["repository"] = repoUrl
-
-	if repoProvider != "" {
-		repoInfo["provider"] = repoProvider
-	}
-
-	if repoHash == "" {
-		repoHash = utils.GetCommitHash()
-	}
-
-	repoInfo["revision"] = repoHash
-
-	return repoInfo
-}
-
-func SetBuilderName(name string) string {
-	if name == "" {
-		builder := utils.GetSystemUser()
-		return builder
-	}
-	return name
 }

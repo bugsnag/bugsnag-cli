@@ -1,22 +1,10 @@
 package build
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"github.com/carlmjohnson/truthy"
 )
-
-type GeneralInfo struct {
-	ApiKey string
-}
-
-type AndroidInfo struct {
-	AppVersionCode string
-}
-
-type IosInfo struct {
-	AppBundleVersion string
-}
 
 type SourceControl struct {
 	Provider   string
@@ -25,36 +13,22 @@ type SourceControl struct {
 }
 
 type CreateBuildInfo struct {
-	GeneralInfo       GeneralInfo
-	AndroidInfo       AndroidInfo
-	IosInfo           IosInfo
-	SourceControl     SourceControl
-	BuilderName       string
-	ReleaseStage      string
-	AppVersion        string
-	AutoAssignRelease *bool
-	MetaData          map[string]string
+	ApiKey            string            `json:"apiKey,omitempty"`
+	AppVersionCode    string            `json:"appVersionCode,omitempty"`
+	AppBundleVersion  string            `json:"appBundleVersion,omitempty"`
+	SourceControl     SourceControl     `json:"sourceControl,omitempty"`
+	BuilderName       string            `json:"builderName,omitempty"`
+	ReleaseStage      string            `json:"releaseStage,omitempty"`
+	AppVersion        string            `json:"appVersion,omitempty"`
+	AutoAssignRelease *bool             `json:"autoAssignRelease,omitempty"`
+	MetaData          map[string]string `json:"metadata,omitempty"`
 }
 
 func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
-	var apiKey string
-
-	if truthy.Value(opts.GeneralInfo.ApiKey) {
-		apiKey = opts.GeneralInfo.ApiKey
-	} else {
-		apiKey = base.GeneralInfo.ApiKey
-	}
-
 	return CreateBuildInfo{
-		GeneralInfo: GeneralInfo{
-			ApiKey: apiKey,
-		},
-		AndroidInfo: AndroidInfo{
-			AppVersionCode: utils.ThisOrThat(opts.AndroidInfo.AppVersionCode, base.AndroidInfo.AppVersionCode).(string),
-		},
-		IosInfo: IosInfo{
-			AppBundleVersion: utils.ThisOrThat(opts.IosInfo.AppBundleVersion, base.IosInfo.AppBundleVersion).(string),
-		},
+		ApiKey:           utils.ThisOrThat(opts.ApiKey, base.ApiKey).(string),
+		AppVersionCode:   utils.ThisOrThat(opts.AppVersionCode, base.AppVersionCode).(string),
+		AppBundleVersion: utils.ThisOrThat(opts.AppBundleVersion, base.AppBundleVersion).(string),
 		SourceControl: SourceControl{
 			Provider:   utils.ThisOrThat(opts.SourceControl.Provider, base.SourceControl.Provider).(string),
 			Repository: utils.ThisOrThat(opts.SourceControl.Repository, base.SourceControl.Repository).(string),
@@ -68,11 +42,27 @@ func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
 	}
 }
 
+func (opts CreateBuildInfo) Validate() error {
+	if opts.ApiKey == "" {
+		return fmt.Errorf("Missing API Key")
+	}
+
+	if opts.AppVersion == "" {
+		return fmt.Errorf("Missing App Version")
+	}
+
+	if opts.SourceControl.Repository == "" || opts.SourceControl.Revision == "" {
+		return fmt.Errorf("Missing Source Control Repository or Revision")
+	}
+
+	return nil
+}
+
 func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
 	return CreateBuildInfo{
-		GeneralInfo: GeneralInfo{ApiKey: opts.ApiKey},
-		AndroidInfo: AndroidInfo{AppVersionCode: opts.CreateBuild.VersionCode},
-		IosInfo:     IosInfo{AppBundleVersion: opts.CreateBuild.BundleVersion},
+		ApiKey:           opts.ApiKey,
+		AppVersionCode:   opts.CreateBuild.VersionCode,
+		AppBundleVersion: opts.CreateBuild.BundleVersion,
 		SourceControl: SourceControl{
 			Provider:   opts.CreateBuild.Provider,
 			Repository: opts.CreateBuild.Repository,
@@ -88,9 +78,9 @@ func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
 
 func PopulateFromPath(path string) CreateBuildInfo {
 	return CreateBuildInfo{
-		GeneralInfo: GeneralInfo{ApiKey: "foobar"},
-		AndroidInfo: AndroidInfo{AppVersionCode: ""},
-		IosInfo:     IosInfo{AppBundleVersion: ""},
+		ApiKey:           "",
+		AppVersionCode:   "",
+		AppBundleVersion: "",
 		SourceControl: SourceControl{
 			Provider:   "",
 			Repository: utils.GetRepoUrl(path),
@@ -101,6 +91,27 @@ func PopulateFromPath(path string) CreateBuildInfo {
 		AppVersion:        "",
 		AutoAssignRelease: nil,
 		MetaData:          nil,
+	}
+}
+
+func PopulateFromAndroidManifest(path string) CreateBuildInfo {
+	var apiKey string
+	androidData, err := BuildAndroidInfo(path)
+
+	if err != nil {
+		return CreateBuildInfo{}
+	}
+
+	for key, value := range androidData.Application.MetaData.Name {
+		if value == "com.bugsnag.android.API_KEY" {
+			apiKey = androidData.Application.MetaData.Value[key]
+		}
+	}
+
+	return CreateBuildInfo{
+		ApiKey:         apiKey,
+		AppVersionCode: androidData.VersionCode,
+		AppVersion:     androidData.VersionName,
 	}
 }
 
