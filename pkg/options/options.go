@@ -54,5 +54,7 @@ type CreateBuild struct {
 	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
 	VersionCode       string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
 	BundleVersion     string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
-	AutoAssignRelease bool              `help:"foobar"`
+	AutoAssignRelease bool              `help:"TBC"`
+	AppManifest       utils.Path        `help:"TBC"`
+	AndroidAab        utils.Path        `help:"TBC"`
 }
