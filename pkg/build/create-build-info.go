@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
@@ -96,7 +97,7 @@ func PopulateFromPath(path string) CreateBuildInfo {
 
 func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 	var apiKey string
-	androidData, err := BuildAndroidInfo(path)
+	androidData, err := android.BuildAndroidInfo(path)
 
 	if err != nil {
 		return CreateBuildInfo{}
