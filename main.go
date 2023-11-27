@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"os"
-
 	"github.com/alecthomas/kong"
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
 )
 
 var package_version = "2.0.0"
@@ -212,46 +211,46 @@ func main() {
 		}
 
 	case "create-build", "create-build <path>":
+		var androidManifestPath string
+		var BaseOptions build.CreateBuildInfo
 
 		UserBuildOptions := build.PopulateFromCliOpts(commands)
-		PathBuildOptions := build.PopulateFromPath(commands.CreateBuild.Path[0])
-		FinalBuildOptions := build.TheGreatMerge(UserBuildOptions, PathBuildOptions)
 
-		fmt.Println(UserBuildOptions)
-		fmt.Println(PathBuildOptions)
-		fmt.Println(FinalBuildOptions)
-		//
-		//if commands.ApiKey == "" {
-		//	log.Error("no API key provided", 1)
-		//}
-		//
-		//// Build connection URI
-		//endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
-		//
-		//if err != nil {
-		//	log.Error("Failed to build upload url: "+err.Error(), 1)
-		//}
-		//
-		//log.Info("Creating build on: " + endpoint)
-		//
-		//buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
-		//	commands.CreateBuild.BuilderName,
-		//	commands.CreateBuild.ReleaseStage,
-		//	commands.CreateBuild.Provider,
-		//	commands.CreateBuild.Repository,
-		//	commands.CreateBuild.Revision,
-		//	commands.CreateBuild.VersionName,
-		//	commands.CreateBuild.VersionCode,
-		//	commands.CreateBuild.BundleVersion,
-		//	commands.CreateBuild.Metadata,
-		//	commands.CreateBuild.Path,
-		//	endpoint,
-		//	commands.DryRun,
-		//)
-		//
-		//if buildUploadError != nil {
-		//	log.Error(buildUploadError.Error(), 1)
-		//}
+		BaseOptions = build.PopulateFromPath(commands.CreateBuild.Path[0])
+
+		if commands.CreateBuild.AndroidAab != "" {
+			androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(commands.CreateBuild.AndroidAab))
+
+			if err != nil {
+				log.Error(err.Error(), 1)
+			}
+		}
+
+		if androidManifestPath == "" {
+			androidManifestPath = string(commands.CreateBuild.AppManifest)
+		}
+
+		if androidManifestPath != "" {
+			ManifestBuildOptions := build.PopulateFromAndroidManifest(androidManifestPath)
+			BaseOptions = build.TheGreatMerge(BaseOptions, ManifestBuildOptions)
+		}
+
+		FinalMerge := build.TheGreatMerge(UserBuildOptions, BaseOptions)
+
+		// Build connection URI
+		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
+
+		if err != nil {
+			log.Error("Failed to build upload url: "+err.Error(), 1)
+		}
+
+		log.Info("Creating build on: " + endpoint)
+
+		err = build.ProcessBuildRequest(FinalMerge, endpoint, commands.DryRun)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
 
 		log.Success("Build created")
 
