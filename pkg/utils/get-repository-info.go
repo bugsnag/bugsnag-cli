@@ -51,3 +51,25 @@ func GetCommitHash() string {
 
 	return strings.TrimSuffix(string(cmdOutput), "\n")
 }
+
+func GetRepoInfo(repoPath string, repoProvider string, repoUrl string, repoHash string) map[string]string {
+	repoInfo := make(map[string]string)
+
+	if repoUrl == "" {
+		repoUrl = GetRepoUrl(repoPath)
+	}
+
+	repoInfo["repository"] = repoUrl
+
+	if repoProvider != "" {
+		repoInfo["provider"] = repoProvider
+	}
+
+	if repoHash == "" {
+		repoHash = GetCommitHash()
+	}
+
+	repoInfo["revision"] = repoHash
+
+	return repoInfo
+}
