@@ -71,51 +71,61 @@ func ProcessReactNativeIos(
 			projectRoot = rootDirPath
 		}
 
-		// Check if we're missing any of these parameters
-		if bundlePath == "" || plistPath == "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
+		// Attempt to parse information from the .xcworkspace file if values aren't provided on the command line
+		if bundlePath == "" || (plistPath == "" && (apiKey == "" || versionName == "" || bundleVersion == "")) {
 
-			// Check to see if we have the xcworkspacePath
-			if xcworkspacePath == "" {
-				// If not, attempt to locate it in the path/ios/ folder
+			// Validate workspacePath (if provided) or attempt to find one
+			if xcworkspacePath != "" {
+				if !utils.FileExists(xcworkspacePath) {
+					return errors.New("unable to find the specified .xcworkspace file: " + xcworkspacePath)
+				}
+			} else {
+				// Attempt to locate .xcworkspace in the path/ios/ folder
 				if utils.IsDir(filepath.Join(path, "ios")) {
-					workspacePath, err := utils.FindFolderWithSuffix(filepath.Join(path, "ios"), ".xcworkspace")
+					xcworkspacePath, _ = utils.FindFolderWithSuffix(filepath.Join(path, "ios"), ".xcworkspace")
+					if xcworkspacePath != "" {
+						log.Info("Found .xcworkspace at: " + xcworkspacePath)
+					} else {
+						log.Info("No .xcworkspace found at: " + xcworkspacePath)
+					}
+				}
+			}
+
+			// Validate the scheme name (if provided) or attempt to find one in the workspace
+			if xcworkspacePath != "" {
+				if scheme != "" {
+					_, err := ios.IsSchemeInWorkspace(xcworkspacePath, scheme)
 					if err != nil {
 						return err
 					}
-					xcworkspacePath = workspacePath
+				} else {
+					// If not, work it out from the xcworkspace file
+					possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
+					schemeExists, _ := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+					if schemeExists {
+						scheme = possibleSchemeName
+						log.Info("Using scheme from .xcworkspace: " + scheme)
+					} else {
+						log.Info("Unable to determine a scheme from .xcworkspace: " + xcworkspacePath)
+					}
 				}
-			} else {
-				if !utils.FileExists(xcworkspacePath) {
-					return errors.New("Could not find a suitable xcworkspace file, please specify the path by using --xcworkspace")
-				}
-			}
 
-			// Check to see if we have a scheme
-			if scheme == "" {
-				// If not, work it out from the xcworkspace file
-				possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
-				schemeExists, _ := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
-				if schemeExists {
-					scheme = possibleSchemeName
-				}
-			} else {
-				_, err := ios.IsSchemeInWorkspace(xcworkspacePath, scheme)
-				if err != nil {
-					return err
-				}
-			}
-
-			// Pull build settings from the xcworkspace file
-			if scheme != "" {
-				var err error
-				buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
-				if err != nil {
-					return err
+				// Pull build settings from the xcworkspace file
+				if scheme != "" {
+					var err error
+					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
+					if err != nil {
+						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcworkspacePath)
+					}
 				}
 			}
 
 			// Check to see if we have the Info.Plist path
-			if plistPath == "" {
+			if plistPath != "" {
+				if !utils.FileExists(plistPath) {
+					return errors.New("unable to find specified Info.plist file: " + plistPath)
+				}
+			} else if buildSettings != nil {
 				// If not, we need to build it from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
@@ -124,48 +134,57 @@ func ProcessReactNativeIos(
 				} else {
 					log.Info("No Info.plist found at: " + plistPathExpected)
 				}
-			} else {
-				if !utils.FileExists(plistPath) {
-					return errors.New("Could not find a suitable Info.plist file, please specify the path by using --plist")
-				}
 			}
 
+		}
+
+		// Check that the bundle file exists and error out if it doesn't
+		if bundlePath != "" {
+			if !utils.FileExists(bundlePath) {
+				return errors.New("unable to find specified bundle file: " + bundlePath)
+			}
+		} else {
 			// Set a bundlePath if it's not defined and check that it exists before proceeding
-			if bundlePath == "" {
-				bundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
-				if !utils.FileExists(bundleFilePath) {
-					return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
+			if buildSettings != nil {
+				possibleBundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
+				if utils.FileExists(possibleBundleFilePath) {
+					bundlePath = possibleBundleFilePath
+					log.Info("Found bundle file at: " + bundlePath)
+				} else {
+					log.Info("No bundle file found at: " + possibleBundleFilePath)
 				}
-				bundlePath = bundleFilePath
 			}
 		}
 
-		// If we have a bundlePath provided, check that it exists and error out if it doesn't
-		if !utils.FileExists(bundlePath) {
-			return errors.New("Could not find a suitable bundle file, please specify the path by using --bundlePath")
+		// Check that we now have a bundle path
+		if bundlePath == "" {
+			return errors.New("Could not find a bundle file, please specify the path by using --bundle-path")
 		}
 
-		// Set a sourceMapPath if it's not defined and check that it exists before proceeding
-		if sourceMapPath == "" {
-			sourceMapFileEnvVar := os.Getenv("SOURCEMAP_FILE")
-
-			// Depending on the value of the SOURCEMAP_FILE environment variable, we will either use the build directory or the value of the environment variable to locate the source map file
-			var sourceMapPathToUse string
-			if sourceMapFileEnvVar == "" {
-				sourceMapPathToUse = buildDirPath
-			} else {
-				sourceMapPathToUse = sourceMapFileEnvVar
-			}
-
-			sourceMapPath = filepath.Join(sourceMapPathToUse, "sourcemaps", "main.jsbundle.map")
+		// Check that the source map file exists and error out if it doesn't
+		if sourceMapPath != "" {
 			if !utils.FileExists(sourceMapPath) {
-				return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
+				return errors.New("unable to find specified source map: " + sourceMapPath)
+			}
+		} else {
+			// Use SOURCEMAP_FILE environment variable, if defined, or use the build directory
+			sourceMapDirPath := os.Getenv("SOURCEMAP_FILE")
+			if sourceMapDirPath == "" {
+				sourceMapDirPath = buildDirPath
+			}
+
+			possibleSourceMapPath := filepath.Join(sourceMapDirPath, "sourcemaps", "main.jsbundle.map")
+			if utils.FileExists(possibleSourceMapPath) {
+				sourceMapPath = possibleSourceMapPath
+				log.Info("Found source map at: " + sourceMapPath)
+			} else {
+				log.Info("No source map found at: " + possibleSourceMapPath)
 			}
 		}
 
-		// If we have a sourceMapPath provided, check that it exists and error out if it doesn't
-		if !utils.FileExists(sourceMapPath) {
-			return errors.New("Could not find a suitable source map file, please specify the path by using --source-map")
+		// Check that we now have a source map path
+		if sourceMapPath == "" {
+			return errors.New("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
 		}
 
 		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
