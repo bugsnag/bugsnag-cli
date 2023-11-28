@@ -16,6 +16,14 @@ steps:
     commands:
       - make unit-test
 
+  - label: ":lint-roller::go: Lint Go Code"
+    commands:
+      - make go-lint
+
+  - label: ":lint-roller::npm: Lint NPM Dependencies"
+    commands:
+      - make npm-lint
+
   - label: CLI Integration Tests
     depends_on: build
     commands:
@@ -73,10 +81,15 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: ":lint-roller::go: Lint Go Code"
+  - label: React Native iOS Integration Tests
+    depends_on: build
     commands:
-      - make go-lint
-
-  - label: ":lint-roller::npm: Lint NPM Dependencies"
-    commands:
-      - make npm-lint
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/react-native-ios
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*

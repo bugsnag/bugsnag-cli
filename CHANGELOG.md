@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 (2023-11-28)
+
+### Enhancements
+
+Add support for:
+- React Native source maps for iOS [online docs (TBD)]()
+
 ## 2.0.0 (2023-10-17)
 
 ### Breaking Changes

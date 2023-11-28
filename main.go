@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
@@ -40,6 +41,7 @@ type CLI struct {
 		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+		ReactNativeIos     upload.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 	CreateBuild          build.CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
@@ -205,6 +207,32 @@ func main() {
 			commands.Upload.ReactNativeAndroid.VersionName,
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload react-native-ios", "upload react-native-ios <path>":
+
+		err := upload.ProcessReactNativeIos(
+			commands.ApiKey,
+			commands.Upload.ReactNativeIos.VersionName,
+			commands.Upload.ReactNativeIos.BundleVersion,
+			commands.Upload.ReactNativeIos.Scheme,
+			commands.Upload.ReactNativeIos.SourceMap,
+			commands.Upload.ReactNativeIos.Bundle,
+			commands.Upload.ReactNativeIos.Plist,
+			commands.Upload.ReactNativeIos.Xcworkspace,
+			commands.Upload.ReactNativeIos.CodeBundleID,
+			commands.Upload.ReactNativeIos.Dev,
+			commands.Upload.ReactNativeIos.ProjectRoot,
+			commands.Upload.ReactNativeIos.Path,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
