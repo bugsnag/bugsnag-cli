@@ -8,9 +8,9 @@ import (
 )
 
 type SourceControl struct {
-	Provider   string
-	Repository string
-	Revision   string
+	Provider   string `json:"provider,omitempty"`
+	Repository string `json:"repository,omitempty"`
+	Revision   string `json:"revision,omitempty"`
 }
 
 type CreateBuildInfo struct {
@@ -45,11 +45,11 @@ func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
 
 func (opts CreateBuildInfo) Validate() error {
 	if opts.ApiKey == "" {
-		return fmt.Errorf("Missing API Key")
+		return fmt.Errorf("no API key provided")
 	}
 
 	if opts.AppVersion == "" {
-		return fmt.Errorf("Missing App Version")
+		return fmt.Errorf("Missing app version, please provide this via the command line options")
 	}
 
 	if opts.SourceControl.Repository == "" || opts.SourceControl.Revision == "" {
