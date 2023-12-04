@@ -211,7 +211,7 @@ func main() {
 
 	case "create-build", "create-build <path>":
 		// Create Build Info
-		CreateBuildOptions, err := build.BuildInfo(commands)
+		CreateBuildOptions, err := build.GatherBuildInfo(commands)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

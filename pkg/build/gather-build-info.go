@@ -120,7 +120,7 @@ func TheGreatMerge(p1 CreateBuildInfo, p2 CreateBuildInfo) CreateBuildInfo {
 	return p1.Override(p2)
 }
 
-func BuildInfo(opts options.CLI) (CreateBuildInfo, error) {
+func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	var androidManifestPath string
 	var err error
 	var BaseOptions CreateBuildInfo
