@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
-	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
@@ -211,49 +210,31 @@ func main() {
 		}
 
 	case "create-build", "create-build <path>":
-		var androidManifestPath string
-		var BaseOptions build.CreateBuildInfo
-
-		UserBuildOptions := build.PopulateFromCliOpts(commands)
-
-		BaseOptions = build.PopulateFromPath(commands.CreateBuild.Path[0])
-
-		if commands.CreateBuild.AndroidAab != "" {
-			androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(commands.CreateBuild.AndroidAab))
-
-			if err != nil {
-				log.Error(err.Error(), 1)
-			}
-		}
-
-		if androidManifestPath == "" {
-			androidManifestPath = string(commands.CreateBuild.AppManifest)
-		}
-
-		if androidManifestPath != "" {
-			ManifestBuildOptions := build.PopulateFromAndroidManifest(androidManifestPath)
-			BaseOptions = build.TheGreatMerge(BaseOptions, ManifestBuildOptions)
-		}
-
-		FinalMerge := build.TheGreatMerge(UserBuildOptions, BaseOptions)
-
-		// Build connection URI
-		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
-
-		if err != nil {
-			log.Error("Failed to build upload url: "+err.Error(), 1)
-		}
-
-		// Validate the required options for the API
-		err = FinalMerge.Validate()
+		// Create Build Info
+		CreateBuildOptions, err := build.BuildInfo(commands)
 
 		if err != nil {
 			log.Error(err.Error(), 1)
 		}
 
+		// Validate Build Info
+		err = CreateBuildOptions.Validate()
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		// Get Endpoint URL
+		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
+
+		if err != nil {
+			log.Error("Failed to build upload url: "+err.Error(), 1)
+		}
+
+		// Process Create Build
 		log.Info("Creating build on: " + endpoint)
 
-		err = build.ProcessBuildRequest(FinalMerge, endpoint, commands.DryRun)
+		err = build.ProcessBuildRequest(CreateBuildOptions, endpoint, commands.DryRun)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

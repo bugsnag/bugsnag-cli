@@ -119,3 +119,34 @@ func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 func TheGreatMerge(p1 CreateBuildInfo, p2 CreateBuildInfo) CreateBuildInfo {
 	return p1.Override(p2)
 }
+
+func BuildInfo(opts options.CLI) (CreateBuildInfo, error) {
+	var androidManifestPath string
+	var err error
+	var BaseOptions CreateBuildInfo
+
+	UserBuildOptions := PopulateFromCliOpts(opts)
+
+	BaseOptions = PopulateFromPath(opts.CreateBuild.Path[0])
+
+	if opts.CreateBuild.AndroidAab != "" {
+		androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(opts.CreateBuild.AndroidAab))
+
+		if err != nil {
+			return CreateBuildInfo{}, err
+		}
+	}
+
+	if androidManifestPath == "" {
+		androidManifestPath = string(opts.CreateBuild.AppManifest)
+	}
+
+	if androidManifestPath != "" {
+		ManifestBuildOptions := PopulateFromAndroidManifest(androidManifestPath)
+		BaseOptions = TheGreatMerge(BaseOptions, ManifestBuildOptions)
+	}
+
+	FinalMerge := TheGreatMerge(UserBuildOptions, BaseOptions)
+
+	return FinalMerge, nil
+}
