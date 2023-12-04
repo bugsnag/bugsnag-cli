@@ -3,9 +3,15 @@ package utils
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+)
+
+const (
+	PLUTIL     = "plutil"
+	XCODEBUILD = "xcodebuild"
 )
 
 // FilePathWalkDir - finds files within a given directory
@@ -123,4 +129,35 @@ func ExtractFile(file string, slug string) (string, error) {
 	}
 
 	return tempDir, nil
+}
+
+// FindFolderWithSuffix finds a folder with a given suffix
+func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
+	var matchingFolder string
+
+	err := filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() && strings.HasSuffix(info.Name(), targetSuffix) {
+			matchingFolder = path
+			return filepath.SkipDir
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return matchingFolder, nil
+}
+
+// LocationOf returns the path of the executable file associated with the given command.
+func LocationOf(something string) string {
+	cmd := exec.Command("which", something)
+	location, _ := cmd.Output()
+	return strings.TrimSpace(string(location))
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/alecthomas/kong"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
@@ -171,6 +172,32 @@ func main() {
 			commands.Upload.ReactNativeAndroid.VersionName,
 			commands.Upload.ReactNativeAndroid.VersionCode,
 			commands.Upload.ReactNativeAndroid.SourceMap,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload react-native-ios", "upload react-native-ios <path>":
+
+		err := upload.ProcessReactNativeIos(
+			commands.ApiKey,
+			commands.Upload.ReactNativeIos.VersionName,
+			commands.Upload.ReactNativeIos.BundleVersion,
+			commands.Upload.ReactNativeIos.Scheme,
+			commands.Upload.ReactNativeIos.SourceMap,
+			commands.Upload.ReactNativeIos.Bundle,
+			commands.Upload.ReactNativeIos.Plist,
+			commands.Upload.ReactNativeIos.Xcworkspace,
+			commands.Upload.ReactNativeIos.CodeBundleID,
+			commands.Upload.ReactNativeIos.Dev,
+			commands.Upload.ReactNativeIos.ProjectRoot,
+			commands.Upload.ReactNativeIos.Path,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

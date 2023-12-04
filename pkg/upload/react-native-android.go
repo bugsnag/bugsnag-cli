@@ -159,7 +159,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite)
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite, "android")
 
 		if err != nil {
 			return err
