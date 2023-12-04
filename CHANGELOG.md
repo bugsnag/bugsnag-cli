@@ -1,11 +1,11 @@
 # Changelog
 
-## 2.1.0 (2023-11-28)
+## 2.1.0 (TBD)
 
 ### Enhancements
 
-Add support for:
-- React Native source maps for iOS [online docs (TBD)]()
+- Add support for React Native source maps for iOS [online docs (TBD)]()
+- Allow `create build` to extract relevant information from a given Android manifest or AAB file.[65](https://github.com/bugsnag/bugsnag-cli/pull/65)
 
 ## 2.0.0 (2023-10-17)
 

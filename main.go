@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-var package_version = "2.0.0"
+var package_version = "2.1.0"
 
 func main() {
 	commands := options.CLI{}
