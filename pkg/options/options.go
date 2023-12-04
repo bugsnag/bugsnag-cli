@@ -46,8 +46,8 @@ type CreateAndroidBuildId struct {
 
 type AndroidBuildOptions struct {
 	VersionCode string     `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
-	AppManifest utils.Path `help:"TBC"`
-	AndroidAab  utils.Path `help:"TBC"`
+	AppManifest utils.Path `help:"The path to the Android manifest file"`
+	AndroidAab  utils.Path `help:"The path to the Android AAB file"`
 }
 
 type IosBuildOptions struct {
@@ -63,7 +63,7 @@ type CreateBuild struct {
 	Revision          string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
 	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
-	AutoAssignRelease bool              `help:"TBC"`
+	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the releaseStage"`
 	AndroidBuildOptions
 	IosBuildOptions
 }
