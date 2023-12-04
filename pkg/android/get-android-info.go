@@ -14,10 +14,10 @@ import (
 
 // Android Manifest reference attriubte IDs
 // https://developer.android.com/reference/android/R.attr#versionCode
-var AndroidVersionCodeId uint32 = 16843291
+const AndroidVersionCodeId uint32 = 16843291
 
 // https://developer.android.com/reference/android/R.attr#versionName
-var AndroidVersionNameId uint32 = 16843292
+const AndroidVersionNameId uint32 = 16843292
 
 type AndroidManifestData struct {
 	XMLName       xml.Name                       `xml:"manifest"`
