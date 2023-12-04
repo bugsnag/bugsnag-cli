@@ -244,6 +244,13 @@ func main() {
 			log.Error("Failed to build upload url: "+err.Error(), 1)
 		}
 
+		// Validate the required options for the API
+		err = FinalMerge.Validate()
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
 		log.Info("Creating build on: " + endpoint)
 
 		err = build.ProcessBuildRequest(FinalMerge, endpoint, commands.DryRun)

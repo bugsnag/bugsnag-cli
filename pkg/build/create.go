@@ -25,13 +25,6 @@ type Payload struct {
 
 func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool) error {
 
-	// Validate the required options for the API
-	err := buildOptions.Validate()
-
-	if err != nil {
-		return err
-	}
-
 	buildPayload, err := json.Marshal(buildOptions)
 
 	if err != nil {
