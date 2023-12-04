@@ -12,6 +12,13 @@ import (
 	"path/filepath"
 )
 
+// Android Manifest reference attriubte IDs
+// https://developer.android.com/reference/android/R.attr#versionCode
+var AndroidVersionCodeId uint32 = 16843291
+
+// https://developer.android.com/reference/android/R.attr#versionName
+var AndroidVersionNameId uint32 = 16843292
+
 type AndroidManifestData struct {
 	XMLName       xml.Name                       `xml:"manifest"`
 	ApplicationId string                         `xml:"package,attr"`
@@ -132,7 +139,7 @@ func GetAndroidProtobufData(path string) (*AndroidManifestData, error) {
 	}
 
 	for _, data := range rawAabManifestData.GetElement().GetAttribute() {
-		if data.ResourceId == 16843291 || data.Name == "versionCode" {
+		if data.ResourceId == AndroidVersionCodeId || data.Name == "versionCode" {
 			aabManifestData["versionCode"] = data.GetValue()
 			continue
 		}
@@ -142,7 +149,7 @@ func GetAndroidProtobufData(path string) (*AndroidManifestData, error) {
 			continue
 		}
 
-		if data.ResourceId == 16843292 || data.Name == "versionName" {
+		if data.ResourceId == AndroidVersionNameId || data.Name == "versionName" {
 			aabManifestData["versionName"] = data.GetValue()
 			continue
 		}
