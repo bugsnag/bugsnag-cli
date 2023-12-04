@@ -62,8 +62,8 @@ func (opts CreateBuildInfo) Validate() error {
 func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
 	return CreateBuildInfo{
 		ApiKey:           opts.ApiKey,
-		AppVersionCode:   opts.CreateBuild.VersionCode,
-		AppBundleVersion: opts.CreateBuild.BundleVersion,
+		AppVersionCode:   opts.CreateBuild.AndroidBuildOptions.VersionCode,
+		AppBundleVersion: opts.CreateBuild.IosBuildOptions.BundleVersion,
 		SourceControl: SourceControl{
 			Provider:   opts.CreateBuild.Provider,
 			Repository: opts.CreateBuild.Repository,
@@ -129,8 +129,8 @@ func BuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 
 	BaseOptions = PopulateFromPath(opts.CreateBuild.Path[0])
 
-	if opts.CreateBuild.AndroidAab != "" {
-		androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(opts.CreateBuild.AndroidAab))
+	if opts.CreateBuild.AndroidBuildOptions.AndroidAab != "" {
+		androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(opts.CreateBuild.AndroidBuildOptions.AndroidAab))
 
 		if err != nil {
 			return CreateBuildInfo{}, err
@@ -138,7 +138,7 @@ func BuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	}
 
 	if androidManifestPath == "" {
-		androidManifestPath = string(opts.CreateBuild.AppManifest)
+		androidManifestPath = string(opts.CreateBuild.AndroidBuildOptions.AppManifest)
 	}
 
 	if androidManifestPath != "" {

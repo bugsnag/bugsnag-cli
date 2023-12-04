@@ -43,6 +43,16 @@ type CreateAndroidBuildId struct {
 	Path utils.Paths `arg:"" name:"path" help:"Path to the project directory" type:"path"`
 }
 
+type AndroidBuildOptions struct {
+	VersionCode string     `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
+	AppManifest utils.Path `help:"TBC"`
+	AndroidAab  utils.Path `help:"TBC"`
+}
+
+type IosBuildOptions struct {
+	BundleVersion string `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
+}
+
 type CreateBuild struct {
 	BuilderName       string            `help:"The name of the entity that triggered the build. Could be a user, system etc."`
 	Metadata          map[string]string `help:"Additional build information"`
@@ -52,9 +62,7 @@ type CreateBuild struct {
 	Revision          string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
 	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
-	VersionCode       string            `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
-	BundleVersion     string            `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 	AutoAssignRelease bool              `help:"TBC"`
-	AppManifest       utils.Path        `help:"TBC"`
-	AndroidAab        utils.Path        `help:"TBC"`
+	AndroidBuildOptions
+	IosBuildOptions
 }
