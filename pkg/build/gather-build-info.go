@@ -45,15 +45,11 @@ func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
 
 func (opts CreateBuildInfo) Validate() error {
 	if opts.ApiKey == "" {
-		return fmt.Errorf("no API key provided")
+		return fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
 	if opts.AppVersion == "" {
-		return fmt.Errorf("Missing app version, please provide this via the command line options")
-	}
-
-	if opts.SourceControl.Repository == "" || opts.SourceControl.Revision == "" {
-		return fmt.Errorf("Missing Source Control Repository or Revision")
+		return fmt.Errorf("missing app version, please specify using `--app-version`")
 	}
 
 	return nil

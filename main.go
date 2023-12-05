@@ -46,7 +46,7 @@ func main() {
 	case "upload all <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
 		err := upload.All(
@@ -137,7 +137,7 @@ func main() {
 	case "upload dart <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
 		err := upload.Dart(commands.Upload.DartSymbol.Path,
@@ -212,7 +212,7 @@ func main() {
 	case "upload unity-android <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
 		err := upload.ProcessUnityAndroid(

@@ -29,7 +29,7 @@ Then('I should see the help banner') do
 end
 
 Then('I should see the API Key error') do
-  Maze.check.include(run_output, "[ERROR] no API key provided")
+  Maze.check.include(run_output, "[ERROR] missing api key, please specify using `--api-key`")
 end
 
 Then('I should see the missing path error') do
@@ -37,7 +37,7 @@ Then('I should see the missing path error') do
 end
 
 Then('I should see the missing app version error') do
-  Maze.check.include(run_output, "[ERROR] Missing app version, please provide this via the command line options")
+  Maze.check.include(run_output, "[ERROR] missing app version, please specify using `--app-version`")
 end
 
 Then('I should see the no such file or directory error') do
