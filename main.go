@@ -261,7 +261,7 @@ func main() {
 		// Process Create Build
 		log.Info("Creating build on: " + endpoint)
 
-		err = build.ProcessBuildRequest(CreateBuildOptions, endpoint, commands.DryRun)
+		err = build.ProcessBuildRequest(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

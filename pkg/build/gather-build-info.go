@@ -125,10 +125,6 @@ func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	var err error
 	var BaseOptions CreateBuildInfo
 
-	UserBuildOptions := PopulateFromCliOpts(opts)
-
-	BaseOptions = PopulateFromPath(opts.CreateBuild.Path[0])
-
 	if opts.CreateBuild.AndroidBuildOptions.AndroidAab != "" {
 		androidManifestPath, err = android.GetAndroidManifestFileFromAAB(string(opts.CreateBuild.AndroidBuildOptions.AndroidAab))
 
@@ -144,6 +140,10 @@ func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	if androidManifestPath != "" {
 		BaseOptions = PopulateFromAndroidManifest(androidManifestPath).Override(BaseOptions)
 	}
+
+	UserBuildOptions := PopulateFromCliOpts(opts)
+
+	BaseOptions = PopulateFromPath(opts.CreateBuild.Path[0])
 
 	FinalMerge := TheGreatMerge(UserBuildOptions, BaseOptions)
 

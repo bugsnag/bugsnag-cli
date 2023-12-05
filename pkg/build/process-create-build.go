@@ -23,7 +23,7 @@ type Payload struct {
 	AppBundleVersion string            `json:"appBundleVersion,omitempty"`
 }
 
-func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool) error {
+func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int) error {
 
 	buildPayload, err := json.Marshal(buildOptions)
 
@@ -39,7 +39,7 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 	req.Header.Add("Content-Type", "application/json")
 
 	if !dryRun {
-		res, err := server.SendRequest(req, 300)
+		res, err := server.SendRequest(req, timeout)
 
 		if err != nil {
 			return fmt.Errorf("error sending file request: %w", err)

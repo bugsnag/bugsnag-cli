@@ -198,8 +198,6 @@ func GetAndroidProtobufData(path string) (*AndroidManifestData, error) {
 }
 
 func BuildAndroidInfo(path string) (*AndroidManifestData, error) {
-	//	Workout if its xml or protobuff
-
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -217,7 +215,6 @@ func BuildAndroidInfo(path string) (*AndroidManifestData, error) {
 	contentType := isXMLContent(buffer)
 
 	if contentType {
-		//	Function to get it from the xml
 		androidData, err := GetAndroidXMLData(path)
 
 		if err != nil {
@@ -233,8 +230,6 @@ func BuildAndroidInfo(path string) (*AndroidManifestData, error) {
 		}
 
 		if contentType {
-			//	Function to get it from the protobuff
-
 			androidData, err := GetAndroidProtobufData(path)
 
 			return androidData, err

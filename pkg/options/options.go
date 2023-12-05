@@ -64,6 +64,7 @@ type CreateBuild struct {
 	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
 	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the releaseStage"`
+	Timeout           int               `help:"Number of seconds to wait before failing an upload request" default:"300"`
 	AndroidBuildOptions
 	IosBuildOptions
 }
