@@ -142,8 +142,7 @@ func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	}
 
 	if androidManifestPath != "" {
-		ManifestBuildOptions := PopulateFromAndroidManifest(androidManifestPath)
-		BaseOptions = TheGreatMerge(BaseOptions, ManifestBuildOptions)
+		BaseOptions = PopulateFromAndroidManifest(androidManifestPath).Override(BaseOptions)
 	}
 
 	FinalMerge := TheGreatMerge(UserBuildOptions, BaseOptions)
