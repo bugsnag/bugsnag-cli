@@ -46,15 +46,13 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 
 		responseBody, err := io.ReadAll(res.Body)
 
-		var responseMap map[string]interface{}
-		err = json.Unmarshal(responseBody, &responseMap)
+		warnings, err := utils.CheckResponseWarnings(responseBody)
 
 		if err != nil {
-			return fmt.Errorf("Error decoding JSON:", err.Error())
+			return err
 		}
 
-		warnings, ok := responseMap["warnings"].([]interface{})
-		if ok {
+		if warnings != nil {
 			for _, warning := range warnings {
 				log.Info(warning.(string))
 			}
