@@ -9,7 +9,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type Payload struct {
@@ -45,10 +44,20 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 			return fmt.Errorf("error sending file request: %w", err)
 		}
 
-		b, err := io.ReadAll(res.Body)
+		responseBody, err := io.ReadAll(res.Body)
 
-		if strings.Contains(string(b), "Source control provider is missing") {
-			log.Info("Source control provider is missing and could not be inferred. Please resend using one of: [github-enterprise, github, gitlab-onpremise, gitlab, bitbucket-server, bitbucket]. Request was still processed but source control information was ignored.")
+		var responseMap map[string]interface{}
+		err = json.Unmarshal(responseBody, &responseMap)
+
+		if err != nil {
+			return fmt.Errorf("Error decoding JSON:", err.Error())
+		}
+
+		warnings, ok := responseMap["warnings"].([]interface{})
+		if ok {
+			for _, warning := range warnings {
+				log.Info(warning.(string))
+			}
 		}
 
 		if err != nil {
@@ -56,7 +65,7 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 		}
 
 		if res.StatusCode != 200 {
-			return fmt.Errorf("%s : %s", res.Status, string(b))
+			return fmt.Errorf("%s : %s", res.Status, string(responseBody))
 		}
 	} else {
 		log.Info("(dryrun) Skipping sending build information to " + endpoint)
