@@ -1,14 +1,11 @@
 package build
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"io"
-	"net/http"
 )
 
 type Payload struct {
@@ -22,49 +19,29 @@ type Payload struct {
 	AppBundleVersion string            `json:"appBundleVersion,omitempty"`
 }
 
+// ProcessBuildRequest processes a build request by creating a payload from the provided
+// build options, logging the build information, and sending an HTTP request to the specified endpoint.
+//
+// Parameters:
+//   - buildOptions: An instance of CreateBuildInfo containing information for the build.
+//   - endpoint: The target URL for the HTTP request.
+//   - dryRun: If true, the function performs a dry run without actually sending the request.
+//   - timeout: The maximum time allowed for the HTTP request.
+//
+// Returns:
+//   - error: An error if any step of the build processing fails. Nil if the process is successful.
 func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int) error {
-
 	buildPayload, err := json.Marshal(buildOptions)
-
 	if err != nil {
-		log.Error("Failed to create build information payload: "+err.Error(), 1)
+		return fmt.Errorf("Failed to create build information payload: " + err.Error())
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	log.Info("Build information: \n" + prettyBuildPayload)
+	log.Info("Build information:\n" + prettyBuildPayload)
 
-	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(buildPayload))
-
-	req.Header.Add("Content-Type", "application/json")
-
-	if !dryRun {
-		res, err := server.SendRequest(req, timeout)
-
-		if err != nil {
-			return fmt.Errorf("error sending file request: %w", err)
-		}
-
-		responseBody, err := io.ReadAll(res.Body)
-
-		if err != nil {
-			return fmt.Errorf("error reading body from response: %w", err)
-		}
-
-		warnings, err := utils.CheckResponseWarnings(responseBody)
-
-		if err != nil {
-			return err
-		}
-
-		for _, warning := range warnings {
-			log.Info(warning.(string))
-		}
-
-		if res.StatusCode != 200 {
-			return fmt.Errorf("%s : %s", res.Status, string(responseBody))
-		}
-	} else {
-		log.Info("(dryrun) Skipping sending build information to " + endpoint)
+	err = server.ProcessRequest(endpoint, buildPayload, timeout, dryRun)
+	if err != nil {
+		return err
 	}
 
 	return nil

@@ -112,8 +112,8 @@ func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 	}
 }
 
-func TheGreatMerge(p1 CreateBuildInfo, p2 CreateBuildInfo) CreateBuildInfo {
-	return p1.Override(p2)
+func TheGreatMerge(x CreateBuildInfo, y CreateBuildInfo) CreateBuildInfo {
+	return x.Override(y)
 }
 
 func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {

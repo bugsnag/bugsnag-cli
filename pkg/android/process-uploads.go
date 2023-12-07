@@ -26,7 +26,7 @@ func UploadAndroidNdk(fileList []string, apiKey string, applicationId string, ve
 
 		fileFieldData["soFile"] = file
 
-		err = server.ProcessRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
 
 		if err != nil {
 			if numberOfFiles > 1 && failOnUploadError {

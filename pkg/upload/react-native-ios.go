@@ -225,7 +225,7 @@ func ProcessReactNativeIos(
 	fileFieldData["sourceMap"] = sourceMapPath
 	fileFieldData["bundle"] = bundlePath
 
-	err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, sourceMapPath, dryRun)
+	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, sourceMapPath, dryRun)
 
 	if err != nil {
 		return err
