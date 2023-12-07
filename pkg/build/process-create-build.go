@@ -46,20 +46,18 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 
 		responseBody, err := io.ReadAll(res.Body)
 
+		if err != nil {
+			return fmt.Errorf("error reading body from response: %w", err)
+		}
+
 		warnings, err := utils.CheckResponseWarnings(responseBody)
 
 		if err != nil {
 			return err
 		}
 
-		if warnings != nil {
-			for _, warning := range warnings {
-				log.Info(warning.(string))
-			}
-		}
-
-		if err != nil {
-			return fmt.Errorf("error reading body from response: %w", err)
+		for _, warning := range warnings {
+			log.Info(warning.(string))
 		}
 
 		if res.StatusCode != 200 {
