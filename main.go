@@ -258,10 +258,7 @@ func main() {
 			log.Error("Failed to build upload url: "+err.Error(), 1)
 		}
 
-		// Process Create Build
-		log.Info("Creating build on: " + endpoint)
-
-		err = build.ProcessBuildRequest(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout)
+		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

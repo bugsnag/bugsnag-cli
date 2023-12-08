@@ -19,7 +19,7 @@ type Payload struct {
 	AppBundleVersion string            `json:"appBundleVersion,omitempty"`
 }
 
-// ProcessBuildRequest processes a build request by creating a payload from the provided
+// ProcessCreateBuild processes a build request by creating a payload from the provided
 // build options, logging the build information, and sending an HTTP request to the specified endpoint.
 //
 // Parameters:
@@ -30,7 +30,7 @@ type Payload struct {
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int) error {
+func ProcessCreateBuild(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int) error {
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
 		return fmt.Errorf("Failed to create build information payload: " + err.Error())
@@ -39,7 +39,7 @@ func ProcessBuildRequest(buildOptions CreateBuildInfo, endpoint string, dryRun b
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
 	log.Info("Build information:\n" + prettyBuildPayload)
 
-	err = server.ProcessRequest(endpoint, buildPayload, timeout, dryRun)
+	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, dryRun)
 	if err != nil {
 		return err
 	}
