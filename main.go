@@ -144,7 +144,7 @@ func main() {
 			commands.Upload.DartSymbol.VersionName,
 			commands.Upload.DartSymbol.VersionCode,
 			commands.Upload.DartSymbol.BundleVersion,
-			commands.Upload.DartSymbol.IosAppPath,
+			string(commands.Upload.DartSymbol.IosAppPath),
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
