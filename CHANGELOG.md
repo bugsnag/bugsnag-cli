@@ -1,11 +1,15 @@
 # Changelog
 
-## 2.1.0 (2023-11-28)
+## 2.1.0 (TBD)
 
 ### Enhancements
 
 Add support for:
 - React Native source maps for iOS [online docs (TBD)]()
+
+### Fixes
+
+- Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [67](https://github.com/bugsnag/bugsnag-cli/pull/67)
 
 ## 2.0.0 (2023-10-17)
 
