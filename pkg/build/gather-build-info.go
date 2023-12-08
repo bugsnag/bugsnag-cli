@@ -112,10 +112,6 @@ func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 	}
 }
 
-func TheGreatMerge(x CreateBuildInfo, y CreateBuildInfo) CreateBuildInfo {
-	return x.Override(y)
-}
-
 func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 	var androidManifestPath string
 	var err error
@@ -141,7 +137,5 @@ func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 
 	UserBuildOptions := PopulateFromCliOpts(opts)
 
-	FinalMerge := TheGreatMerge(UserBuildOptions, BaseOptions)
-
-	return FinalMerge, nil
+	return UserBuildOptions.Override(BaseOptions), nil
 }

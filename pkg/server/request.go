@@ -149,7 +149,7 @@ func ProcessRequest(endpoint string, payload []byte, timeout int, dryRun bool) e
 		}
 
 		for _, warning := range warnings {
-			log.Info(warning.(string))
+			log.Warn(warning.(string))
 		}
 
 		if res.StatusCode != 200 {

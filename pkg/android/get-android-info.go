@@ -105,8 +105,8 @@ func GetAndroidManifestFileFromAAB(path string) (string, error) {
 	return "", fmt.Errorf("no aab file")
 }
 
-// GetAndroidXMLData - Pulls information from a human-readable xml file into a struct
-func GetAndroidXMLData(manifestFile string) (*AndroidManifestData, error) {
+// getAndroidXMLData - Pulls information from a human-readable xml file into a struct
+func getAndroidXMLData(manifestFile string) (*AndroidManifestData, error) {
 	data, err := os.ReadFile(manifestFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read " + manifestFile + " : " + err.Error())
@@ -121,7 +121,7 @@ func GetAndroidXMLData(manifestFile string) (*AndroidManifestData, error) {
 	return manifestData, nil
 }
 
-func GetAndroidProtobufData(path string) (*AndroidManifestData, error) {
+func getAndroidProtobufData(path string) (*AndroidManifestData, error) {
 	aabManifestData := make(map[string]string)
 
 	content, err := os.ReadFile(path)
@@ -215,7 +215,7 @@ func BuildAndroidInfo(path string) (*AndroidManifestData, error) {
 	contentType := isXMLContent(buffer)
 
 	if contentType {
-		androidData, err := GetAndroidXMLData(path)
+		androidData, err := getAndroidXMLData(path)
 
 		if err != nil {
 			return nil, err
@@ -230,7 +230,7 @@ func BuildAndroidInfo(path string) (*AndroidManifestData, error) {
 		}
 
 		if contentType {
-			androidData, err := GetAndroidProtobufData(path)
+			androidData, err := getAndroidProtobufData(path)
 
 			return androidData, err
 		}
