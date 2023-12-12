@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -152,14 +153,18 @@ func sendRequest(request *http.Request, timeout int) error {
 	if err != nil {
 		return fmt.Errorf("error reading body from response: %w", err)
 	}
+	
+	contentType := response.Header.Get("Content-Type")
 
-	warnings, err := utils.CheckResponseWarnings(responseBody)
-	if err != nil {
-		return err
-	}
+	if strings.Contains(contentType, "application/json") {
+		warnings, err := utils.CheckResponseWarnings(responseBody)
+		if err != nil {
+			return err
+		}
 
-	for _, warning := range warnings {
-		log.Warn(warning.(string))
+		for _, warning := range warnings {
+			log.Warn(warning.(string))
+		}
 	}
 
 	statusOK := response.StatusCode >= 200 && response.StatusCode < 300
