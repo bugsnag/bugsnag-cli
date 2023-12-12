@@ -29,7 +29,7 @@
                https://developer.android.com/studio/build/manifest-build-variables.html
             -->
 
-        <meta-data android:name="com.bugsnag.android.API_KEY" android:value="your-api-key"/>
+        <meta-data android:name="com.bugsnag.android.API_KEY" android:value="1234567890ABCDEF1234567890ABCDEF"/>
 
         <provider android:authorities="com.example.bugsnag.android.androidx-startup" android:exported="false" android:name="androidx.startup.InitializationProvider">
 

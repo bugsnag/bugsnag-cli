@@ -51,7 +51,7 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 			fileFieldData["file"] = file
 		}
 
-		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout, file, dryRun)
+		requestStatus := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, file, dryRun)
 
 		if requestStatus != nil {
 			if numberOfFiles > 1 && failOnUploadError {
