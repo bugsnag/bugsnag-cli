@@ -2,12 +2,11 @@ package upload
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
+	"path/filepath"
 )
 
 type AndroidAabMapping struct {
@@ -60,12 +59,10 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 
 		if len(soFileList) > 0 {
-			for _, file := range soFileList {
-				err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+			err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", soFileList, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
 
-				if err != nil {
-					return err
-				}
+			if err != nil {
+				return err
 			}
 		} else {
 			log.Info("No NDK (.so) files detected for upload.")

@@ -64,10 +64,14 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			requestStatus := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
 
 			if requestStatus != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return requestStatus
+				if numberOfFiles > 1 {
+					if failOnUploadError {
+						return err
+					} else {
+						log.Warn(err.Error())
+					}
 				} else {
-					log.Warn(requestStatus.Error())
+					return err
 				}
 			} else {
 				log.Success(file)
@@ -113,10 +117,14 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			}
 
 			if err != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return err
+				if numberOfFiles > 1 {
+					if failOnUploadError {
+						return err
+					} else {
+						log.Warn(err.Error())
+					}
 				} else {
-					log.Warn(err.Error())
+					return err
 				}
 			} else {
 				log.Success(file)
