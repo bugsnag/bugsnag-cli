@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -144,18 +143,25 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 //   - error: An error indicating the reason for failure or nil if the request is successful.
 func processRequest(request *http.Request, timeout int, retryCount int) error {
 	var err error
-	for i := 0; i <= retryCount; i++ {
+	i := 0
+	for {
 		err = sendRequest(request, timeout)
 		if err == nil {
 			return nil
 		}
 
-		log.Warn("Attempt " + strconv.Itoa(i+1) + " %d failed. Retrying...")
+		log.Warn("Request Failed, Retrying...")
+		i++
+
+		if i >= retryCount {
+			break
+		}
+
 		time.Sleep(time.Second)
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed after %d attempts", retryCount)
+		return fmt.Errorf("failed after %d attempts. "+err.Error(), retryCount)
 	}
 
 	return nil
