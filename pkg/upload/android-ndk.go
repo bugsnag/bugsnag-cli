@@ -192,7 +192,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		}
 	}
 
-	err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
+	err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, retries, dryRun, failOnUploadError)
 
 	if err != nil {
 		return err

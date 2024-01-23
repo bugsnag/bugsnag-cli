@@ -61,7 +61,7 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
+			requestStatus := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 			if requestStatus != nil {
 				if numberOfFiles > 1 {
@@ -113,7 +113,7 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			if dryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
+				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 			}
 
 			if err != nil {

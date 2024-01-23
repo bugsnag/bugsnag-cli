@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -81,7 +82,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, fileName string, dryRun bool) error {
+func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool) error {
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
@@ -90,7 +91,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 	if !dryRun {
 		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
 
-		err := sendRequest(req, timeout)
+		err := processRequest(req, timeout, retries)
 		if err != nil {
 			return err
 		}
@@ -112,14 +113,14 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(endpoint string, payload []byte, timeout int, dryRun bool) error {
+func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool) error {
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 
 	if !dryRun {
 		log.Info("Sending build information to " + endpoint)
 
-		err := sendRequest(req, timeout)
+		err := processRequest(req, timeout, retries)
 		if err != nil {
 			return err
 		}
@@ -128,6 +129,31 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, dryRun bo
 	}
 
 	return nil
+}
+
+// processRequest sends an HTTP request using sendRequest function with retry logic.
+// It attempts to send the request multiple times, specified by retryCount parameter,
+// and waits for a short duration between each attempt.
+// If all attempts fail, it returns an error indicating the failure after the specified number of attempts.
+// Parameters:
+//   - request: The HTTP request to be sent.
+//   - timeout: Timeout duration for the HTTP request in seconds.
+//   - retryCount: Number of times to retry the request in case of failure.
+//
+// Returns:
+//   - error: An error indicating the reason for failure or nil if the request is successful.
+func processRequest(request *http.Request, timeout int, retryCount int) error {
+	for i := 0; i < retryCount; i++ {
+		err := sendRequest(request, timeout)
+		if err == nil {
+			return nil
+		}
+
+		log.Warn("Attempt " + strconv.Itoa(i+1) + " %d failed. Retrying...")
+		time.Sleep(time.Second)
+	}
+
+	return fmt.Errorf("failed after %d attempts", retryCount)
 }
 
 // sendRequest sends an HTTP request using the provided request object and timeout.
@@ -153,7 +179,7 @@ func sendRequest(request *http.Request, timeout int) error {
 	if err != nil {
 		return fmt.Errorf("error reading body from response: %w", err)
 	}
-	
+
 	contentType := response.Header.Get("Content-Type")
 
 	if strings.Contains(contentType, "application/json") {

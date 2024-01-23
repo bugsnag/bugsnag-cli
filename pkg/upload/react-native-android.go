@@ -169,7 +169,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
 			return err
