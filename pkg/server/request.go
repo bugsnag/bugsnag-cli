@@ -143,17 +143,24 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 // Returns:
 //   - error: An error indicating the reason for failure or nil if the request is successful.
 func processRequest(request *http.Request, timeout int, retryCount int) error {
+	var err error
 	for i := 0; i < retryCount; i++ {
-		err := sendRequest(request, timeout)
+		err = sendRequest(request, timeout)
 		if err == nil {
 			return nil
 		}
+
+		fmt.Println(err)
 
 		log.Warn("Attempt " + strconv.Itoa(i+1) + " %d failed. Retrying...")
 		time.Sleep(time.Second)
 	}
 
-	return fmt.Errorf("failed after %d attempts", retryCount)
+	if err != nil {
+		return fmt.Errorf("failed after %d attempts", retryCount)
+	}
+
+	return nil
 }
 
 // sendRequest sends an HTTP request using the provided request object and timeout.
