@@ -65,6 +65,7 @@ type CreateBuild struct {
 	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
 	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the releaseStage"`
 	Timeout           int               `help:"Number of seconds to wait before failing an upload request" default:"300"`
+	Retries           int               `help:"Number of retry attempts before failing an upload request" default:"0"`
 	AndroidBuildOptions
 	IosBuildOptions
 }

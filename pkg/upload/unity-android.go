@@ -109,7 +109,7 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	err = android.UploadAndroidNdk(symbolFileList, manifestData["apiKey"], manifestData["applicationId"], manifestData["versionName"], manifestData["versionCode"], projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
+	err = android.UploadAndroidNdk(symbolFileList, manifestData["apiKey"], manifestData["applicationId"], manifestData["versionName"], manifestData["versionCode"], projectRoot, overwrite, endpoint, timeout, retries, dryRun, failOnUploadError)
 
 	if err != nil {
 		return err
