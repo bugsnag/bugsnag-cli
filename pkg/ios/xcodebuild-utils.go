@@ -18,6 +18,25 @@ type XcodeBuildSettings struct {
 	DsymName              string `mapstructure:"DWARF_DSYM_FILE_NAME"`
 }
 
+// GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
+func GetDefaultScheme(path string) (string, error) {
+	schemes, err := getXcodeSchemes(path)
+	if err != nil {
+		return "", err
+	}
+
+	switch len(schemes) {
+	case 0:
+		return "", errors.Errorf("No schemes found in the workspace file located at '%s'"+
+			"please define which scheme to use with --scheme", path)
+	case 1:
+		return schemes[0], nil
+	default:
+		return "", errors.Errorf("Multiple schemes found in the workspace file located at '%s', "+
+			"please define which scheme to use with --scheme", path)
+	}
+}
+
 // IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
 func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
 	schemes, _ := getXcodeSchemes(path)

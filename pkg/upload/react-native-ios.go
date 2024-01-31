@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -100,7 +99,11 @@ func ProcessReactNativeIos(
 					}
 				} else {
 					// If not, work it out from the xcworkspace file
-					possibleSchemeName := strings.TrimSuffix(filepath.Base(xcworkspacePath), ".xcworkspace")
+					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath)
+					if err != nil {
+						return err
+					}
+
 					schemeExists, _ := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
 					if schemeExists {
 						scheme = possibleSchemeName
