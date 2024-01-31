@@ -3,7 +3,6 @@ package android
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -28,27 +27,16 @@ type MetaData struct {
 
 // ParseAndroidManifestXML - Pulls information from a human-readable xml file into a struct
 func ParseAndroidManifestXML(manifestFile string) (*Manifest, error) {
-	file, err := os.Open(manifestFile)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to open " + manifestFile + " : " + err.Error())
-	}
-
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-
+	data, err := os.ReadFile(manifestFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read " + manifestFile + " : " + err.Error())
 	}
 
-	manifestData := Manifest{}
-
+	var manifestData *Manifest
 	err = xml.Unmarshal(data, &manifestData)
-
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse data from " + manifestFile + " : " + err.Error())
 	}
 
-	return &manifestData, nil
+	return manifestData, nil
 }

@@ -3,7 +3,9 @@ package upload
 import (
 	"fmt"
 	"path/filepath"
-	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -74,7 +76,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 					}
 				} else {
 					if variantFileFormat != "" {
-						variantDirName = fmt.Sprintf(variantFileFormat, strings.Title(variant))
+						variantDirName = fmt.Sprintf(variantFileFormat,
+							cases.Title(language.Und, cases.NoLower).String(variant))
+
 					} else {
 						variantDirName = variant
 					}
@@ -155,7 +159,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite)
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite, "android")
 
 		if err != nil {
 			return err
@@ -165,7 +169,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
 			return err

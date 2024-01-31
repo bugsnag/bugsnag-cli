@@ -51,13 +51,17 @@ func All(paths []string, options map[string]string, endpoint string, timeout int
 			fileFieldData["file"] = file
 		}
 
-		requestStatus := server.ProcessRequest(endpoint, uploadOptions, fileFieldData, timeout, file, dryRun)
+		requestStatus := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 		if requestStatus != nil {
-			if numberOfFiles > 1 && failOnUploadError {
-				return requestStatus
+			if numberOfFiles > 1 {
+				if failOnUploadError {
+					return err
+				} else {
+					log.Warn(err.Error())
+				}
 			} else {
-				log.Warn(requestStatus.Error())
+				return err
 			}
 		} else {
 			log.Success("Uploaded " + filepath.Base(file))

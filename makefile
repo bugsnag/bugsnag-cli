@@ -48,6 +48,16 @@ unit-test:
 fmt:
 	gofmt -w ./
 
+
+.PHONY: npm-lint
+npm-lint:
+	npm i && npm install -g npm-check && npm-check
+
+.PHONY: go-lint
+go-lint:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	golangci-lint run
+
 .PHONY: bump
 bump:
 ifneq ($(shell git diff --staged),)
@@ -70,16 +80,43 @@ features/base-fixtures/dart:
 	cd $@ && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
 
 .PHONY: features/base-fixtures/rn0_69
-features/base-fixtures/rn0_69:
-	cd $@ && npm i
-	cd $@/android && ./gradlew bundleRelease
+features/base-fixtures/rn0_69: features/base-fixtures/rn0_69/android features/base-fixtures/rn0_69/ios
 
 .PHONY: features/base-fixtures/rn0_70
-features/base-fixtures/rn0_70:
-	cd $@ && npm i
-	cd $@/android && ./gradlew bundleRelease
+features/base-fixtures/rn0_70: features/base-fixtures/rn0_70/android features/base-fixtures/rn0_70/ios
 
 .PHONY: features/base-fixtures/rn0_72
-features/base-fixtures/rn0_72:
-	cd $@ && npm i
-	cd $@/android && ./gradlew bundleRelease
+features/base-fixtures/rn0_72: features/base-fixtures/rn0_72/android features/base-fixtures/rn0_72/ios
+
+.PHONY: features/base-fixtures/rn0_69/android
+features/base-fixtures/rn0_69/android:
+	cd $@/../ && npm i
+	cd $@ && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/rn0_69/ios
+features/base-fixtures/rn0_69/ios:
+	cd $@/../ && npm i && bundle install
+	cd $@ && pod install
+	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
+
+.PHONY: features/base-fixtures/rn0_70/android
+features/base-fixtures/rn0_70/android:
+	cd $@/../ && npm i
+	cd $@ && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/rn0_70/ios
+features/base-fixtures/rn0_70/ios:
+	cd $@/../ && npm i && bundle install
+	cd $@ && pod install
+	cd $@ && xcodebuild -workspace rn0_70.xcworkspace -scheme rn0_70 -configuration Release -sdk iphoneos build
+
+.PHONY: features/base-fixtures/rn0_72/android
+features/base-fixtures/rn0_72/android:
+	cd $@/../ && npm i
+	cd $@ && ./gradlew bundleRelease
+
+.PHONY: features/base-fixtures/rn0_72/ios
+features/base-fixtures/rn0_72/ios:
+	cd $@/../ && npm i && bundle install
+	cd $@ && pod install
+	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build

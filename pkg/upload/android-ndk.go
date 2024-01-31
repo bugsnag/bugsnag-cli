@@ -68,7 +68,7 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 			}
 
 		} else {
-			fileList = []string{path}
+			fileList = append(fileList, path)
 
 			if appManifestPath == "" {
 				if variant == "" {
@@ -94,108 +94,108 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 				}
 			}
 		}
+	}
 
-		if projectRoot != "" {
-			log.Info("Using " + projectRoot + " as the project root")
-		}
+	if projectRoot != "" {
+		log.Info("Using " + projectRoot + " as the project root")
+	}
 
-		// Check to see if we need to read the manifest file due to missing options
-		if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
+	// Check to see if we need to read the manifest file due to missing options
+	if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
 
-			log.Info("Reading data from AndroidManifest.xml")
-			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
-
-			if err != nil {
-				return err
-			}
-
-			if apiKey == "" {
-				for key, value := range manifestData.Application.MetaData.Name {
-					if value == "com.bugsnag.android.API_KEY" {
-						apiKey = manifestData.Application.MetaData.Value[key]
-					}
-				}
-
-				if apiKey != "" {
-					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
-
-				}
-			}
-
-			if applicationId == "" {
-				applicationId = manifestData.ApplicationId
-
-				if applicationId != "" {
-					log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
-				}
-			}
-
-			if versionCode == "" {
-				versionCode = manifestData.VersionCode
-
-				if versionCode != "" {
-					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
-				}
-			}
-
-			if versionName == "" {
-				versionName = manifestData.VersionName
-
-				if versionName != "" {
-					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
-				}
-			}
-		}
-
-		// Process .so files through objcopy to create .sym files, filtering any other file type
-		for _, file := range fileList {
-			if strings.HasSuffix(file, ".so.sym") {
-				symbolFileList = append(symbolFileList, file)
-			} else if filepath.Ext(file) == ".so" {
-				// Check NDK path is set
-				if objCopyPath == "" {
-					androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
-
-					if err != nil {
-						return err
-					}
-
-					objCopyPath, err = android.BuildObjcopyPath(androidNdkRoot)
-
-					if err != nil {
-						return err
-					}
-
-					log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
-				}
-
-				log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
-
-				if workingDir == "" {
-					workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
-
-					if err != nil {
-						return fmt.Errorf("error creating temporary working directory " + err.Error())
-					}
-
-					defer os.RemoveAll(workingDir)
-				}
-
-				outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
-
-				if err != nil {
-					return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
-				}
-
-				symbolFileList = append(symbolFileList, outputFile)
-			}
-		}
-
-		err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, dryRun, failOnUploadError)
+		log.Info("Reading data from AndroidManifest.xml")
+		manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 		if err != nil {
 			return err
 		}
+
+		if apiKey == "" {
+			for key, value := range manifestData.Application.MetaData.Name {
+				if value == "com.bugsnag.android.API_KEY" {
+					apiKey = manifestData.Application.MetaData.Value[key]
+				}
+			}
+
+			if apiKey != "" {
+				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+
+			}
+		}
+
+		if applicationId == "" {
+			applicationId = manifestData.ApplicationId
+
+			if applicationId != "" {
+				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+			}
+		}
+
+		if versionCode == "" {
+			versionCode = manifestData.VersionCode
+
+			if versionCode != "" {
+				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+			}
+		}
+
+		if versionName == "" {
+			versionName = manifestData.VersionName
+
+			if versionName != "" {
+				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+			}
+		}
+	}
+
+	// Process .so files through objcopy to create .sym files, filtering any other file type
+	for _, file := range fileList {
+		if strings.HasSuffix(file, ".so.sym") {
+			symbolFileList = append(symbolFileList, file)
+		} else if filepath.Ext(file) == ".so" {
+			// Check NDK path is set
+			if objCopyPath == "" {
+				androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
+
+				if err != nil {
+					return err
+				}
+
+				objCopyPath, err = android.BuildObjcopyPath(androidNdkRoot)
+
+				if err != nil {
+					return err
+				}
+
+				log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
+			}
+
+			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
+
+			if workingDir == "" {
+				workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
+
+				if err != nil {
+					return fmt.Errorf("error creating temporary working directory " + err.Error())
+				}
+
+				defer os.RemoveAll(workingDir)
+			}
+
+			outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
+
+			if err != nil {
+				return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
+			}
+
+			symbolFileList = append(symbolFileList, outputFile)
+		}
+	}
+
+	err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, retries, dryRun, failOnUploadError)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

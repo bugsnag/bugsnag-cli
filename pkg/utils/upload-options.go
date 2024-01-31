@@ -78,8 +78,20 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appVersionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
+
+	// Return early if all three of these are empty/undefined
+	if appVersion == "" && versionCode == "" && codeBundleId == "" {
+		var platformSpecificTerminology string
+		if platform == "android" {
+			platformSpecificTerminology = "version code"
+		} else if platform == "ios" {
+			platformSpecificTerminology = "bundle version"
+		}
+
+		return nil, fmt.Errorf("you must set at least the version name, %s and code bundle ID to uniquely identify the build", platformSpecificTerminology)
+	}
 
 	if apiKey != "" {
 		uploadOptions["apiKey"] = apiKey
@@ -87,12 +99,13 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	if appVersion != "" {
-		uploadOptions["appVersion"] = appVersion
-	}
+	uploadOptions["appVersion"] = appVersion
 
-	if appVersionCode != "" {
-		uploadOptions["appVersionCode"] = appVersionCode
+	if platform == "android" {
+		uploadOptions["appVersionCode"] = versionCode
+
+	} else if platform == "ios" {
+		uploadOptions["appBundleVersion"] = versionCode
 	}
 
 	if codeBundleId != "" {
@@ -105,14 +118,10 @@ func BuildReactNativeAndroidUploadOptions(apiKey string, appVersion string, appV
 
 	uploadOptions["projectRoot"] = projectRoot
 
-	uploadOptions["platform"] = "android"
+	uploadOptions["platform"] = platform
 
 	if overwrite {
 		uploadOptions["overwrite"] = "true"
-	}
-
-	if uploadOptions["appVersion"] == "" && uploadOptions["appVersionCode"] == "" && uploadOptions["codeBundleId"] == "" {
-		return nil, fmt.Errorf("you must set at least the version name, version code or code bundle ID to uniquely identify the build")
 	}
 
 	return uploadOptions, nil

@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "BugSnag CLI",
   "main": "install.js",
   "repository": {
@@ -17,11 +17,12 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
-    "axios": "^1.4.0",
-    "console.table": "^0.10.0"
+    "axios": "^1.6.2",
+    "js-yaml": "^4.1.0"
   },
   "files": [
-    "install.js"
+    "install.js",
+    "supported-platforms.yml"
   ],
   "scripts": {
     "postinstall": "node install.js"
