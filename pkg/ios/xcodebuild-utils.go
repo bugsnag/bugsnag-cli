@@ -27,13 +27,11 @@ func GetDefaultScheme(path string) (string, error) {
 
 	switch len(schemes) {
 	case 0:
-		return "", errors.Errorf("No schemes found in the workspace file located at '%s'"+
-			"please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
 	case 1:
 		return schemes[0], nil
 	default:
-		return "", errors.Errorf("Multiple schemes found in the workspace file located at '%s', "+
-			"please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("No schemes found in location '%s', please define which scheme to use with --scheme", path)
 	}
 }
 
