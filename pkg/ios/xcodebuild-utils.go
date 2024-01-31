@@ -18,23 +18,29 @@ type XcodeBuildSettings struct {
 	DsymName              string `mapstructure:"DWARF_DSYM_FILE_NAME"`
 }
 
-// IsSchemeInWorkspace checks if a scheme is in a given workspace
-func IsSchemeInWorkspace(workspacePath, schemeToFind string) (bool, error) {
-	schemes, _ := getXcodeSchemes(workspacePath)
+// IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
+func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
+	schemes, _ := getXcodeSchemes(path)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
 			return true, nil
 		}
 	}
 
-	return false, errors.Errorf("Unable to locate scheme '%s' in the workspace file located at '%s'", schemeToFind, workspacePath)
+	return false, errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, path)
 }
 
-// getXcodeSchemes parses the xcodebuild output for a given workspace path to return a slice of schemes
-func getXcodeSchemes(workspacePath string) ([]string, error) {
+// getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
+func getXcodeSchemes(path string) ([]string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
-		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", workspacePath, "-list")
+		if strings.HasSuffix(path, ".xcworkspace") {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-list")
+		} else if strings.HasSuffix(path, ".xcodeproj") {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-list")
+		} else {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
+		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
 	}
@@ -65,11 +71,17 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 	return &buildSettings, nil
 }
 
-// getXcodeBuildSettings parses the xcodebuild output for a given workspace and scheme to return a map of all build settings
-func getXcodeBuildSettings(workspacePath, schemeName string) (*map[string]*string, error) {
+// getXcodeBuildSettings parses the xcodebuild output for a given path and scheme to return a map of all build settings
+func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
-		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", workspacePath, "-scheme", schemeName, "-showBuildSettings")
+		if strings.HasSuffix(path, ".xcworkspace") {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
+		} else if strings.HasSuffix(path, ".xcodeproj") {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
+		} else {
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-scheme", schemeName, "-showBuildSettings")
+		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
 	}
