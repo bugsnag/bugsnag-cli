@@ -132,36 +132,47 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	return &buildSettingsMap, nil
 }
 
-// GetProjectRoot determines the projectRoot from a given path
-func GetProjectRoot(path string, projRootSet bool) (string, error) {
-	var projectRoot string
+type DsymUploadInfo struct {
+	ProjectRoot string
+	DsymPath    string
+}
 
-	if projRootSet {
-		log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
-		return path, nil
+// ProcessPathValue determines the projectRoot from a given path
+func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) {
+	if path == "" && projectRoot == "" {
+		currentDir, _ := os.Getwd()
+		return &DsymUploadInfo{currentDir, ""}, nil
 	}
 
 	_, err := os.Stat(path)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if utils.IsDir(path) {
 
+		if projectRoot != "" {
+			log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
+			return &DsymUploadInfo{projectRoot, ""}, nil
+		}
+
 		if strings.HasSuffix(path, ".xcworkspace") {
 			// If path is pointing to a .xcworkspace directory, set projectRoot to two directory up
-			projectRoot = filepath.Dir(filepath.Dir(path))
+			return &DsymUploadInfo{filepath.Dir(filepath.Dir(path)), ""}, nil
 
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			// If path is pointing to a .xcworkspace directory, set projectRoot to one directory up
-			projectRoot = filepath.Dir(path)
+			return &DsymUploadInfo{filepath.Dir(path), ""}, nil
+		} else {
+			// If path is pointing to a directory, set projectRoot to the path
+			return &DsymUploadInfo{path, ""}, nil
 		}
 
 	} else {
-		log.Error("string argument passed to GetProjectRoot is not a directory", 1)
+		// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
+		return &DsymUploadInfo{projectRoot, path}, nil
 	}
 
-	return projectRoot, nil
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
