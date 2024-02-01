@@ -28,8 +28,8 @@ type XcodeBuildSettings struct {
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
-func GetDefaultScheme(path string) (string, error) {
-	schemes, err := getXcodeSchemes(path)
+func GetDefaultScheme(path, projectRoot string) (string, error) {
+	schemes, err := getXcodeSchemes(path, projectRoot)
 	if err != nil {
 		return "", err
 	}
@@ -45,8 +45,8 @@ func GetDefaultScheme(path string) (string, error) {
 }
 
 // IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
-func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
-	schemes, _ := getXcodeSchemes(path)
+func IsSchemeInWorkspace(path, schemeToFind, projectRoot string) (bool, error) {
+	schemes, _ := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
 			return true, nil
@@ -57,7 +57,7 @@ func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
-func getXcodeSchemes(path string) ([]string, error) {
+func getXcodeSchemes(path, projectRoot string) ([]string, error) {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
@@ -65,7 +65,16 @@ func getXcodeSchemes(path string) ([]string, error) {
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-list")
 		} else {
+
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
+
+			// Change the working directory of the command to path if projectRoot is not set, otherwise use projectRoot instead
+			if projectRoot == "" {
+				cmd.Dir = path
+			} else {
+				cmd.Dir = projectRoot
+			}
+
 		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
@@ -88,9 +97,9 @@ func getXcodeSchemes(path string) ([]string, error) {
 }
 
 // GetXcodeBuildSettings returns a struct of the relevant build settings for a given workspace and scheme
-func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSettings, error) {
+func GetXcodeBuildSettings(workspacePath, schemeName, projectRoot string) (*XcodeBuildSettings, error) {
 	var buildSettings XcodeBuildSettings
-	allBuildSettings, err := getXcodeBuildSettings(workspacePath, schemeName)
+	allBuildSettings, err := getXcodeBuildSettings(workspacePath, schemeName, projectRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -103,15 +112,25 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 }
 
 // getXcodeBuildSettings parses the xcodebuild output for a given path and scheme to return a map of all build settings
-func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error) {
+func getXcodeBuildSettings(path, schemeName, projectRoot string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
+
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
 		} else {
+
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-scheme", schemeName, "-showBuildSettings")
+
+			// Change the working directory of the command to path if projectRoot is not set, otherwise use projectRoot instead
+			if projectRoot == "" {
+				cmd.Dir = path
+			} else {
+				cmd.Dir = projectRoot
+			}
+
 		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
