@@ -44,8 +44,8 @@ func GetDefaultScheme(path, projectRoot string) (string, error) {
 	}
 }
 
-// IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
-func IsSchemeInWorkspace(path, schemeToFind, projectRoot string) (bool, error) {
+// IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
+func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
 	schemes, _ := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
@@ -160,7 +160,10 @@ func getXcodeBuildSettings(path, schemeName, projectRoot string) (*map[string]*s
 // ProcessPathValue determines the projectRoot from a given path
 func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) {
 	if path == "" && projectRoot == "" {
-		currentDir, _ := os.Getwd()
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
 		return &DsymUploadInfo{currentDir, ""}, nil
 	}
 
