@@ -10,7 +10,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 )
 
-// Tests expected common use case behaviour outlined in: https://smartbear.atlassian.net/wiki/spaces/EN/pages/3891986527/PLAT-11454+ED+-+iOS+dSYM+uploads+BugSnag+CLI#New-%3Cpath%3E-behaviour-explained
+// Tests expected common use case behaviour for processing <path> value
 func TestProcessPathValue(t *testing.T) {
 
 	// Get working dir
