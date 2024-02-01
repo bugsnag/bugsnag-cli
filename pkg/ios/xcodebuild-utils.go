@@ -18,6 +18,23 @@ type XcodeBuildSettings struct {
 	DsymName              string `mapstructure:"DWARF_DSYM_FILE_NAME"`
 }
 
+// GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
+func GetDefaultScheme(path string) (string, error) {
+	schemes, err := getXcodeSchemes(path)
+	if err != nil {
+		return "", err
+	}
+
+	switch len(schemes) {
+	case 0:
+		return "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
+	case 1:
+		return schemes[0], nil
+	default:
+		return "", errors.Errorf("No schemes found in location '%s', please define which scheme to use with --scheme", path)
+	}
+}
+
 // IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
 func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
 	schemes, _ := getXcodeSchemes(path)
@@ -50,8 +67,13 @@ func getXcodeSchemes(path string) ([]string, error) {
 		return nil, err
 	}
 
-	schemes := strings.SplitAfterN(string(output), "Schemes:", 2)[1]
-	schemesSlice := strings.Split(strings.ReplaceAll(schemes, " ", ""), "\n")
+	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
+
+	// Remove excess whitespace and double newlines before splitting into a slice
+	replacer := strings.NewReplacer(" ", "", "\n\n", "")
+	sanitisedSchemes := replacer.Replace(schemes)
+
+	schemesSlice := strings.Split(sanitisedSchemes, "\n")
 
 	return schemesSlice, nil
 }
