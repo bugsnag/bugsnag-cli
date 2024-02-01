@@ -161,7 +161,7 @@ func GetProjectRoot(path string, projRootSet bool) (string, error) {
 		log.Error("string argument passed to GetProjectRoot is not a directory", 1)
 	}
 
-	return "", err
+	return projectRoot, nil
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
