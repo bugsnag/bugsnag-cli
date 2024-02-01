@@ -138,6 +138,7 @@ func GetProjectRoot(path string, projRootSet bool) (string, error) {
 
 	if projRootSet {
 		log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
+		return path, nil
 	}
 
 	_, err := os.Stat(path)
