@@ -13,6 +13,12 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
+// DsymUploadInfo contains the relevant information for uploading dSYMs to bugsnag
+type DsymUploadInfo struct {
+	ProjectRoot string
+	DsymPath    string
+}
+
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
 type XcodeBuildSettings struct {
 	ConfigurationBuildDir string `mapstructure:"CONFIGURATION_BUILD_DIR"`
@@ -130,11 +136,6 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	}
 
 	return &buildSettingsMap, nil
-}
-
-type DsymUploadInfo struct {
-	ProjectRoot string
-	DsymPath    string
 }
 
 // ProcessPathValue determines the projectRoot from a given path
