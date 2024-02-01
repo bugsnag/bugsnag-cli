@@ -1,12 +1,15 @@
 package ios
 
 import (
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -127,6 +130,37 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	}
 
 	return &buildSettingsMap, nil
+}
+
+// GetProjectRoot determines the projectRoot from a given path
+func GetProjectRoot(path string, projRootSet bool) (string, error) {
+	var projectRoot string
+
+	if projRootSet {
+		log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
+	}
+
+	_, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if utils.IsDir(path) {
+
+		if strings.HasSuffix(path, ".xcworkspace") {
+			// If path is pointing to a .xcworkspace directory, set projectRoot to two directory up
+			projectRoot = filepath.Dir(filepath.Dir(path))
+
+		} else if strings.HasSuffix(path, ".xcodeproj") {
+			// If path is pointing to a .xcworkspace directory, set projectRoot to one directory up
+			projectRoot = filepath.Dir(path)
+		}
+
+	} else {
+		log.Error("string argument passed to GetProjectRoot is not a directory", 1)
+	}
+
+	return projectRoot, nil
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
