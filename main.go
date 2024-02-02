@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/alecthomas/kong"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
@@ -8,7 +10,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
 )
 
 var package_version = "2.1.0"
@@ -198,6 +199,26 @@ func main() {
 			commands.Upload.ReactNativeIos.Dev,
 			commands.Upload.ReactNativeIos.ProjectRoot,
 			commands.Upload.ReactNativeIos.Path,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload dsym", "upload dsym <path>":
+
+		err := upload.ProcessDsym(
+			commands.ApiKey,
+			commands.Upload.Dsym.VersionName,
+			commands.Upload.Dsym.Scheme,
+			commands.Upload.Dsym.Dev,
+			commands.Upload.Dsym.ProjectRoot,
+			commands.Upload.Dsym.Path,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
