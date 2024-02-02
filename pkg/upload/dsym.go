@@ -16,6 +16,7 @@ type Dsym struct {
 	VersionName string      `help:"The version of the application."`
 	Scheme      string      `help:"The name of the scheme to use when building the application."`
 	Dev         bool        `help:"Indicates whether the application is a debug or release build"`
+	Plist       string      `help:"Path to the Info.plist file" type:"path"`
 	ProjectRoot string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	Path        utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
@@ -25,6 +26,7 @@ func ProcessDsym(
 	versionName string,
 	scheme string,
 	dev bool,
+	plistPath string,
 	projectRoot string,
 	paths []string,
 	endpoint string,
@@ -47,7 +49,7 @@ func ProcessDsym(
 
 		// If scheme is set explicitly, check if it exists
 		if scheme != "" {
-			_, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
+			schemeExists, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
 			if err != nil {
 				return err
 			}
@@ -63,12 +65,13 @@ func ProcessDsym(
 				return err
 			}
 
-			if schemeExists {
-				scheme = possibleSchemeName
-				log.Info("Using scheme: " + scheme)
-			} else {
-				log.Info("Unable to determine a scheme using " + schemeDerivedFrom)
-			}
+			scheme = possibleSchemeName
+		}
+
+		if schemeExists {
+			log.Info("Using scheme: " + scheme)
+		} else {
+			log.Info("Unable to determine a scheme using " + schemeDerivedFrom)
 		}
 
 		// If the dsymPath is not fed in via <path>
@@ -93,11 +96,28 @@ func ProcessDsym(
 
 		}
 
-		uploadOptions, err := utils.BuildDsymUploadOptions(apiKey, versionName, dev, uploadInfo.ProjectRoot, overwrite)
-		if err != nil {
-			return err
+		if plistPath != "" && (apiKey == "" || versionName == "") {
+			// Read data from the plist
+			plistData, err := ios.GetPlistData(plistPath)
+			if err != nil {
+				return err
+			}
+
+			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+			if versionName == "" {
+				versionName = plistData.VersionName
+				log.Info("Using version name from Info.plist: " + versionName)
+
+			}
+
+			if apiKey == "" {
+				apiKey = plistData.BugsnagProjectDetails.ApiKey
+				log.Info("Using API key from Info.plist: " + apiKey)
+			}
+
 		}
 
+		uploadOptions, err := utils.BuildDsymUploadOptions(apiKey, versionName, dev, uploadInfo.ProjectRoot, overwrite)
 		if err != nil {
 			return err
 		}
