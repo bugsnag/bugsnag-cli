@@ -42,6 +42,14 @@ func ProcessDsym(
 			return err
 		}
 
+		// If the scheme is not set explicitly, try to find it
+		if scheme == "" {
+			scheme, err = ios.GetDefaultScheme(path, uploadInfo.ProjectRoot)
+			if err != nil {
+				return err
+			}
+		}
+
 		// If the dsymPath is not fed in via <path>
 		if uploadInfo.DsymPath == "" {
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme, projectRoot)
