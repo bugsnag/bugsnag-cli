@@ -35,6 +35,9 @@ func ProcessDsym(
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
+	var possibleSchemeName string
+	var schemeExists bool
+	var schemeDerivedFrom string
 
 	for _, path := range paths {
 		uploadInfo, err := ios.ProcessPathValue(path, projectRoot)
@@ -42,11 +45,29 @@ func ProcessDsym(
 			return err
 		}
 
-		// If the scheme is not set explicitly, try to find it
-		if scheme == "" {
-			scheme, err = ios.GetDefaultScheme(path, uploadInfo.ProjectRoot)
+		// If scheme is set explicitly, check if it exists
+		if scheme != "" {
+			_, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
 			if err != nil {
 				return err
+			}
+		} else {
+			// If the scheme is not set explicitly, try to find it
+			possibleSchemeName, schemeDerivedFrom, err = ios.GetDefaultScheme(path, uploadInfo.ProjectRoot)
+			if err != nil {
+				return err
+			}
+
+			schemeExists, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
+			if err != nil {
+				return err
+			}
+
+			if schemeExists {
+				scheme = possibleSchemeName
+				log.Info("Using scheme: " + scheme)
+			} else {
+				log.Info("Unable to determine a scheme using " + schemeDerivedFrom)
 			}
 		}
 

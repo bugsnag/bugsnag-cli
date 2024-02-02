@@ -93,18 +93,18 @@ func ProcessReactNativeIos(
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
 			if xcworkspacePath != "" {
 				if scheme != "" {
-					_, err := ios.IsSchemeInPath(xcworkspacePath, scheme, projectRoot)
+					_, _, err := ios.IsSchemeInPath(xcworkspacePath, scheme, projectRoot)
 					if err != nil {
 						return err
 					}
 				} else {
 					// If not, work it out from the xcworkspace file
-					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath, projectRoot)
+					possibleSchemeName, _, err := ios.GetDefaultScheme(xcworkspacePath, projectRoot)
 					if err != nil {
 						return err
 					}
 
-					schemeExists, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName, projectRoot)
+					schemeExists, _, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName, projectRoot)
 					if schemeExists {
 						scheme = possibleSchemeName
 						log.Info("Using scheme from .xcworkspace: " + scheme)

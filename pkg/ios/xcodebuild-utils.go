@@ -28,39 +28,45 @@ type XcodeBuildSettings struct {
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
-func GetDefaultScheme(path, projectRoot string) (string, error) {
-	schemes := getXcodeSchemes(path, projectRoot)
+func GetDefaultScheme(path, projectRoot string) (string, string, error) {
+	schemes, derivedFrom := getXcodeSchemes(path, projectRoot)
 
 	switch len(schemes) {
 	case 0:
-		return "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
+		return "", "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
 	case 1:
-		return schemes[0], nil
+		return schemes[0], derivedFrom, nil
 	default:
-		return "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
+		return "", "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
 	}
 }
 
 // IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
-func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
-	schemes := getXcodeSchemes(path, projectRoot)
+func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, string, error) {
+	schemes, derivedFrom := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
-			return true, nil
+			return true, derivedFrom, nil
 		}
 	}
 
-	return false, errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, path)
+	return false, "", errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, path)
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
-func getXcodeSchemes(path, projectRoot string) []string {
+func getXcodeSchemes(path, projectRoot string) ([]string, string) {
 	var cmd *exec.Cmd
+
+	// Used for showing which path value the scheme was found with i.e. either <path> or --project-root
+	var derivedFrom string
+
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-list")
+			derivedFrom = path
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-list")
+			derivedFrom = path
 		} else {
 
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
@@ -68,18 +74,20 @@ func getXcodeSchemes(path, projectRoot string) []string {
 			// Change the working directory of the command to path if projectRoot is not set, otherwise use projectRoot instead
 			if projectRoot == "" {
 				cmd.Dir = path
+				derivedFrom = path
 			} else {
 				cmd.Dir = projectRoot
+				derivedFrom = projectRoot
 			}
 
 		}
 	} else {
-		return []string{}
+		return []string{}, ""
 	}
 
 	output, err := cmd.Output()
 	if err != nil {
-		return []string{}
+		return []string{}, ""
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
@@ -90,7 +98,7 @@ func getXcodeSchemes(path, projectRoot string) []string {
 
 	schemesSlice := strings.Split(sanitisedSchemes, "\n")
 
-	return schemesSlice
+	return schemesSlice, derivedFrom
 }
 
 // GetXcodeBuildSettings returns a struct of the relevant build settings for a given path and scheme
