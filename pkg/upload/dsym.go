@@ -16,6 +16,7 @@ type Dsym struct {
 	VersionName string      `help:"The version of the application."`
 	Scheme      string      `help:"The name of the scheme to use when building the application."`
 	Dev         bool        `help:"Indicates whether the application is a debug or release build"`
+	DsymPath    string      `help:"Path to the dSYM" type:"path"`
 	Plist       string      `help:"Path to the Info.plist file" type:"path"`
 	ProjectRoot string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	Path        utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
@@ -26,6 +27,7 @@ func ProcessDsym(
 	versionName string,
 	scheme string,
 	dev bool,
+	dsymPath string,
 	plistPath string,
 	projectRoot string,
 	paths []string,
@@ -44,6 +46,11 @@ func ProcessDsym(
 			return err
 		}
 
+		// If dsymPath is not set explicitly, use uploadInfo to set it
+		if dsymPath != "" {
+			dsymPath = uploadInfo.DsymPath
+		}
+
 		// If projectRoot is not set explicitly, use uploadInfo to set it
 		if projectRoot == "" {
 			projectRoot = uploadInfo.ProjectRoot
@@ -56,32 +63,36 @@ func ProcessDsym(
 				return err
 			}
 		} else {
-			// If the scheme is not set explicitly, try to find it
-			scheme, err = ios.GetDefaultScheme(path, projectRoot)
-			if err != nil {
-				return err
+
+			// Only when the dsym path is not set, try and work out the scheme
+			if dsymPath == "" {
+				// If the scheme is not set explicitly, try to find it
+				scheme, err = ios.GetDefaultScheme(path, projectRoot)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		log.Info("Using scheme: " + scheme)
 
 		// If the dsymPath is not fed in via <path>
-		if uploadInfo.DsymPath == "" {
+		if dsymPath == "" {
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme, projectRoot)
 			if err != nil {
 				return err
 			}
 
 			// Build the dsymPath from build settings
-			uploadInfo.DsymPath = buildSettings.ConfigurationBuildDir + "/" + buildSettings.DsymName + "/Contents/Resources/DWARF"
+			dsymPath = buildSettings.ConfigurationBuildDir + "/" + buildSettings.DsymName + "/Contents/Resources/DWARF"
 
-			filesFound, _ := os.ReadDir(uploadInfo.DsymPath)
+			filesFound, _ := os.ReadDir(dsymPath)
 			switch len(filesFound) {
 			case 0:
-				return errors.Errorf("No files found in location '%s'", uploadInfo.DsymPath)
+				return errors.Errorf("No dSYM files found in expected location '%s'", dsymPath)
 			case 1:
-				uploadInfo.DsymPath = filepath.Join(uploadInfo.DsymPath, filesFound[0].Name())
+				dsymPath = filepath.Join(dsymPath, filesFound[0].Name())
 			default:
-				return errors.Errorf("Multiple files found in location '%s'", uploadInfo.DsymPath)
+				return errors.Errorf("Multiple dSYM files found in expected location '%s'", dsymPath)
 			}
 
 		}
@@ -113,14 +124,14 @@ func ProcessDsym(
 		}
 
 		fileFieldData := make(map[string]string)
-		fileFieldData["dsym"] = uploadInfo.DsymPath
+		fileFieldData["dsym"] = dsymPath
 
-		err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, uploadInfo.DsymPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsymPath, dryRun)
 
 		if err != nil {
 			return err
 		} else {
-			log.Success("Uploaded " + filepath.Base(uploadInfo.DsymPath))
+			log.Success("Uploaded " + filepath.Base(dsymPath))
 		}
 	}
 

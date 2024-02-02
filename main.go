@@ -217,6 +217,7 @@ func main() {
 			commands.Upload.Dsym.VersionName,
 			commands.Upload.Dsym.Scheme,
 			commands.Upload.Dsym.Dev,
+			commands.Upload.Dsym.DsymPath,
 			commands.Upload.Dsym.Plist,
 			commands.Upload.Dsym.ProjectRoot,
 			commands.Upload.Dsym.Path,
