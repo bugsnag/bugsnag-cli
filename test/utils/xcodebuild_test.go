@@ -144,3 +144,70 @@ func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
 		})
 	}
 }
+
+// Tests expected use cases when fetching build settings
+func TestGetXcodeBuildSettings(t *testing.T) {
+	tt := map[string]struct {
+		pathValue      string
+		scheme         string
+		projectRoot    string
+		expectedResult *ios.XcodeBuildSettings
+	}{
+		"successfully retrieve build settings for xcodeproj and scheme": {
+			pathValue:   "../../features/base-fixtures/rn0_72/ios/rn0_72.xcodeproj",
+			scheme:      "rn0_72",
+			projectRoot: "",
+			expectedResult: &ios.XcodeBuildSettings{
+				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
+				InfoPlistPath:         "Info.plist",
+				BuiltProductsDir:      "Build/Products/Release-iphoneos",
+				DsymName:              "rn0_72.app.dSYM",
+			},
+		},
+		"successfully retrieve build settings for xcworkspace and scheme": {
+			pathValue:   "../../features/base-fixtures/rn0_69/ios/rn0_69.xcworkspace",
+			scheme:      "rn0_69",
+			projectRoot: "",
+			expectedResult: &ios.XcodeBuildSettings{
+				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
+				InfoPlistPath:         "Info.plist",
+				BuiltProductsDir:      "Build/Products/Release-iphoneos",
+				DsymName:              "rn0_69.app.dSYM",
+			},
+		},
+		"successfully retrieve build settings for path to project root and scheme": {
+			pathValue:   "../../features/base-fixtures/rn0_70/ios/",
+			scheme:      "rn0_70",
+			projectRoot: "",
+			expectedResult: &ios.XcodeBuildSettings{
+				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
+				InfoPlistPath:         "Info.plist",
+				BuiltProductsDir:      "Build/Products/Release-iphoneos",
+				DsymName:              "rn0_70.app.dSYM",
+			},
+		},
+		"successfully retrieve build settings for projectRoot (which takes precedence) and scheme": {
+			pathValue:   "../../features/base-fixtures/rn0_69/ios/",
+			scheme:      "rn0_70",
+			projectRoot: "../../features/base-fixtures/rn0_70/ios/",
+			expectedResult: &ios.XcodeBuildSettings{
+				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
+				InfoPlistPath:         "Info.plist",
+				BuiltProductsDir:      "Build/Products/Release-iphoneos",
+				DsymName:              "rn0_70.app.dSYM",
+			},
+		},
+	}
+
+	for name, tc := range tt {
+		t.Run(name, func(t *testing.T) {
+			actualResult, err := ios.GetXcodeBuildSettings(tc.pathValue, tc.scheme, tc.projectRoot)
+			require.NoError(t, err)
+			assert.NotNil(t, actualResult)
+
+			assert.Contains(t, actualResult.ConfigurationBuildDir, tc.expectedResult.ConfigurationBuildDir)
+			assert.Contains(t, actualResult.InfoPlistPath, tc.expectedResult.InfoPlistPath)
+			assert.Contains(t, actualResult.BuiltProductsDir, tc.expectedResult.BuiltProductsDir)
+		})
+	}
+}

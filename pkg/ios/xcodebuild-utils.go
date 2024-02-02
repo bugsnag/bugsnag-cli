@@ -93,10 +93,10 @@ func getXcodeSchemes(path, projectRoot string) []string {
 	return schemesSlice
 }
 
-// GetXcodeBuildSettings returns a struct of the relevant build settings for a given workspace and scheme
-func GetXcodeBuildSettings(workspacePath, schemeName, projectRoot string) (*XcodeBuildSettings, error) {
+// GetXcodeBuildSettings returns a struct of the relevant build settings for a given path and scheme
+func GetXcodeBuildSettings(path, schemeName, projectRoot string) (*XcodeBuildSettings, error) {
 	var buildSettings XcodeBuildSettings
-	allBuildSettings, err := getXcodeBuildSettings(workspacePath, schemeName, projectRoot)
+	allBuildSettings, err := getXcodeBuildSettings(path, schemeName, projectRoot)
 	if err != nil {
 		return nil, err
 	}
