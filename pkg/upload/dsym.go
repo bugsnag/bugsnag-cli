@@ -47,6 +47,11 @@ func ProcessDsym(
 			return err
 		}
 
+		// If projectRoot is not set explicitly, use uploadInfo to set it
+		if projectRoot == "" {
+			projectRoot = uploadInfo.ProjectRoot
+		}
+
 		// If scheme is set explicitly, check if it exists
 		if scheme != "" {
 			schemeExists, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
@@ -55,7 +60,7 @@ func ProcessDsym(
 			}
 		} else {
 			// If the scheme is not set explicitly, try to find it
-			possibleSchemeName, schemeDerivedFrom, err = ios.GetDefaultScheme(path, uploadInfo.ProjectRoot)
+			possibleSchemeName, schemeDerivedFrom, err = ios.GetDefaultScheme(path, projectRoot)
 			if err != nil {
 				return err
 			}
