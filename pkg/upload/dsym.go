@@ -37,7 +37,6 @@ func ProcessDsym(
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
-	var possibleSchemeName string
 	var schemeExists bool
 	var schemeDerivedFrom string
 
@@ -58,25 +57,19 @@ func ProcessDsym(
 			if err != nil {
 				return err
 			}
+
+			if schemeExists {
+				log.Info("Using scheme: " + scheme)
+			} else {
+				log.Info("Unable to determine a scheme using " + schemeDerivedFrom)
+			}
 		} else {
 			// If the scheme is not set explicitly, try to find it
-			possibleSchemeName, schemeDerivedFrom, err = ios.GetDefaultScheme(path, projectRoot)
+			scheme, schemeDerivedFrom, err = ios.GetDefaultScheme(path, projectRoot)
 			if err != nil {
 				return err
 			}
-
-			schemeExists, schemeDerivedFrom, err = ios.IsSchemeInPath(path, scheme, projectRoot)
-			if err != nil {
-				return err
-			}
-
-			scheme = possibleSchemeName
-		}
-
-		if schemeExists {
 			log.Info("Using scheme: " + scheme)
-		} else {
-			log.Info("Unable to determine a scheme using " + schemeDerivedFrom)
 		}
 
 		// If the dsymPath is not fed in via <path>
