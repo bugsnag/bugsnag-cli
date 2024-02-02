@@ -176,12 +176,8 @@ func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) 
 			return &DsymUploadInfo{projectRoot, ""}, nil
 		}
 
-		if strings.HasSuffix(path, ".xcworkspace") {
-			// If path is pointing to a .xcworkspace directory, set projectRoot to two directory up
-			return &DsymUploadInfo{filepath.Dir(filepath.Dir(path)), ""}, nil
-
-		} else if strings.HasSuffix(path, ".xcodeproj") {
-			// If path is pointing to a .xcworkspace directory, set projectRoot to one directory up
+		if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+			// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
 			return &DsymUploadInfo{filepath.Dir(path), ""}, nil
 		} else {
 			// If path is pointing to a directory, set projectRoot to the path

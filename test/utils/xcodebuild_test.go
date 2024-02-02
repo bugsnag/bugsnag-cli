@@ -34,7 +34,7 @@ func TestProcessPathValue(t *testing.T) {
 			},
 		},
 		"if <path> is set, is a .xcworkspace directory and --project-root is not set, two directories up from <path> is returned": {
-			pathValue:   "../testdata/ios/parent_root/MyTestApp.xcodeproj/project.xcworkspace",
+			pathValue:   "../testdata/ios/parent_root/MyTestApp.xcworkspace",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
