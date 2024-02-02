@@ -28,29 +28,29 @@ type XcodeBuildSettings struct {
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
-func GetDefaultScheme(path, projectRoot string) (string, string, error) {
+func GetDefaultScheme(path, projectRoot string) (string, error) {
 	schemes, derivedFrom := getXcodeSchemes(path, projectRoot)
 
 	switch len(schemes) {
 	case 0:
-		return "", "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", derivedFrom)
 	case 1:
-		return schemes[0], derivedFrom, nil
+		return schemes[0], nil
 	default:
-		return "", "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", derivedFrom)
 	}
 }
 
 // IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
-func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, string, error) {
+func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
 	schemes, derivedFrom := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
-			return true, derivedFrom, nil
+			return true, nil
 		}
 	}
 
-	return false, "", errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, path)
+	return false, errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, derivedFrom)
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes

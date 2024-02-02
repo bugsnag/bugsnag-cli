@@ -109,7 +109,7 @@ func TestGetDefaultScheme(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualScheme, _, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+			actualScheme, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedScheme, actualScheme)
@@ -138,7 +138,7 @@ func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			_, _, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+			_, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
 
 			assert.Contains(t, err.Error(), tc.expectedExceptionMsg)
 		})
