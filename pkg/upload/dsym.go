@@ -47,7 +47,7 @@ func ProcessDsym(
 		}
 
 		// If dsymPath is not set explicitly, use uploadInfo to set it
-		if dsymPath != "" {
+		if dsymPath == "" {
 			dsymPath = uploadInfo.DsymPath
 		}
 
