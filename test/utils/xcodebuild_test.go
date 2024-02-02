@@ -12,8 +12,6 @@ import (
 
 // Tests expected common use case behaviour for processing <path> value
 func TestProcessPathValue(t *testing.T) {
-
-	// Get working dir
 	currentDir, _ := os.Getwd()
 
 	tt := map[string]struct {
@@ -86,6 +84,63 @@ func TestProcessPathValue(t *testing.T) {
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedResult, actualResult)
+		})
+	}
+}
+
+// Tests expected common use cases when determining the default scheme
+func TestGetDefaultScheme(t *testing.T) {
+	tt := map[string]struct {
+		pathValue      string
+		projectRoot    string
+		expectedScheme string
+	}{
+		"projectRoot value takes precedence over path value for fetching scheme": {
+			pathValue:      "../../features/base-fixtures/rn0_72/ios/",
+			projectRoot:    "../../features/base-fixtures/rn0_69/ios/",
+			expectedScheme: "rn0_69",
+		},
+		"xcodeproj takes precedence over path value for fetching scheme": {
+			pathValue:      "../../features/base-fixtures/rn0_72/ios/rn0_72.xcodeproj",
+			projectRoot:    "../../features/base-fixtures/rn0_69/ios/",
+			expectedScheme: "rn0_72",
+		},
+	}
+
+	for name, tc := range tt {
+		t.Run(name, func(t *testing.T) {
+			actualScheme, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+			require.NoError(t, err)
+
+			assert.Equal(t, tc.expectedScheme, actualScheme)
+		})
+	}
+}
+
+// Tests expected common error scenarios when determining the default scheme
+func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
+	tt := map[string]struct {
+		pathValue            string
+		projectRoot          string
+		expectedExceptionMsg string
+	}{
+		"multiple schemes found results in exception": {
+			pathValue:            "../../features/base-fixtures/rn0_72/ios/rn0_72.xcworkspace",
+			projectRoot:          "../../features/base-fixtures/rn0_69/ios/",
+			expectedExceptionMsg: "Multiple schemes found",
+		},
+		"no schemes found results in exception": {
+			pathValue:            "../testdata/ios/parent_root",
+			projectRoot:          "../testdata/ios/parent_root",
+			expectedExceptionMsg: "No schemes found",
+		},
+	}
+
+	for name, tc := range tt {
+		t.Run(name, func(t *testing.T) {
+			_, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+
+			assert.Contains(t, err.Error(), tc.expectedExceptionMsg)
 		})
 	}
 }

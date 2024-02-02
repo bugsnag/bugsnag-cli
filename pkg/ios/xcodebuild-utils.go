@@ -29,10 +29,7 @@ type XcodeBuildSettings struct {
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
 func GetDefaultScheme(path, projectRoot string) (string, error) {
-	schemes, err := getXcodeSchemes(path, projectRoot)
-	if err != nil {
-		return "", err
-	}
+	schemes := getXcodeSchemes(path, projectRoot)
 
 	switch len(schemes) {
 	case 0:
@@ -40,13 +37,13 @@ func GetDefaultScheme(path, projectRoot string) (string, error) {
 	case 1:
 		return schemes[0], nil
 	default:
-		return "", errors.Errorf("No schemes found in location '%s', please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
 	}
 }
 
 // IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
 func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
-	schemes, _ := getXcodeSchemes(path, projectRoot)
+	schemes := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
 			return true, nil
@@ -57,7 +54,7 @@ func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
-func getXcodeSchemes(path, projectRoot string) ([]string, error) {
+func getXcodeSchemes(path, projectRoot string) []string {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
@@ -77,12 +74,12 @@ func getXcodeSchemes(path, projectRoot string) ([]string, error) {
 
 		}
 	} else {
-		return nil, errors.New("Unable to locate xcodebuild on this system.")
+		return []string{}
 	}
 
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return []string{}
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
@@ -93,7 +90,7 @@ func getXcodeSchemes(path, projectRoot string) ([]string, error) {
 
 	schemesSlice := strings.Split(sanitisedSchemes, "\n")
 
-	return schemesSlice, nil
+	return schemesSlice
 }
 
 // GetXcodeBuildSettings returns a struct of the relevant build settings for a given workspace and scheme
