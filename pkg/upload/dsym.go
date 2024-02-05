@@ -123,6 +123,7 @@ func ProcessDsym(
 		for _, dsym := range *dsyms {
 			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
 			log.Info("Uploading dSYM " + dsymInfo)
+			// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
 			if plistPath != "" && (apiKey == "" || versionName == "") {
 				// Read data from the plist
 				plistData, err = ios.GetPlistData(plistPath)
@@ -142,10 +143,8 @@ func ProcessDsym(
 					log.Info("Using API key from Info.plist: " + utils.DisplayBlankIfEmpty(apiKey))
 				}
 
-			}
-
-			if plistPath == "" && (apiKey == "" || versionName == "") {
-				// If not, we need to build it from build settings values
+			} else if plistPath == "" && (apiKey == "" || versionName == "") {
+				// If not, we need to build the path to Info.plist from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
