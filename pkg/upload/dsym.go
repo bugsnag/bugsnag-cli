@@ -1,8 +1,6 @@
 package upload
 
 import (
-	"path/filepath"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
@@ -142,7 +140,7 @@ func ProcessDsym(
 			if err != nil {
 				return err
 			} else {
-				log.Success("Uploaded " + filepath.Base(dsymPath))
+				log.Success("Uploaded " + dsym.Name)
 			}
 		}
 	}
