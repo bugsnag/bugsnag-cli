@@ -1,10 +1,7 @@
 package upload
 
 import (
-	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -39,6 +36,9 @@ func ProcessDsym(
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
+	var dsyms *[]*ios.DsymFile
+	var plistData *ios.PlistData
+	var uploadOptions map[string]string
 
 	for _, path := range paths {
 		uploadInfo, err := ios.ProcessPathValue(path, projectRoot)
@@ -84,54 +84,51 @@ func ProcessDsym(
 
 			// Build the dsymPath from build settings
 			dsymPath = buildSettings.ConfigurationBuildDir + "/" + buildSettings.DsymName + "/Contents/Resources/DWARF"
-
-			filesFound, _ := os.ReadDir(dsymPath)
-			switch len(filesFound) {
-			case 0:
-				return errors.Errorf("No dSYM files found in expected location '%s'", dsymPath)
-			case 1:
-				dsymPath = filepath.Join(dsymPath, filesFound[0].Name())
-			default:
-				return errors.Errorf("Multiple dSYM files found in expected location '%s'", dsymPath)
-			}
-
-		}
-
-		if plistPath != "" && (apiKey == "" || versionName == "") {
-			// Read data from the plist
-			plistData, err := ios.GetPlistData(plistPath)
+			dsyms, err = ios.GetDsymsForUpload(dsymPath)
 			if err != nil {
 				return err
 			}
 
-			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
-			if versionName == "" {
-				versionName = plistData.VersionName
-				log.Info("Using version name from Info.plist: " + versionName)
+		}
+
+		for _, dsym := range *dsyms {
+			log.Info("Uploading dSYM: " + dsym.UUID)
+			if plistPath != "" && (apiKey == "" || versionName == "") {
+				// Read data from the plist
+				plistData, err = ios.GetPlistData(plistPath)
+				if err != nil {
+					return err
+				}
+
+				// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+				if versionName == "" {
+					versionName = plistData.VersionName
+					log.Info("Using version name from Info.plist: " + versionName)
+
+				}
+
+				if apiKey == "" {
+					apiKey = plistData.BugsnagProjectDetails.ApiKey
+					log.Info("Using API key from Info.plist: " + apiKey)
+				}
 
 			}
 
-			if apiKey == "" {
-				apiKey = plistData.BugsnagProjectDetails.ApiKey
-				log.Info("Using API key from Info.plist: " + apiKey)
+			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
+			if err != nil {
+				return err
 			}
 
-		}
+			fileFieldData := make(map[string]string)
+			fileFieldData["dsym"] = dsymPath + "/" + dsym.Name
 
-		uploadOptions, err := utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
-		if err != nil {
-			return err
-		}
+			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.Name, dryRun)
 
-		fileFieldData := make(map[string]string)
-		fileFieldData["dsym"] = dsymPath
-
-		err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsymPath, dryRun)
-
-		if err != nil {
-			return err
-		} else {
-			log.Success("Uploaded " + filepath.Base(dsymPath))
+			if err != nil {
+				return err
+			} else {
+				log.Success("Uploaded " + filepath.Base(dsymPath))
+			}
 		}
 	}
 
