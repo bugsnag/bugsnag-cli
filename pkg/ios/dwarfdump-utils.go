@@ -3,6 +3,7 @@ package ios
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -36,7 +37,7 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 			for _, file := range filesFound {
 				if strings.HasSuffix(file.Name(), ".zip") {
 					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
-					path, _ = utils.ExtractFile(path+"/"+file.Name(), "dsym")
+					path, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
 
 					if path != "" {
 						log.Info("Unzipped " + file.Name() + " to " + path + " for uploading")

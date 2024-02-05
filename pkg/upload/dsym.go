@@ -75,7 +75,7 @@ func ProcessDsym(
 				}
 			}
 		}
-		log.Info("Using scheme: " + scheme)
+		log.Info("Using scheme: " + utils.DisplayBlankIfEmpty(scheme))
 
 		// If the dsymPath is not fed in via <path>
 		if dsymPath == "" {
@@ -90,7 +90,7 @@ func ProcessDsym(
 			// Check if dsymPath exists, if not, try alternative path instead
 			err = utils.Path(dsymPath).Validate()
 			if err != nil {
-				log.Info("Could not find dSYM in expected location: " + dsymPath)
+				log.Info("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
 				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
 
 				err = utils.Path(dsymPath).Validate()
@@ -105,7 +105,7 @@ func ProcessDsym(
 			var extractedLocation string
 			extractedLocation, err = utils.ExtractFile(dsymPath, "dsym")
 			if err != nil {
-				log.Warn(dsymPath + " is not a zip file or directory")
+				log.Warn(utils.DisplayBlankIfEmpty(dsymPath) + " is not a zip file or directory")
 				return err
 			}
 
@@ -133,15 +133,26 @@ func ProcessDsym(
 				// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
 				if versionName == "" {
 					versionName = plistData.VersionName
-					log.Info("Using version name from Info.plist: " + versionName)
+					log.Info("Using version name from Info.plist: " + utils.DisplayBlankIfEmpty(versionName))
 
 				}
 
 				if apiKey == "" {
 					apiKey = plistData.BugsnagProjectDetails.ApiKey
-					log.Info("Using API key from Info.plist: " + apiKey)
+					log.Info("Using API key from Info.plist: " + utils.DisplayBlankIfEmpty(apiKey))
 				}
 
+			}
+
+			if plistPath == "" && (apiKey == "" || versionName == "") {
+				// If not, we need to build it from build settings values
+				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+				if utils.FileExists(plistPathExpected) {
+					plistPath = plistPathExpected
+					log.Info("Found Info.plist at expected location: " + plistPath)
+				} else {
+					log.Info("No Info.plist found at expected location: " + plistPathExpected)
+				}
 			}
 
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
@@ -150,14 +161,14 @@ func ProcessDsym(
 			}
 
 			fileFieldData := make(map[string]string)
-			fileFieldData["dsym"] = dsymPath + "/" + dsym.Name
+			fileFieldData["dsym"] = filepath.Join(dsymPath, dsym.Name)
 
-			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+			err = server.ProcessFileRequest(filepath.Join(endpoint, "dsym"), uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
 				return err
 			} else {
-				log.Success("Uploaded dSYM: " + dsymInfo)
+				log.Success("Uploaded dSYM: " + utils.DisplayBlankIfEmpty(dsym.Name))
 			}
 		}
 	}

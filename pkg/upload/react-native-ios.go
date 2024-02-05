@@ -133,9 +133,9 @@ func ProcessReactNativeIos(
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					log.Info("Found Info.plist at: " + plistPath)
+					log.Info("Found Info.plist at expected location: " + plistPath)
 				} else {
-					log.Info("No Info.plist found at: " + plistPathExpected)
+					log.Info("No Info.plist found at expected location: " + plistPathExpected)
 				}
 			}
 
