@@ -1,14 +1,23 @@
 package ios
 
 import (
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
+
+// DsymUploadInfo contains the relevant information for uploading dSYMs to bugsnag
+type DsymUploadInfo struct {
+	ProjectRoot string
+	DsymPath    string
+}
 
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
 type XcodeBuildSettings struct {
@@ -19,11 +28,8 @@ type XcodeBuildSettings struct {
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
-func GetDefaultScheme(path string) (string, error) {
-	schemes, err := getXcodeSchemes(path)
-	if err != nil {
-		return "", err
-	}
+func GetDefaultScheme(path, projectRoot string) (string, error) {
+	schemes := getXcodeSchemes(path, projectRoot)
 
 	switch len(schemes) {
 	case 0:
@@ -31,13 +37,13 @@ func GetDefaultScheme(path string) (string, error) {
 	case 1:
 		return schemes[0], nil
 	default:
-		return "", errors.Errorf("No schemes found in location '%s', please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
 	}
 }
 
-// IsSchemeInWorkspace checks if a scheme is in a given path or checks current directory if path is empty
-func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
-	schemes, _ := getXcodeSchemes(path)
+// IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
+func IsSchemeInPath(path, schemeToFind, projectRoot string) (bool, error) {
+	schemes := getXcodeSchemes(path, projectRoot)
 	for _, scheme := range schemes {
 		if scheme == schemeToFind {
 			return true, nil
@@ -48,7 +54,7 @@ func IsSchemeInWorkspace(path, schemeToFind string) (bool, error) {
 }
 
 // getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
-func getXcodeSchemes(path string) ([]string, error) {
+func getXcodeSchemes(path, projectRoot string) []string {
 	var cmd *exec.Cmd
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
@@ -56,15 +62,24 @@ func getXcodeSchemes(path string) ([]string, error) {
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-list")
 		} else {
+
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
+
+			// Change the working directory of the command to path if projectRoot is not set, otherwise use projectRoot instead
+			if projectRoot == "" {
+				cmd.Dir = path
+			} else {
+				cmd.Dir = projectRoot
+			}
+
 		}
 	} else {
-		return nil, errors.New("Unable to locate xcodebuild on this system.")
+		return []string{}
 	}
 
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, err
+		return []string{}
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
@@ -75,13 +90,13 @@ func getXcodeSchemes(path string) ([]string, error) {
 
 	schemesSlice := strings.Split(sanitisedSchemes, "\n")
 
-	return schemesSlice, nil
+	return schemesSlice
 }
 
-// GetXcodeBuildSettings returns a struct of the relevant build settings for a given workspace and scheme
-func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSettings, error) {
+// GetXcodeBuildSettings returns a struct of the relevant build settings for a given path and scheme
+func GetXcodeBuildSettings(path, schemeName, projectRoot string) (*XcodeBuildSettings, error) {
 	var buildSettings XcodeBuildSettings
-	allBuildSettings, err := getXcodeBuildSettings(workspacePath, schemeName)
+	allBuildSettings, err := getXcodeBuildSettings(path, schemeName, projectRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -94,15 +109,25 @@ func GetXcodeBuildSettings(workspacePath, schemeName string) (*XcodeBuildSetting
 }
 
 // getXcodeBuildSettings parses the xcodebuild output for a given path and scheme to return a map of all build settings
-func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error) {
+func getXcodeBuildSettings(path, schemeName, projectRoot string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
+
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
 		} else {
+
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-scheme", schemeName, "-showBuildSettings")
+
+			// Change the working directory of the command to path if projectRoot is not set, otherwise use projectRoot instead
+			if projectRoot == "" {
+				cmd.Dir = path
+			} else {
+				cmd.Dir = projectRoot
+			}
+
 		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
@@ -127,6 +152,43 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	}
 
 	return &buildSettingsMap, nil
+}
+
+// ProcessPathValue determines the projectRoot from a given path
+func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) {
+	if path == "" && projectRoot == "" {
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		return &DsymUploadInfo{currentDir, ""}, nil
+	}
+
+	_, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if utils.IsDir(path) {
+
+		if projectRoot != "" {
+			log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
+			return &DsymUploadInfo{projectRoot, ""}, nil
+		}
+
+		if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+			// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
+			return &DsymUploadInfo{filepath.Dir(path), ""}, nil
+		} else {
+			// If path is pointing to a directory, set projectRoot to the path
+			return &DsymUploadInfo{path, ""}, nil
+		}
+
+	} else {
+		// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
+		return &DsymUploadInfo{projectRoot, path}, nil
+	}
+
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it

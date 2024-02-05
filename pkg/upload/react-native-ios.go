@@ -93,18 +93,18 @@ func ProcessReactNativeIos(
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
 			if xcworkspacePath != "" {
 				if scheme != "" {
-					_, err := ios.IsSchemeInWorkspace(xcworkspacePath, scheme)
+					_, err := ios.IsSchemeInPath(xcworkspacePath, scheme, projectRoot)
 					if err != nil {
 						return err
 					}
 				} else {
 					// If not, work it out from the xcworkspace file
-					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath)
+					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath, projectRoot)
 					if err != nil {
 						return err
 					}
 
-					schemeExists, _ := ios.IsSchemeInWorkspace(xcworkspacePath, possibleSchemeName)
+					schemeExists, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName, projectRoot)
 					if schemeExists {
 						scheme = possibleSchemeName
 						log.Info("Using scheme from .xcworkspace: " + scheme)
@@ -116,7 +116,7 @@ func ProcessReactNativeIos(
 				// Pull build settings from the xcworkspace file
 				if scheme != "" {
 					var err error
-					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
+					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme, projectRoot)
 					if err != nil {
 						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcworkspacePath)
 					}
