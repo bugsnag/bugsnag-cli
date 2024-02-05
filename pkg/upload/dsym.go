@@ -105,7 +105,8 @@ func ProcessDsym(
 		}
 
 		for _, dsym := range *dsyms {
-			log.Info("Uploading dSYM: " + dsym.UUID)
+			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
+			log.Info("Uploading dSYM " + dsymInfo)
 			if plistPath != "" && (apiKey == "" || versionName == "") {
 				// Read data from the plist
 				plistData, err = ios.GetPlistData(plistPath)
@@ -135,12 +136,12 @@ func ProcessDsym(
 			fileFieldData := make(map[string]string)
 			fileFieldData["dsym"] = dsymPath + "/" + dsym.Name
 
-			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.Name, dryRun)
+			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
 				return err
 			} else {
-				log.Success("Uploaded " + dsym.Name)
+				log.Success("Uploaded dSYM: " + dsymInfo)
 			}
 		}
 	}
