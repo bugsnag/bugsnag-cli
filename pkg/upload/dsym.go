@@ -46,8 +46,9 @@ func ProcessDsym(
 			return err
 		}
 
-		// If dsymPath is not set explicitly, use uploadInfo to set it
-		if dsymPath == "" {
+		// If dsymPath is not set explicitly, use uploadInfo to set it (if available)
+		// uploadInfo.DsymPath is set when <path> is recognised as a dsym path
+		if dsymPath == "" && uploadInfo.DsymPath != "" {
 			dsymPath = uploadInfo.DsymPath
 		}
 
@@ -84,11 +85,25 @@ func ProcessDsym(
 
 			// Build the dsymPath from build settings
 			dsymPath = buildSettings.ConfigurationBuildDir + "/" + buildSettings.DsymName + "/Contents/Resources/DWARF"
-			dsyms, err = ios.GetDsymsForUpload(dsymPath)
+
+		} else {
+			// Use the dsymPath from the command line, check if it's zipped and unzip it if necessary
+			var extractedLocation string
+			extractedLocation, err = utils.ExtractFile(dsymPath, ".zip")
 			if err != nil {
+				log.Info(dsymPath + " is not a zip file or directory")
 				return err
 			}
 
+			if extractedLocation != "" {
+				log.Info("Unzipped " + dsymPath + " to " + extractedLocation + " for uploading")
+				dsymPath = extractedLocation
+			}
+		}
+
+		dsyms, err = ios.GetDsymsForUpload(dsymPath)
+		if err != nil {
+			return err
 		}
 
 		for _, dsym := range *dsyms {
