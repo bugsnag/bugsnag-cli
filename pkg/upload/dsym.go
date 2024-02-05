@@ -87,9 +87,9 @@ func ProcessDsym(
 		} else {
 			// Use the dsymPath from the command line, check if it's zipped and unzip it if necessary
 			var extractedLocation string
-			extractedLocation, err = utils.ExtractFile(dsymPath, ".zip")
+			extractedLocation, err = utils.ExtractFile(dsymPath, "zip")
 			if err != nil {
-				log.Info(dsymPath + " is not a zip file or directory")
+				log.Warn(dsymPath + " is not a zip file or directory")
 				return err
 			}
 

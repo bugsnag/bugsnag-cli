@@ -34,7 +34,16 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 	default:
 		if isDwarfDumpInstalled() {
 			for _, file := range filesFound {
-				cmd := exec.Command("dwarfdump", "-u", file.Name())
+				if strings.HasSuffix(file.Name(), ".zip") {
+					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
+					path, _ = utils.ExtractFile(path+"/"+file.Name(), "zip")
+
+					if path != "" {
+						log.Info("Unzipped " + file.Name() + " to " + path + " for uploading")
+					}
+				}
+
+				cmd := exec.Command("dwarfdump", "-u", strings.TrimSuffix(file.Name(), ".zip"))
 				cmd.Dir = path
 
 				output, _ := cmd.Output()
@@ -57,7 +66,7 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 						}
 					}
 				} else {
-					log.Info("Skipping file without UUID: " + file.Name())
+					log.Info("Skipping upload for file without UUID: " + file.Name())
 				}
 
 			}
