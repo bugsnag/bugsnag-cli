@@ -1,6 +1,9 @@
 package upload
 
 import (
+	"path/filepath"
+	"strings"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
@@ -82,7 +85,20 @@ func ProcessDsym(
 			}
 
 			// Build the dsymPath from build settings
-			dsymPath = buildSettings.ConfigurationBuildDir + "/" + buildSettings.DsymName + "/Contents/Resources/DWARF"
+			dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
+
+			// Check if dsymPath exists, if not, try alternative path instead
+			err = utils.Path(dsymPath).Validate()
+			if err != nil {
+				log.Info("Could not find dSYM in expected location: " + dsymPath)
+				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+
+				err = utils.Path(dsymPath).Validate()
+				if err != nil {
+					return err
+				}
+				log.Info("Using alternative dSYM path: " + dsymPath)
+			}
 
 		} else {
 			// Use the dsymPath from the command line, check if it's zipped and unzip it if necessary
