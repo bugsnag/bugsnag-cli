@@ -25,7 +25,7 @@ func isDwarfDumpInstalled() bool {
 }
 
 // GetDsymsForUpload returns information on the valid dSYM files found in a given path
-func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
+func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) {
 	filesFound, _ := os.ReadDir(path)
 	var dsymFiles []*DsymFile
 
@@ -44,30 +44,41 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 					}
 				}
 
-				cmd := exec.Command("dwarfdump", "-u", strings.TrimSuffix(file.Name(), ".zip"))
-				cmd.Dir = path
+				fileInfo, _ := os.Stat(filepath.Join(path, file.Name()))
 
-				output, _ := cmd.Output()
-
-				if len(output) > 0 {
-					outputStr := string(output)
-
-					outputStr = strings.Replace(outputStr, "\n", "", -1)
-					outputStr = strings.ReplaceAll(outputStr, "(", "")
-					outputStr = strings.ReplaceAll(outputStr, ")", "")
-
-					if strings.Contains(outputStr, "UUID: ") {
-						info := strings.Split(outputStr, " ")
-						if len(info) == 4 {
-							dsymFile := &DsymFile{}
-							dsymFile.UUID = info[1]
-							dsymFile.Arch = info[2]
-							dsymFile.Name = info[3]
-							dsymFiles = append(dsymFiles, dsymFile)
-						}
+				if fileInfo.Size() == 0 {
+					if ignoreEmptyDsym {
+						log.Warn("Skipping empty file: " + file.Name())
+					} else {
+						log.Error("Skipping empty file: "+file.Name(), 0)
 					}
 				} else {
-					log.Info("Skipping upload for file without UUID: " + file.Name())
+					cmd := exec.Command("dwarfdump", "-u", strings.TrimSuffix(file.Name(), ".zip"))
+					cmd.Dir = path
+
+					output, _ := cmd.Output()
+
+					if len(output) > 0 {
+						outputStr := string(output)
+
+						outputStr = strings.Replace(outputStr, "\n", "", -1)
+						outputStr = strings.ReplaceAll(outputStr, "(", "")
+						outputStr = strings.ReplaceAll(outputStr, ")", "")
+
+						if strings.Contains(outputStr, "UUID: ") {
+							info := strings.Split(outputStr, " ")
+							if len(info) == 4 {
+								dsymFile := &DsymFile{}
+								dsymFile.UUID = info[1]
+								dsymFile.Arch = info[2]
+								dsymFile.Name = info[3]
+								dsymFiles = append(dsymFiles, dsymFile)
+							}
+						}
+
+					} else {
+						log.Info("Skipping file without UUID: " + file.Name())
+					}
 				}
 
 			}

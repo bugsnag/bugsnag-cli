@@ -18,6 +18,7 @@ type Dsym struct {
 	Plist              string      `help:"Path to the Info.plist file" type:"path"`
 	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
 	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
@@ -30,6 +31,7 @@ func ProcessDsym(
 	plistPath string,
 	projectRoot string,
 	ignoreMissingDwarf bool,
+	ignoreEmptyDsym bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -138,7 +140,7 @@ func ProcessDsym(
 			}
 		}
 
-		dsyms, err = ios.GetDsymsForUpload(dsymPath)
+		dsyms, err = ios.GetDsymsForUpload(dsymPath, ignoreEmptyDsym)
 		if err != nil {
 			if ignoreMissingDwarf {
 				log.Warn(err.Error())
