@@ -15,6 +15,7 @@ type XcodeBuildSettings struct {
 	ConfigurationBuildDir string `mapstructure:"CONFIGURATION_BUILD_DIR"`
 	InfoPlistPath         string `mapstructure:"INFOPLIST_PATH"`
 	BuiltProductsDir      string `mapstructure:"BUILT_PRODUCTS_DIR"`
+	ProjectTempRoot       string `mapstructure:"PROJECT_TEMP_ROOT"`
 }
 
 // IsSchemeInWorkspace checks if a scheme is in a given workspace
