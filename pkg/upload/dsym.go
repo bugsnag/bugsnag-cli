@@ -19,6 +19,7 @@ type Dsym struct {
 	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
+	FailOnUpload       bool        `help:"Whether to stop any further uploads if a file fails to upload successfully. By default the command attempts to upload all files"`
 	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
@@ -32,6 +33,7 @@ func ProcessDsym(
 	projectRoot string,
 	ignoreMissingDwarf bool,
 	ignoreEmptyDsym bool,
+	failOnUpload bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -122,22 +124,6 @@ func ProcessDsym(
 
 			}
 
-		} else {
-			// Use the dsymPath from the command line, check if it's zipped and unzip it if necessary
-			var extractedLocation string
-			extractedLocation, err = utils.ExtractFile(dsymPath, "dsym")
-			if err != nil {
-				if ignoreMissingDwarf {
-					log.Warn(utils.DisplayBlankIfEmpty(dsymPath) + " is not a zip file or directory")
-				} else {
-					log.Error(utils.DisplayBlankIfEmpty(dsymPath)+" is not a zip file or directory", 1)
-				}
-			}
-
-			if extractedLocation != "" {
-				log.Info("Unzipped " + dsymPath + " to " + extractedLocation + " for uploading")
-				dsymPath = extractedLocation
-			}
 		}
 
 		dsyms, err = ios.GetDsymsForUpload(dsymPath, ignoreEmptyDsym)
@@ -194,7 +180,11 @@ func ProcessDsym(
 			err = server.ProcessFileRequest(filepath.Join(endpoint, "dsym"), uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
-				return err
+				if failOnUpload {
+					return err
+				} else {
+					log.Warn(err.Error())
+				}
 			} else {
 				log.Success("Uploaded dSYM: " + utils.DisplayBlankIfEmpty(dsym.Name))
 			}
