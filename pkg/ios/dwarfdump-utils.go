@@ -69,13 +69,11 @@ func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) 
 						for _, str := range outputSlice {
 							if strings.Contains(str, "UUID: ") {
 								info := strings.Split(str, " ")
-								//if len(info) == 4 {
 								dsymFile := &DsymFile{}
 								dsymFile.UUID = info[1]
 								dsymFile.Arch = info[2]
 								dsymFile.Name = filepath.Base(info[3])
 								dsymFiles = append(dsymFiles, dsymFile)
-								//}
 							}
 						}
 					} else {
