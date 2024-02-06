@@ -130,6 +130,7 @@ func ProcessDsym(
 		if err != nil {
 			if ignoreMissingDwarf {
 				log.Warn(err.Error())
+				return nil
 			} else {
 				return err
 			}
