@@ -157,7 +157,7 @@ func ProcessReactNativeIos(
 					bundlePath = possibleBundleFilePath
 					log.Info("Found bundle file at: " + bundlePath)
 				} else {
-					possibleBundleFilePath = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates/"+scheme+"/BuildProductsPath/Release-iphoneos/main.jsbundle")
+					possibleBundleFilePath = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), "main.jsbundle")
 					if utils.FileExists(possibleBundleFilePath) {
 						bundlePath = possibleBundleFilePath
 						log.Info("Found bundle file at: " + bundlePath)
