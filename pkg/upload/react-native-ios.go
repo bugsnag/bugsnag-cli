@@ -132,7 +132,7 @@ func ProcessReactNativeIos(
 					plistPath = plistPathExpected
 					log.Info("Found Info.plist at: " + plistPath)
 				} else {
-					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates/"+scheme+"/BuildProductsPath/Release-iphoneos/"+scheme+".app/Info.plist")
+					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)				
 					if utils.FileExists(plistPathExpected) {
 						plistPath = plistPathExpected
 						log.Info("Found Info.plist at: " + plistPath)
