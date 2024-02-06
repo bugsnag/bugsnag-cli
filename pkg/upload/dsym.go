@@ -11,13 +11,14 @@ import (
 )
 
 type Dsym struct {
-	VersionName string      `help:"The version of the application."`
-	Scheme      string      `help:"The name of the scheme to use when building the application."`
-	Dev         bool        `help:"Indicates whether the application is a debug or release build"`
-	DsymPath    string      `help:"Path to the dSYM" type:"path"`
-	Plist       string      `help:"Path to the Info.plist file" type:"path"`
-	ProjectRoot string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	Path        utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	VersionName        string      `help:"The version of the application"`
+	Scheme             string      `help:"The name of the scheme to use when building the application"`
+	Dev                bool        `help:"Indicates whether the application is a debug or release build"`
+	DsymPath           string      `help:"Path to the dSYM" type:"path"`
+	Plist              string      `help:"Path to the Info.plist file" type:"path"`
+	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
 func ProcessDsym(
@@ -28,6 +29,7 @@ func ProcessDsym(
 	dsymPath string,
 	plistPath string,
 	projectRoot string,
+	ignoreMissingDwarf bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -90,14 +92,32 @@ func ProcessDsym(
 			// Check if dsymPath exists, if not, try alternative path instead
 			err = utils.Path(dsymPath).Validate()
 			if err != nil {
-				log.Info("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
-				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+				if utils.Path(dsymPath).Validate() != nil {
+					if ignoreMissingDwarf {
+						log.Warn("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
+					} else {
+						log.Error("Could not find dSYM in expected location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
+					}
+				} else {
+					log.Info("Using dSYM path: " + dsymPath)
+				}
 
+				// Check if dsymPath exists, if not, try alternative path instead
 				err = utils.Path(dsymPath).Validate()
 				if err != nil {
-					return err
+					dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+
+					if utils.Path(dsymPath).Validate() != nil {
+						if ignoreMissingDwarf {
+							log.Warn("Could not find dSYM in alternative location: " + utils.DisplayBlankIfEmpty(dsymPath))
+						} else {
+							log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
+						}
+					} else {
+						log.Info("Using alternative dSYM path: " + dsymPath)
+					}
 				}
-				log.Info("Using alternative dSYM path: " + dsymPath)
+
 			}
 
 		} else {
@@ -105,8 +125,11 @@ func ProcessDsym(
 			var extractedLocation string
 			extractedLocation, err = utils.ExtractFile(dsymPath, "dsym")
 			if err != nil {
-				log.Warn(utils.DisplayBlankIfEmpty(dsymPath) + " is not a zip file or directory")
-				return err
+				if ignoreMissingDwarf {
+					log.Warn(utils.DisplayBlankIfEmpty(dsymPath) + " is not a zip file or directory")
+				} else {
+					log.Error(utils.DisplayBlankIfEmpty(dsymPath)+" is not a zip file or directory", 1)
+				}
 			}
 
 			if extractedLocation != "" {
@@ -117,7 +140,11 @@ func ProcessDsym(
 
 		dsyms, err = ios.GetDsymsForUpload(dsymPath)
 		if err != nil {
-			return err
+			if ignoreMissingDwarf {
+				log.Warn(err.Error())
+			} else {
+				return err
+			}
 		}
 
 		for _, dsym := range *dsyms {

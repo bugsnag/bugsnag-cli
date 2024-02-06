@@ -220,6 +220,7 @@ func main() {
 			commands.Upload.Dsym.DsymPath,
 			commands.Upload.Dsym.Plist,
 			commands.Upload.Dsym.ProjectRoot,
+			commands.Upload.Dsym.IgnoreMissingDwarf,
 			commands.Upload.Dsym.Path,
 			endpoint,
 			commands.Upload.Timeout,
