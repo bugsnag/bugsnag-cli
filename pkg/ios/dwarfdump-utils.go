@@ -52,18 +52,22 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 				if len(output) > 0 {
 					outputStr := string(output)
 
-					outputStr = strings.Replace(outputStr, "\n", "", -1)
+					outputStr = strings.TrimSuffix(outputStr, "\n")
 					outputStr = strings.ReplaceAll(outputStr, "(", "")
 					outputStr = strings.ReplaceAll(outputStr, ")", "")
 
-					if strings.Contains(outputStr, "UUID: ") {
-						info := strings.Split(outputStr, " ")
-						if len(info) == 4 {
-							dsymFile := &DsymFile{}
-							dsymFile.UUID = info[1]
-							dsymFile.Arch = info[2]
-							dsymFile.Name = info[3]
-							dsymFiles = append(dsymFiles, dsymFile)
+					outputSlice := strings.Split(outputStr, "\n")
+
+					for _, str := range outputSlice {
+						if strings.Contains(str, "UUID: ") {
+							info := strings.Split(str, " ")
+							if len(info) == 4 {
+								dsymFile := &DsymFile{}
+								dsymFile.UUID = info[1]
+								dsymFile.Arch = info[2]
+								dsymFile.Name = info[3]
+								dsymFiles = append(dsymFiles, dsymFile)
+							}
 						}
 					}
 				} else {
