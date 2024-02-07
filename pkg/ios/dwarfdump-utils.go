@@ -38,13 +38,16 @@ func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) 
 				if strings.HasSuffix(file.Name(), ".zip") {
 					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
 					path, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
+					defer func(path string) {
+						_ = os.RemoveAll(path)
+					}(path)
 
 					if path != "" {
 						log.Info("Unzipped " + file.Name() + " to " + path + " for uploading")
 					}
 				}
 
-				fileInfo, _ := os.Stat(filepath.Join(path, file.Name()))
+				fileInfo, _ := os.Stat(filepath.Join(path, strings.TrimSuffix(file.Name(), ".zip")))
 
 				if fileInfo.Size() == 0 {
 					if ignoreEmptyDsym {
