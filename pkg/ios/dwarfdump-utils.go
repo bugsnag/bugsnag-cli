@@ -27,6 +27,7 @@ func isDwarfDumpInstalled() bool {
 // GetDsymsForUpload returns information on the valid dSYM files found in a given path
 func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 	filesFound, _ := os.ReadDir(path)
+	var tempDir string
 	var dsymFiles []*DsymFile
 
 	switch len(filesFound) {
@@ -37,10 +38,14 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 			for _, file := range filesFound {
 				if strings.HasSuffix(file.Name(), ".zip") {
 					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
-					path, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
+					tempDir, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
 
-					if path != "" {
-						log.Info("Unzipped " + file.Name() + " to " + path + " for uploading")
+					if tempDir != "" {
+						log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
+						path = tempDir
+					} else {
+						log.Warn("Could not unzip " + file.Name() + " to a temporary directory, skipping")
+						continue
 					}
 				}
 
@@ -73,8 +78,15 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 				} else {
 					log.Info("Skipping upload for file without UUID: " + file.Name())
 				}
-
 			}
+			if tempDir != "" {
+				err := os.RemoveAll(tempDir)
+				if err != nil {
+					log.Warn("Could not remove temporary directory: " + tempDir)
+				}
+			}
+		} else {
+			return nil, errors.New("Unable to locate dwarfdump on this system.")
 		}
 	}
 

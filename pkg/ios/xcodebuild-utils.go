@@ -93,10 +93,12 @@ func getXcodeSchemes(path, projectRoot string) ([]string, string) {
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
 
 	// Remove excess whitespace and double newlines before splitting into a slice
-	replacer := strings.NewReplacer(" ", "", "\n\n", "")
-	sanitisedSchemes := replacer.Replace(schemes)
+	schemes = strings.ReplaceAll(schemes, "\n\n", "")
+	schemesSlice := strings.Split(schemes, "\n")
 
-	schemesSlice := strings.Split(sanitisedSchemes, "\n")
+	for i, scheme := range schemesSlice {
+		schemesSlice[i] = strings.TrimSpace(scheme)
+	}
 
 	return schemesSlice, derivedFrom
 }
