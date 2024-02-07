@@ -59,7 +59,7 @@ func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) 
 					}
 
 				} else {
-					cmd := exec.Command("dwarfdump", "-u", filepath.Join(path, file.Name()))
+					cmd := exec.Command(utils.DWARFDUMP, "-u", filepath.Join(path, file.Name()))
 					output, _ := cmd.Output()
 
 					if len(output) > 0 {
@@ -92,6 +92,8 @@ func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) 
 					}
 				}
 			}
+		} else {
+			return nil, errors.New("Unable to locate dwarfdump on this system.")
 		}
 	}
 
