@@ -42,8 +42,11 @@ func GetDsymsForUpload(path string, ignoreEmptyDsym bool) (*[]*DsymFile, error) 
 
 					if tempDir != "" {
 						log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
+						path = tempDir
+					} else {
+						log.Warn("Could not unzip " + file.Name() + " to a temporary directory, skipping")
+						continue
 					}
-					path = tempDir
 				}
 
 				fileInfo, _ := os.Stat(filepath.Join(path, strings.TrimSuffix(file.Name(), ".zip")))
