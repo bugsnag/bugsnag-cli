@@ -91,37 +91,36 @@ func ProcessDsym(
 			}
 
 			// Build the dsymPath from build settings
+			// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
 			dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
 
 			// Check if dsymPath exists, if not, try alternative path instead
-			err = utils.Path(dsymPath).Validate()
-			if err != nil {
-				if utils.Path(dsymPath).Validate() != nil {
-					if ignoreMissingDwarf {
-						log.Warn("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
-					} else {
-						log.Error("Could not find dSYM in expected location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
-					}
+			if utils.Path(dsymPath).Validate() != nil {
+
+				if ignoreMissingDwarf {
+					log.Warn("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
 				} else {
-					log.Info("Using dSYM path: " + dsymPath)
+					log.Error("Could not find dSYM in expected location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
 				}
 
-				// Check if dsymPath exists, if not, try alternative path instead
-				err = utils.Path(dsymPath).Validate()
-				if err != nil {
-					dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+				// Try alternative path which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app
+				altDsympath := filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
 
-					if utils.Path(dsymPath).Validate() != nil {
-						if ignoreMissingDwarf {
-							log.Warn("Could not find dSYM in alternative location: " + utils.DisplayBlankIfEmpty(dsymPath))
-						} else {
-							log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
-						}
+				if utils.Path(dsymPath).Validate() != nil {
+
+					if ignoreMissingDwarf {
+						log.Warn("Could not find dSYM in alternative location: " + utils.DisplayBlankIfEmpty(dsymPath))
 					} else {
-						log.Info("Using alternative dSYM path: " + dsymPath)
+						log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
 					}
+
+				} else {
+					log.Info("Using alternative dSYM path: " + altDsympath)
+					dsymPath = altDsympath
 				}
 
+			} else {
+				log.Info("Using dSYM path: " + dsymPath)
 			}
 
 		}
