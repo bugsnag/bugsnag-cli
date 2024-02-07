@@ -131,7 +131,7 @@ func ProcessDsym(
 					return err
 				}
 
-				// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+				// Check if the variables are empty, set if they are and log that we are using setting from the plist file
 				if versionName == "" {
 					versionName = plistData.VersionName
 					log.Info("Using version name from Info.plist: " + utils.DisplayBlankIfEmpty(versionName))
