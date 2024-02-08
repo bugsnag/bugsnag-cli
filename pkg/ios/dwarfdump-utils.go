@@ -45,6 +45,8 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 						path = tempDir
 					} else {
 						log.Warn("Could not unzip " + file.Name() + " to a temporary directory, skipping")
+						// Silently remove the temp dir if one was created before continuing
+						removeTempDir(tempDir)
 						continue
 					}
 				}
@@ -79,16 +81,16 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 					log.Info("Skipping upload for file without UUID: " + file.Name())
 				}
 			}
-			if tempDir != "" {
-				err := os.RemoveAll(tempDir)
-				if err != nil {
-					log.Warn("Could not remove temporary directory: " + tempDir)
-				}
-			}
+			removeTempDir(tempDir)
 		} else {
 			return nil, errors.New("Unable to locate dwarfdump on this system.")
 		}
 	}
 
 	return &dsymFiles, nil
+}
+
+// removeTempDir removes a temporary directory and disregards any errors
+func removeTempDir(tempDir string) {
+	_ = os.RemoveAll(tempDir)
 }
