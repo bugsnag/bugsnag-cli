@@ -51,7 +51,7 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 					}
 				}
 
-				cmd := exec.Command("dwarfdump", "-u", strings.TrimSuffix(file.Name(), ".zip"))
+				cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(file.Name(), ".zip"))
 				cmd.Dir = path
 
 				output, _ := cmd.Output()
