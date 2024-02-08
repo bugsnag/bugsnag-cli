@@ -43,10 +43,13 @@ build-macos:
 fmt:
 	gofmt -w ./
 
-.PHONY: unit-test
+.PHONY: unit-test-setup
 unit-test:
 	go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
 	go test -race -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
+
+.PHONY: unit-tests
+test: unit-test-setup features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
 
 .PHONY: npm-lint
 npm-lint:
