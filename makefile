@@ -41,7 +41,7 @@ build-macos:
 
 .PHONY: unit-test
 unit-test:
-	go test -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
+	go test -json -v ./test/... 2>&1 | tee /tmp/gotest.log
 
 
 .PHONY: fmt
