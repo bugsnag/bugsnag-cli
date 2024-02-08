@@ -146,7 +146,7 @@ func ProcessDsym(
 			fileFieldData := make(map[string]string)
 			fileFieldData["dsym"] = filepath.Join(dsymPath, dsym.Name)
 
-			err = server.ProcessFileRequest(filepath.Join(endpoint, "dsym"), uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
 				return err
