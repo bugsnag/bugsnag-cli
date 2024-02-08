@@ -41,7 +41,8 @@ build-macos:
 
 .PHONY: unit-test
 unit-test:
-	go test -json -v ./test/... 2>&1 | tee /tmp/gotest.log
+	go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
+	go test -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
 
 .PHONY: fmt
