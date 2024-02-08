@@ -2,7 +2,6 @@ package upload
 
 import (
 	"path/filepath"
-	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -88,20 +87,10 @@ func ProcessDsym(
 			// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
 			dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
 
-			// Check if dsymPath exists, if not, try alternative path instead
+			// Check if dsymPath exists before proceeding
 			if utils.Path(dsymPath).Validate() != nil {
-
-				// Try alternative path which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app
-				altDsympath := filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
-
-				if utils.Path(dsymPath).Validate() != nil {
-					// TODO: This will be downgraded to a warning with --ignore-missing-dwarf in near future
-					log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
-				} else {
-					log.Info("Using alternative dSYM path: " + altDsympath)
-					dsymPath = altDsympath
-				}
-
+				// TODO: This will be downgraded to a warning with --ignore-missing-dwarf in near future
+				log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
 			} else {
 				log.Info("Using dSYM path: " + dsymPath)
 			}
