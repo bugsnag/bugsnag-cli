@@ -11,6 +11,11 @@ steps:
         upload:
           - bin/**/*
 
+  # Unit Test
+  - label: Unit Test
+    commands:
+      - make unit-test
+
   - label: ":lint-roller::go: Lint Go Code"
     commands:
       - make go-lint
@@ -88,8 +93,3 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
-
-  # Unit Test
-  - label: Unit Test
-    commands:
-      - make unit-test
