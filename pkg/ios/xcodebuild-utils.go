@@ -87,7 +87,7 @@ func getXcodeSchemes(path, projectRoot string) ([]string, string) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return []string{}, ""
+		return []string{}, derivedFrom
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
