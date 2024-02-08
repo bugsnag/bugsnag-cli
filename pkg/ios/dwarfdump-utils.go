@@ -12,7 +12,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// DwarfInfo stores the UUID, architecture and name of a dSYM file
+// DwarfInfo stores the UUID, architecture and name of a dwarf file
 type DwarfInfo struct {
 	UUID string
 	Arch string
