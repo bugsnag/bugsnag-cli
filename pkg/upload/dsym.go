@@ -151,7 +151,7 @@ func ProcessDsym(
 			if err != nil {
 				return err
 			} else {
-				log.Success("Uploaded dSYM: " + utils.DisplayBlankIfEmpty(dsym.Name))
+				log.Success("Uploaded dSYM: " + dsym.Name)
 			}
 		}
 	}
