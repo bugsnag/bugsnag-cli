@@ -85,34 +85,27 @@ func ProcessDsym(
 			}
 
 			// Build the dsymPath from build settings
+			// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
 			dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
 
 			// Check if dsymPath exists, if not, try alternative path instead
-			err = utils.Path(dsymPath).Validate()
-			if err != nil {
-				log.Info("Could not find dSYM in expected location: " + utils.DisplayBlankIfEmpty(dsymPath))
-				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+			if utils.Path(dsymPath).Validate() != nil {
 
-				err = utils.Path(dsymPath).Validate()
-				if err != nil {
-					return err
+				// Try alternative path which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app
+				altDsympath := filepath.Join(buildSettings.ConfigurationBuildDir, strings.TrimSuffix(buildSettings.DsymName, ".dSYM"))
+
+				if utils.Path(dsymPath).Validate() != nil {
+					// TODO: This will be downgraded to a warning with --ignore-missing-dwarf in near future
+					log.Error("Could not find dSYM in alternative location: "+utils.DisplayBlankIfEmpty(dsymPath), 1)
+				} else {
+					log.Info("Using alternative dSYM path: " + altDsympath)
+					dsymPath = altDsympath
 				}
-				log.Info("Using alternative dSYM path: " + dsymPath)
+
+			} else {
+				log.Info("Using dSYM path: " + dsymPath)
 			}
 
-		} else {
-			// Use the dsymPath from the command line, check if it's zipped and unzip it if necessary
-			var extractedLocation string
-			extractedLocation, err = utils.ExtractFile(dsymPath, "dsym")
-			if err != nil {
-				log.Warn(utils.DisplayBlankIfEmpty(dsymPath) + " is not a zip file or directory")
-				return err
-			}
-
-			if extractedLocation != "" {
-				log.Info("Unzipped " + dsymPath + " to " + extractedLocation + " for uploading")
-				dsymPath = extractedLocation
-			}
 		}
 
 		dsyms, err = ios.GetDsymsForUpload(dsymPath)
