@@ -49,7 +49,7 @@ unit-test:
 	go test -race -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
 .PHONY: unit-tests
-unit-tests: unit-test-setup features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
+unit-tests: unit-test-setup features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
 
 .PHONY: npm-lint
 npm-lint:
