@@ -103,39 +103,40 @@ func ProcessDsym(
 			return err
 		}
 
+		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
+		if plistPath == "" && (apiKey == "" || versionName == "") {
+			plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+			if utils.FileExists(plistPathExpected) {
+				plistPath = plistPathExpected
+				log.Info("Found Info.plist at expected location: " + plistPath)
+			} else {
+				log.Info("No Info.plist found at expected location: " + plistPathExpected)
+			}
+		}
+
+		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
+		if plistPath != "" && (apiKey == "" || versionName == "") {
+			// Read data from the plist
+			plistData, err = ios.GetPlistData(plistPath)
+			if err != nil {
+				return err
+			}
+
+			// Check if the variables are empty, set if they are and log that we are using setting from the plist file
+			if versionName == "" {
+				versionName = plistData.VersionName
+				log.Info("Using version name from Info.plist: " + utils.DisplayBlankIfEmpty(versionName))
+			}
+
+			if apiKey == "" {
+				apiKey = plistData.BugsnagProjectDetails.ApiKey
+				log.Info("Using API key from Info.plist: " + utils.DisplayBlankIfEmpty(apiKey))
+			}
+		}
+
 		for _, dsym := range *dsyms {
 			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
 			log.Info("Uploading dSYM " + dsymInfo)
-			// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
-			if plistPath != "" && (apiKey == "" || versionName == "") {
-				// Read data from the plist
-				plistData, err = ios.GetPlistData(plistPath)
-				if err != nil {
-					return err
-				}
-
-				// Check if the variables are empty, set if they are and log that we are using setting from the plist file
-				if versionName == "" {
-					versionName = plistData.VersionName
-					log.Info("Using version name from Info.plist: " + utils.DisplayBlankIfEmpty(versionName))
-
-				}
-
-				if apiKey == "" {
-					apiKey = plistData.BugsnagProjectDetails.ApiKey
-					log.Info("Using API key from Info.plist: " + utils.DisplayBlankIfEmpty(apiKey))
-				}
-
-			} else if plistPath == "" && (apiKey == "" || versionName == "") {
-				// If not, we need to build the path to Info.plist from build settings values
-				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-				if utils.FileExists(plistPathExpected) {
-					plistPath = plistPathExpected
-					log.Info("Found Info.plist at expected location: " + plistPath)
-				} else {
-					log.Info("No Info.plist found at expected location: " + plistPathExpected)
-				}
-			}
 
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
 			if err != nil {
