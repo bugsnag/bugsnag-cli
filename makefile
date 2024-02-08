@@ -41,6 +41,9 @@ build-macos:
 
 .PHONY: unit-test
 unit-test:
+	cd features/base-fixtures/rn0_69/ios && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
+	cd features/base-fixtures/rn0_70/ios && xcodebuild -workspace rn0_70.xcworkspace -scheme rn0_70 -configuration Release -sdk iphoneos build
+	cd features/base-fixtures/rn0_72/ios && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
 	go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
 	go test -race -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
