@@ -12,8 +12,8 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// DsymFile stores the UUID, architecture and name of a dSYM file
-type DsymFile struct {
+// DwarfInfo stores the UUID, architecture and name of a dSYM file
+type DwarfInfo struct {
 	UUID string
 	Arch string
 	Name string
@@ -25,10 +25,10 @@ func isDwarfDumpInstalled() bool {
 }
 
 // GetDsymsForUpload returns information on the valid dSYM files found in a given path
-func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
+func GetDsymsForUpload(path string) (*[]*DwarfInfo, error) {
 	filesFound, _ := os.ReadDir(path)
 	var tempDir string
-	var dsymFiles []*DsymFile
+	var dsymFiles []*DwarfInfo
 
 	switch len(filesFound) {
 	case 0:
@@ -50,36 +50,7 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 						continue
 					}
 				}
-
-				cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(file.Name(), ".zip"))
-				cmd.Dir = path
-
-				output, _ := cmd.Output()
-
-				if len(output) > 0 {
-					outputStr := string(output)
-
-					outputStr = strings.TrimSuffix(outputStr, "\n")
-					outputStr = strings.ReplaceAll(outputStr, "(", "")
-					outputStr = strings.ReplaceAll(outputStr, ")", "")
-
-					outputSlice := strings.Split(outputStr, "\n")
-
-					for _, str := range outputSlice {
-						if strings.Contains(str, "UUID: ") {
-							info := strings.Split(str, " ")
-							if len(info) == 4 {
-								dsymFile := &DsymFile{}
-								dsymFile.UUID = info[1]
-								dsymFile.Arch = info[2]
-								dsymFile.Name = info[3]
-								dsymFiles = append(dsymFiles, dsymFile)
-							}
-						}
-					}
-				} else {
-					log.Info("Skipping upload for file without UUID: " + file.Name())
-				}
+				dsymFiles = getDwarfFileInfo(path, file.Name())
 			}
 			removeTempDir(tempDir)
 		} else {
@@ -88,6 +59,42 @@ func GetDsymsForUpload(path string) (*[]*DsymFile, error) {
 	}
 
 	return &dsymFiles, nil
+}
+
+// getDwarfFileInfo parses dwarfdump output to easier to manage/parsable DwarfInfo structs
+func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
+	var dwarfInfo []*DwarfInfo
+
+	cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(fileName, ".zip"))
+	cmd.Dir = path
+
+	output, _ := cmd.Output()
+	if len(output) > 0 {
+		outputStr := string(output)
+
+		outputStr = strings.TrimSuffix(outputStr, "\n")
+		outputStr = strings.ReplaceAll(outputStr, "(", "")
+		outputStr = strings.ReplaceAll(outputStr, ")", "")
+
+		outputSlice := strings.Split(outputStr, "\n")
+
+		for _, str := range outputSlice {
+			if strings.Contains(str, "UUID: ") {
+				rawDwarfInfo := strings.Split(str, " ")
+				if len(rawDwarfInfo) == 4 {
+					dwarf := &DwarfInfo{}
+					dwarf.UUID = rawDwarfInfo[1]
+					dwarf.Arch = rawDwarfInfo[2]
+					dwarf.Name = rawDwarfInfo[3]
+					dwarfInfo = append(dwarfInfo, dwarf)
+				}
+			}
+		}
+	} else {
+		log.Info("Skipping file without UUID: " + fileName)
+	}
+
+	return dwarfInfo
 }
 
 // removeTempDir removes a temporary directory and disregards any errors

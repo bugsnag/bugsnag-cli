@@ -36,7 +36,7 @@ func ProcessDsym(
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
-	var dsyms *[]*ios.DsymFile
+	var dsyms *[]*ios.DwarfInfo
 	var plistData *ios.PlistData
 	var uploadOptions map[string]string
 
