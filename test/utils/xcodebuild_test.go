@@ -33,20 +33,14 @@ func TestProcessPathValue(t *testing.T) {
 				ProjectRoot: "../testdata/ios/parent_root",
 			},
 		},
-		"if <path> is set, is a .xcworkspace directory and --project-root is not set, two directories up from <path> is returned": {
+		"if <path> is set, is a .xcworkspace directory and --project-root is not set, one directory up from <path> is returned": {
 			pathValue:   "../testdata/ios/parent_root/MyTestApp.xcworkspace",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
 			},
 		},
-		"if <path> is set as a directory, use it as project root": {
-			pathValue: "../testdata/ios/parent_root",
-			expectedResult: &ios.DsymUploadInfo{
-				ProjectRoot: "../testdata/ios/parent_root",
-			},
-		},
-		"if <path> and --project-root are both unset, current working directory is returned": {
+		"if <path> and --project-root are both unset, current working directory is returned as project root": {
 			pathValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{

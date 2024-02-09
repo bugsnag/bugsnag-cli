@@ -47,7 +47,8 @@ func GetDsymsForUpload(path string) (*[]*DwarfInfo, error) {
 					log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
 					path = tempDir
 				} else {
-					log.Warn("Could not unzip " + file.Name() + " to a temporary directory, skipping")
+					// TODO: This will be downgraded to a warning with --fail-on-upload in near future
+					log.Error("Could not unzip "+file.Name()+" to a temporary directory, skipping", 1)
 					// Silently remove the temp dir if one was created before continuing
 					removeTempDir(tempDir)
 					continue
