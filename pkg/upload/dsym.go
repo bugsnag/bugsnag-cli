@@ -59,7 +59,7 @@ func ProcessDsym(
 
 		// If scheme is set explicitly, check if it exists
 		if scheme != "" {
-			_, err = ios.IsSchemeInPath(path, scheme, projectRoot)
+			_, err = ios.IsSchemeInPath(path, scheme)
 			if err != nil {
 				return err
 			}
@@ -68,7 +68,7 @@ func ProcessDsym(
 			// Only when the dsym path is not set, try and work out the scheme
 			if dsymPath == "" {
 				// If the scheme is not set explicitly, try to find it
-				scheme, err = ios.GetDefaultScheme(path, projectRoot)
+				scheme, err = ios.GetDefaultScheme(path)
 				if err != nil {
 					return err
 				}
@@ -78,7 +78,7 @@ func ProcessDsym(
 
 		// If the dsymPath is not fed in via <path>
 		if dsymPath == "" {
-			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme, projectRoot)
+			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
 			if err != nil {
 				return err
 			}

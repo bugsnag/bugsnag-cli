@@ -40,11 +40,10 @@ func TestProcessPathValue(t *testing.T) {
 				ProjectRoot: "../testdata/ios/parent_root",
 			},
 		},
-		"if <path> is set, is a normal directory and --project-root is set, --project-root takes precedence and it's value returned": {
-			pathValue:   "../testdata/ios/parent_root",
-			projectRoot: "../testdata/ios/alt_parent_root",
+		"if <path> is set as a directory, use it as project root": {
+			pathValue: "../testdata/ios/parent_root",
 			expectedResult: &ios.DsymUploadInfo{
-				ProjectRoot: "../testdata/ios/alt_parent_root",
+				ProjectRoot: "../testdata/ios/parent_root",
 			},
 		},
 		"if <path> and --project-root are both unset, current working directory is returned": {
@@ -92,24 +91,25 @@ func TestProcessPathValue(t *testing.T) {
 func TestGetDefaultScheme(t *testing.T) {
 	tt := map[string]struct {
 		pathValue      string
-		projectRoot    string
 		expectedScheme string
 	}{
-		"projectRoot value takes precedence over path value for fetching scheme": {
-			pathValue:      "../testdata/ios/test",
-			projectRoot:    "../testdata/ios/SingleSchemeExample",
+		"<path> contains a normal directory and is used to fetch the scheme": {
+			pathValue:      "../testdata/ios/SingleSchemeExample/",
 			expectedScheme: "SingleSchemeExample",
 		},
-		"xcodeproj takes precedence over path value for fetching scheme": {
+		"<path> contains a .xcodeproj directory and is used to fetch the scheme": {
 			pathValue:      "../testdata/ios/SingleSchemeExample/SingleSchemeExample.xcodeproj",
-			projectRoot:    "../testdata/ios/SingleSchemeExample",
 			expectedScheme: "SingleSchemeExample",
+		},
+		"<path> contains a .xcworkspace directory and is used to fetch the scheme": {
+			pathValue:      "../testdata/ios/WorkspaceExample.xcworkspace",
+			expectedScheme: "WorkspaceScheme",
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualScheme, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+			actualScheme, err := ios.GetDefaultScheme(tc.pathValue)
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedScheme, actualScheme)
@@ -121,24 +121,21 @@ func TestGetDefaultScheme(t *testing.T) {
 func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
 	tt := map[string]struct {
 		pathValue            string
-		projectRoot          string
 		expectedExceptionMsg string
 	}{
 		"multiple schemes found results in exception": {
 			pathValue:            "../testdata/ios/MultipleSchemeExample/MultipleSchemeExample.xcodeproj",
-			projectRoot:          "",
 			expectedExceptionMsg: "Multiple schemes found",
 		},
 		"no schemes found results in exception": {
 			pathValue:            "../testdata/ios/parent_root",
-			projectRoot:          "../testdata/ios/parent_root",
 			expectedExceptionMsg: "No schemes found",
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			_, err := ios.GetDefaultScheme(tc.pathValue, tc.projectRoot)
+			_, err := ios.GetDefaultScheme(tc.pathValue)
 
 			assert.Contains(t, err.Error(), tc.expectedExceptionMsg)
 		})
@@ -150,13 +147,11 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 	tt := map[string]struct {
 		pathValue      string
 		scheme         string
-		projectRoot    string
 		expectedResult *ios.XcodeBuildSettings
 	}{
 		"successfully retrieve build settings for xcodeproj and scheme": {
-			pathValue:   "../../features/base-fixtures/rn0_72/ios/rn0_72.xcodeproj",
-			scheme:      "rn0_72",
-			projectRoot: "",
+			pathValue: "../../features/base-fixtures/rn0_72/ios/rn0_72.xcodeproj",
+			scheme:    "rn0_72",
 			expectedResult: &ios.XcodeBuildSettings{
 				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
 				InfoPlistPath:         "Info.plist",
@@ -165,9 +160,8 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 			},
 		},
 		"successfully retrieve build settings for xcworkspace and scheme": {
-			pathValue:   "../../features/base-fixtures/rn0_69/ios/rn0_69.xcworkspace",
-			scheme:      "rn0_69",
-			projectRoot: "",
+			pathValue: "../../features/base-fixtures/rn0_69/ios/rn0_69.xcworkspace",
+			scheme:    "rn0_69",
 			expectedResult: &ios.XcodeBuildSettings{
 				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
 				InfoPlistPath:         "Info.plist",
@@ -176,9 +170,8 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 			},
 		},
 		"successfully retrieve build settings for path to project root and scheme": {
-			pathValue:   "../../features/base-fixtures/rn0_70/ios/",
-			scheme:      "rn0_70",
-			projectRoot: "",
+			pathValue: "../../features/base-fixtures/rn0_70/ios/",
+			scheme:    "rn0_70",
 			expectedResult: &ios.XcodeBuildSettings{
 				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
 				InfoPlistPath:         "Info.plist",
@@ -186,22 +179,21 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 				DsymName:              "rn0_70.app.dSYM",
 			},
 		},
-		"successfully retrieve build settings for projectRoot (which takes precedence) and scheme": {
-			pathValue:   "../../features/base-fixtures/rn0_69/ios/",
-			scheme:      "rn0_70",
-			projectRoot: "../../features/base-fixtures/rn0_70/ios/",
+		"successfully retrieve build settings for projectRoot and scheme": {
+			pathValue: "../../features/base-fixtures/rn0_69/ios/",
+			scheme:    "rn0_69",
 			expectedResult: &ios.XcodeBuildSettings{
 				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
 				InfoPlistPath:         "Info.plist",
 				BuiltProductsDir:      "Build/Products/Release-iphoneos",
-				DsymName:              "rn0_70.app.dSYM",
+				DsymName:              "rn0_69.app.dSYM",
 			},
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualResult, err := ios.GetXcodeBuildSettings(tc.pathValue, tc.scheme, tc.projectRoot)
+			actualResult, err := ios.GetXcodeBuildSettings(tc.pathValue, tc.scheme)
 			require.NoError(t, err)
 			assert.NotNil(t, actualResult)
 
