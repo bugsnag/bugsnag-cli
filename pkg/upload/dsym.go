@@ -63,6 +63,7 @@ func ProcessDsym(
 			if err != nil {
 				return err
 			}
+			log.Info("Using scheme: " + scheme)
 		} else {
 
 			// Only when the dsym path is not set, try and work out the scheme
@@ -72,9 +73,9 @@ func ProcessDsym(
 				if err != nil {
 					return err
 				}
+				log.Info("Using scheme: " + scheme)
 			}
 		}
-		log.Info("Using scheme: " + utils.DisplayBlankIfEmpty(scheme))
 
 		// If the dsymPath is not fed in via <path>
 		if dsymPath == "" {
