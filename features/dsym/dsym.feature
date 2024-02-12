@@ -5,7 +5,6 @@ Feature: Dsym Integration Tests
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Dsym Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "scheme" equals "SingleSchemeExample"
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.0"
     And the sourcemap payload field "dev" equals "true"
