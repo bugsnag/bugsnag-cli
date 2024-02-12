@@ -66,7 +66,7 @@ endif
 	@./scripts/bump-version.sh $(VERSION)
 
 .PHONY: test-fixtures
-test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
+test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72 features/base-fixtures/dsym/SingleSchemeExample
 
 .PHONY: features/base-fixtures/android
 features/base-fixtures/android:
@@ -119,3 +119,9 @@ features/base-fixtures/rn0_72/ios:
 	cd $@/../ && npm i && bundle install
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
+
+.PHONY: features/base-fixtures/dsym/SingleSchemeExample
+features/base-fixtures/dsym/SingleSchemeExample:
+	cd $@/../ && npm i && bundle install
+	cd $@ && pod install
+	cd $@ && xcodebuild -scheme SingleSchemeExample -configuration Release -sdk iphoneos build
