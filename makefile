@@ -99,6 +99,12 @@ features/base-fixtures/rn0_69/ios:
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
 
+.PHONY: features/base-fixtures/rn0_69/ios/archive
+features/base-fixtures/rn0_69/ios/archive:
+	cd features/base-fixtures/rn0_69/ios/../ && npm i && bundle install
+	cd features/base-fixtures/rn0_69/ios/ && pod install
+	cd features/base-fixtures/rn0_69/ios/ && xcrun xcodebuild -scheme rn0_69 -workspace rn0_69.xcworkspace -configuration Release -archivePath "../rn0_69.xcarchive" -allowProvisioningUpdates archive
+
 .PHONY: features/base-fixtures/rn0_70/android
 features/base-fixtures/rn0_70/android:
 	cd $@/../ && npm i
@@ -110,6 +116,12 @@ features/base-fixtures/rn0_70/ios:
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_70.xcworkspace -scheme rn0_70 -configuration Release -sdk iphoneos build
 
+.PHONY: features/base-fixtures/rn0_70/ios/archive
+features/base-fixtures/rn0_70/ios/archive:
+	cd features/base-fixtures/rn0_70/ios/../ && npm i && bundle install
+	cd features/base-fixtures/rn0_70/ios/ && pod install
+	cd features/base-fixtures/rn0_70/ios/ && xcrun xcodebuild -scheme rn0_70 -workspace rn0_70.xcworkspace -configuration Release -archivePath "../rn0_70.xcarchive" -allowProvisioningUpdates archive
+
 .PHONY: features/base-fixtures/rn0_72/android
 features/base-fixtures/rn0_72/android:
 	cd $@/../ && npm i
@@ -120,3 +132,9 @@ features/base-fixtures/rn0_72/ios:
 	cd $@/../ && npm i && bundle install
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
+
+.PHONY: features/base-fixtures/rn0_72/ios/archive
+features/base-fixtures/rn0_72/ios/archive:
+	cd features/base-fixtures/rn0_72/ios/../ && npm i && bundle install
+	cd features/base-fixtures/rn0_72/ios/ && pod install
+	cd features/base-fixtures/rn0_72/ios/ && xcrun xcodebuild -scheme rn0_72 -workspace rn0_72.xcworkspace -configuration Release -archivePath "../rn0_72.xcarchive" -allowProvisioningUpdates archive

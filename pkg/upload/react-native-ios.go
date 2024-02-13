@@ -132,7 +132,13 @@ func ProcessReactNativeIos(
 					plistPath = plistPathExpected
 					log.Info("Found Info.plist at: " + plistPath)
 				} else {
-					log.Info("No Info.plist found at: " + plistPathExpected)
+					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)				
+					if utils.FileExists(plistPathExpected) {
+						plistPath = plistPathExpected
+						log.Info("Found Info.plist at: " + plistPath)
+					} else {
+						log.Info("No Info.plist found at: " + plistPathExpected)
+					}
 				}
 			}
 
@@ -151,7 +157,13 @@ func ProcessReactNativeIos(
 					bundlePath = possibleBundleFilePath
 					log.Info("Found bundle file at: " + bundlePath)
 				} else {
-					log.Info("No bundle file found at: " + possibleBundleFilePath)
+					possibleBundleFilePath = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), "main.jsbundle")
+					if utils.FileExists(possibleBundleFilePath) {
+						bundlePath = possibleBundleFilePath
+						log.Info("Found bundle file at: " + bundlePath)
+					} else {
+						log.Info("No bundle file found at: " + possibleBundleFilePath)
+					}
 				}
 			}
 		}
