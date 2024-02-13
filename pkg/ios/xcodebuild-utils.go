@@ -196,52 +196,6 @@ func ProcessPathValues(path, dsymPath, projectRoot string) (*DsymUploadInfo, err
 	return nil, nil
 }
 
-//// ProcessPathValue determines the projectRoot from a given path
-//func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) {
-//	if path == "" && projectRoot == "" {
-//		currentDir, err := os.Getwd()
-//		if err != nil {
-//			return nil, err
-//		}
-//		return &DsymUploadInfo{currentDir, []string{""}}, nil
-//	}
-//
-//	_, err := os.Stat(path)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	if utils.IsDir(path) {
-//
-//		if projectRoot != "" {
-//			log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
-//			return &DsymUploadInfo{projectRoot, []string{""}}, nil
-//		}
-//
-//		if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
-//			// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
-//			return &DsymUploadInfo{filepath.Dir(path), []string{""}}, nil
-//		} else {
-//			dsymPaths, _ := findDsyms(path)
-//			//fmt.Print(dsymPaths)
-//
-//			if len(dsymPaths) != 0 {
-//				// Otherwise, don't set project root and set dsymPaths to the found dSYM locations
-//				return &DsymUploadInfo{"", dsymPaths}, nil
-//			} else {
-//				// If path is pointing to a directory and no dSYMs found within it, set projectRoot to the path
-//				return &DsymUploadInfo{path, []string{""}}, nil
-//			}
-//
-//		}
-//
-//	} else {
-//		// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
-//		return &DsymUploadInfo{"", []string{path}}, nil
-//	}
-//
-//}
-
 func findDsyms(root string) ([]string, error) {
 	var dsyms []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
