@@ -16,11 +16,13 @@ func TestProcessPathValue(t *testing.T) {
 
 	tt := map[string]struct {
 		pathValue      string
+		dsymValue      string
 		projectRoot    string
 		expectedResult *ios.DsymUploadInfo
 	}{
 		"if <path> is set, is a normal directory and --project-root is not set, value of <path> is returned as-is": {
 			pathValue:   "../testdata/ios/parent_root",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
@@ -28,6 +30,7 @@ func TestProcessPathValue(t *testing.T) {
 		},
 		"if <path> is set, is a .xcodeproj directory and --project-root is not set, one directory up from <path> is returned": {
 			pathValue:   "../testdata/ios/parent_root/MyTestApp.xcodeproj",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
@@ -35,6 +38,7 @@ func TestProcessPathValue(t *testing.T) {
 		},
 		"if <path> is set, is a .xcworkspace directory and --project-root is not set, one directory up from <path> is returned": {
 			pathValue:   "../testdata/ios/parent_root/MyTestApp.xcworkspace",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
@@ -42,6 +46,7 @@ func TestProcessPathValue(t *testing.T) {
 		},
 		"if <path> and --project-root are both unset, current working directory is returned as project root": {
 			pathValue:   "",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: currentDir,
@@ -49,31 +54,34 @@ func TestProcessPathValue(t *testing.T) {
 		},
 		"if <path> is a file then set the dsym path to it's value": {
 			pathValue:   "../testdata/ios/MyTestApp",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
-				DsymPath: "../testdata/ios/MyTestApp",
+				DsymPaths: &[]string{"../testdata/ios/MyTestApp"},
 			},
 		},
 		"if <path> is a .zip then set the dsym path to it's value": {
 			pathValue:   "../testdata/ios/MyTestApp.zip",
+			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
-				DsymPath: "../testdata/ios/MyTestApp.zip",
+				DsymPaths: &[]string{"../testdata/ios/MyTestApp.zip"},
 			},
 		},
 		"if <path> is a file then set the dsym path to it's value and if --project-root is set, use it's value for project root": {
 			pathValue:   "../testdata/ios/MyTestApp",
+			dsymValue:   "",
 			projectRoot: "../testdata/ios/parent_root",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
-				DsymPath:    "../testdata/ios/MyTestApp",
+				DsymPaths:   &[]string{"../testdata/ios/MyTestApp"},
 			},
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualResult, err := ios.ProcessPathValue(tc.pathValue, tc.projectRoot)
+			actualResult, err := ios.ProcessPathValues(tc.pathValue, tc.dsymValue, tc.projectRoot)
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedResult, actualResult)
