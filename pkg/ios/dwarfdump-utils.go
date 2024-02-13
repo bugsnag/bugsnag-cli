@@ -14,9 +14,10 @@ import (
 
 // DwarfInfo stores the UUID, architecture and name of a dwarf file
 type DwarfInfo struct {
-	UUID string
-	Arch string
-	Name string
+	UUID     string
+	Arch     string
+	Name     string
+	Location string
 }
 
 // isDwarfDumpInstalled checks if dwarfdump is installed by checking if there is a path returned for it
@@ -25,39 +26,41 @@ func isDwarfDumpInstalled() bool {
 }
 
 // GetDsymsForUpload returns information on the valid dSYM files found in a given path
-func GetDsymsForUpload(path string) (*[]*DwarfInfo, error) {
-	filesFound, _ := os.ReadDir(path)
-	var tempDir string
+func GetDsymsForUpload(paths []string) (*[]*DwarfInfo, error) {
 	var dsymFiles []*DwarfInfo
+	for _, path := range paths {
+		filesFound, _ := os.ReadDir(path)
+		var tempDir string
 
-	switch len(filesFound) {
-	case 0:
-		return nil, errors.Errorf("No dSYM files found in expected location '%s'", path)
-	default:
-		if !isDwarfDumpInstalled() {
-			return nil, errors.New("Unable to locate dwarfdump on this system.")
-		}
-
-		for _, file := range filesFound {
-			if strings.HasSuffix(file.Name(), ".zip") {
-				log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
-				tempDir, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
-
-				if tempDir != "" {
-					log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
-					path = tempDir
-				} else {
-					// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-					log.Error("Could not unzip "+file.Name()+" to a temporary directory, skipping", 1)
-					// Silently remove the temp dir if one was created before continuing
-					removeTempDir(tempDir)
-					continue
-				}
+		switch len(filesFound) {
+		case 0:
+			return nil, errors.Errorf("No dSYM files found in expected location '%s'", path)
+		default:
+			if !isDwarfDumpInstalled() {
+				return nil, errors.New("Unable to locate dwarfdump on this system.")
 			}
-			dsymFiles = getDwarfFileInfo(path, file.Name())
-			removeTempDir(tempDir)
-		}
 
+			for _, file := range filesFound {
+				if strings.HasSuffix(file.Name(), ".zip") {
+					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
+					tempDir, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
+
+					if tempDir != "" {
+						log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
+						path = tempDir
+					} else {
+						// TODO: This will be downgraded to a warning with --fail-on-upload in near future
+						log.Error("Could not unzip "+file.Name()+" to a temporary directory, skipping", 1)
+						// Silently remove the temp dir if one was created before continuing
+						removeTempDir(tempDir)
+						continue
+					}
+				}
+				dsymFiles = append(dsymFiles, getDwarfFileInfo(path, file.Name())...)
+				removeTempDir(tempDir)
+			}
+
+		}
 	}
 
 	return &dsymFiles, nil
@@ -88,6 +91,7 @@ func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 					dwarf.UUID = rawDwarfInfo[1]
 					dwarf.Arch = rawDwarfInfo[2]
 					dwarf.Name = rawDwarfInfo[3]
+					dwarf.Location = path
 					dwarfInfo = append(dwarfInfo, dwarf)
 				}
 			}

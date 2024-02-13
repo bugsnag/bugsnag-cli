@@ -41,24 +41,18 @@ func ProcessDsym(
 	var uploadOptions map[string]string
 
 	for _, path := range paths {
-		uploadInfo, err := ios.ProcessPathValue(path, projectRoot)
+		uploadInfo, err := ios.ProcessPathValues(path, dsymPath, projectRoot)
 		if err != nil {
 			return err
 		}
 
-		// If dsymPath is not set explicitly, use uploadInfo to set it (if available)
-		// uploadInfo.DsymPath is set when <path> is recognised as a dsym path
-		if dsymPath == "" && uploadInfo.DsymPath != "" {
-			dsymPath = uploadInfo.DsymPath
-		}
-
-		// If projectRoot is not set explicitly, use uploadInfo to set it
-		if projectRoot == "" {
+		// If projectRoot is not set explicitly, use uploadInfo to set it (where possible)
+		if projectRoot == "" && uploadInfo.ProjectRoot != "" {
 			projectRoot = uploadInfo.ProjectRoot
 		}
 
 		// If scheme is set explicitly, check if it exists
-		if scheme != "" {
+		if scheme != "" && len(uploadInfo.DsymPaths) == 0 {
 			_, err = ios.IsSchemeInPath(path, scheme)
 			if err != nil {
 				return err
@@ -67,7 +61,7 @@ func ProcessDsym(
 		} else {
 
 			// Only when the dsym path is not set, try and work out the scheme
-			if dsymPath == "" {
+			if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
 				// If the scheme is not set explicitly, try to find it
 				scheme, err = ios.GetDefaultScheme(path)
 				if err != nil {
@@ -78,7 +72,7 @@ func ProcessDsym(
 		}
 
 		// If the dsymPath is not fed in via <path>
-		if dsymPath == "" {
+		if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
 			if err != nil {
 				return err
@@ -99,7 +93,7 @@ func ProcessDsym(
 
 		}
 
-		dsyms, err = ios.GetDsymsForUpload(dsymPath)
+		dsyms, err = ios.GetDsymsForUpload(uploadInfo.DsymPaths)
 		if err != nil {
 			return err
 		}
@@ -149,7 +143,7 @@ func ProcessDsym(
 			}
 
 			fileFieldData := make(map[string]string)
-			fileFieldData["dsym"] = filepath.Join(dsymPath, dsym.Name)
+			fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
 
 			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
