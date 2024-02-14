@@ -52,6 +52,7 @@ func ProcessDsym(
 
 		// If workingDir is not empty
 		if workingDir != "" {
+			projectRoot = workingDir
 
 			// If scheme is set explicitly, check if it exists
 			if scheme != "" {
