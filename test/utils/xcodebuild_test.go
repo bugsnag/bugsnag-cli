@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // Tests expected common use case behaviour for processing <path> value
@@ -57,7 +58,7 @@ func TestProcessPathValue(t *testing.T) {
 			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
-				DsymPaths: &[]string{"../testdata/ios/MyTestApp"},
+				DsymPaths: []string{"../testdata/ios/MyTestApp"},
 			},
 		},
 		"if <path> is a .zip then set the dsym path to it's value": {
@@ -65,7 +66,7 @@ func TestProcessPathValue(t *testing.T) {
 			dsymValue:   "",
 			projectRoot: "",
 			expectedResult: &ios.DsymUploadInfo{
-				DsymPaths: &[]string{"../testdata/ios/MyTestApp.zip"},
+				DsymPaths: []string{"../testdata/ios/MyTestApp.zip"},
 			},
 		},
 		"if <path> is a file then set the dsym path to it's value and if --project-root is set, use it's value for project root": {
@@ -74,7 +75,7 @@ func TestProcessPathValue(t *testing.T) {
 			projectRoot: "../testdata/ios/parent_root",
 			expectedResult: &ios.DsymUploadInfo{
 				ProjectRoot: "../testdata/ios/parent_root",
-				DsymPaths:   &[]string{"../testdata/ios/MyTestApp"},
+				DsymPaths:   []string{"../testdata/ios/MyTestApp"},
 			},
 		},
 	}
@@ -84,7 +85,11 @@ func TestProcessPathValue(t *testing.T) {
 			actualResult, err := ios.ProcessPathValues(tc.pathValue, tc.dsymValue, tc.projectRoot)
 			require.NoError(t, err)
 
-			assert.Equal(t, tc.expectedResult, actualResult)
+			assert.Equal(t, tc.expectedResult.ProjectRoot, actualResult.ProjectRoot)
+			assert.Equal(t, tc.expectedResult.DsymPaths, actualResult.DsymPaths)
+
+			// Clean up the temp dir
+			utils.RemoveTempDir(actualResult.TempDir)
 		})
 	}
 }
@@ -202,6 +207,52 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 			assert.Contains(t, actualResult.ConfigurationBuildDir, tc.expectedResult.ConfigurationBuildDir)
 			assert.Contains(t, actualResult.InfoPlistPath, tc.expectedResult.InfoPlistPath)
 			assert.Contains(t, actualResult.BuiltProductsDir, tc.expectedResult.BuiltProductsDir)
+		})
+	}
+}
+
+func TestProcessPathValueDsym(t *testing.T) {
+	tt := map[string]struct {
+		pathValue             string
+		dsymValue             string
+		projectRoot           string
+		expectedNumberOfDsyms int
+	}{
+		"<path> value contains a path to one dSYM for uploading": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym",
+			dsymValue:             "",
+			projectRoot:           "",
+			expectedNumberOfDsyms: 1,
+		},
+		"<path> value contains a path to one zipped dSYM for uploading": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym.zip",
+			dsymValue:             "",
+			projectRoot:           "",
+			expectedNumberOfDsyms: 1,
+		},
+		"<path> value contains a path to two dSYMs for uploading": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms",
+			dsymValue:             "",
+			projectRoot:           "",
+			expectedNumberOfDsyms: 2,
+		},
+		"<path> value contains a path to two zipped dSYMs for uploading": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms.zip",
+			dsymValue:             "",
+			projectRoot:           "",
+			expectedNumberOfDsyms: 2,
+		},
+	}
+
+	for name, tc := range tt {
+		t.Run(name, func(t *testing.T) {
+			actualResult, err := ios.ProcessPathValues(tc.pathValue, tc.dsymValue, tc.projectRoot)
+			require.NoError(t, err)
+
+			assert.Equal(t, tc.expectedNumberOfDsyms, len(actualResult.DsymPaths))
+
+			// Clean up the temp dir
+			utils.RemoveTempDir(actualResult.TempDir)
 		})
 	}
 }

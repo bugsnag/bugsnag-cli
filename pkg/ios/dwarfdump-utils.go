@@ -52,12 +52,12 @@ func GetDsymsForUpload(paths []string) (*[]*DwarfInfo, error) {
 						// TODO: This will be downgraded to a warning with --fail-on-upload in near future
 						log.Error("Could not unzip "+file.Name()+" to a temporary directory, skipping", 1)
 						// Silently remove the temp dir if one was created before continuing
-						removeTempDir(tempDir)
+						utils.RemoveTempDir(tempDir)
 						continue
 					}
 				}
 				dsymFiles = append(dsymFiles, getDwarfFileInfo(path, file.Name())...)
-				removeTempDir(tempDir)
+				utils.RemoveTempDir(tempDir)
 			}
 
 		}
@@ -101,9 +101,4 @@ func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 	}
 
 	return dwarfInfo
-}
-
-// removeTempDir removes a temporary directory and disregards any errors
-func removeTempDir(tempDir string) {
-	_ = os.RemoveAll(tempDir)
 }

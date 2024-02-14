@@ -162,3 +162,8 @@ func LocationOf(something string) string {
 	location, _ := cmd.Output()
 	return strings.TrimSpace(string(location))
 }
+
+// RemoveTempDir removes a temporary directory and disregards any errors
+func RemoveTempDir(tempDir string) {
+	_ = os.RemoveAll(tempDir)
+}

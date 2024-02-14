@@ -52,7 +52,7 @@ func ProcessDsym(
 		}
 
 		// If scheme is set explicitly, check if it exists
-		if scheme != "" && len(*uploadInfo.DsymPaths) == 0 {
+		if scheme != "" && len(uploadInfo.DsymPaths) == 0 {
 			_, err = ios.IsSchemeInPath(path, scheme)
 			if err != nil {
 				return err
@@ -61,7 +61,7 @@ func ProcessDsym(
 		} else {
 
 			// Only when the dsym path is not set, try and work out the scheme
-			if dsymPath == "" && len(*uploadInfo.DsymPaths) == 0 {
+			if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
 				// If the scheme is not set explicitly, try to find it
 				scheme, err = ios.GetDefaultScheme(path)
 				if err != nil {
@@ -72,7 +72,7 @@ func ProcessDsym(
 		}
 
 		// If the dsymPath is not fed in via <path>
-		if dsymPath == "" && len(*uploadInfo.DsymPaths) == 0 {
+		if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
 			if err != nil {
 				return err
@@ -93,7 +93,7 @@ func ProcessDsym(
 
 		}
 
-		dsyms, err = ios.GetDsymsForUpload(*uploadInfo.DsymPaths)
+		dsyms, err = ios.GetDsymsForUpload(uploadInfo.DsymPaths)
 		if err != nil {
 			return err
 		}
@@ -151,6 +151,10 @@ func ProcessDsym(
 				return err
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Name)
+			}
+
+			if uploadInfo.TempDir != "" {
+				utils.RemoveTempDir(uploadInfo.TempDir)
 			}
 		}
 	}
