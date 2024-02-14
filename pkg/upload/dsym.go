@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
@@ -41,38 +42,34 @@ func ProcessDsym(
 	var uploadOptions map[string]string
 
 	for _, path := range paths {
-		uploadInfo, err := ios.ProcessPathValues(path, dsymPath, projectRoot)
+		err := ios.ValidatePaths(path, dsymPath, projectRoot)
 		if err != nil {
 			return err
 		}
 
-		// If projectRoot is not set explicitly, use uploadInfo to set it (where possible)
-		if projectRoot == "" && uploadInfo.ProjectRoot != "" {
-			projectRoot = uploadInfo.ProjectRoot
-		}
+		// workingDir will be empty in cases where --dsym-path is not set or if <path> is a path containing dSYM(s)
+		workingDir := ios.SetWorkingDirectory(path)
 
-		// If scheme is set explicitly, check if it exists
-		if scheme != "" && len(uploadInfo.DsymPaths) == 0 {
-			_, err = ios.IsSchemeInPath(path, scheme)
-			if err != nil {
-				return err
-			}
-			log.Info("Using scheme: " + scheme)
-		} else {
+		// If workingDir is not empty
+		if workingDir != "" {
 
-			// Only when the dsym path is not set, try and work out the scheme
-			if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
-				// If the scheme is not set explicitly, try to find it
+			// If scheme is set explicitly, check if it exists
+			if scheme != "" {
+				_, err = ios.IsSchemeInPath(path, scheme)
+				if err != nil {
+					return err
+				}
+				log.Info("Using scheme: " + scheme)
+
+			} else {
+				// Otherwise, try to find it
 				scheme, err = ios.GetDefaultScheme(path)
 				if err != nil {
 					return err
 				}
 				log.Info("Using scheme: " + scheme)
 			}
-		}
 
-		// If the dsymPath is not fed in via <path>
-		if dsymPath == "" && len(uploadInfo.DsymPaths) == 0 {
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
 			if err != nil {
 				return err
@@ -84,28 +81,31 @@ func ProcessDsym(
 
 			// Check if dsymPath exists before proceeding
 			if utils.Path(dsymPath).Validate() != nil {
-				// TODO: This will be downgraded to a warning with --ignore-missing-dwarf in near future
+				// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
 				log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
 					"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path", 1)
 			} else {
 				log.Info("Using dSYM path: " + dsymPath)
+				ios.DsymDirs = append(ios.DsymDirs, dsymPath)
 			}
 
 		}
 
-		dsyms, err = ios.GetDsymsForUpload(uploadInfo.DsymPaths)
+		dsyms, err = ios.GetDsymsForUpload(ios.DsymDirs)
 		if err != nil {
 			return err
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
 		if plistPath == "" && (apiKey == "" || versionName == "") {
-			plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-			if utils.FileExists(plistPathExpected) {
-				plistPath = plistPathExpected
-				log.Info("Found Info.plist at expected location: " + plistPath)
-			} else {
-				log.Info("No Info.plist found at expected location: " + plistPathExpected)
+			if buildSettings != nil {
+				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+				if utils.FileExists(plistPathExpected) {
+					plistPath = plistPathExpected
+					log.Info("Found Info.plist at expected location: " + plistPath)
+				} else {
+					log.Info("No Info.plist found at expected location: " + plistPathExpected)
+				}
 			}
 		}
 
@@ -153,9 +153,12 @@ func ProcessDsym(
 				log.Success("Uploaded dSYM: " + dsym.Name)
 			}
 
-			if uploadInfo.TempDir != "" {
-				utils.RemoveTempDir(uploadInfo.TempDir)
-			}
+		}
+	}
+
+	if ios.TempDirs != nil {
+		for _, tempDir := range ios.TempDirs {
+			_ = os.RemoveAll(tempDir)
 		}
 	}
 

@@ -3,7 +3,6 @@ package ios
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -30,7 +29,6 @@ func GetDsymsForUpload(paths []string) (*[]*DwarfInfo, error) {
 	var dsymFiles []*DwarfInfo
 	for _, path := range paths {
 		filesFound, _ := os.ReadDir(path)
-		var tempDir string
 
 		switch len(filesFound) {
 		case 0:
@@ -41,25 +39,8 @@ func GetDsymsForUpload(paths []string) (*[]*DwarfInfo, error) {
 			}
 
 			for _, file := range filesFound {
-				if strings.HasSuffix(file.Name(), ".zip") {
-					log.Info("Attempting to unzip " + file.Name() + " before proceeding to upload")
-					tempDir, _ = utils.ExtractFile(filepath.Join(path, file.Name()), "dsym")
-
-					if tempDir != "" {
-						log.Info("Unzipped " + file.Name() + " to " + tempDir + " for uploading")
-						path = tempDir
-					} else {
-						// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-						log.Error("Could not unzip "+file.Name()+" to a temporary directory, skipping", 1)
-						// Silently remove the temp dir if one was created before continuing
-						utils.RemoveTempDir(tempDir)
-						continue
-					}
-				}
 				dsymFiles = append(dsymFiles, getDwarfFileInfo(path, file.Name())...)
-				utils.RemoveTempDir(tempDir)
 			}
-
 		}
 	}
 
