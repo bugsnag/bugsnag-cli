@@ -211,42 +211,45 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 	}
 }
 
+// Tests expected scenarios where path can be a directory containing a file or directory containing a dSYM
 func TestProcessPathValueDsym(t *testing.T) {
 	tt := map[string]struct {
 		pathValue             string
-		dsymValue             string
-		projectRoot           string
 		expectedNumberOfDsyms int
 	}{
 		"<path> value contains a path to one dSYM for uploading": {
 			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym",
-			dsymValue:             "",
-			projectRoot:           "",
 			expectedNumberOfDsyms: 1,
 		},
 		"<path> value contains a path to one zipped dSYM for uploading": {
 			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym.zip",
-			dsymValue:             "",
-			projectRoot:           "",
 			expectedNumberOfDsyms: 1,
 		},
 		"<path> value contains a path to two dSYMs for uploading": {
 			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms",
-			dsymValue:             "",
-			projectRoot:           "",
 			expectedNumberOfDsyms: 2,
 		},
 		"<path> value contains a path to two zipped dSYMs for uploading": {
 			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms.zip",
-			dsymValue:             "",
-			projectRoot:           "",
 			expectedNumberOfDsyms: 2,
+		},
+		"<path> value contains zip file containing directory of dSYM files that was compressed with macOS Archive Utility": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/macos-compressed-dsyms.zip",
+			expectedNumberOfDsyms: 6,
+		},
+		"<path> value contains a zip file containing single dSYM files": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/app.dSYM.zip",
+			expectedNumberOfDsyms: 1,
+		},
+		"<path> value contains an .xcarchive containing commas and special characters": {
+			pathValue:             "../testdata/ios/dsym-test-fixtures/bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive",
+			expectedNumberOfDsyms: 1,
 		},
 	}
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualResult, err := ios.ProcessPathValues(tc.pathValue, tc.dsymValue, tc.projectRoot)
+			actualResult, err := ios.ProcessPathValues(tc.pathValue, "", "")
 			require.NoError(t, err)
 
 			assert.Equal(t, tc.expectedNumberOfDsyms, len(actualResult.DsymPaths))
