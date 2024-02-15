@@ -1,0 +1,24 @@
+{
+  "" : {
+    "dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/Objects-normal/arm64/swift-ios-master.d",
+    "diagnostics" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/Objects-normal/arm64/swift-ios-master.dia",
+    "emit-module-dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/Objects-normal/arm64/swift-ios-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/Objects-normal/arm64/swift-ios-master-emit-module.dia",
+    "swift-dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/Objects-normal/arm64/swift-ios-master.swiftdeps"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/DerivedData/swift-ios/Index.noindex/Build/Intermediates.noindex/swift-ios.build/Debug-iphonesimulator/swift-ios.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/swift-ios/AnotherClass.swift" : {
+
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/swift-ios/AppDelegate.swift" : {
+
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/swift-ios/SceneDelegate.swift" : {
+
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/swift-ios/ViewController.swift" : {
+
+  }
+}

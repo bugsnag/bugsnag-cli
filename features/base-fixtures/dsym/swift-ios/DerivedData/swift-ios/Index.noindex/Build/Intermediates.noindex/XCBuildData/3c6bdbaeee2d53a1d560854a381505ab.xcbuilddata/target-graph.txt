@@ -1,0 +1,10 @@
+Target dependency graph (6 targets)
+Target 'BugsnagNetworkRequestPlugin' in project 'Pods'
+➜ Explicit dependency on target 'Bugsnag' in project 'Pods'
+Target 'Bugsnag' in project 'Pods' (no dependencies)
+Target 'BugsnagNetworkRequestPlugin' in project 'Pods'
+➜ Explicit dependency on target 'Bugsnag' in project 'Pods'
+Target 'Bugsnag' in project 'Pods' (no dependencies)
+Target 'BugsnagNetworkRequestPlugin' in project 'Pods'
+➜ Explicit dependency on target 'Bugsnag' in project 'Pods'
+Target 'Bugsnag' in project 'Pods' (no dependencies)

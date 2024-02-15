@@ -120,8 +120,8 @@ features/base-fixtures/rn0_72/ios:
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
 
-.PHONY: features/base-fixtures/dsym/SingleSchemeExample
-features/base-fixtures/dsym/SingleSchemeExample:
-	cd $@/../ && npm i && bundle install
+.PHONY: features/base-fixtures/dsym/swift-package-manager
+features/base-fixtures/dsym/swift-package-manager:
+	cd $@ && bundle install
 	cd $@ && pod install
-	cd $@ && xcodebuild -scheme SingleSchemeExample -configuration Release -sdk iphoneos build
+	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates

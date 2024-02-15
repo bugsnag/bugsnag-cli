@@ -1,0 +1,22 @@
+PODS:
+  - Bugsnag (6.28.0)
+  - BugsnagNetworkRequestPlugin (6.28.0):
+    - Bugsnag (~> 6.13)
+
+DEPENDENCIES:
+  - Bugsnag (from `../..`)
+  - BugsnagNetworkRequestPlugin (from `../..`)
+
+EXTERNAL SOURCES:
+  Bugsnag:
+    :path: "../.."
+  BugsnagNetworkRequestPlugin:
+    :path: "../.."
+
+SPEC CHECKSUMS:
+  Bugsnag: dd258f499a0a041e3ffc856c8d0c802e02fe3026
+  BugsnagNetworkRequestPlugin: c0051a6be04d33c56f100b0a1b7252e1a052131b
+
+PODFILE CHECKSUM: 260c956ce01b4c722234b2a32cd793abaa3837cb
+
+COCOAPODS: 1.14.3

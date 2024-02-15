@@ -218,31 +218,31 @@ package utils_testing
 //		expectedNumberOfDsyms int
 //	}{
 //		"<path> value contains a path to one dSYM for uploading": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym",
+//			pathValue:             "../testdata/ios/fixtures/single-dsym",
 //			expectedNumberOfDsyms: 1,
 //		},
 //		"<path> value contains a path to one zipped dSYM for uploading": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/single-dsym.zip",
+//			pathValue:             "../testdata/ios/fixtures/single-dsym.zip",
 //			expectedNumberOfDsyms: 1,
 //		},
 //		"<path> value contains a path to two dSYMs for uploading": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms",
+//			pathValue:             "../testdata/ios/fixtures/dsyms",
 //			expectedNumberOfDsyms: 2,
 //		},
 //		"<path> value contains a path to two zipped dSYMs for uploading": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/dsyms.zip",
+//			pathValue:             "../testdata/ios/fixtures/dsyms.zip",
 //			expectedNumberOfDsyms: 2,
 //		},
 //		"<path> value contains zip file containing directory of dSYM files that was compressed with macOS Archive Utility": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/macos-compressed-dsyms.zip",
+//			pathValue:             "../testdata/ios/fixtures/macos-compressed-dsyms.zip",
 //			expectedNumberOfDsyms: 6,
 //		},
 //		"<path> value contains a zip file containing single dSYM files": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/app.dSYM.zip",
+//			pathValue:             "../testdata/ios/fixtures/app.dSYM.zip",
 //			expectedNumberOfDsyms: 1,
 //		},
 //		"<path> value contains an .xcarchive containing commas and special characters": {
-//			pathValue:             "../testdata/ios/dsym-test-fixtures/bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive",
+//			pathValue:             "../testdata/ios/fixtures/bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive",
 //			expectedNumberOfDsyms: 1,
 //		},
 //	}
