@@ -16,7 +16,8 @@ import (
 // DsymUploadInfo contains the relevant information for uploading dSYMs to bugsnag
 type DsymUploadInfo struct {
 	ProjectRoot string
-	DsymPath    string
+	DsymPaths   []string
+	TempDir     string
 }
 
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
@@ -147,41 +148,87 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	return &buildSettingsMap, nil
 }
 
-// ProcessPathValue determines the projectRoot from a given path
-func ProcessPathValue(path string, projectRoot string) (*DsymUploadInfo, error) {
-	if path == "" && projectRoot == "" {
-		currentDir, err := os.Getwd()
-		if err != nil {
-			return nil, err
-		}
-		return &DsymUploadInfo{currentDir, ""}, nil
+// ProcessPathValues determines which values are set for each path value to be utilised downstream
+func ProcessPathValues(path, dsymPath, projectRoot string) (*DsymUploadInfo, error) {
+
+	// If no path, dsymPath or projectRoot is set, use current directory to set the project root
+	if path == "" && dsymPath == "" && projectRoot == "" {
+		currentDir, _ := os.Getwd()
+		return &DsymUploadInfo{currentDir, nil, ""}, nil
 	}
 
-	_, err := os.Stat(path)
-	if err != nil {
-		return nil, err
+	// If dsymPath is set, then use it and don't set projectRoot
+	if dsymPath != "" {
+		foundDsymLocations := findDsyms(dsymPath)
+		return &DsymUploadInfo{"", foundDsymLocations, ""}, nil
 	}
 
-	if utils.IsDir(path) {
+	// If path is set
+	if path != "" {
 
-		if projectRoot != "" {
-			log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
-			return &DsymUploadInfo{projectRoot, ""}, nil
-		}
+		// If path is also a directory
+		if utils.IsDir(path) {
 
-		if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+			// If projectRoot is set, use it for downstream
+			if projectRoot != "" {
+				log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
+				return &DsymUploadInfo{projectRoot, nil, ""}, nil
+			}
+
 			// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
-			return &DsymUploadInfo{filepath.Dir(path), ""}, nil
+			if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+				// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
+				return &DsymUploadInfo{filepath.Dir(path), nil, ""}, nil
+			} else {
+
+				// If path is a directory (not .xcodeproj or .xcworkspace), check for dSYMs within it
+				foundDsymLocations := findDsyms(path)
+
+				if foundDsymLocations == nil {
+					// If path is pointing to a directory and no dSYMs found within it, set projectRoot with path
+					return &DsymUploadInfo{path, nil, ""}, nil
+				}
+
+				// If there are dSYMs found, set dsymPaths to the found dSYM locations
+				// Use whichever value is set for projectRoot
+				return &DsymUploadInfo{projectRoot, foundDsymLocations, ""}, nil
+			}
+
 		} else {
-			// If path is pointing to a directory, set projectRoot to the path
-			return &DsymUploadInfo{path, ""}, nil
+
+			// If path is pointing to a .zip file, we will extract it and look for dSYMS within it to set DsymPaths
+			if strings.HasSuffix(path, ".zip") {
+				tempDir, _ := utils.ExtractFile(path, "dsym")
+				foundDsymLocations := findDsyms(tempDir)
+
+				return &DsymUploadInfo{projectRoot, foundDsymLocations, tempDir}, nil
+			}
+
+			// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
+			// Use whichever value is set for projectRoot
+			return &DsymUploadInfo{projectRoot, []string{path}, ""}, nil
 		}
 
-	} else {
-		// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
-		return &DsymUploadInfo{projectRoot, path}, nil
 	}
 
+	return nil, nil
+}
+
+func findDsyms(root string) []string {
+	var dsyms []string
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if strings.HasSuffix(info.Name(), ".dSYM") {
+			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
+		}
+		return nil
+	})
+	if err != nil {
+		return nil
+	}
+	return dsyms
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
