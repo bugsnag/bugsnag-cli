@@ -1,3 +1,3 @@
 source "https://rubygems.org"
-gem "bugsnag-maze-runner", path: "/Users/jason.mccullough/Documents/bugsnag-repos/maze-runner/", tag: 'v9.1.1'
+gem "bugsnag-maze-runner", git: "https://github.com/bugsnag/maze-runner", tag: 'v9.2.0'
 gem 'cocoapods'
