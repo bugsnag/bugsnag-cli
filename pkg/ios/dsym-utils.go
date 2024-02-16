@@ -124,9 +124,11 @@ func findDsyms(root string) []string {
 		if err != nil {
 			return err
 		}
+
 		if strings.HasSuffix(info.Name(), ".dSYM") {
 			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
 		}
+
 		return nil
 	})
 	if err != nil {
