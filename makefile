@@ -123,5 +123,4 @@ features/base-fixtures/rn0_72/ios:
 .PHONY: features/base-fixtures/dsym/swift-package-manager
 features/base-fixtures/dsym/swift-package-manager:
 	cd $@ && bundle install
-	cd $@ && pod install
 	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
