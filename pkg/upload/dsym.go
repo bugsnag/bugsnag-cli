@@ -44,6 +44,13 @@ func ProcessDsym(
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
 
+	// Performs an automatic cleanup of temporary directories at the end
+	defer func() {
+		for _, tempDir := range tempDirs {
+			_ = os.RemoveAll(tempDir)
+		}
+	}()
+
 	for _, path := range paths {
 
 		if path == "" {
@@ -53,7 +60,7 @@ func ProcessDsym(
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
-			log.Info("Using '" + projectRoot + "' as project root, this can be changed at any time with a --project-root flag")
+			log.Info("Defaulting to '" + projectRoot + "' as the project root")
 
 			// Get build settings and dsymPath
 
@@ -74,24 +81,28 @@ func ProcessDsym(
 
 			}
 
-			var err error
-			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
-			if err != nil {
-				return err
+			if scheme != "" {
+				var err error
+				buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
+				if err != nil {
+					return err
+				}
 			}
 
-			if dsymPath == "" {
-				// Build the dsymPath from build settings
-				// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
-				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+			if buildSettings != nil {
+				if dsymPath == "" {
+					// Build the dsymPath from build settings
+					// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
+					dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
 
-				// Check if dsymPath exists before proceeding
-				if utils.Path(dsymPath).Validate() != nil {
-					// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
-					log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
-						"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
-				} else {
-					log.Info("Using dSYM path: " + dsymPath)
+					// Check if dsymPath exists before proceeding
+					if utils.Path(dsymPath).Validate() != nil {
+						// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
+						log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
+							"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
+					} else {
+						log.Info("Using dSYM path: " + dsymPath)
+					}
 				}
 			}
 
@@ -103,7 +114,9 @@ func ProcessDsym(
 		if dsymPath != "" {
 			var tempDir string
 			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath)
-			if len(dwarfInfo) > 0 && projectRoot == "" {
+			if len(dwarfInfo) == 0 {
+				return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
+			} else if projectRoot == "" {
 				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 			}
 			tempDirs = append(tempDirs, tempDir)
@@ -173,10 +186,6 @@ func ProcessDsym(
 			}
 
 		}
-	}
-
-	for _, tempDir := range tempDirs {
-		_ = os.RemoveAll(tempDir)
 	}
 
 	return nil
