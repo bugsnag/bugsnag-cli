@@ -82,8 +82,8 @@ func ProcessDsym(
 
 			if dsymPath == "" {
 				// Build the dsymPath from build settings
-				// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
-				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
+				// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
+				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
 
 				// Check if dsymPath exists before proceeding
 				if utils.Path(dsymPath).Validate() != nil {
