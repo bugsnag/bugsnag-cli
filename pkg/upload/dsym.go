@@ -95,7 +95,7 @@ func ProcessDsym(
 				// Check if dsymPath exists before proceeding
 				if utils.Path(dsymPath).Validate() != nil {
 					// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
-					log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
+					log.Error("Could not find dSYM with scheme '" + scheme + "' in expected location: " + utils.DisplayBlankIfEmpty(dsymPath) + "\n\n" +
 						"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
 				} else {
 					log.Info("Using dSYM path: " + dsymPath)
