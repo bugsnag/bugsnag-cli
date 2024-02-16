@@ -44,6 +44,13 @@ func ProcessDsym(
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
 
+	// Performs an automatic cleanup of temporary directories at the end
+	defer func() {
+		for _, tempDir := range tempDirs {
+			_ = os.RemoveAll(tempDir)
+		}
+	}()
+
 	for _, path := range paths {
 
 		if path == "" {
@@ -173,10 +180,6 @@ func ProcessDsym(
 			}
 
 		}
-	}
-
-	for _, tempDir := range tempDirs {
-		_ = os.RemoveAll(tempDir)
 	}
 
 	return nil
