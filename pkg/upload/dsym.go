@@ -60,7 +60,7 @@ func ProcessDsym(
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
-			log.Info("Using '" + projectRoot + "' as project root, this can be changed at any time with a --project-root flag")
+			log.Info("Defaulting to '" + projectRoot + "' as the project root")
 
 			// Get build settings and dsymPath
 
