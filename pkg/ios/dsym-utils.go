@@ -43,14 +43,14 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 
 			if err != nil {
 				// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-				log.Error("Could not unzip " + fileName + " to a temporary directory, skipping", 1)
+				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
 
 			}
 
-		} else if strings.HasSuffix(path, ".dSYM") {
+		} else if strings.HasSuffix(path, strings.ToLower(".dSYM")) {
 			// If path points to a .dSYM file, then we will use it as is
 			dsymLocations = append(dsymLocations, path)
 		}
@@ -125,7 +125,7 @@ func findDsyms(root string) []string {
 			return err
 		}
 
-		if strings.HasSuffix(info.Name(), ".dSYM") {
+		if strings.HasSuffix(info.Name(), strings.ToLower(".dSYM")) {
 			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
 		}
 

@@ -114,7 +114,9 @@ func ProcessDsym(
 		if dsymPath != "" {
 			var tempDir string
 			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath)
-			if len(dwarfInfo) > 0 && projectRoot == "" {
+			if len(dwarfInfo) == 0 {
+				return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
+			} else if projectRoot == "" {
 				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 			}
 			tempDirs = append(tempDirs, tempDir)
