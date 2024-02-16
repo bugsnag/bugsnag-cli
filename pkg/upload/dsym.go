@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -37,64 +38,79 @@ func ProcessDsym(
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
-	var dsyms *[]*ios.DwarfInfo
 	var plistData *ios.PlistData
 	var uploadOptions map[string]string
 
+	var dwarfInfo []*ios.DwarfInfo
+	var tempDirs []string
+
 	for _, path := range paths {
-		err := ios.ValidatePaths(path, dsymPath, projectRoot)
-		if err != nil {
-			return err
+
+		if path == "" {
+			// set path to current directory if not set
+			path, _ = os.Getwd()
 		}
 
-		// workingDir will be empty in cases where --dsym-path is not set or if <path> is a path containing dSYM(s)
-		workingDir := ios.SetWorkingDirectory(path)
+		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
+			log.Info("Using '" + projectRoot + "' as project root, this can be changed at any time with a --project-root flag")
 
-		// If workingDir is not empty
-		if workingDir != "" {
-			projectRoot = workingDir
+			// Get build settings and dsymPath
 
 			// If scheme is set explicitly, check if it exists
 			if scheme != "" {
-				_, err = ios.IsSchemeInPath(path, scheme)
+				_, err := ios.IsSchemeInPath(path, scheme)
 				if err != nil {
-					return err
+					log.Warn(err.Error())
 				}
-				log.Info("Using scheme: " + scheme)
 
 			} else {
 				// Otherwise, try to find it
+				var err error
 				scheme, err = ios.GetDefaultScheme(path)
 				if err != nil {
-					return err
+					log.Warn(err.Error())
 				}
-				log.Info("Using scheme: " + scheme)
+
 			}
 
+			var err error
 			buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
 			if err != nil {
 				return err
 			}
 
-			// Build the dsymPath from build settings
-			// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
-			dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
+			if dsymPath == "" {
+				// Build the dsymPath from build settings
+				// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM/Contents/Resources/DWARF
+				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName, "Contents", "Resources", "DWARF")
 
-			// Check if dsymPath exists before proceeding
-			if utils.Path(dsymPath).Validate() != nil {
-				// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
-				log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
-					"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path", 1)
-			} else {
-				log.Info("Using dSYM path: " + dsymPath)
-				ios.DsymDirs = append(ios.DsymDirs, dsymPath)
+				// Check if dsymPath exists before proceeding
+				if utils.Path(dsymPath).Validate() != nil {
+					// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
+					log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
+						"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
+				} else {
+					log.Info("Using dSYM path: " + dsymPath)
+				}
 			}
 
+		} else if dsymPath == "" {
+			log.Info("No Xcode project, workspace or package in '" + path + "'")
+			dsymPath = path
 		}
 
-		dsyms, err = ios.GetDsymsForUpload(ios.DsymDirs)
-		if err != nil {
-			return err
+		if dsymPath != "" {
+			var tempDir string
+			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath)
+			if len(dwarfInfo) > 0 && projectRoot == "" {
+				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
+			}
+			tempDirs = append(tempDirs, tempDir)
+		}
+
+		if len(dwarfInfo) == 0 {
+			return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -113,6 +129,7 @@ func ProcessDsym(
 		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
 		if plistPath != "" && (apiKey == "" || versionName == "") {
 			// Read data from the plist
+			var err error
 			plistData, err = ios.GetPlistData(plistPath)
 			if err != nil {
 				return err
@@ -134,10 +151,11 @@ func ProcessDsym(
 			}
 		}
 
-		for _, dsym := range *dsyms {
+		for _, dsym := range dwarfInfo {
 			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
 			log.Info("Uploading dSYM " + dsymInfo)
 
+			var err error
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
 			if err != nil {
 				return err
@@ -157,10 +175,8 @@ func ProcessDsym(
 		}
 	}
 
-	if ios.TempDirs != nil {
-		for _, tempDir := range ios.TempDirs {
-			_ = os.RemoveAll(tempDir)
-		}
+	for _, tempDir := range tempDirs {
+		_ = os.RemoveAll(tempDir)
 	}
 
 	return nil
