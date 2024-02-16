@@ -66,7 +66,7 @@ endif
 	@./scripts/bump-version.sh $(VERSION)
 
 .PHONY: test-fixtures
-test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72 features/base-fixtures/dsym/SingleSchemeExample
+test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72 features/base-fixtures/dsym/swift-package-manager
 
 .PHONY: features/base-fixtures/android
 features/base-fixtures/android:
