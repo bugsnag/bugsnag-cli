@@ -33,7 +33,7 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 	} else {
 
 		// If path is pointing to a .zip file, we will extract it and look for dSYMS within it to get dsymLocations
-		if strings.HasSuffix(path, ".zip") {
+		if strings.HasSuffix(path, strings.ToLower(".zip")) {
 
 			fileName := filepath.Base(path)
 			log.Info("Attempting to unzip " + fileName + " before proceeding to upload")
@@ -84,7 +84,7 @@ func isDwarfDumpInstalled() bool {
 func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 	var dwarfInfo []*DwarfInfo
 
-	cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(fileName, ".zip"))
+	cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(fileName, strings.ToLower(".zip")))
 	cmd.Dir = path
 
 	output, _ := cmd.Output()
