@@ -100,6 +100,7 @@ steps:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/dsym
+      - make features/base-fixtures/dsym/swift-package-manager
     plugins:
       artifacts#v1.5.0:
         download:
