@@ -43,7 +43,7 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 
 			if err != nil {
 				// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
+				log.Error("Could not unzip " + fileName + " to a temporary directory, skipping", 1)
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
