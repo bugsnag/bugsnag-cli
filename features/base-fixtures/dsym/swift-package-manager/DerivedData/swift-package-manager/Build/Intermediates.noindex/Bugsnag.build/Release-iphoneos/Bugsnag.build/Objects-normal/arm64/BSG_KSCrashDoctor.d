@@ -1,0 +1,9 @@
+dependencies: \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/KSCrash/Source/KSCrash/Recording/BSG_KSCrashDoctor.m \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/Build/Intermediates.noindex/Bugsnag.build/Release-iphoneos/Bugsnag.build/DerivedSources/resource_bundle_accessor.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/KSCrash/Source/KSCrash/Recording/BSG_KSCrashDoctor.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/Helpers/BSGDefines.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/KSCrash/Source/KSCrash/Recording/BSG_KSCrashReportFields.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/KSCrash/Source/KSCrash/Recording/BSG_KSSystemInfo.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/include/Bugsnag/BugsnagDefines.h \
+  /Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/Helpers/BugsnagLogger.h

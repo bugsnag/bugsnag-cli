@@ -1,7 +1,7 @@
 Feature: dSYM Uploads for Swift Package Manager Projects Integration Tests
 
   Scenario: Upload a single dSYM sourcemap using all CLI flags
-    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --project-root=/my/project/root/ --plist=features/base-fixtures/dsym/swift-package-manager/swift-package-manager/Info.plist --scheme=swift-package-manager --version-name=1.0 features/base-fixtures/dsym/swift-package-manager
+    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --project-root=/my/project/root/ --plist=features/base-fixtures/dsym/swift-package-manager/swift-package-manager/Info.plist --scheme=swift-package-manager --version-name=1.0 --dsym-path=features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/Build/Products/Release-iphoneos/swift-package-manager.app.dSYM features/base-fixtures/dsym/swift-package-manager
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the dSYM Build API
     Then the sourcemaps Content-Type header is valid multipart form-data

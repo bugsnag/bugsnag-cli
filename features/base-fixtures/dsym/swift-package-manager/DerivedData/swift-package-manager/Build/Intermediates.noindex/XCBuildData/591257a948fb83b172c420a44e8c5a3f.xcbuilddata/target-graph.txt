@@ -1,0 +1,9 @@
+Target dependency graph (4 targets)
+Target 'swift-package-manager' in project 'swift-package-manager'
+➜ Explicit dependency on target 'Bugsnag' in project 'Bugsnag'
+Target 'Bugsnag' in project 'Bugsnag'
+➜ Explicit dependency on target 'Bugsnag' in project 'Bugsnag'
+➜ Explicit dependency on target 'Bugsnag_Bugsnag' in project 'Bugsnag'
+Target 'Bugsnag' in project 'Bugsnag'
+➜ Explicit dependency on target 'Bugsnag_Bugsnag' in project 'Bugsnag'
+Target 'Bugsnag_Bugsnag' in project 'Bugsnag' (no dependencies)

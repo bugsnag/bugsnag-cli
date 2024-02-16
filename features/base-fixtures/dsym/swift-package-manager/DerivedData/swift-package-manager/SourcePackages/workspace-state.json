@@ -1,0 +1,27 @@
+{
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "bugsnag-cocoa",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/bugsnag/bugsnag-cocoa.git",
+          "name" : "Bugsnag"
+        },
+        "state" : {
+          "checkoutState" : {
+            "branch" : "master",
+            "revision" : "49f60b8dc2e94e7ede1114e2c39ba6ac0b576f42"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "bugsnag-cocoa"
+      }
+    ]
+  },
+  "version" : 6
+}

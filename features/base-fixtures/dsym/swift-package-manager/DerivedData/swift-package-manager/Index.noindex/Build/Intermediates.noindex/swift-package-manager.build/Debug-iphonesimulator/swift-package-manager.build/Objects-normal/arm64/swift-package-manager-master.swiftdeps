@@ -1,0 +1,14 @@
+version: "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+options: "89d90b41ef77dc0445131b29086d1f1e13b3e915f004552dbf4f0fb3f2f6fcae"
+build_start_time: [1708101055, 769316000]
+build_end_time: [1708101055, 771303000]
+inputs:
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-ios/swift-ios/AnotherClass.swift": !dirty [1708099500, 744122648]
+  ? "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/Index.noindex/Build/Intermediates.noindex/swift-package-manager.build/Debug-iphonesimulator/swift-package-manager.build/DerivedSources/GeneratedAssetSymbols.swift"
+  : !dirty [1708101055, 761894062]
+  ? "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/swift-package-manager/AppDelegate.swift"
+  : !dirty [1708099500, 754052764]
+  ? "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/swift-package-manager/SceneDelegate.swift"
+  : !dirty [1708099500, 757686427]
+  ? "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/swift-package-manager/ViewController.swift"
+  : !dirty [1708099500, 757865302]

@@ -1,0 +1,4 @@
+module Bugsnag {
+umbrella header "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cli/features/base-fixtures/dsym/swift-package-manager/DerivedData/swift-package-manager/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/include/Bugsnag/Bugsnag.h"
+export *
+}

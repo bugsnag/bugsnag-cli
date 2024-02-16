@@ -1,0 +1,4 @@
+module BugsnagNetworkRequestPlugin {
+umbrella header "/Users/jason.mccullough/Library/Developer/Xcode/DerivedData/swift-package-manager-edbxjprzpgvlnncvmkzbsmmpegky/SourcePackages/checkouts/bugsnag-cocoa/BugsnagNetworkRequestPlugin/BugsnagNetworkRequestPlugin/include/BugsnagNetworkRequestPlugin/BugsnagNetworkRequestPlugin.h"
+export *
+}
