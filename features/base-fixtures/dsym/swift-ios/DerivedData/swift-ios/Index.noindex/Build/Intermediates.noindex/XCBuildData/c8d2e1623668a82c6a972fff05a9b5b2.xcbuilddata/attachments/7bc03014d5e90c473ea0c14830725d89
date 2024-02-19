@@ -1,0 +1,6 @@
+framework module BugsnagNetworkRequestPlugin {
+  umbrella header "BugsnagNetworkRequestPlugin-umbrella.h"
+
+  export *
+  module * { export * }
+}
