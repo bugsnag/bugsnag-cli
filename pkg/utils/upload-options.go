@@ -78,6 +78,32 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
+func BuildDsymUploadOptions(apiKey string, appVersion string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	uploadOptions["appVersion"] = appVersion
+
+	if dev {
+		uploadOptions["dev"] = "true"
+	}
+
+	uploadOptions["projectRoot"] = projectRoot
+
+	uploadOptions["platform"] = "ios"
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	return uploadOptions, nil
+}
+
 func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 

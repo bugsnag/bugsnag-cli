@@ -93,18 +93,18 @@ func ProcessReactNativeIos(
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
 			if xcworkspacePath != "" {
 				if scheme != "" {
-					_, err := ios.IsSchemeInPath(xcworkspacePath, scheme, projectRoot)
+					_, err := ios.IsSchemeInPath(xcworkspacePath, scheme)
 					if err != nil {
 						return err
 					}
 				} else {
 					// If not, work it out from the xcworkspace file
-					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath, projectRoot)
+					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath)
 					if err != nil {
 						return err
 					}
 
-					schemeExists, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName, projectRoot)
+					schemeExists, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName)
 					if schemeExists {
 						scheme = possibleSchemeName
 						log.Info("Using scheme from .xcworkspace: " + scheme)
@@ -116,7 +116,7 @@ func ProcessReactNativeIos(
 				// Pull build settings from the xcworkspace file
 				if scheme != "" {
 					var err error
-					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme, projectRoot)
+					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
 					if err != nil {
 						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcworkspacePath)
 					}
@@ -133,9 +133,9 @@ func ProcessReactNativeIos(
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					log.Info("Found Info.plist at: " + plistPath)
+					log.Info("Found Info.plist at expected location: " + plistPath)
 				} else {
-					log.Info("No Info.plist found at: " + plistPathExpected)
+					log.Info("No Info.plist found at expected location: " + plistPathExpected)
 				}
 			}
 

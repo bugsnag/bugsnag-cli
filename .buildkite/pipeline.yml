@@ -11,10 +11,10 @@ steps:
         upload:
           - bin/**/*
 
-  # Unit Test
-  - label: Unit Test
+  # Run the unit tests
+  - label: Unit Tests
     commands:
-      - make unit-test
+      - make unit-tests
 
   - label: ":lint-roller::go: Lint Go Code"
     commands:
