@@ -9,16 +9,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
-
-// DsymUploadInfo contains the relevant information for uploading dSYMs to bugsnag
-type DsymUploadInfo struct {
-	ProjectRoot string
-	DsymPaths   []string
-	TempDir     string
-}
 
 // XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
 type XcodeBuildSettings struct {
@@ -148,87 +140,45 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	return &buildSettingsMap, nil
 }
 
-// ProcessPathValues determines which values are set for each path value to be utilised downstream
-func ProcessPathValues(path, dsymPath, projectRoot string) (*DsymUploadInfo, error) {
-
-	// If no path, dsymPath or projectRoot is set, use current directory to set the project root
-	if path == "" && dsymPath == "" && projectRoot == "" {
-		currentDir, _ := os.Getwd()
-		return &DsymUploadInfo{currentDir, nil, ""}, nil
+func IsPathAnXcodeProjectOrWorkspace(path string) bool {
+	if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+		return true
 	}
 
-	// If dsymPath is set, then use it and don't set projectRoot
-	if dsymPath != "" {
-		foundDsymLocations, _ := findDsyms(dsymPath)
-		return &DsymUploadInfo{"", foundDsymLocations, ""}, nil
+	var err error
+	if isXcodebuildInstalled() {
+		cmd := exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
+		cmd.Dir = path
+		_, err = cmd.Output()
 	}
 
-	// If path is set
-	if path != "" {
-
-		// If path is also a directory
-		if utils.IsDir(path) {
-
-			// If projectRoot is set, use it for downstream
-			if projectRoot != "" {
-				log.Info("--project-root flag set, it's value takes precedence and will be used for upload")
-				return &DsymUploadInfo{projectRoot, nil, ""}, nil
-			}
-
-			// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
-			if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
-				// If path is pointing to a .xcodeproj or .xcworkspace directory, set projectRoot to one directory up
-				return &DsymUploadInfo{filepath.Dir(path), nil, ""}, nil
-			} else {
-
-				// If path is a directory (not .xcodeproj or .xcworkspace), check for dSYMs within it
-				foundDsymLocations, _ := findDsyms(path)
-
-				if foundDsymLocations == nil {
-					// If path is pointing to a directory and no dSYMs found within it, set projectRoot with path
-					return &DsymUploadInfo{path, nil, ""}, nil
-				}
-
-				// If there are dSYMs found, set dsymPaths to the found dSYM locations
-				// Use whichever value is set for projectRoot
-				return &DsymUploadInfo{projectRoot, foundDsymLocations, ""}, nil
-			}
-
-		} else {
-
-			// If path is pointing to a .zip file, we will extract it and look for dSYMS within it to set DsymPaths
-			if strings.HasSuffix(path, ".zip") {
-				tempDir, _ := utils.ExtractFile(path, "dsym")
-				foundDsymLocations, _ := findDsyms(tempDir)
-
-				return &DsymUploadInfo{projectRoot, foundDsymLocations, tempDir}, nil
-			}
-
-			// If path is pointing to a file, we will assume it's pointing to a dSYM and use as-is
-			// Use whichever value is set for projectRoot
-			return &DsymUploadInfo{projectRoot, []string{path}, ""}, nil
-		}
-
-	}
-
-	return nil, nil
+	return err == nil
 }
 
-func findDsyms(root string) ([]string, error) {
-	var dsyms []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
+// GetDefaultProjectRoot works out a value for using as project root if one isn't provided
+func GetDefaultProjectRoot(path, projectRoot string) string {
+	if projectRoot == "" {
+		if path == "" {
+			currentDir, _ := os.Getwd()
+			return currentDir
 		}
-		if strings.HasSuffix(info.Name(), ".dSYM") {
-			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
+
+		if utils.IsDir(path) {
+
+			// If path is pointing to a .xcodeproj or .xcworkspace directory, set the project root to one directory up
+			if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
+				return filepath.Dir(path)
+
+			}
 		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
+
+		// If path is pointing to a normal directory, set that as the project root
+		return path
+
+	} else {
+		// If the project root is already set, use as-is
+		return projectRoot
 	}
-	return dsyms, nil
 }
 
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
