@@ -33,6 +33,11 @@ Then('I should see the API Key error') do
   Maze.check.include(run_output, "[ERROR] missing api key, please specify using `--api-key`")
 end
 
+Then('I should see the Project Root error') do
+  Maze.check.include(run_output, "[ERROR] --project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
+end
+
+
 Then('I should see the missing path error') do
   Maze.check.include(run_output, "error: expected \"<path>\"")
 end

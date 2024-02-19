@@ -55,3 +55,8 @@ Feature: dSYM Upload Integration Tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "platform" equals "ios"
+
+  Scenario: Attempt to upload a single dSYM sourcemap using path containing one dSYM but --project-root is not defined in the command
+    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF features/dsym/fixtures/single-dsym
+    And I wait to receive 1 sourcemaps
+    Then I should see the Project Root error
