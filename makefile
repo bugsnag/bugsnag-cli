@@ -123,4 +123,8 @@ features/base-fixtures/rn0_72/ios:
 .PHONY: features/base-fixtures/dsym/swift-package-manager
 features/base-fixtures/dsym/swift-package-manager:
 	cd $@ && bundle install
+	echo "--- Resolve Swift Package Dependencies"
+	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
+	echo "+++ Build Release iOS"
+	#cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
 	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
