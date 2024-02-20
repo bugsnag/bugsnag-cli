@@ -133,4 +133,5 @@ end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
+  puts @output
 end
