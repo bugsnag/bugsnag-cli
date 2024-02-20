@@ -120,13 +120,11 @@ features/base-fixtures/rn0_72/ios:
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
 
-.PHONY: features/base-fixtures/dsym/swiftui
-features/base-fixtures/dsym/swiftui:
-#	cd $@ && bundle install
-#	echo "--- Resolve Swift Package Dependencies"
-#	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
-#	echo "+++ Build Release iOS"
-#	#cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-#	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
+.PHONY: features/base-fixtures/dsym/swift-package-manager
+features/base-fixtures/dsym/swift-package-manager:
 	cd $@ && bundle install
-	cd $@ && xcodebuild -scheme "swiftui (iOS)" -configuration Release -sdk iphoneos build -allowProvisioningUpdates
+	echo "--- Resolve Swift Package Dependencies"
+	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
+	echo "+++ Build Release iOS"
+	#cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
+	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates

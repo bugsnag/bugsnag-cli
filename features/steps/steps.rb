@@ -22,7 +22,6 @@ end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
   @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
-  puts @output
 end
 
 Then('I should see the help banner') do

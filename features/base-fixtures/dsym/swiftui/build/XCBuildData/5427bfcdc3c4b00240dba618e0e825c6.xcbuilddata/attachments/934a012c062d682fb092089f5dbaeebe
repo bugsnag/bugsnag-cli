@@ -1,4 +1,0 @@
-module Bugsnag {
-umbrella header "/Users/jason.mccullough/Library/Developer/Xcode/DerivedData/swiftui-cawvshtqgvsitzekoocfhsvifqvw/SourcePackages/checkouts/bugsnag-cocoa/Bugsnag/include/Bugsnag/Bugsnag.h"
-export *
-}
