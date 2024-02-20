@@ -5,7 +5,7 @@
 	<key>bugsnag</key>
 	<dict>
 		<key>apiKey</key>
-		<string>1234567890ABCDEF1234567890ABCDEF</string>
+		<string>YOUR-API-KEY</string>
 	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>

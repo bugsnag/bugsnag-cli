@@ -1,0 +1,35 @@
+{
+  "" : {
+    "const-values" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master.swiftconstvalues",
+    "dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master.d",
+    "diagnostics" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master.dia",
+    "emit-module-dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master-emit-module.dia",
+    "swift-dependencies" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/swift-package-manager-master.swiftdeps"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-ios/swift-ios/AnotherClass.swift" : {
+    "index-unit-output-path" : "/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AnotherClass.o",
+    "llvm-bc" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AnotherClass.bc",
+    "object" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AnotherClass.o"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/swift-package-manager/AppDelegate.swift" : {
+    "index-unit-output-path" : "/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/swift-package-manager/SceneDelegate.swift" : {
+    "index-unit-output-path" : "/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/SceneDelegate.o",
+    "llvm-bc" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/SceneDelegate.bc",
+    "object" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/SceneDelegate.o"
+  },
+  "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/swift-package-manager/ViewController.swift" : {
+    "index-unit-output-path" : "/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/ViewController.o",
+    "llvm-bc" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/ViewController.bc",
+    "object" : "/Users/jason.mccullough/Documents/bugsnag-repos/bugsnag-cocoa/examples/swift-package-manager/build/swift-package-manager.build/Release-iphoneos/swift-package-manager.build/Objects-normal/arm64/ViewController.o"
+  }
+}
