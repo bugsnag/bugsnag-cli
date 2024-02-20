@@ -20,7 +20,7 @@ type DwarfInfo struct {
 	Location string
 }
 
-func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
+func FindDsymsInPath(path string, ignoreEmptyDsym, failOnUpload bool) ([]*DwarfInfo, string, error) {
 	var tempDir string
 	var dsymLocations []string
 	var dwarfInfo []*DwarfInfo
@@ -42,8 +42,11 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
+				if failOnUpload {
+					log.Warn("Could not unzip " + fileName + " to a temporary directory, skipping")
+				} else {
+					log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
+				}
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
@@ -67,7 +70,16 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 			filesFound, _ := os.ReadDir(dsymLocation)
 
 			for _, file := range filesFound {
-				dwarfInfo = append(dwarfInfo, getDwarfFileInfo(dsymLocation, file.Name())...)
+				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
+				if ignoreEmptyDsym {
+					log.Warn("Skipping empty file: " + file.Name())
+				} else {
+					log.Error("Skipping empty file: "+file.Name(), 0)
+				}
+
+				if fileInfo.Size() > 0 {
+					dwarfInfo = append(dwarfInfo, getDwarfFileInfo(dsymLocation, file.Name())...)
+				}
 			}
 		}
 	}
