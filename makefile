@@ -126,5 +126,5 @@ features/base-fixtures/dsym/swift-package-manager:
 	echo "--- Resolve Swift Package Dependencies"
 	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
 	echo "+++ Build Release iOS"
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-	#cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
+	#cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
+	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
