@@ -71,14 +71,15 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, failOnUpload bool) ([]*DwarfI
 
 			for _, file := range filesFound {
 				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
-				if ignoreEmptyDsym {
-					log.Warn("Skipping empty file: " + file.Name())
-				} else {
-					log.Error("Skipping empty file: "+file.Name(), 0)
-				}
 
 				if fileInfo.Size() > 0 {
 					dwarfInfo = append(dwarfInfo, getDwarfFileInfo(dsymLocation, file.Name())...)
+				} else {
+					if ignoreEmptyDsym {
+						log.Warn("Skipping empty file: " + file.Name())
+					} else {
+						log.Error("Skipping empty file: "+file.Name(), 0)
+					}
 				}
 			}
 		}
