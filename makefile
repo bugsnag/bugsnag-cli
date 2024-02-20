@@ -66,7 +66,7 @@ endif
 	@./scripts/bump-version.sh $(VERSION)
 
 .PHONY: test-fixtures
-test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72 features/base-fixtures/dsym/swift-package-manager
+test-fixtures: features/base-fixtures/android features/base-fixtures/dart features/base-fixtures/rn0_69 features/base-fixtures/rn0_70 features/base-fixtures/rn0_72
 
 .PHONY: features/base-fixtures/android
 features/base-fixtures/android:
@@ -119,12 +119,3 @@ features/base-fixtures/rn0_72/ios:
 	cd $@/../ && npm i && bundle install
 	cd $@ && pod install
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
-
-.PHONY: features/base-fixtures/dsym/swift-package-manager
-features/base-fixtures/dsym/swift-package-manager:
-	cd $@ && bundle install
-	echo "--- Resolve Swift Package Dependencies"
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
-	echo "+++ Build Release iOS"
-	#cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-	cd $@ && xcodebuild -scheme swift-package-manager -configuration Release -sdk iphoneos build -allowProvisioningUpdates
