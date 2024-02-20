@@ -124,7 +124,6 @@ features/base-fixtures/rn0_72/ios:
 features/base-fixtures/dsym/swift-package-manager:
 	cd $@ && bundle install
 	echo "--- Resolve Swift Package Dependencies"
-	cd $@ && sed -i '' -e 's/kind = branch/kind = revision/' -e "s/branch = master/revision = ${BUILDKITE_COMMIT}/" swift-package-manager.xcodeproj/project.pbxproj
 	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -derivedDataPath DerivedData -resolvePackageDependencies
 	echo "+++ Build Release iOS"
 	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -derivedDataPath DerivedData -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
