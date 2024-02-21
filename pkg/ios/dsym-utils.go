@@ -91,7 +91,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 					if ignoreEmptyDsym {
 						log.Warn("Skipping empty file: " + file.Name())
 					} else {
-						log.Error("Skipping empty file: "+file.Name(), 0)
+						log.Error("Skipping empty file: " + file.Name(), 0)
 					}
 				}
 			}
