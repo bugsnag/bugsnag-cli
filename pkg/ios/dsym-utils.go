@@ -47,11 +47,10 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
-
 			}
 
-		} else if strings.HasSuffix(strings.ToLower(path), ".dsym") {
-			// If path points to a .dSYM file, then we will use it as is
+		} else {
+			// If path points to a file, then we will assume it is a dSYM and use it as-is
 			dsymLocations = append(dsymLocations, path)
 		}
 
@@ -64,7 +63,16 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 		}
 
 		for _, dsymLocation := range dsymLocations {
-			filesFound, _ := os.ReadDir(dsymLocation)
+			filesFound, err := os.ReadDir(dsymLocation)
+
+			if err != nil {
+				// If not a directory, then we'll assume that the path is pointing straight to a file
+				if strings.Contains(err.Error(), "not a directory") {
+					fileName := filepath.Base(dsymLocation)
+					dsymLocation = filepath.Dir(dsymLocation)
+					dwarfInfo = append(dwarfInfo, getDwarfFileInfo(dsymLocation, fileName)...)
+				}
+			}
 
 			for _, file := range filesFound {
 				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))

@@ -1,0 +1,46 @@
+default_platform(:ios)
+
+endpoint = ENV['BUGSNAG_ENDPOINT']
+api_key = ENV['BUGSNAG_API_KEY']
+config_file = ENV['BUGSNAG_CONFIG_FILE']
+ignore_empty_dsym = ENV['BUGSNAG_IGNORE_EMPTY_DSYM']
+ignore_missing_dwarf = ENV['BUGSNAG_IGNORE_MISSING_DWARF']
+
+platform :ios do
+  lane :send_build do
+    send_build_to_bugsnag(upload_url: endpoint, api_key: api_key)
+  end
+
+  lane :upload_symbols do
+    if config_file.nil?
+      upload_symbols_to_bugsnag(upload_url: endpoint)
+    else
+      upload_symbols_to_bugsnag(upload_url: endpoint, config_file: config_file)
+    end
+  end
+
+  lane :upload_symbols_with_api_key do
+    upload_symbols_to_bugsnag(upload_url: endpoint, api_key: api_key, ignore_empty_dsym: ignore_empty_dsym, ignore_missing_dwarf: ignore_missing_dwarf)
+  end
+
+  lane :upload_symbols_after_gym do
+    # Sets a custom value to DSYM_OUTPUT_PATH
+    Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = "../app-center"
+    upload_symbols_to_bugsnag(upload_url: endpoint, api_key: api_key, ignore_empty_dsym: true, ignore_missing_dwarf: true)
+  end
+
+  lane :upload_symbols_after_download_dsyms do
+    # Sets a custom value to DSYM_PATHS
+    Actions.lane_context[SharedValues::DSYM_PATHS] = ["../app-center"]
+    upload_symbols_to_bugsnag(upload_url: endpoint, api_key: api_key, ignore_empty_dsym: true, ignore_missing_dwarf: true)
+  end
+
+  lane :upload_symbols_after_gym_and_download_dsyms do
+    Actions.lane_context[SharedValues::DSYM_OUTPUT_PATH] = "../app-center"
+    Actions.lane_context[SharedValues::DSYM_PATHS] = ["../bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive/dSYMs"]
+    upload_symbols_to_bugsnag(upload_url: endpoint, api_key: api_key, ignore_empty_dsym: true, ignore_missing_dwarf: true)
+  end
+
+end
+
+
