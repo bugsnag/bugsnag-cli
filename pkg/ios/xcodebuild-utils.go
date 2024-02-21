@@ -18,6 +18,7 @@ type XcodeBuildSettings struct {
 	InfoPlistPath         string `mapstructure:"INFOPLIST_PATH"`
 	BuiltProductsDir      string `mapstructure:"BUILT_PRODUCTS_DIR"`
 	DsymName              string `mapstructure:"DWARF_DSYM_FILE_NAME"`
+	ProjectTempRoot       string `mapstructure:"PROJECT_TEMP_ROOT"`
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
