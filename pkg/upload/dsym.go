@@ -125,7 +125,12 @@ func ProcessDsym(
 		}
 
 		if len(dwarfInfo) == 0 {
-			return errors.New("No dSYM files found")
+			if ignoreEmptyDsym || ignoreMissingDwarf {
+				log.Warn("No dSYM files found")
+				continue
+			} else {
+				return errors.New("No dSYM files found")
+			}
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values

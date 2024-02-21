@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
@@ -90,7 +92,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 	if !dryRun {
 		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
 
-		err := processRequest(req, timeout, retries)
+		err = processRequest(req, timeout, retries)
 		if err != nil {
 			return err
 		}
@@ -161,7 +163,7 @@ func processRequest(request *http.Request, timeout int, retryCount int) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("failed after %d attempts. "+err.Error(), retryCount)
+		return errors.Errorf("failed after %d attempts. %s", retryCount, err.Error())
 	}
 
 	return nil
