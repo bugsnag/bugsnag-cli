@@ -24,6 +24,16 @@ When(/^I run bugsnag-cli with (.*)$/) do |flags|
   @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
 end
 
+Then('I should see a log level of {string} when no dSYM files could be found') do |log_level|
+  message = log_level + ' No dSYM files found'
+  Maze.check.include(run_output, message)
+end
+
+Then('I should see a log level of {string} when no dSYM files could be uploaded') do |log_level|
+  message = log_level + ' failed after'
+  Maze.check.include(run_output, message)
+end
+
 Then('I should see the help banner') do
   Maze.check.include(run_output, "Usage: #{arch}-#{os}-#{binary} <command>")
 end

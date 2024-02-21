@@ -20,7 +20,7 @@ type DwarfInfo struct {
 	Location string
 }
 
-func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
+func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*DwarfInfo, string, error) {
 	var tempDir string
 	var dsymLocations []string
 	var dwarfInfo []*DwarfInfo
@@ -42,8 +42,8 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				// TODO: This will be downgraded to a warning with --fail-on-upload in near future
-				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
+				log.Error("Could not unzip " + fileName + " to a temporary directory, skipping", 1)
+
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
@@ -75,7 +75,25 @@ func FindDsymsInPath(path string) ([]*DwarfInfo, string, error) {
 			}
 
 			for _, file := range filesFound {
-				dwarfInfo = append(dwarfInfo, getDwarfFileInfo(dsymLocation, file.Name())...)
+				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
+
+				if fileInfo.Size() > 0 {
+					info := getDwarfFileInfo(dsymLocation, file.Name())
+					if len(info) == 0 {
+						if ignoreMissingDwarf {
+							log.Warn(fileInfo.Name() + " is not a valid DWARF file, skipping")
+						} else {
+							log.Error(fileInfo.Name()+" is not a valid DWARF file, skipping", 1)
+						}
+					}
+					dwarfInfo = append(dwarfInfo, info...)
+				} else {
+					if ignoreEmptyDsym {
+						log.Warn("Skipping empty file: " + file.Name())
+					} else {
+						log.Error("Skipping empty file: " + file.Name(), 0)
+					}
+				}
 			}
 		}
 	}
@@ -118,8 +136,6 @@ func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 				}
 			}
 		}
-	} else {
-		log.Info("Skipping file without UUID: " + fileName)
 	}
 
 	return dwarfInfo
@@ -133,7 +149,8 @@ func findDsyms(root string) []string {
 			return err
 		}
 
-		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") {
+		// If the file is a dSYM, add it to the list (unless it resides within the __MACOSX directory)
+		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
 			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
 		}
 

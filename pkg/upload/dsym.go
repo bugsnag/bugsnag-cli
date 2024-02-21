@@ -12,13 +12,16 @@ import (
 )
 
 type Dsym struct {
-	VersionName string      `help:"The version of the application."`
-	Scheme      string      `help:"The name of the scheme to use when building the application."`
-	Dev         bool        `help:"Indicates whether the application is a debug or release build"`
-	DsymPath    string      `help:"Path to the dSYM" type:"path"`
-	Plist       string      `help:"Path to the Info.plist file" type:"path"`
-	ProjectRoot string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	Path        utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	VersionName        string      `help:"The version of the application."`
+	Scheme             string      `help:"The name of the scheme to use when building the application."`
+	Dev                bool        `help:"Indicates whether the application is a debug or release build"`
+	DsymPath           string      `help:"Path to the dSYM" type:"path"`
+	Plist              string      `help:"Path to the Info.plist file" type:"path"`
+	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
+	FailOnUpload       bool        `help:"Whether to stop any further uploads if a file fails to upload successfully. By default the command attempts to upload"`
+	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
 func ProcessDsym(
@@ -29,6 +32,9 @@ func ProcessDsym(
 	dsymPath string,
 	plistPath string,
 	projectRoot string,
+	ignoreMissingDwarf bool,
+	ignoreEmptyDsym bool,
+	failOnUpload bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -93,15 +99,13 @@ func ProcessDsym(
 				if dsymPath == "" {
 					// Build the dsymPath from build settings
 					// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
-					dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+					possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
 
 					// Check if dsymPath exists before proceeding
-					if utils.Path(dsymPath).Validate() != nil {
-						// TODO: This will be toggled between Error and Warn with --ignore-missing-dwarf in near future
-						log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
-							"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
-					} else {
+					_, err := os.Stat(possibleDsymPath)
+					if err == nil {
 						log.Info("Using dSYM path: " + dsymPath)
+						dsymPath = possibleDsymPath
 					}
 				}
 			}
@@ -113,17 +117,20 @@ func ProcessDsym(
 
 		if dsymPath != "" {
 			var tempDir string
-			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath)
-			if len(dwarfInfo) == 0 {
-				return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
-			} else if projectRoot == "" {
+			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
+			if len(dwarfInfo) > 0 && projectRoot == "" {
 				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 			}
 			tempDirs = append(tempDirs, tempDir)
 		}
 
 		if len(dwarfInfo) == 0 {
-			return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
+			if ignoreEmptyDsym || ignoreMissingDwarf {
+				log.Warn("No dSYM files found")
+				continue
+			} else {
+				return errors.New("No dSYM files found")
+			}
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -180,7 +187,11 @@ func ProcessDsym(
 			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
-				return err
+				if failOnUpload {
+					return err
+				} else {
+					log.Warn(err.Error())
+				}
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Name)
 			}
