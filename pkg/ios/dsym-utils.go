@@ -149,7 +149,8 @@ func findDsyms(root string) []string {
 			return err
 		}
 
-		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") {
+		// If the file is a dSYM, add it to the list (unless it resides within the __MACOSX directory)
+		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
 			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
 		}
 
