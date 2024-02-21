@@ -99,19 +99,13 @@ func ProcessDsym(
 				if dsymPath == "" {
 					// Build the dsymPath from build settings
 					// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
-					dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+					possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
 
 					// Check if dsymPath exists before proceeding
-					if utils.Path(dsymPath).Validate() != nil {
-						if ignoreMissingDwarf {
-							log.Warn("Could not find dSYM with scheme '" + scheme + "' in expected location: " + utils.DisplayBlankIfEmpty(dsymPath) + "\n\n" +
-								"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n")
-						} else {
-							log.Error("Could not find dSYM with scheme '"+scheme+"' in expected location: "+utils.DisplayBlankIfEmpty(dsymPath)+"\n\n"+
-								"Check that the scheme correlates to the above dSYM location, try re-building your project or specify the dSYM path using --dsym-path\n", 1)
-						}
-					} else {
+					_, err := os.Stat(possibleDsymPath)
+					if err == nil {
 						log.Info("Using dSYM path: " + dsymPath)
+						dsymPath = possibleDsymPath
 					}
 				}
 			}
@@ -123,7 +117,7 @@ func ProcessDsym(
 
 		if dsymPath != "" {
 			var tempDir string
-			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, failOnUpload)
+			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
 			if len(dwarfInfo) > 0 && projectRoot == "" {
 				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 			}
@@ -131,11 +125,7 @@ func ProcessDsym(
 		}
 
 		if len(dwarfInfo) == 0 {
-			if ignoreMissingDwarf {
-				log.Warn("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
-			} else {
-				return errors.New("No dSYM files found in expected locations '" + dsymPath + "' and '" + path + "'")
-			}
+			return errors.New("No dSYM files found")
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
