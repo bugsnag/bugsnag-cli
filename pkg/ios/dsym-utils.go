@@ -42,7 +42,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				log.Error("Could not unzip " + fileName + " to a temporary directory, skipping", 1)
+				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
 
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
@@ -91,7 +91,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 					if ignoreEmptyDsym {
 						log.Warn("Skipping empty file: " + file.Name())
 					} else {
-						log.Error("Skipping empty file: " + file.Name(), 0)
+						log.Error("Skipping empty file: "+file.Name(), 0)
 					}
 				}
 			}
