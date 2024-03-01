@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -187,6 +188,12 @@ func ProcessDsym(
 			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 
 			if err != nil {
+				if strings.Contains(err.Error(), "404 Not Found") {
+					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+				}
+			}
+
+			if err != nil {
 				if failOnUpload {
 					return err
 				} else {
@@ -195,7 +202,6 @@ func ProcessDsym(
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Name)
 			}
-
 		}
 	}
 
