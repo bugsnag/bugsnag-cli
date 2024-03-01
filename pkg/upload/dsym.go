@@ -189,13 +189,16 @@ func ProcessDsym(
 
 			if err != nil {
 				if strings.Contains(err.Error(), "404 Not Found") {
-					log.Info("Trying " + endpoint)
 					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
 				}
 			}
 
 			if err != nil {
-				return err
+				if failOnUpload {
+					return err
+				} else {
+					log.Warn(err.Error())
+				}
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Name)
 			}
