@@ -214,16 +214,16 @@ func main() {
 
 		err := upload.ProcessDsym(
 			commands.ApiKey,
+			string(commands.Upload.Dsym.XcodeProject),
 			commands.Upload.Dsym.Scheme,
-			commands.Upload.Dsym.DsymPath,
-			commands.Upload.Dsym.Plist,
+			string(commands.Upload.Dsym.Plist),
 			commands.Upload.Dsym.Path,
-			commands.Upload.Dsym.FailOnUpload,
 			endpoint,
+			commands.Upload.Overwrite,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
-			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.FailOnUploadError,
 		)
 
 		if err != nil {

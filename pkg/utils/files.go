@@ -162,3 +162,20 @@ func LocationOf(something string) string {
 	location, _ := cmd.Output()
 	return strings.TrimSpace(string(location))
 }
+
+func GetBaseWithoutExt(path string) string {
+	filePath := path
+
+	base := filepath.Base(filePath)
+
+	dotIndex := strings.LastIndex(base, ".")
+
+	var baseWithoutExt string
+	if dotIndex >= 0 {
+		baseWithoutExt = base[:dotIndex]
+	} else {
+		baseWithoutExt = base
+	}
+
+	return baseWithoutExt
+}
