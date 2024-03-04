@@ -212,7 +212,7 @@ func main() {
 
 	case "upload dsym", "upload dsym <path>":
 
-		err := upload.ProcessDysmNew(
+		err := upload.ProcessDsym(
 			commands.ApiKey,
 			commands.Upload.Dsym.Scheme,
 			commands.Upload.Dsym.DsymPath,

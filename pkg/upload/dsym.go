@@ -2,14 +2,14 @@ package upload
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
-	"strings"
-
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 type Dsym struct {
@@ -27,24 +27,19 @@ type Dsym struct {
 
 func ProcessDsym(
 	apiKey string,
-	versionName string,
 	scheme string,
-	dev bool,
-	dsymPath string,
+	xcodeProjectPath string,
 	plistPath string,
-	projectRoot string,
-	ignoreMissingDwarf bool,
-	ignoreEmptyDsym bool,
-	failOnUpload bool,
 	paths []string,
+	failOnUpload bool,
 	endpoint string,
 	timeout int,
 	retries int,
 	overwrite bool,
 	dryRun bool,
 ) error {
-
 	var buildSettings *ios.XcodeBuildSettings
+	var dsymPath string
 	var plistData *ios.PlistData
 	var uploadOptions map[string]string
 
@@ -59,21 +54,16 @@ func ProcessDsym(
 	}()
 
 	for _, path := range paths {
+		if utils.IsDir(path) {
+			if xcodeProjectPath == "" {
+				xcodeProjectPath, _ = ios.FindProjectOrWorkspaceInPath(path)
+			}
 
-		if path == "" {
-			// set path to current directory if not set
-			path, _ = os.Getwd()
-		}
-
-		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
-			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
-			log.Info("Defaulting to '" + projectRoot + "' as the project root")
-
-			// Get build settings and dsymPath
+			fmt.Println(xcodeProjectPath)
 
 			// If scheme is set explicitly, check if it exists
 			if scheme != "" {
-				_, err := ios.IsSchemeInPath(path, scheme)
+				_, err := ios.IsSchemeInPath(xcodeProjectPath, scheme)
 				if err != nil {
 					log.Warn(err.Error())
 				}
@@ -81,12 +71,14 @@ func ProcessDsym(
 			} else {
 				// Otherwise, try to find it
 				var err error
-				scheme, err = ios.GetDefaultScheme(path)
+				scheme, err = ios.GetDefaultScheme(xcodeProjectPath)
 				if err != nil {
 					log.Warn(err.Error())
 				}
 
 			}
+
+			fmt.Println(scheme)
 
 			if scheme != "" {
 				var err error
@@ -96,112 +88,91 @@ func ProcessDsym(
 				}
 			}
 
-			if buildSettings != nil {
-				if dsymPath == "" {
-					// Build the dsymPath from build settings
-					// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
-					possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+			fmt.Println(buildSettings)
 
-					// Check if dsymPath exists before proceeding
-					_, err := os.Stat(possibleDsymPath)
-					if err == nil {
-						log.Info("Using dSYM path: " + dsymPath)
-						dsymPath = possibleDsymPath
+			if buildSettings != nil {
+				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+
+				_, err := os.Stat(dsymPath)
+				if err == nil {
+					log.Info("Using dSYM path: " + dsymPath)
+				}
+			}
+
+			fmt.Println(dsymPath)
+
+			if dsymPath != "" {
+				var tempDir string
+				dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, false, false)
+				tempDirs = append(tempDirs, tempDir)
+			}
+			if len(dwarfInfo) == 0 {
+				return errors.New("No dSYM files found")
+			}
+
+			// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
+			if plistPath == "" && apiKey == "" {
+				if buildSettings != nil {
+					plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
+					if utils.FileExists(plistPathExpected) {
+						plistPath = plistPathExpected
+						log.Info("Found Info.plist at expected location: " + plistPath)
+					} else {
+						log.Info("No Info.plist found at expected location: " + plistPathExpected)
 					}
 				}
 			}
 
-		} else if dsymPath == "" {
-			log.Info("No Xcode project, workspace or package in '" + path + "'")
-			dsymPath = path
-		}
-
-		if dsymPath != "" {
-			var tempDir string
-			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
-			if len(dwarfInfo) > 0 && projectRoot == "" {
-				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
-			}
-			tempDirs = append(tempDirs, tempDir)
-		}
-
-		if len(dwarfInfo) == 0 {
-			if ignoreEmptyDsym || ignoreMissingDwarf {
-				log.Warn("No dSYM files found")
-				continue
-			} else {
-				return errors.New("No dSYM files found")
-			}
-		}
-
-		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
-		if plistPath == "" && (apiKey == "" || versionName == "") {
-			if buildSettings != nil {
-				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-				if utils.FileExists(plistPathExpected) {
-					plistPath = plistPathExpected
-					log.Info("Found Info.plist at expected location: " + plistPath)
-				} else {
-					log.Info("No Info.plist found at expected location: " + plistPathExpected)
-				}
-			}
-		}
-
-		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
-		if plistPath != "" && (apiKey == "" || versionName == "") {
-			// Read data from the plist
-			var err error
-			plistData, err = ios.GetPlistData(plistPath)
-			if err != nil {
-				return err
-			}
-
-			// Check if the variables are empty, set if they are and log that we are using setting from the plist file
-			if versionName == "" {
-				versionName = plistData.VersionName
-				if versionName != "" {
-					log.Info("Using version name from Info.plist: " + versionName)
-				}
-			}
-
-			if apiKey == "" {
-				apiKey = plistData.BugsnagProjectDetails.ApiKey
-				if apiKey != "" {
-					log.Info("Using API key from Info.plist: " + apiKey)
-				}
-			}
-		}
-
-		for _, dsym := range dwarfInfo {
-			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
-			log.Info("Uploading dSYM " + dsymInfo)
-
-			var err error
-			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, overwrite)
-			if err != nil {
-				return err
-			}
-
-			fileFieldData := make(map[string]string)
-			fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
-
-			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
-
-			if err != nil {
-				if strings.Contains(err.Error(), "404 Not Found") {
-					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
-				}
-			}
-
-			if err != nil {
-				if failOnUpload {
+			// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
+			if plistPath != "" && apiKey == "" {
+				// Read data from the plist
+				var err error
+				plistData, err = ios.GetPlistData(plistPath)
+				if err != nil {
 					return err
-				} else {
-					log.Warn(err.Error())
 				}
-			} else {
-				log.Success("Uploaded dSYM: " + dsym.Name)
+
+				if apiKey == "" {
+					apiKey = plistData.BugsnagProjectDetails.ApiKey
+					if apiKey != "" {
+						log.Info("Using API key from Info.plist: " + apiKey)
+					}
+				}
 			}
+
+			for _, dsym := range dwarfInfo {
+				dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
+				log.Info("Uploading dSYM " + dsymInfo)
+
+				var err error
+				uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, overwrite)
+				if err != nil {
+					return err
+				}
+
+				fileFieldData := make(map[string]string)
+				fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
+
+				err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+
+				if err != nil {
+					if strings.Contains(err.Error(), "404 Not Found") {
+						err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+					}
+				}
+
+				if err != nil {
+					if failOnUpload {
+						return err
+					} else {
+						log.Warn(err.Error())
+					}
+				} else {
+					log.Success("Uploaded dSYM: " + dsym.Name)
+				}
+			}
+		} else {
+			return fmt.Errorf("Invalid path: %s", path)
 		}
 	}
 
