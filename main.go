@@ -218,6 +218,7 @@ func main() {
 			commands.Upload.Dsym.DsymPath,
 			commands.Upload.Dsym.Plist,
 			commands.Upload.Dsym.Path,
+			commands.Upload.Dsym.FailOnUpload,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

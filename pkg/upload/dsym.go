@@ -177,7 +177,7 @@ func ProcessDsym(
 			log.Info("Uploading dSYM " + dsymInfo)
 
 			var err error
-			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
+			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, overwrite)
 			if err != nil {
 				return err
 			}
