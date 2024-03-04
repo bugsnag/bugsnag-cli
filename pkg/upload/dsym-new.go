@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -37,7 +38,16 @@ func ProcessDysmNew(
 			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(path, false, false)
 			tempDirs = append(tempDirs, tempDir)
 
+			if len(dwarfInfo) == 0 {
+				return errors.New("No dSYM files found")
+			}
+
 			fmt.Println(dwarfInfo)
+
+			for _, dsym := range dwarfInfo {
+				dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
+				fmt.Println(dsymInfo)
+			}
 
 		} else if ios.IsDsymFile(path) {
 			log.Info("file")
