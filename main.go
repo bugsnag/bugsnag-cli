@@ -212,17 +212,11 @@ func main() {
 
 	case "upload dsym", "upload dsym <path>":
 
-		err := upload.ProcessDsym(
+		err := upload.ProcessDysmNew(
 			commands.ApiKey,
-			commands.Upload.Dsym.VersionName,
 			commands.Upload.Dsym.Scheme,
-			commands.Upload.Dsym.Dev,
 			commands.Upload.Dsym.DsymPath,
 			commands.Upload.Dsym.Plist,
-			commands.Upload.Dsym.ProjectRoot,
-			commands.Upload.Dsym.IgnoreMissingDwarf,
-			commands.Upload.Dsym.IgnoreEmptyDsym,
-			commands.Upload.Dsym.FailOnUpload,
 			commands.Upload.Dsym.Path,
 			endpoint,
 			commands.Upload.Timeout,

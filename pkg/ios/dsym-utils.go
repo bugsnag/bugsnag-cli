@@ -42,7 +42,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				log.Error("Could not unzip " + fileName + " to a temporary directory, skipping", 1)
+				log.Error("Could not unzip "+fileName+" to a temporary directory, skipping", 1)
 
 			} else {
 				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")

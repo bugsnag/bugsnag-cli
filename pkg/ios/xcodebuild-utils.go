@@ -156,6 +156,10 @@ func IsPathAnXcodeProjectOrWorkspace(path string) bool {
 	return err == nil
 }
 
+func IsDsymFile(filename string) bool {
+	return strings.HasSuffix(filename, ".dSYM")
+}
+
 // GetDefaultProjectRoot works out a value for using as project root if one isn't provided
 func GetDefaultProjectRoot(path, projectRoot string) string {
 	if projectRoot == "" {
