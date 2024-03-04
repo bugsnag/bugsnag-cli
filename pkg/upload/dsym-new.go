@@ -46,6 +46,8 @@ func ProcessDysmNew(
 				xcodeProjectPath, _ = ios.FindProjectOrWorkspaceInPath(path)
 			}
 
+			fmt.Println(xcodeProjectPath)
+
 			// If scheme is set explicitly, check if it exists
 			if scheme != "" {
 				_, err := ios.IsSchemeInPath(xcodeProjectPath, scheme)
@@ -63,6 +65,8 @@ func ProcessDysmNew(
 
 			}
 
+			fmt.Println(scheme)
+
 			if scheme != "" {
 				var err error
 				buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
@@ -70,6 +74,8 @@ func ProcessDysmNew(
 					return err
 				}
 			}
+
+			fmt.Println(buildSettings)
 
 			if buildSettings != nil {
 				dsymPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
