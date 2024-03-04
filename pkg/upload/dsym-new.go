@@ -86,6 +86,8 @@ func ProcessDysmNew(
 				}
 			}
 
+			fmt.Println(dsymPath)
+
 			if dsymPath != "" {
 				var tempDir string
 				dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, false, false)
