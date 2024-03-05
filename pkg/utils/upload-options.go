@@ -78,7 +78,7 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildDsymUploadOptions(apiKey string, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildDsymUploadOptions(apiKey string, projectRoot string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
@@ -88,12 +88,6 @@ func BuildDsymUploadOptions(apiKey string, projectRoot string, overwrite bool) (
 	}
 
 	uploadOptions["projectRoot"] = projectRoot
-
-	uploadOptions["platform"] = "ios"
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
 
 	return uploadOptions, nil
 }
