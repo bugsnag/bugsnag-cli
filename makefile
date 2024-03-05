@@ -137,10 +137,3 @@ features/base-fixtures/rn0_72/ios/archive:
 	cd features/base-fixtures/rn0_72/ios/../ && npm i && bundle install
 	cd features/base-fixtures/rn0_72/ios/ && pod install
 	cd features/base-fixtures/rn0_72/ios/ && xcrun xcodebuild -scheme rn0_72 -workspace rn0_72.xcworkspace -configuration Release -archivePath "../rn0_72.xcarchive" -allowProvisioningUpdates archive
-
-.PHONY: features/base-fixtures/dsym/swift-package-manager
-features/base-fixtures/dsym/swift-package-manager:
-	bundle install
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -resolvePackageDependencies
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-
