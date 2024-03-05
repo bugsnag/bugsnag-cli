@@ -163,7 +163,7 @@ func processRequest(request *http.Request, timeout int, retryCount int) error {
 	}
 
 	if err != nil {
-		return errors.Errorf("failed after %d attempts. %s", retryCount, err.Error())
+		return errors.Errorf("failed after %d attempts. %s", i, err.Error())
 	}
 
 	return nil
