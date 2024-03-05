@@ -2,7 +2,6 @@ package upload
 
 import (
 	"errors"
-	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
@@ -129,8 +128,6 @@ func ProcessDsym(apiKey string, xcodeProjectPath string, scheme string, plistPat
 					xcodeProjectPath, _ = ios.FindProjectOrWorkspaceInPath(path)
 				}
 
-				fmt.Println(xcodeProjectPath)
-
 				// If scheme is set explicitly, check if it exists
 				if scheme != "" {
 					_, err := ios.IsSchemeInPath(xcodeProjectPath, scheme)
@@ -146,8 +143,6 @@ func ProcessDsym(apiKey string, xcodeProjectPath string, scheme string, plistPat
 					}
 
 				}
-
-				fmt.Println(scheme)
 
 				if scheme != "" {
 					buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
