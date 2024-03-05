@@ -38,7 +38,6 @@ func ProcessDsym(
 	endpoint string,
 	timeout int,
 	retries int,
-	overwrite bool,
 	dryRun bool,
 ) error {
 
@@ -65,6 +64,14 @@ func ProcessDsym(
 		}
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+			if xcodeProjPath == "" {
+				xcodeProjPath = path
+			}
+		} else {
+			dsymPath = path
+		}
+
+		if xcodeProjPath != "" {
 			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
 			log.Info("Defaulting to '" + projectRoot + "' as the project root")
 
@@ -95,41 +102,20 @@ func ProcessDsym(
 				}
 			}
 
-			if buildSettings != nil {
-				if dsymPath == "" {
-					// Build the dsymPath from build settings
-					// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
-					possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
+			if buildSettings != nil && dsymPath == "" {
+				// Build the dsymPath from build settings
+				// Which is built up to look like: /Users/Path/To/Config/Build/Dir/MyApp.app.dSYM
+				possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
 
-					// Check if dsymPath exists before proceeding
-					_, err := os.Stat(possibleDsymPath)
-					if err == nil {
-						log.Info("Using dSYM path: " + dsymPath)
-						dsymPath = possibleDsymPath
-					}
+				// Check if dsymPath exists before proceeding
+				_, err := os.Stat(possibleDsymPath)
+				if err == nil {
+					log.Info("Using dSYM path: " + dsymPath)
+					dsymPath = possibleDsymPath
 				}
+
 			}
 
-		} else {
-			dsymPath = path
-
-			if xcodeProjPath != "" {
-				if scheme == "" {
-					var err error
-					scheme, err = ios.GetDefaultScheme(xcodeProjPath)
-					if err != nil {
-						log.Warn(err.Error())
-					}
-
-					if scheme != "" {
-						var err error
-						buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
-						if err != nil {
-							return err
-						}
-					}
-				}
-			}
 		}
 
 		if dsymPath != "" {
@@ -185,7 +171,7 @@ func ProcessDsym(
 			log.Info("Uploading dSYM " + dsymInfo)
 
 			var err error
-			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot, overwrite)
+			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {
 				return err
 			}

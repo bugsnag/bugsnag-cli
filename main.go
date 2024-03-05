@@ -225,7 +225,6 @@ func main() {
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
-			commands.Upload.Overwrite,
 			commands.DryRun,
 		)
 
