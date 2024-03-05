@@ -378,7 +378,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bugsnag/bugsnag-cocoa.git";
 			requirement = {
-				branch = master;
+				branch = next;
 				kind = branch;
 			};
 		};
