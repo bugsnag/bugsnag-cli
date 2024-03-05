@@ -72,14 +72,14 @@ func ProcessDsym(
 		}
 
 		if xcodeProjPath != "" {
-			projectRoot = ios.GetDefaultProjectRoot(path, projectRoot)
+			projectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, projectRoot)
 			log.Info("Defaulting to '" + projectRoot + "' as the project root")
 
 			// Get build settings and dsymPath
 
 			// If scheme is set explicitly, check if it exists
 			if scheme != "" {
-				_, err := ios.IsSchemeInPath(path, scheme)
+				_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
 				if err != nil {
 					log.Warn(err.Error())
 				}
@@ -87,7 +87,7 @@ func ProcessDsym(
 			} else {
 				// Otherwise, try to find it
 				var err error
-				scheme, err = ios.GetDefaultScheme(path)
+				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					log.Warn(err.Error())
 				}
@@ -96,7 +96,7 @@ func ProcessDsym(
 
 			if scheme != "" {
 				var err error
-				buildSettings, err = ios.GetXcodeBuildSettings(path, scheme)
+				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 				if err != nil {
 					return err
 				}
