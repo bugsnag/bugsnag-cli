@@ -123,7 +123,6 @@ func ProcessDsym(apiKey string, xcodeProjectPath string, scheme string, plistPat
 				}
 
 			} else {
-				log.Info("Processing project directory: " + path)
 				if xcodeProjectPath == "" {
 					xcodeProjectPath, _ = ios.FindProjectOrWorkspaceInPath(path)
 				}
@@ -230,8 +229,6 @@ func ProcessDsym(apiKey string, xcodeProjectPath string, scheme string, plistPat
 				}
 			}
 		} else if filepath.Ext(path) == ".zip" {
-			log.Info("Processing zip file: " + path)
-
 			// Unzip the file
 			var tempDir string
 			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(path, false, false)
