@@ -16,8 +16,8 @@ type Dsym struct {
 	VersionName        string      `help:"The version of the application."`
 	Scheme             string      `help:"The name of the scheme to use when building the application."`
 	Dev                bool        `help:"Indicates whether the application is a debug or release build"`
-	DsymPath           string      `help:"Path to the dSYM" type:"path"`
-	Plist              string      `help:"Path to the Info.plist file" type:"path"`
+	XcodeProject       utils.Path  `help:"Path to the dSYM" type:"path"`
+	Plist              utils.Path  `help:"Path to the Info.plist file" type:"path"`
 	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
@@ -27,10 +27,8 @@ type Dsym struct {
 
 func ProcessDsym(
 	apiKey string,
-	versionName string,
 	scheme string,
-	dev bool,
-	dsymPath string,
+	xcodeProjPath string,
 	plistPath string,
 	projectRoot string,
 	ignoreMissingDwarf bool,
@@ -50,6 +48,7 @@ func ProcessDsym(
 
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
+	var dsymPath string
 
 	// Performs an automatic cleanup of temporary directories at the end
 	defer func() {
@@ -111,9 +110,26 @@ func ProcessDsym(
 				}
 			}
 
-		} else if dsymPath == "" {
-			log.Info("No Xcode project, workspace or package in '" + path + "'")
+		} else {
 			dsymPath = path
+
+			if xcodeProjPath != "" {
+				if scheme == "" {
+					var err error
+					scheme, err = ios.GetDefaultScheme(xcodeProjPath)
+					if err != nil {
+						log.Warn(err.Error())
+					}
+
+					if scheme != "" {
+						var err error
+						buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
 		}
 
 		if dsymPath != "" {
@@ -135,7 +151,7 @@ func ProcessDsym(
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
-		if plistPath == "" && (apiKey == "" || versionName == "") {
+		if plistPath == "" && apiKey == "" {
 			if buildSettings != nil {
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
@@ -148,20 +164,12 @@ func ProcessDsym(
 		}
 
 		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
-		if plistPath != "" && (apiKey == "" || versionName == "") {
+		if plistPath != "" && apiKey == "" {
 			// Read data from the plist
 			var err error
 			plistData, err = ios.GetPlistData(plistPath)
 			if err != nil {
 				return err
-			}
-
-			// Check if the variables are empty, set if they are and log that we are using setting from the plist file
-			if versionName == "" {
-				versionName = plistData.VersionName
-				if versionName != "" {
-					log.Info("Using version name from Info.plist: " + versionName)
-				}
 			}
 
 			if apiKey == "" {
@@ -177,7 +185,7 @@ func ProcessDsym(
 			log.Info("Uploading dSYM " + dsymInfo)
 
 			var err error
-			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, versionName, dev, projectRoot, overwrite)
+			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot, overwrite)
 			if err != nil {
 				return err
 			}

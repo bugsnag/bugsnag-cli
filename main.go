@@ -214,11 +214,9 @@ func main() {
 
 		err := upload.ProcessDsym(
 			commands.ApiKey,
-			commands.Upload.Dsym.VersionName,
 			commands.Upload.Dsym.Scheme,
-			commands.Upload.Dsym.Dev,
-			commands.Upload.Dsym.DsymPath,
-			commands.Upload.Dsym.Plist,
+			string(commands.Upload.Dsym.XcodeProject),
+			string(commands.Upload.Dsym.Plist),
 			commands.Upload.Dsym.ProjectRoot,
 			commands.Upload.Dsym.IgnoreMissingDwarf,
 			commands.Upload.Dsym.IgnoreEmptyDsym,
