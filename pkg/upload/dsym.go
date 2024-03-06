@@ -48,6 +48,7 @@ func ProcessDsym(
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
 	var dsymPath string
+	var err error
 
 	// Performs an automatic cleanup of temporary directories at the end
 	defer func() {
@@ -86,7 +87,6 @@ func ProcessDsym(
 
 			} else {
 				// Otherwise, try to find it
-				var err error
 				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					log.Warn(err.Error())
@@ -95,7 +95,6 @@ func ProcessDsym(
 			}
 
 			if scheme != "" {
-				var err error
 				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 				if err != nil {
 					return err
@@ -120,20 +119,18 @@ func ProcessDsym(
 
 		if dsymPath != "" {
 			var tempDir string
-			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
+			dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
 			if len(dwarfInfo) > 0 && projectRoot == "" {
 				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 			}
 			tempDirs = append(tempDirs, tempDir)
 		}
 
-		if len(dwarfInfo) == 0 {
-			if ignoreEmptyDsym || ignoreMissingDwarf {
-				log.Warn("No dSYM files found")
-				continue
-			} else {
-				return errors.New("No dSYM files found")
-			}
+		if len(dwarfInfo) == 0 && (ignoreEmptyDsym || ignoreMissingDwarf) {
+			log.Warn("No dSYM files found: " + err.Error())
+			continue
+		} else {
+			return errors.New("No dSYM files found: " + err.Error())
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -152,7 +149,6 @@ func ProcessDsym(
 		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
 		if plistPath != "" && apiKey == "" {
 			// Read data from the plist
-			var err error
 			plistData, err = ios.GetPlistData(plistPath)
 			if err != nil {
 				return err
@@ -170,7 +166,6 @@ func ProcessDsym(
 			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
 			log.Info("Uploading dSYM " + dsymInfo)
 
-			var err error
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {
 				return err
