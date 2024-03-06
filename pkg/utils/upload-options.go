@@ -78,7 +78,7 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildDsymUploadOptions(apiKey string, appVersion string, dev bool, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildDsymUploadOptions(apiKey string, projectRoot string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
@@ -87,19 +87,7 @@ func BuildDsymUploadOptions(apiKey string, appVersion string, dev bool, projectR
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	uploadOptions["appVersion"] = appVersion
-
-	if dev {
-		uploadOptions["dev"] = "true"
-	}
-
 	uploadOptions["projectRoot"] = projectRoot
-
-	uploadOptions["platform"] = "ios"
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
 
 	return uploadOptions, nil
 }

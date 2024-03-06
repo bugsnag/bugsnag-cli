@@ -22,7 +22,6 @@ end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
   @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
-  puts @output
 end
 
 Then('I should see a log level of {string} when no dSYM files could be found') do |log_level|
@@ -89,7 +88,6 @@ end
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appVersion" is not null
   )
 end
 
