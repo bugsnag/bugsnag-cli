@@ -128,10 +128,16 @@ func ProcessDsym(
 
 		if len(dwarfInfo) == 0 {
 			if ignoreEmptyDsym || ignoreMissingDwarf {
-				log.Warn("No dSYM files found: " + err.Error())
+				if err != nil {
+					log.Warn("No dSYM files found: " + err.Error())
+				}
+				log.Warn("No dSYM files found")
 				continue
 			} else {
-				return errors.New("No dSYM files found: " + err.Error())
+				if err != nil {
+					return errors.New("No dSYM files found: " + err.Error())
+				}
+				return errors.New("No dSYM files found")
 			}
 		}
 
