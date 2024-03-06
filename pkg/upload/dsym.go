@@ -49,6 +49,7 @@ func ProcessDsym(
 	var tempDirs []string
 	var dsymPath string
 	var err error
+	var tempDir string
 
 	// Performs an automatic cleanup of temporary directories at the end
 	defer func() {
@@ -84,20 +85,18 @@ func ProcessDsym(
 				if err != nil {
 					log.Warn(err.Error())
 				}
-
 			} else {
 				// Otherwise, try to find it
 				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					log.Warn(err.Error())
 				}
-
 			}
 
 			if scheme != "" {
 				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 				if err != nil {
-					return err
+					log.Warn(err.Error())
 				}
 			}
 
@@ -112,33 +111,23 @@ func ProcessDsym(
 					log.Info("Using dSYM path: " + dsymPath)
 					dsymPath = possibleDsymPath
 				}
-
 			}
-
 		}
 
-		if dsymPath != "" {
-			var tempDir string
-			dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
-			if len(dwarfInfo) > 0 && projectRoot == "" {
-				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
-			}
-			tempDirs = append(tempDirs, tempDir)
+		if projectRoot == "" {
+			return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 		}
 
-		if len(dwarfInfo) == 0 {
-			if ignoreEmptyDsym || ignoreMissingDwarf {
-				if err != nil {
-					log.Warn("No dSYM files found: " + err.Error())
-				}
-				log.Warn("No dSYM files found")
-				continue
-			} else {
-				if err != nil {
-					return errors.New("No dSYM files found: " + err.Error())
-				}
-				return errors.New("No dSYM files found")
-			}
+		if dsymPath == "" {
+			return errors.New("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
+		}
+
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
+		tempDirs = append(tempDirs, tempDir)
+		if err != nil {
+			return err
+		} else if len(dwarfInfo) == 0 {
+			return errors.New("No dSYM files found in: " + dsymPath)
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -154,7 +143,7 @@ func ProcessDsym(
 			}
 		}
 
-		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
+		// If the Info.plist path is defined and we still don't know the apiKey try to extract them from it
 		if plistPath != "" && apiKey == "" {
 			// Read data from the plist
 			plistData, err = ios.GetPlistData(plistPath)
@@ -195,12 +184,14 @@ func ProcessDsym(
 					return err
 				} else {
 					log.Warn(err.Error())
+					return nil
 				}
 			} else {
-				log.Success("Uploaded dSYM: " + dsym.Name)
+				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
+				return nil
 			}
 		}
 	}
 
-	return nil
+	return errors.New("")
 }
