@@ -184,14 +184,12 @@ func ProcessDsym(
 					return err
 				} else {
 					log.Warn(err.Error())
-					return nil
 				}
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
-				return nil
 			}
 		}
 	}
 
-	return errors.New("")
+	return nil
 }
