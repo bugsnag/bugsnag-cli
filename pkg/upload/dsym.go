@@ -21,7 +21,6 @@ type Dsym struct {
 	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
-	FailOnUpload       bool        `help:"Whether to stop any further uploads if a file fails to upload successfully. By default the command attempts to upload"`
 	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
@@ -33,7 +32,7 @@ func ProcessDsym(
 	projectRoot string,
 	ignoreMissingDwarf bool,
 	ignoreEmptyDsym bool,
-	failOnUpload bool,
+	failOnUploadError bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -180,10 +179,14 @@ func ProcessDsym(
 			}
 
 			if err != nil {
-				if failOnUpload {
-					return err
+				if len(dwarfInfo) > 1 {
+					if failOnUploadError {
+						return err
+					} else {
+						log.Warn(err.Error())
+					}
 				} else {
-					log.Warn(err.Error())
+					return err
 				}
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
