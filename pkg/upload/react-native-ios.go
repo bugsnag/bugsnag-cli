@@ -82,17 +82,10 @@ func ProcessReactNativeIos(
 				if ios.IsPathAnXcodeProjectOrWorkspace(filepath.Join(rootDirPath, "ios")) {
 					possibleXcodeProjPath := filepath.Join(rootDirPath, "ios")
 					xcodeProjPath = ios.FindXcodeProjOrWorkspace(possibleXcodeProjPath)
-					if xcodeProjPath != "" {
+					if utils.FileExists(xcodeProjPath) {
 						log.Info("Found Xcode project file in: " + xcodeProjPath)
-					} else {
-						log.Info("No Xcode project file found in: " + path)
-
 					}
 				}
-			}
-
-			if xcodeProjPath == "" {
-				return errors.New("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
 
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
@@ -126,6 +119,8 @@ func ProcessReactNativeIos(
 						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcodeProjPath)
 					}
 				}
+			} else {
+				return errors.New("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
 
 			// Check to see if we have the Info.Plist path

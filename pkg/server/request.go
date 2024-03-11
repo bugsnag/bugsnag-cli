@@ -152,12 +152,13 @@ func processRequest(request *http.Request, timeout int, retryCount int) error {
 			return nil
 		}
 
-		log.Warn("Request Failed, Retrying...")
 		i++
 
-		if i >= retryCount {
+		if i > retryCount {
 			break
 		}
+
+		log.Warn("Request Failed, Retrying...")
 
 		time.Sleep(time.Second)
 	}
