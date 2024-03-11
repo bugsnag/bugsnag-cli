@@ -21,7 +21,6 @@ type Dsym struct {
 	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
-	FailOnUpload       bool        `help:"Whether to stop any further uploads if a file fails to upload successfully. By default the command attempts to upload"`
 	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 }
 
@@ -33,7 +32,7 @@ func ProcessDsym(
 	projectRoot string,
 	ignoreMissingDwarf bool,
 	ignoreEmptyDsym bool,
-	failOnUpload bool,
+	failOnUploadError bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -48,6 +47,8 @@ func ProcessDsym(
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
 	var dsymPath string
+	var err error
+	var tempDir string
 
 	// Performs an automatic cleanup of temporary directories at the end
 	defer func() {
@@ -83,22 +84,18 @@ func ProcessDsym(
 				if err != nil {
 					log.Warn(err.Error())
 				}
-
 			} else {
 				// Otherwise, try to find it
-				var err error
 				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					log.Warn(err.Error())
 				}
-
 			}
 
 			if scheme != "" {
-				var err error
 				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 				if err != nil {
-					return err
+					log.Warn(err.Error())
 				}
 			}
 
@@ -113,27 +110,23 @@ func ProcessDsym(
 					log.Info("Using dSYM path: " + dsymPath)
 					dsymPath = possibleDsymPath
 				}
-
 			}
-
 		}
 
-		if dsymPath != "" {
-			var tempDir string
-			dwarfInfo, tempDir, _ = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
-			if len(dwarfInfo) > 0 && projectRoot == "" {
-				return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
-			}
-			tempDirs = append(tempDirs, tempDir)
+		if projectRoot == "" {
+			return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 		}
 
-		if len(dwarfInfo) == 0 {
-			if ignoreEmptyDsym || ignoreMissingDwarf {
-				log.Warn("No dSYM files found")
-				continue
-			} else {
-				return errors.New("No dSYM files found")
-			}
+		if dsymPath == "" {
+			return errors.New("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
+		}
+
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
+		tempDirs = append(tempDirs, tempDir)
+		if err != nil {
+			return err
+		} else if len(dwarfInfo) == 0 {
+			return errors.New("No dSYM files found in: " + dsymPath)
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -149,10 +142,9 @@ func ProcessDsym(
 			}
 		}
 
-		// If the Info.plist path is defined and we still don't know the apiKey or verionName, try to extract them from it
+		// If the Info.plist path is defined and we still don't know the apiKey try to extract them from it
 		if plistPath != "" && apiKey == "" {
 			// Read data from the plist
-			var err error
 			plistData, err = ios.GetPlistData(plistPath)
 			if err != nil {
 				return err
@@ -170,7 +162,6 @@ func ProcessDsym(
 			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
 			log.Info("Uploading dSYM " + dsymInfo)
 
-			var err error
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {
 				return err
@@ -188,13 +179,17 @@ func ProcessDsym(
 			}
 
 			if err != nil {
-				if failOnUpload {
-					return err
+				if len(dwarfInfo) > 1 {
+					if failOnUploadError {
+						return err
+					} else {
+						log.Warn(err.Error())
+					}
 				} else {
-					log.Warn(err.Error())
+					return err
 				}
 			} else {
-				log.Success("Uploaded dSYM: " + dsym.Name)
+				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
 			}
 		}
 	}
