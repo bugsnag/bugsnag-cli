@@ -101,8 +101,8 @@ func ProcessDsym(
 				// Check if dsymPath exists before proceeding
 				_, err := os.Stat(possibleDsymPath)
 				if err == nil {
-					log.Info("Using dSYM path: " + dsymPath)
 					dsymPath = possibleDsymPath
+					log.Info("Using dSYM path: " + dsymPath)
 				}
 			}
 		}
