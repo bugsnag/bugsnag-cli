@@ -151,6 +151,8 @@ func IsPathAnXcodeProjectOrWorkspace(path string) bool {
 		cmd := exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
 		cmd.Dir = path
 		_, err = cmd.Output()
+	} else {
+		return false
 	}
 
 	return err == nil
