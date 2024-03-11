@@ -189,3 +189,33 @@ func GetDefaultProjectRoot(path, projectRoot string) string {
 func isXcodebuildInstalled() bool {
 	return utils.LocationOf(utils.XCODEBUILD) != ""
 }
+
+// FindXcodeProjOrWorkspace finds the .xcodeproj or .xcworkspace file in a given directory
+// and returns the path to it
+// If neither is found, an empty string is returned
+// If both are found, the .xcworkspace file is returned
+func FindXcodeProjOrWorkspace(path string) string {
+	var xcodeProjPath string
+	var xcodeWorkspacePath string
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return ""
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".xcodeproj") {
+			xcodeProjPath = filepath.Join(path, file.Name())
+		} else if strings.HasSuffix(file.Name(), ".xcworkspace") {
+			xcodeWorkspacePath = filepath.Join(path, file.Name())
+		}
+	}
+
+	if xcodeWorkspacePath != "" {
+		return xcodeWorkspacePath
+	} else if xcodeProjPath != "" {
+		return xcodeProjPath
+	}
+
+	return ""
+}
