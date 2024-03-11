@@ -96,6 +96,10 @@ steps:
 
   - label: dSYM Integration Tests
     depends_on: build
+    agents:
+      queue: macos-13-arm
+    env:
+      XCODE_VERSION: 15.2.0
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install

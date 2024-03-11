@@ -58,12 +58,6 @@ func ProcessDsym(
 	}()
 
 	for _, path := range paths {
-
-		if path == "" {
-			// set path to current directory if not set
-			path, _ = os.Getwd()
-		}
-
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			if xcodeProjPath == "" {
 				xcodeProjPath = path
@@ -107,8 +101,8 @@ func ProcessDsym(
 				// Check if dsymPath exists before proceeding
 				_, err := os.Stat(possibleDsymPath)
 				if err == nil {
-					log.Info("Using dSYM path: " + dsymPath)
 					dsymPath = possibleDsymPath
+					log.Info("Using dSYM path: " + dsymPath)
 				}
 			}
 		}
