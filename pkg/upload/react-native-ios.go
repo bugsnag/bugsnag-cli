@@ -79,8 +79,8 @@ func ProcessReactNativeIos(
 					return errors.New("unable to find the specified Xcode project file: " + xcodeProjPath)
 				}
 			} else {
-				if ios.IsPathAnXcodeProjectOrWorkspace(rootDirPath) {
-					xcodeProjPath = rootDirPath
+				if ios.IsPathAnXcodeProjectOrWorkspace(filepath.Join(rootDirPath, "ios")) {
+					xcodeProjPath = filepath.Join(rootDirPath, "ios")
 					log.Info("Found Xcode project file in: " + xcodeProjPath)
 				} else {
 					log.Info("No Xcode project file found in: " + xcodeProjPath)
