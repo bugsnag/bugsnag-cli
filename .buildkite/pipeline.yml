@@ -96,6 +96,8 @@ steps:
 
   - label: dSYM Integration Tests
     depends_on: build
+    env:
+      XCODE_VERSION: 13.4.1
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
