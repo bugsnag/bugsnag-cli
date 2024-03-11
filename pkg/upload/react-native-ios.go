@@ -35,7 +35,7 @@ func ProcessReactNativeIos(
 	sourceMapPath string,
 	bundlePath string,
 	plistPath string,
-	xcworkspacePath string,
+	xcodeProjPath string,
 	codeBundleId string,
 	dev bool,
 	projectRoot string,
@@ -74,51 +74,48 @@ func ProcessReactNativeIos(
 		if bundlePath == "" || (plistPath == "" && (apiKey == "" || versionName == "" || bundleVersion == "")) {
 
 			// Validate workspacePath (if provided) or attempt to find one
-			if xcworkspacePath != "" {
-				if !utils.FileExists(xcworkspacePath) {
-					return errors.New("unable to find the specified .xcworkspace file: " + xcworkspacePath)
+			if xcodeProjPath != "" {
+				if !utils.FileExists(xcodeProjPath) {
+					return errors.New("unable to find the specified Xcode project file: " + xcodeProjPath)
 				}
 			} else {
-				// Attempt to locate .xcworkspace in the path/ios/ folder
-				if utils.IsDir(filepath.Join(path, "ios")) {
-					xcworkspacePath, _ = utils.FindFolderWithSuffix(filepath.Join(path, "ios"), ".xcworkspace")
-					if xcworkspacePath != "" {
-						log.Info("Found .xcworkspace at: " + xcworkspacePath)
-					} else {
-						log.Info("No .xcworkspace found at: " + xcworkspacePath)
-					}
+				if ios.IsPathAnXcodeProjectOrWorkspace(rootDirPath) {
+					xcodeProjPath = rootDirPath
+					log.Info("Found Xcode project file in: " + xcodeProjPath)
+				} else {
+					log.Info("No Xcode project file found in: " + xcodeProjPath)
 				}
 			}
 
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
-			if xcworkspacePath != "" {
+			if xcodeProjPath != "" {
 				if scheme != "" {
-					_, err := ios.IsSchemeInPath(xcworkspacePath, scheme)
+					_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
 					if err != nil {
 						return err
 					}
 				} else {
 					// If not, work it out from the xcworkspace file
-					possibleSchemeName, err := ios.GetDefaultScheme(xcworkspacePath)
+					possibleSchemeName, err := ios.GetDefaultScheme(xcodeProjPath)
 					if err != nil {
 						return err
 					}
 
-					schemeExists, _ := ios.IsSchemeInPath(xcworkspacePath, possibleSchemeName)
+					schemeExists, _ := ios.IsSchemeInPath(xcodeProjPath, possibleSchemeName)
 					if schemeExists {
 						scheme = possibleSchemeName
 						log.Info("Using scheme from .xcworkspace: " + scheme)
 					} else {
-						log.Info("Unable to determine a scheme from .xcworkspace: " + xcworkspacePath)
+						log.Info("Unable to determine a scheme from .xcworkspace: " + xcodeProjPath)
 					}
 				}
 
 				// Pull build settings from the xcworkspace file
 				if scheme != "" {
 					var err error
-					buildSettings, err = ios.GetXcodeBuildSettings(xcworkspacePath, scheme)
+					buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 					if err != nil {
-						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcworkspacePath)
+						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcodeProjPath)
 					}
 				}
 			}
