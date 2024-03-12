@@ -108,13 +108,16 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	var cmd *exec.Cmd
 
 	if isXcodebuildInstalled() {
+		if !strings.HasSuffix(path, ".xcworkspace") && !strings.HasSuffix(path, ".xcodeproj") {
+			path = FindXcodeProjOrWorkspace(path)
+		}
+
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
 		} else {
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-scheme", schemeName, "-showBuildSettings")
-			cmd.Dir = path
+			return nil, errors.New("Unable to locate xcodeproj or xcworkspace in the given path")
 		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")

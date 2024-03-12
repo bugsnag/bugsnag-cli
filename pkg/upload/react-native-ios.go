@@ -49,6 +49,7 @@ func ProcessReactNativeIos(
 
 	var rootDirPath string
 	var buildSettings *ios.XcodeBuildSettings
+	var err error
 
 	for _, path := range paths {
 		// Check/Set the build folder
@@ -80,43 +81,30 @@ func ProcessReactNativeIos(
 				}
 			} else {
 				if ios.IsPathAnXcodeProjectOrWorkspace(filepath.Join(rootDirPath, "ios")) {
-					possibleXcodeProjPath := filepath.Join(rootDirPath, "ios")
-					xcodeProjPath = ios.FindXcodeProjOrWorkspace(possibleXcodeProjPath)
-					if utils.FileExists(xcodeProjPath) {
-						log.Info("Found Xcode project file in: " + xcodeProjPath)
-					}
+					xcodeProjPath = filepath.Join(rootDirPath, "ios")
 				}
 			}
 
 			// Validate the scheme name (if provided) or attempt to find one in the workspace
 			if xcodeProjPath != "" {
+				// If scheme is set explicitly, check if it exists
 				if scheme != "" {
 					_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
 					if err != nil {
-						return err
+						log.Warn(err.Error())
 					}
 				} else {
-					// If not, work it out from the xcworkspace file
-					possibleSchemeName, err := ios.GetDefaultScheme(xcodeProjPath)
+					// Otherwise, try to find it
+					scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 					if err != nil {
-						return err
-					}
-
-					schemeExists, _ := ios.IsSchemeInPath(xcodeProjPath, possibleSchemeName)
-					if schemeExists {
-						scheme = possibleSchemeName
-						log.Info("Using scheme from .xcworkspace: " + scheme)
-					} else {
-						log.Info("Unable to determine a scheme from .xcworkspace: " + xcodeProjPath)
+						log.Warn(err.Error())
 					}
 				}
 
-				// Pull build settings from the xcworkspace file
 				if scheme != "" {
-					var err error
 					buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 					if err != nil {
-						log.Warn("Unable to read build settings for scheme " + scheme + " from " + xcodeProjPath)
+						log.Warn(err.Error())
 					}
 				}
 			} else {
