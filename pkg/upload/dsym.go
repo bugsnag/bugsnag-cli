@@ -32,7 +32,6 @@ func ProcessDsym(
 	projectRoot string,
 	ignoreMissingDwarf bool,
 	ignoreEmptyDsym bool,
-	failOnUploadError bool,
 	paths []string,
 	endpoint string,
 	timeout int,
@@ -173,15 +172,7 @@ func ProcessDsym(
 			}
 
 			if err != nil {
-				if len(dwarfInfo) > 1 {
-					if failOnUploadError {
-						return err
-					} else {
-						log.Warn(err.Error())
-					}
-				} else {
-					return err
-				}
+				return err
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
 			}

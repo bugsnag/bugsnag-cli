@@ -20,7 +20,21 @@ type UnityAndroid struct {
 	BuildUuid     string      `help:"Module Build UUID"`
 }
 
-func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, versionCode string, buildUuid string, versionName string, projectRoot string, paths []string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessUnityAndroid(
+	apiKey string,
+	aabPath string,
+	applicationId string,
+	versionCode string,
+	buildUuid string,
+	versionName string,
+	projectRoot string,
+	paths []string,
+	endpoint string,
+	retries int,
+	timeout int,
+	overwrite bool,
+	dryRun bool,
+) error {
 	var err error
 	var zipPath string
 	var archList []string
@@ -68,7 +82,20 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 			return err
 		}
 
-		err = ProcessAndroidAab(manifestData["apiKey"], manifestData["applicationId"], manifestData["buildUuid"], []string{aabDir}, projectRoot, manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+		err = ProcessAndroidAab(
+			manifestData["apiKey"],
+			manifestData["applicationId"],
+			manifestData["buildUuid"],
+			[]string{aabDir},
+			projectRoot,
+			manifestData["versionCode"],
+			manifestData["versionName"],
+			endpoint,
+			retries,
+			timeout,
+			overwrite,
+			dryRun,
+		)
 
 		if err != nil {
 			return err
@@ -109,7 +136,19 @@ func ProcessUnityAndroid(apiKey string, aabPath string, applicationId string, ve
 		}
 	}
 
-	err = android.UploadAndroidNdk(symbolFileList, manifestData["apiKey"], manifestData["applicationId"], manifestData["versionName"], manifestData["versionCode"], projectRoot, overwrite, endpoint, timeout, retries, dryRun, failOnUploadError)
+	err = android.UploadAndroidNdk(
+		symbolFileList,
+		manifestData["apiKey"],
+		manifestData["applicationId"],
+		manifestData["versionName"],
+		manifestData["versionCode"],
+		projectRoot,
+		overwrite,
+		endpoint,
+		timeout,
+		retries,
+		dryRun,
+	)
 
 	if err != nil {
 		return err

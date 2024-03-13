@@ -42,6 +42,10 @@ func main() {
 		log.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
+	if commands.FailOnUploadError {
+		log.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release.")
+	}
+
 	switch ctx.Command() {
 
 	case "upload all <path>":
@@ -58,7 +62,6 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.DryRun,
 		)
 
@@ -77,7 +80,6 @@ func main() {
 			commands.Upload.AndroidAab.VersionCode,
 			commands.Upload.AndroidAab.VersionName,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
@@ -101,7 +103,6 @@ func main() {
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
@@ -141,7 +142,8 @@ func main() {
 			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
-		err := upload.Dart(commands.Upload.DartSymbol.Path,
+		err := upload.Dart(
+			commands.Upload.DartSymbol.Path,
 			commands.Upload.DartSymbol.VersionName,
 			commands.Upload.DartSymbol.VersionCode,
 			commands.Upload.DartSymbol.BundleVersion,
@@ -151,7 +153,6 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.DryRun,
 		)
 
@@ -220,7 +221,6 @@ func main() {
 			commands.Upload.Dsym.ProjectRoot,
 			commands.Upload.Dsym.IgnoreMissingDwarf,
 			commands.Upload.Dsym.IgnoreEmptyDsym,
-			commands.FailOnUploadError,
 			commands.Upload.Dsym.Path,
 			endpoint,
 			commands.Upload.Timeout,
@@ -248,7 +248,6 @@ func main() {
 			commands.Upload.UnityAndroid.ProjectRoot,
 			commands.Upload.UnityAndroid.Path,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,

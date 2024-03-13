@@ -26,7 +26,24 @@ type ReactNativeAndroid struct {
 	VersionCode  string      `help:"The version code for the application (Android only)."`
 }
 
-func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, versionName string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
+func ProcessReactNativeAndroid(
+	apiKey string,
+	appManifestPath string,
+	bundlePath string,
+	codeBundleId string,
+	dev bool,
+	paths []string,
+	projectRoot string,
+	variant string,
+	versionName string,
+	versionCode string,
+	sourceMapPath string,
+	endpoint string,
+	timeout int,
+	retries int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var err error
 	var uploadOptions map[string]string

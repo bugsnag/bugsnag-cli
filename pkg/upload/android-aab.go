@@ -18,7 +18,20 @@ type AndroidAabMapping struct {
 	VersionName   string      `help:"Module version name"`
 }
 
-func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidAab(
+	apiKey string,
+	applicationId string,
+	buildUuid string,
+	paths []string,
+	projectRoot string,
+	versionCode string,
+	versionName string,
+	endpoint string,
+	retries int,
+	timeout int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var manifestData map[string]string
 	var aabDir string
@@ -59,7 +72,22 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 
 		if len(soFileList) > 0 {
-			err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", soFileList, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+			err = ProcessAndroidNDK(
+				manifestData["apiKey"],
+				manifestData["applicationId"],
+				"",
+				"",
+				soFileList,
+				projectRoot,
+				"",
+				manifestData["versionCode"],
+				manifestData["versionName"],
+				endpoint,
+				retries,
+				timeout,
+				overwrite,
+				dryRun,
+			)
 
 			if err != nil {
 				return err

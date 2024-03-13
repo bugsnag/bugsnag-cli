@@ -7,7 +7,19 @@ import (
 	"path/filepath"
 )
 
-func UploadAndroidNdk(fileList []string, apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, overwrite bool, endpoint string, timeout int, retries int, dryRun bool, failOnUploadError bool) error {
+func UploadAndroidNdk(
+	fileList []string,
+	apiKey string,
+	applicationId string,
+	versionName string,
+	versionCode string,
+	projectRoot string,
+	overwrite bool,
+	endpoint string,
+	timeout int,
+	retries int,
+	dryRun bool,
+) error {
 	fileFieldData := make(map[string]string)
 
 	numberOfFiles := len(fileList)
@@ -29,15 +41,7 @@ func UploadAndroidNdk(fileList []string, apiKey string, applicationId string, ve
 		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 		if err != nil {
-			if numberOfFiles > 1 {
-				if failOnUploadError {
-					return err
-				} else {
-					log.Warn(err.Error())
-				}
-			} else {
-				return err
-			}
+			return err
 		} else {
 			log.Success("Uploaded " + filepath.Base(file))
 		}
