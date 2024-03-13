@@ -172,7 +172,11 @@ func ProcessDsym(
 			}
 
 			if err != nil {
-				return err
+				if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
+					log.Warn("Duplicate file detected, skipping upload of " + dsym.Location + "/" + dsym.Name)
+				} else {
+					return err
+				}
 			} else {
 				log.Success("Uploaded dSYM: " + dsym.Location + "/" + dsym.Name)
 			}

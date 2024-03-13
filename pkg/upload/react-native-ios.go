@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -231,7 +232,11 @@ func ProcessReactNativeIos(
 	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 	if err != nil {
-		return err
+		if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
+			log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(sourceMapPath))
+		} else {
+			return err
+		}
 	} else {
 		log.Success("Uploaded " + filepath.Base(sourceMapPath))
 	}

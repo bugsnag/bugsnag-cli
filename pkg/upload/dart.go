@@ -71,13 +71,16 @@ func Dart(
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
-			if requestStatus != nil {
-
-				return err
+			if err != nil {
+				if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
+					log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(file))
+				} else {
+					return err
+				}
 			} else {
-				log.Success(file)
+				log.Success("Uploaded " + filepath.Base(file))
 			}
 
 			continue
@@ -120,9 +123,13 @@ func Dart(
 			}
 
 			if err != nil {
-				return err
+				if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
+					log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(file))
+				} else {
+					return err
+				}
 			} else {
-				log.Success(file)
+				log.Success("Uploaded " + filepath.Base(file))
 			}
 
 			continue
