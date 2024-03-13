@@ -39,15 +39,14 @@ build-macos:
 	GOOS=darwin GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-macos-bugsnag-cli main.go
 	GOOS=darwin GOARCH=arm64 go build -ldflags '-s' -o bin/arm64-macos-bugsnag-cli main.go
 
-.PHONY: unit-test
-unit-test:
-	go test -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
-
-
 .PHONY: fmt
 fmt:
 	gofmt -w ./
 
+.PHONY: unit-tests
+unit-test:
+	go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.5.0
+	go test -race -json -v ./test/... 2>&1 | tee /tmp/gotest.log | gotestfmt
 
 .PHONY: npm-lint
 npm-lint:
@@ -78,6 +77,12 @@ features/base-fixtures/dart:
 	cd $@ && $(FLUTTER_BIN) pub get
 	cd $@ && $(FLUTTER_BIN) build apk  --suppress-analytics --split-debug-info=app-debug-info
 	cd $@ && $(FLUTTER_BIN) build ios --no-codesign --suppress-analytics --no-tree-shake-icons --split-debug-info=app-debug-info
+
+.PHONY: features/base-fixtures/dsym
+features/base-fixtures/dsym:
+	bundle install
+	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
+	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -configuration Release -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
 
 .PHONY: features/base-fixtures/rn0_69
 features/base-fixtures/rn0_69: features/base-fixtures/rn0_69/android features/base-fixtures/rn0_69/ios

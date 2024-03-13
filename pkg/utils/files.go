@@ -12,6 +12,7 @@ import (
 const (
 	PLUTIL     = "plutil"
 	XCODEBUILD = "xcodebuild"
+	DWARFDUMP  = "dwarfdump"
 )
 
 // FilePathWalkDir - finds files within a given directory

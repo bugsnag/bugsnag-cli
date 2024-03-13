@@ -39,7 +39,7 @@ Feature: React Native 0.72 iOS Integration Tests
     When I make the "features/base-fixtures/rn0_72/ios"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev features/base-fixtures/rn0_72
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --scheme=rn0_72 features/base-fixtures/rn0_72
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -53,7 +53,7 @@ Feature: React Native 0.72 iOS Integration Tests
     When I make the "features/base-fixtures/rn0_72/ios/archive"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev features/base-fixtures/rn0_72
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --scheme=rn0_72 features/base-fixtures/rn0_72
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/alecthomas/kong"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
@@ -8,7 +10,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"os"
 )
 
 var package_version = "2.1.0"
@@ -202,6 +203,28 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload dsym", "upload dsym <path>":
+
+		err := upload.ProcessDsym(
+			commands.ApiKey,
+			commands.Upload.Dsym.Scheme,
+			string(commands.Upload.Dsym.XcodeProject),
+			string(commands.Upload.Dsym.Plist),
+			commands.Upload.Dsym.ProjectRoot,
+			commands.Upload.Dsym.IgnoreMissingDwarf,
+			commands.Upload.Dsym.IgnoreEmptyDsym,
+			commands.FailOnUploadError,
+			commands.Upload.Dsym.Path,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
 			commands.DryRun,
 		)
 
