@@ -108,13 +108,16 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	var cmd *exec.Cmd
 
 	if isXcodebuildInstalled() {
+		if !strings.HasSuffix(path, ".xcworkspace") && !strings.HasSuffix(path, ".xcodeproj") {
+			path = FindXcodeProjOrWorkspace(path)
+		}
+
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
 		} else {
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-scheme", schemeName, "-showBuildSettings")
-			cmd.Dir = path
+			return nil, errors.New("Unable to locate xcodeproj or xcworkspace in the given path")
 		}
 	} else {
 		return nil, errors.New("Unable to locate xcodebuild on this system.")
@@ -151,6 +154,8 @@ func IsPathAnXcodeProjectOrWorkspace(path string) bool {
 		cmd := exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
 		cmd.Dir = path
 		_, err = cmd.Output()
+	} else {
+		return false
 	}
 
 	return err == nil
@@ -185,4 +190,34 @@ func GetDefaultProjectRoot(path, projectRoot string) string {
 // isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
 func isXcodebuildInstalled() bool {
 	return utils.LocationOf(utils.XCODEBUILD) != ""
+}
+
+// FindXcodeProjOrWorkspace finds the .xcodeproj or .xcworkspace file in a given directory
+// and returns the path to it
+// If neither is found, an empty string is returned
+// If both are found, the .xcworkspace file is returned
+func FindXcodeProjOrWorkspace(path string) string {
+	var xcodeProjPath string
+	var xcodeWorkspacePath string
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return ""
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".xcodeproj") {
+			xcodeProjPath = filepath.Join(path, file.Name())
+		} else if strings.HasSuffix(file.Name(), ".xcworkspace") {
+			xcodeWorkspacePath = filepath.Join(path, file.Name())
+		}
+	}
+
+	if xcodeWorkspacePath != "" {
+		return xcodeWorkspacePath
+	} else if xcodeProjPath != "" {
+		return xcodeProjPath
+	}
+
+	return ""
 }
