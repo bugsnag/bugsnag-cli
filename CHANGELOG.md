@@ -14,7 +14,6 @@
 ### Fixes
 
 - Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [67](https://github.com/bugsnag/bugsnag-cli/pull/67)
-- Ensure that we handle `--fail-on-upload-error` and multiple files correctly for Android AAB and NDK. [68](https://github.com/bugsnag/bugsnag-cli/pull/68)
 - Ensure that uploads are retried when passing the `--retries=x` argument to the CLI. [70](https://github.com/bugsnag/bugsnag-cli/pull/70)
 
 ## 2.0.0 (2023-10-17)
