@@ -2,11 +2,9 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
-
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -190,13 +188,8 @@ func ProcessReactNativeAndroid(
 		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
-			if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
-				log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(sourceMapPath))
-			} else {
-				return err
-			}
-		} else {
-			log.Success("Uploaded " + filepath.Base(sourceMapPath))
+
+			return err
 		}
 	}
 

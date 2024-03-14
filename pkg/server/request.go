@@ -93,8 +93,15 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
 
 		err = processRequest(req, timeout, retries)
+
 		if err != nil {
-			return err
+			if strings.Contains(err.Error(), "409") {
+				log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(fileName))
+			} else {
+				return err
+			}
+		} else {
+			log.Success("Uploaded " + filepath.Base(fileName))
 		}
 	} else {
 		log.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)

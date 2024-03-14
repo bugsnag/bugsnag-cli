@@ -2,11 +2,9 @@ package upload
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
-	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -232,13 +230,8 @@ func ProcessReactNativeIos(
 	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 	if err != nil {
-		if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
-			log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(sourceMapPath))
-		} else {
-			return err
-		}
-	} else {
-		log.Success("Uploaded " + filepath.Base(sourceMapPath))
+
+		return err
 	}
 
 	return nil

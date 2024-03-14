@@ -199,13 +199,7 @@ func ProcessAndroidProguard(
 		}
 
 		if err != nil {
-			if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
-				log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(mappingFile))
-			} else {
-				return err
-			}
-		} else {
-			log.Success("Uploaded " + filepath.Base(mappingFile))
+			return err
 		}
 	}
 	return nil

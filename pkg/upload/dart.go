@@ -74,13 +74,8 @@ func Dart(
 			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 			if err != nil {
-				if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
-					log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(file))
-				} else {
-					return err
-				}
-			} else {
-				log.Success("Uploaded " + filepath.Base(file))
+
+				return err
 			}
 
 			continue
@@ -123,13 +118,8 @@ func Dart(
 			}
 
 			if err != nil {
-				if strings.Contains(err.Error(), "409") && strings.Contains(err.Error(), "duplicate") {
-					log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(file))
-				} else {
-					return err
-				}
-			} else {
-				log.Success("Uploaded " + filepath.Base(file))
+
+				return err
 			}
 
 			continue
