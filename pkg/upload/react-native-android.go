@@ -2,10 +2,9 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -26,7 +25,24 @@ type ReactNativeAndroid struct {
 	VersionCode  string      `help:"The version code for the application (Android only)."`
 }
 
-func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, versionName string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
+func ProcessReactNativeAndroid(
+	apiKey string,
+	appManifestPath string,
+	bundlePath string,
+	codeBundleId string,
+	dev bool,
+	paths []string,
+	projectRoot string,
+	variant string,
+	versionName string,
+	versionCode string,
+	sourceMapPath string,
+	endpoint string,
+	timeout int,
+	retries int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var err error
 	var uploadOptions map[string]string
@@ -172,9 +188,8 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
+
 			return err
-		} else {
-			log.Success("Uploaded " + filepath.Base(sourceMapPath))
 		}
 	}
 

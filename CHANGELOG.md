@@ -2,15 +2,18 @@
 
 ## 2.1.0 (TBD)
 
+### Breaking Changes
+- Deprecate the `--fail-on-upload-error` flag. [95](https://github.com/bugsnag/bugsnag-cli/pull/90)
+
 ### Enhancements
 
 - Add support for React Native source maps for iOS [online docs (TBD)]()
+- Add support for dSYM uploads for iOS [online docs (TBD)]()
 - Allow `create build` to extract relevant information from a given Android manifest or AAB file.[65](https://github.com/bugsnag/bugsnag-cli/pull/65)
 
 ### Fixes
 
 - Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [67](https://github.com/bugsnag/bugsnag-cli/pull/67)
-- Ensure that we handle `--fail-on-upload-error` and multiple files correctly for Android AAB and NDK. [68](https://github.com/bugsnag/bugsnag-cli/pull/68)
 - Ensure that uploads are retried when passing the `--retries=x` argument to the CLI. [70](https://github.com/bugsnag/bugsnag-cli/pull/70)
 
 ## 2.0.0 (2023-10-17)

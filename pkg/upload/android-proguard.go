@@ -200,8 +200,6 @@ func ProcessAndroidProguard(
 
 		if err != nil {
 			return err
-		} else {
-			log.Success("Uploaded " + filepath.Base(mappingFile))
 		}
 	}
 	return nil

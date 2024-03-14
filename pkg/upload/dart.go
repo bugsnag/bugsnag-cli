@@ -26,12 +26,22 @@ type DartSymbolOptions struct {
 	BundleVersion string      `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 }
 
-func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
+func Dart(
+	paths []string,
+	version string,
+	versionCode string,
+	bundleVersion string,
+	iosAppPath string,
+	endpoint string,
+	timeout int, retries int,
+	overwrite bool,
+	apiKey string,
+	dryRun bool,
+) error {
 
 	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
-	numberOfFiles := len(fileList)
 
 	if err != nil {
 		log.Error("error building file list", 1)
@@ -61,20 +71,11 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
-			if requestStatus != nil {
-				if numberOfFiles > 1 {
-					if failOnUploadError {
-						return err
-					} else {
-						log.Warn(err.Error())
-					}
-				} else {
-					return err
-				}
-			} else {
-				log.Success(file)
+			if err != nil {
+
+				return err
 			}
 
 			continue
@@ -117,17 +118,8 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			}
 
 			if err != nil {
-				if numberOfFiles > 1 {
-					if failOnUploadError {
-						return err
-					} else {
-						log.Warn(err.Error())
-					}
-				} else {
-					return err
-				}
-			} else {
-				log.Success(file)
+
+				return err
 			}
 
 			continue

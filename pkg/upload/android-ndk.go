@@ -22,7 +22,22 @@ type AndroidNdkMapping struct {
 	VersionName    string      `help:"Module version name"`
 }
 
-func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot string, appManifestPath string, paths []string, projectRoot string, variant string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidNDK(
+	apiKey string,
+	applicationId string,
+	androidNdkRoot string,
+	appManifestPath string,
+	paths []string,
+	projectRoot string,
+	variant string,
+	versionCode string,
+	versionName string,
+	endpoint string,
+	retries int,
+	timeout int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var fileList []string
 	var symbolFileList []string
@@ -192,7 +207,19 @@ func ProcessAndroidNDK(apiKey string, applicationId string, androidNdkRoot strin
 		}
 	}
 
-	err = android.UploadAndroidNdk(symbolFileList, apiKey, applicationId, versionName, versionCode, projectRoot, overwrite, endpoint, timeout, retries, dryRun, failOnUploadError)
+	err = android.UploadAndroidNdk(
+		symbolFileList,
+		apiKey,
+		applicationId,
+		versionName,
+		versionCode,
+		projectRoot,
+		overwrite,
+		endpoint,
+		timeout,
+		retries,
+		dryRun,
+	)
 
 	if err != nil {
 		return err

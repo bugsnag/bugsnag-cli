@@ -2,10 +2,9 @@ package upload
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -231,9 +230,8 @@ func ProcessReactNativeIos(
 	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 	if err != nil {
+
 		return err
-	} else {
-		log.Success("Uploaded " + filepath.Base(sourceMapPath))
 	}
 
 	return nil
