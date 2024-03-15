@@ -7,8 +7,8 @@
 
 ### Enhancements
 
-- Add support for React Native source maps for iOS [online docs (TBD)]()
-- Add support for dSYM uploads for iOS [online docs (TBD)]()
+- Add support for React Native source maps for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/)
+- Add support for dSYM uploads for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dsym/)
 - Allow `create build` to extract relevant information from a given Android manifest or AAB file.[65](https://github.com/bugsnag/bugsnag-cli/pull/65)
 
 ### Fixes
