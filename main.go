@@ -195,7 +195,7 @@ func main() {
 			commands.Upload.ReactNativeIos.SourceMap,
 			commands.Upload.ReactNativeIos.Bundle,
 			commands.Upload.ReactNativeIos.Plist,
-			commands.Upload.ReactNativeIos.Xcworkspace,
+			commands.Upload.ReactNativeIos.XcodeProject,
 			commands.Upload.ReactNativeIos.CodeBundleID,
 			commands.Upload.ReactNativeIos.Dev,
 			commands.Upload.ReactNativeIos.ProjectRoot,

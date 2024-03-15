@@ -19,7 +19,7 @@ type ReactNativeIos struct {
 	SourceMap     string      `help:"Path to the source map file" type:"path"`
 	Bundle        string      `help:"Path to the bundle file" type:"path"`
 	Plist         string      `help:"Path to the Info.plist file" type:"path"`
-	Xcworkspace   string      `help:"Path to the .xcworkspace file" type:"path"`
+	XcodeProject  string      `help:"Path to the .xcworkspace file" type:"path"`
 	CodeBundleID  string      `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
 	Dev           bool        `help:"Indicates whether the application is a debug or release build"`
 	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
