@@ -2,7 +2,7 @@
 
 ## 2.1.0 (TBD)
 
-### Breaking Changes
+### Deprecations
 - Deprecate the `--fail-on-upload-error` flag. [95](https://github.com/bugsnag/bugsnag-cli/pull/90)
 
 ### Enhancements
