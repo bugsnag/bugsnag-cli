@@ -4,50 +4,18 @@ import (
 	"os"
 
 	"github.com/alecthomas/kong"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.0.0"
-
-// Global CLI options
-type Globals struct {
-	UploadAPIRootUrl  string            `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
-	Port              int               `help:"Port number for the upload server" default:"443"`
-	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
-	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
-	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
-	DryRun            bool              `help:"Validate but do not process"`
-}
-
-// Unique CLI options
-type CLI struct {
-	Globals
-
-	Upload struct {
-		// shared options
-		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
-		Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
-		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
-
-		// required options
-		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload Proguard mapping files for Android"`
-		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-	} `cmd:"" help:"Upload symbol/mapping files"`
-	CreateBuild          build.CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
-	CreateAndroidBuildId build.CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
-}
+var package_version = "2.1.0"
 
 func main() {
-	commands := CLI{}
+	commands := options.CLI{}
 
 	// If running without any extra arguments, default to the --help flag
 	// https://github.com/alecthomas/kong/issues/33#issuecomment-1207365879
@@ -74,12 +42,16 @@ func main() {
 		log.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
+	if commands.FailOnUploadError {
+		log.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release. All commands now fail if the upload is unsuccessful.")
+	}
+
 	switch ctx.Command() {
 
 	case "upload all <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
 		err := upload.All(
@@ -90,7 +62,6 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.DryRun,
 		)
 
@@ -109,7 +80,6 @@ func main() {
 			commands.Upload.AndroidAab.VersionCode,
 			commands.Upload.AndroidAab.VersionName,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
@@ -133,7 +103,6 @@ func main() {
 			commands.Upload.AndroidNdk.VersionCode,
 			commands.Upload.AndroidNdk.VersionName,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
@@ -170,20 +139,20 @@ func main() {
 	case "upload dart <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
-		err := upload.Dart(commands.Upload.DartSymbol.Path,
+		err := upload.Dart(
+			commands.Upload.DartSymbol.Path,
 			commands.Upload.DartSymbol.VersionName,
 			commands.Upload.DartSymbol.VersionCode,
 			commands.Upload.DartSymbol.BundleVersion,
-			commands.Upload.DartSymbol.IosAppPath,
+			string(commands.Upload.DartSymbol.IosAppPath),
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.ApiKey,
-			commands.FailOnUploadError,
 			commands.DryRun,
 		)
 
@@ -216,10 +185,57 @@ func main() {
 			log.Error(err.Error(), 1)
 		}
 
+	case "upload react-native-ios", "upload react-native-ios <path>":
+
+		err := upload.ProcessReactNativeIos(
+			commands.ApiKey,
+			commands.Upload.ReactNativeIos.VersionName,
+			commands.Upload.ReactNativeIos.BundleVersion,
+			commands.Upload.ReactNativeIos.Scheme,
+			commands.Upload.ReactNativeIos.SourceMap,
+			commands.Upload.ReactNativeIos.Bundle,
+			commands.Upload.ReactNativeIos.Plist,
+			commands.Upload.ReactNativeIos.XcodeProject,
+			commands.Upload.ReactNativeIos.CodeBundleID,
+			commands.Upload.ReactNativeIos.Dev,
+			commands.Upload.ReactNativeIos.ProjectRoot,
+			commands.Upload.ReactNativeIos.Path,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+	case "upload dsym", "upload dsym <path>":
+
+		err := upload.ProcessDsym(
+			commands.ApiKey,
+			commands.Upload.Dsym.Scheme,
+			string(commands.Upload.Dsym.XcodeProject),
+			string(commands.Upload.Dsym.Plist),
+			commands.Upload.Dsym.ProjectRoot,
+			commands.Upload.Dsym.IgnoreMissingDwarf,
+			commands.Upload.Dsym.IgnoreEmptyDsym,
+			commands.Upload.Dsym.Path,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.DryRun,
+		)
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
 	case "upload unity-android <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+			log.Error("missing api key, please specify using `--api-key`", 1)
 		}
 
 		err := upload.ProcessUnityAndroid(
@@ -232,7 +248,6 @@ func main() {
 			commands.Upload.UnityAndroid.ProjectRoot,
 			commands.Upload.UnityAndroid.Path,
 			endpoint,
-			commands.FailOnUploadError,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
@@ -244,37 +259,31 @@ func main() {
 		}
 
 	case "create-build", "create-build <path>":
+		// Create Build Info
+		CreateBuildOptions, err := build.GatherBuildInfo(commands)
 
-		if commands.ApiKey == "" {
-			log.Error("no API key provided", 1)
+		if err != nil {
+			log.Error(err.Error(), 1)
 		}
 
-		// Build connection URI
-		endpoint, err := utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
+		// Validate Build Info
+		err = CreateBuildOptions.Validate()
+
+		if err != nil {
+			log.Error(err.Error(), 1)
+		}
+
+		// Get Endpoint URL
+		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
 			log.Error("Failed to build upload url: "+err.Error(), 1)
 		}
 
-		log.Info("Creating build on: " + endpoint)
+		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries)
 
-		buildUploadError := build.ProcessBuildRequest(commands.ApiKey,
-			commands.CreateBuild.BuilderName,
-			commands.CreateBuild.ReleaseStage,
-			commands.CreateBuild.Provider,
-			commands.CreateBuild.Repository,
-			commands.CreateBuild.Revision,
-			commands.CreateBuild.VersionName,
-			commands.CreateBuild.VersionCode,
-			commands.CreateBuild.BundleVersion,
-			commands.CreateBuild.Metadata,
-			commands.CreateBuild.Path,
-			endpoint,
-			commands.DryRun,
-		)
-
-		if buildUploadError != nil {
-			log.Error(buildUploadError.Error(), 1)
+		if err != nil {
+			log.Error(err.Error(), 1)
 		}
 
 		log.Success("Build created")

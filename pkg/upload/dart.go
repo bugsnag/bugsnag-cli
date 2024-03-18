@@ -4,7 +4,6 @@ import (
 	"debug/elf"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,20 +15,33 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
+var androidSymbolFileRegex = regexp.MustCompile("android-([^;]*).symbols")
+var iosSymbolFileRegex = regexp.MustCompile("ios-([^;]*).symbols")
+
 type DartSymbolOptions struct {
 	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	IosAppPath    string      `help:"(optional) the path to the built iOS app."`
+	IosAppPath    utils.Path  `help:"(optional) the path to the built iOS app." type:"path"`
 	VersionName   string      `help:"The version of the application." xor:"app-version,version-name"`
 	VersionCode   string      `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
 	BundleVersion string      `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
 }
 
-func Dart(paths []string, version string, versionCode string, bundleVersion string, iosAppPath string, endpoint string, timeout int, retries int, overwrite bool, apiKey string, failOnUploadError bool, dryRun bool) error {
+func Dart(
+	paths []string,
+	version string,
+	versionCode string,
+	bundleVersion string,
+	iosAppPath string,
+	endpoint string,
+	timeout int, retries int,
+	overwrite bool,
+	apiKey string,
+	dryRun bool,
+) error {
 
 	log.Info("Building file list from path")
 
 	fileList, err := utils.BuildFileList(paths)
-	numberOfFiles := len(fileList)
 
 	if err != nil {
 		log.Error("error building file list", 1)
@@ -40,15 +52,15 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 	for _, file := range fileList {
 
 		// Check if we're dealing with an android or iOS symbol file
-		androidPlatform, _ := regexp.MatchString("android-([^;]*).symbols", file)
-		iosPlatform, _ := regexp.MatchString("ios-([^;]*).symbols", file)
+		isAndroidPlatform := androidSymbolFileRegex.MatchString(file)
+		isIosPlatform := iosSymbolFileRegex.MatchString(file)
 
 		// Start processing the android symbol file
-		if androidPlatform {
+		if isAndroidPlatform {
 			log.Info("Processing android symbol file: " + file)
 
-			buildId, err := GetBuildIdFromElfFile(file)
-
+			var buildId string
+			buildId, err = GetBuildIdFromElfFile(file)
 			if err != nil {
 				return err
 			}
@@ -59,23 +71,18 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			requestStatus := server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
+			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
-			if requestStatus != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return requestStatus
-				} else {
-					log.Warn(requestStatus.Error())
-				}
-			} else {
-				log.Success(file)
+			if err != nil {
+
+				return err
 			}
 
 			continue
 		}
 
 		// Process iOS file
-		if iosPlatform {
+		if isIosPlatform {
 			log.Info("Processing iOS symbol file: " + file)
 
 			if iosAppPath == "" {
@@ -86,14 +93,14 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 				}
 			}
 
-			arch, err := GetArchFromElfFile(file)
-
+			var arch string
+			arch, err = GetArchFromElfFile(file)
 			if err != nil {
 				return err
 			}
 
-			buildId, err := DwarfDumpUuid(file, iosAppPath, arch)
-
+			var buildId string
+			buildId, err = DwarfDumpUuid(file, iosAppPath, arch)
 			if err != nil {
 				return err
 			}
@@ -107,17 +114,12 @@ func Dart(paths []string, version string, versionCode string, bundleVersion stri
 			if dryRun {
 				err = nil
 			} else {
-				err = server.ProcessRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, file, dryRun)
+				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 			}
 
 			if err != nil {
-				if numberOfFiles > 1 && failOnUploadError {
-					return err
-				} else {
-					log.Warn(err.Error())
-				}
-			} else {
-				log.Success(file)
+
+				return err
 			}
 
 			continue
@@ -154,8 +156,8 @@ func GetBuildIdFromElfFile(symbolFile string) (string, error) {
 	}
 
 	if sect := elfData.Section(".note.gnu.build-id"); sect != nil {
-		data, err := sect.Data()
-
+		var data []byte
+		data, err = sect.Data()
 		if err != nil {
 			return "", fmt.Errorf("error reading symbol file")
 		}
@@ -200,7 +202,7 @@ func GetArchFromElfFile(symbolFile string) (string, error) {
 func GetIosAppPath(symbolFile string) (string, error) {
 	sampleRegexp := regexp.MustCompile(`/[^/]*/[^/]*$`)
 	basePath := filepath.Join(sampleRegexp.ReplaceAllString(symbolFile, "") + "/build/ios/iphoneos")
-	files, err := ioutil.ReadDir(basePath)
+	files, err := os.ReadDir(basePath)
 
 	if err != nil {
 		return "", err
@@ -210,7 +212,7 @@ func GetIosAppPath(symbolFile string) (string, error) {
 		if strings.Contains(file.Name(), ".app") && file.IsDir() {
 			iosAppPath := filepath.Join(basePath + "/" + file.Name() + "/Frameworks/App.framework/App")
 
-			_, err := os.Stat(iosAppPath)
+			_, err = os.Stat(iosAppPath)
 
 			if errors.Is(err, os.ErrNotExist) {
 				return "", err

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.1.0 (TBD)
+
+### Deprecations
+- The `--fail-on-upload-error` option now has no affect: upload commands will now all return a non-zero exit code if the upload is unsuccessful. All 4xx and 5xx status codes from the upload API are treated as errors apart from duplicate files (409), which the command will not treat as an error case to allow re-run commands to succeed. [95](https://github.com/bugsnag/bugsnag-cli/pull/90)
+
+### Enhancements
+
+- Add support for React Native source maps for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/)
+- Add support for dSYM uploads for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dsym/)
+- Allow `create build` to extract relevant information from a given Android manifest or AAB file.[65](https://github.com/bugsnag/bugsnag-cli/pull/65)
+
+### Fixes
+
+- Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [67](https://github.com/bugsnag/bugsnag-cli/pull/67)
+- Ensure that uploads are retried when passing the `--retries=x` argument to the CLI. [70](https://github.com/bugsnag/bugsnag-cli/pull/70)
+
 ## 2.0.0 (2023-10-17)
 
 ### Breaking Changes

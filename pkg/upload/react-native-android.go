@@ -2,8 +2,9 @@ package upload
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"path/filepath"
-	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -24,7 +25,24 @@ type ReactNativeAndroid struct {
 	VersionCode  string      `help:"The version code for the application (Android only)."`
 }
 
-func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath string, codeBundleId string, dev bool, paths []string, projectRoot string, variant string, versionName string, versionCode string, sourceMapPath string, endpoint string, timeout int, retries int, overwrite bool, dryRun bool) error {
+func ProcessReactNativeAndroid(
+	apiKey string,
+	appManifestPath string,
+	bundlePath string,
+	codeBundleId string,
+	dev bool,
+	paths []string,
+	projectRoot string,
+	variant string,
+	versionName string,
+	versionCode string,
+	sourceMapPath string,
+	endpoint string,
+	timeout int,
+	retries int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var err error
 	var uploadOptions map[string]string
@@ -74,7 +92,9 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 					}
 				} else {
 					if variantFileFormat != "" {
-						variantDirName = fmt.Sprintf(variantFileFormat, strings.Title(variant))
+						variantDirName = fmt.Sprintf(variantFileFormat,
+							cases.Title(language.Und, cases.NoLower).String(variant))
+
 					} else {
 						variantDirName = variant
 					}
@@ -155,7 +175,7 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeAndroidUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite)
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite, "android")
 
 		if err != nil {
 			return err
@@ -165,12 +185,11 @@ func ProcessReactNativeAndroid(apiKey string, appManifestPath string, bundlePath
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
+
 			return err
-		} else {
-			log.Success("Uploaded " + filepath.Base(sourceMapPath))
 		}
 	}
 

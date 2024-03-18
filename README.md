@@ -82,11 +82,31 @@ To get unminified stack traces for JavaScript code in your React Native app buil
 
 See the [`upload react-native-android`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-android/) command reference for full usage information.
 
+### React Native JavaScript source maps (iOS only)
+
+To get unminified stack traces for JavaScript code in your React Native app built for iOS, source maps must be generated and uploaded to BugSnag.
+
+    $ bugsnag-cli upload react-native-ios
+
+See the [`upload react-native-ios`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/) command reference for full usage information.
+
 ### Dart symbols for Flutter
 
 If you are stripping debug symbols from your Dart code when building your Flutter apps, you will need to upload symbol files in order to see full stacktraces using the following command:
 
     $ bugsnag-cli upload dart --api-key=YOUR_API_KEY app-debug-info/
+
+### dSYM files (iOS, macOS, tvOS)
+
+Upload dSYM files to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
+
+    $ bugsnag-cli upload dsym
+
+### Unity Symbol Files (Android only) 
+
+The unity-android command uploads the IL2CPP symbols from the .symbols.zip file produced by the Unity build (see [Unity documentation](https://docs.unity3d.com/Manual/android-symbols.html) for more information) to the [NDK symbol API](https://d1upynpnqddd6j.cloudfront.net/api/ndk-symbol-mapping-upload/).
+
+    $ bugsnag-cli upload unity-android /path/to/build/directory
 
 
 ## BugSnag On-Premise

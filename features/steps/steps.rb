@@ -22,6 +22,17 @@ end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
   @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
+  puts @output
+end
+
+Then('I should see a log level of {string} when no dSYM files could be found') do |log_level|
+  message = log_level + ' No dSYM files found'
+  Maze.check.include(run_output, message)
+end
+
+Then('I should see a log level of {string} when no dSYM files could be uploaded') do |log_level|
+  message = log_level + ' failed after'
+  Maze.check.include(run_output, message)
 end
 
 Then('I should see the help banner') do
@@ -29,15 +40,20 @@ Then('I should see the help banner') do
 end
 
 Then('I should see the API Key error') do
-  Maze.check.include(run_output, "[ERROR] no API key provided")
+  Maze.check.include(run_output, "[ERROR] missing api key, please specify using `--api-key`")
 end
+
+Then('I should see the Project Root error') do
+  Maze.check.include(run_output, "[ERROR] --project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
+end
+
 
 Then('I should see the missing path error') do
   Maze.check.include(run_output, "error: expected \"<path>\"")
 end
 
 Then('I should see the missing app version error') do
-  Maze.check.include(run_output, "[ERROR] Missing app version, please provide this via the command line options")
+  Maze.check.include(run_output, "[ERROR] missing app version, please specify using `--app-version`")
 end
 
 Then('I should see the no such file or directory error') do
@@ -67,6 +83,12 @@ Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
+  )
+end
+
+Then('the sourcemap is valid for the dSYM Build API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
   )
 end
 
@@ -120,4 +142,5 @@ end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
+  puts @output
 end

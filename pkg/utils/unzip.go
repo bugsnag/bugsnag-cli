@@ -12,7 +12,7 @@ import (
 func Unzip(path, outputPath string) error {
 	archive, err := zip.OpenReader(path)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer archive.Close()
 
@@ -22,7 +22,10 @@ func Unzip(path, outputPath string) error {
 			return fmt.Errorf("invalid file path")
 		}
 		if f.FileInfo().IsDir() {
-			os.MkdirAll(filePath, os.ModePerm)
+			err = os.MkdirAll(filePath, os.ModePerm)
+			if err != nil {
+				return err
+			}
 			continue
 		}
 

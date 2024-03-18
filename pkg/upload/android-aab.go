@@ -2,12 +2,11 @@ package upload
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
+	"path/filepath"
 )
 
 type AndroidAabMapping struct {
@@ -19,7 +18,20 @@ type AndroidAabMapping struct {
 	VersionName   string      `help:"Module version name"`
 }
 
-func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, paths []string, projectRoot string, versionCode string, versionName string, endpoint string, failOnUploadError bool, retries int, timeout int, overwrite bool, dryRun bool) error {
+func ProcessAndroidAab(
+	apiKey string,
+	applicationId string,
+	buildUuid string,
+	paths []string,
+	projectRoot string,
+	versionCode string,
+	versionName string,
+	endpoint string,
+	retries int,
+	timeout int,
+	overwrite bool,
+	dryRun bool,
+) error {
 
 	var manifestData map[string]string
 	var aabDir string
@@ -60,12 +72,25 @@ func ProcessAndroidAab(apiKey string, applicationId string, buildUuid string, pa
 		}
 
 		if len(soFileList) > 0 {
-			for _, file := range soFileList {
-				err = ProcessAndroidNDK(manifestData["apiKey"], manifestData["applicationId"], "", "", []string{file}, projectRoot, "", manifestData["versionCode"], manifestData["versionName"], endpoint, failOnUploadError, retries, timeout, overwrite, dryRun)
+			err = ProcessAndroidNDK(
+				manifestData["apiKey"],
+				manifestData["applicationId"],
+				"",
+				"",
+				soFileList,
+				projectRoot,
+				"",
+				manifestData["versionCode"],
+				manifestData["versionName"],
+				endpoint,
+				retries,
+				timeout,
+				overwrite,
+				dryRun,
+			)
 
-				if err != nil {
-					return err
-				}
+			if err != nil {
+				return err
 			}
 		} else {
 			log.Info("No NDK (.so) files detected for upload.")
