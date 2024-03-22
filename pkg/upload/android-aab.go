@@ -107,7 +107,7 @@ func ProcessAndroidAab(
 			manifestData["applicationId"],
 			"",
 			manifestData["buildUuid"],
-			nil,
+			[]string{filepath.Join(aabDir, "base", "dex")},
 			[]string{mappingFilePath},
 			"",
 			manifestData["versionCode"],

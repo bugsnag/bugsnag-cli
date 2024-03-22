@@ -134,6 +134,10 @@ func ProcessAndroidProguard(
 					}
 				}
 
+				if len(dexFiles) == 0 && variant != "" {
+					dexFiles = android.FindVariantDexFiles(mappingFile, variant)
+				}
+
 				if buildUuid == "" && len(dexFiles) > 0 {
 					safeDexFile, err := android.GetDexFiles(dexFiles)
 					if err != nil {
