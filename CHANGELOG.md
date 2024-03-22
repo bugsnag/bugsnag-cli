@@ -1,6 +1,12 @@
 # Changelog
 
-## 2.1.0 (TBD)
+## 2.1.1 (2023-03-22)
+
+### Fixes
+
+- Ensure that the `--retries` flag is correctly passed to the Unity Android upload API. [91](https://github.com/bugsnag/bugsnag-cli/pull/91)
+
+## 2.1.0 (2023-03-18)
 
 ### Deprecations
 - The `--fail-on-upload-error` option now has no affect: upload commands will now all return a non-zero exit code if the upload is unsuccessful. All 4xx and 5xx status codes from the upload API are treated as errors apart from duplicate files (409), which the command will not treat as an error case to allow re-run commands to succeed. [95](https://github.com/bugsnag/bugsnag-cli/pull/90)

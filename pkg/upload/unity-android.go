@@ -30,8 +30,8 @@ func ProcessUnityAndroid(
 	projectRoot string,
 	paths []string,
 	endpoint string,
-	retries int,
 	timeout int,
+	retries int,
 	overwrite bool,
 	dryRun bool,
 ) error {
