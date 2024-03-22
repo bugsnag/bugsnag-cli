@@ -17,7 +17,8 @@ type UnityAndroid struct {
 	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string      `help:"Module version code"`
 	VersionName   string      `help:"Module version name"`
-	BuildUuid     string      `help:"Module Build UUID"`
+	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
 }
 
 func ProcessUnityAndroid(
@@ -26,6 +27,7 @@ func ProcessUnityAndroid(
 	applicationId string,
 	versionCode string,
 	buildUuid string,
+	noBuildUuid bool,
 	versionName string,
 	projectRoot string,
 	paths []string,
@@ -76,7 +78,7 @@ func ProcessUnityAndroid(
 
 		defer os.RemoveAll(aabDir)
 
-		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
 
 		if err != nil {
 			return err
@@ -86,6 +88,7 @@ func ProcessUnityAndroid(
 			manifestData["apiKey"],
 			manifestData["applicationId"],
 			manifestData["buildUuid"],
+			noBuildUuid,
 			[]string{aabDir},
 			projectRoot,
 			manifestData["versionCode"],
@@ -105,7 +108,7 @@ func ProcessUnityAndroid(
 	log.Info("Extracting " + filepath.Base(zipPath) + " into a temporary directory")
 
 	if manifestData == nil {
-		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, versionCode, versionName)
+		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
 	}
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")

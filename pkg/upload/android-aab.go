@@ -11,7 +11,8 @@ import (
 
 type AndroidAabMapping struct {
 	ApplicationId string      `help:"Module application identifier"`
-	BuildUuid     string      `help:"Module Build UUID ('none' to opt-out)"`
+	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
 	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string      `help:"Module version code"`
@@ -22,6 +23,7 @@ func ProcessAndroidAab(
 	apiKey string,
 	applicationId string,
 	buildUuid string,
+	noBuildUuid bool,
 	paths []string,
 	projectRoot string,
 	versionCode string,
@@ -56,7 +58,7 @@ func ProcessAndroidAab(
 		}
 	}
 
-	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, versionCode, versionName)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
 
 	if err != nil {
 		return err
@@ -107,6 +109,7 @@ func ProcessAndroidAab(
 			manifestData["applicationId"],
 			"",
 			manifestData["buildUuid"],
+			noBuildUuid,
 			[]string{filepath.Join(aabDir, "base", "dex")},
 			[]string{mappingFilePath},
 			"",

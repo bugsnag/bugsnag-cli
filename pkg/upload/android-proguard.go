@@ -14,7 +14,8 @@ import (
 type AndroidProguardMapping struct {
 	ApplicationId string      `help:"Module application identifier"`
 	AppManifest   string      `help:"Path to app manifest file" type:"path"`
-	BuildUuid     string      `help:"Module Build UUID"`
+	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
 	DexFiles      []string    `help:"Path to classes.dex files or directory" type:"path" default:""`
 	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
 	Variant       string      `help:"Build type, like 'debug' or 'release'"`
@@ -27,6 +28,7 @@ func ProcessAndroidProguard(
 	applicationId string,
 	appManifestPath string,
 	buildUuid string,
+	noBuildUuid bool,
 	dexFiles []string,
 	paths []string,
 	variant string,
@@ -127,7 +129,10 @@ func ProcessAndroidProguard(
 				}
 			}
 
-			if buildUuid == "" {
+			if noBuildUuid {
+				buildUuid = ""
+				log.Info("No build ID will be used")
+			} else if buildUuid == "" {
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
 						buildUuid = manifestData.Application.MetaData.Value[i]
