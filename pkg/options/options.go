@@ -11,7 +11,6 @@ type Globals struct {
 	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
 	Port              int               `help:"Port number for the upload server" default:"443"`
 	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
-	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
 	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
 	DryRun            bool              `help:"Validate but do not process"`
 }
