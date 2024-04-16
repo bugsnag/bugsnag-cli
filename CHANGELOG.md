@@ -6,6 +6,7 @@
 
 - `upload android-proguard` will now attempt to automatically locate the `classes.dex` files if no build-uuid or dex-files are found or specified [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
 - Added the `--no-build-uuid` option to the `upload android-*` options [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
+- Added `Windows_NT` to `supported-platforms.yml` [95](https://github.com/bugsnag/bugsnag-cli/pull/95)
 
 ## 2.1.1 (2023-03-22)
 
