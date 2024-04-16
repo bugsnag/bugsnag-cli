@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"io"
 	"os"
+	"fmt"
 )
 
 func GzipCompress(file string) (string, error) {
