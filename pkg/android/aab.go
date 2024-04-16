@@ -32,7 +32,7 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			manifestData, err = ReadAabManifest(filepath.Join(aabManifestPath))
 
 			if err != nil {
-				return aabUploadOptions, fmt.Errorf("unable to read data from %s %w", path, err.Error())
+				return aabUploadOptions, fmt.Errorf("unable to read data from %s %s", path, err.Error())
 			}
 		} else {
 			return aabUploadOptions, fmt.Errorf("AndroidManifest.xml not found in AAB file")

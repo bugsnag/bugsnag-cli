@@ -120,7 +120,7 @@ func ExtractFile(file string, slug string) (string, error) {
 	tempDir, err := os.MkdirTemp("", fmt.Sprintf("bugsnag-cli-%s-unpacking-*", slug))
 
 	if err != nil {
-		return "", fmt.Errorf("error creating temporary working directory %w", err.Error())
+		return "", fmt.Errorf("error creating temporary working directory %s", err.Error())
 	}
 
 	err = Unzip(file, tempDir)

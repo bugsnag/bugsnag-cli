@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"

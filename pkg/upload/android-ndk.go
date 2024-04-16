@@ -67,7 +67,7 @@ func ProcessAndroidNDK(
 			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
 
 			if err != nil {
-				return fmt.Errorf("error building file list for variant: %s. %w", variant, err.Error())
+				return fmt.Errorf("error building file list for variant: %s. %s", variant, err.Error())
 			}
 
 			if appManifestPath == "" {
@@ -191,7 +191,7 @@ func ProcessAndroidNDK(
 				workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
 
 				if err != nil {
-					return fmt.Errorf("error creating temporary working directory %w", err.Error())
+					return fmt.Errorf("error creating temporary working directory %s", err.Error())
 				}
 
 				defer os.RemoveAll(workingDir)
@@ -200,7 +200,7 @@ func ProcessAndroidNDK(
 			outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
 
 			if err != nil {
-				return fmt.Errorf("failed to process file, %s using objcopy : %w", file, err.Error())
+				return fmt.Errorf("failed to process file, %s using objcopy : %s", file, err.Error())
 			}
 
 			symbolFileList = append(symbolFileList, outputFile)
