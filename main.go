@@ -35,7 +35,7 @@ func main() {
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
 	if err != nil {
-		log.Error("Failed to build upload url: "+err.Error(), 1)
+		log.Error(fmt.Sprintf("Failed to build upload url: %w", err.Error()), 1)
 	}
 
 	if commands.DryRun {
@@ -280,7 +280,7 @@ func main() {
 		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
-			log.Error("Failed to build upload url: "+err.Error(), 1)
+			log.Error(fmt.Sprintf("Failed to build upload url: %w", err.Error()), 1)
 		}
 
 		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries)

@@ -20,7 +20,7 @@ func GzipCompress(file string) (string, error) {
 		return "", err
 	}
 
-	newFile := file + ".gz"
+	newFile := fmt.Sprintf("%s.gz", file)
 
 	gzipFile, err := os.Create(newFile)
 

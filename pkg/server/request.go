@@ -90,21 +90,21 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 	}
 
 	if !dryRun {
-		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
+		log.Info(fmt.Sprintf("Uploading %s to %s", filepath.Base(fileName), endpoint))
 
 		err = processRequest(req, timeout, retries)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "409") {
-				log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(fileName))
+				log.Warn(fmt.Sprintf("Duplicate file detected, skipping upload of %s", filepath.Base(fileName)))
 			} else {
 				return err
 			}
 		} else {
-			log.Success("Uploaded " + filepath.Base(fileName))
+			log.Success(fmt.Sprintf("Uploaded %s", filepath.Base(fileName)))
 		}
 	} else {
-		log.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
+		log.Info(fmt.Sprintf("(dryrun) Skipping upload of %s to %s", filepath.Base(fileName), endpoint))
 	}
 
 	return nil
@@ -126,14 +126,14 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 	req.Header.Add("Content-Type", "application/json")
 
 	if !dryRun {
-		log.Info("Sending build information to " + endpoint)
+		log.Info(fmt.Sprintf("Sending build information to %s", endpoint))
 
 		err := processRequest(req, timeout, retries)
 		if err != nil {
 			return err
 		}
 	} else {
-		log.Info("(dryrun) Skipping sending build information to " + endpoint)
+		log.Info(fmt.Sprintf("(dryrun) Skipping sending build information to %s", endpoint))
 	}
 
 	return nil

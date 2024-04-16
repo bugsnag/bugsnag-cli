@@ -36,15 +36,15 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 		if strings.HasSuffix(strings.ToLower(path), ".zip") {
 
 			fileName := filepath.Base(path)
-			log.Info("Attempting to unzip " + fileName + " before proceeding to upload")
+			log.Info(fmt.Sprintf("Attempting to unzip %s before proceeding to upload", fileName))
 
 			var err error
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				return nil, tempDir, errors.New("Could not unzip " + fileName + " to a temporary directory, skipping")
+				return nil, tempDir, fmt.Errorf("Could not unzip %s to a temporary directory, skipping", fileName)
 			} else {
-				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
+				log.Info(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
 				dsymLocations = findDsyms(tempDir)
 			}
 
@@ -58,7 +58,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 	// If we have found dSYMs, use dwarfdump to get the UUID etc for each dSYM
 	if len(dsymLocations) > 0 {
 		if !isDwarfDumpInstalled() {
-			return nil, tempDir, errors.New("Unable to locate dwarfdump on this system.")
+			return nil, tempDir, fmt.Errorf("Unable to locate dwarfdump on this system.")
 		}
 
 		for _, dsymLocation := range dsymLocations {
@@ -80,17 +80,17 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 					info := getDwarfFileInfo(dsymLocation, file.Name())
 					if len(info) == 0 {
 						if ignoreMissingDwarf {
-							log.Info(fileInfo.Name() + " is not a valid DWARF file, skipping")
+							log.Info(fmt.Sprintf("%s is not a valid DWARF file, skipping", fileInfo.Name()))
 						} else {
-							return nil, tempDir, errors.New(fileInfo.Name() + " is not a valid DWARF file")
+							return nil, tempDir, fmt.Errorf("%s is not a valid DWARF file", fileInfo.Name())
 						}
 					}
 					dwarfInfo = append(dwarfInfo, info...)
 				} else {
 					if ignoreEmptyDsym {
-						log.Info(file.Name() + " is empty, skipping")
+						log.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
 					} else {
-						return nil, tempDir, errors.New(file.Name() + " is empty")
+						return nil, tempDir, fmt.Errorf("%s is empty", file.Name())
 					}
 				}
 			}

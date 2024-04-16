@@ -29,13 +29,13 @@ type MetaData struct {
 func ParseAndroidManifestXML(manifestFile string) (*Manifest, error) {
 	data, err := os.ReadFile(manifestFile)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read " + manifestFile + " : " + err.Error())
+		return nil, fmt.Errorf("unable to read %s : %w", manifestFile, err.Error())
 	}
 
 	var manifestData *Manifest
 	err = xml.Unmarshal(data, &manifestData)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse data from " + manifestFile + " : " + err.Error())
+		return nil, fmt.Errorf("unable to parse data from %s : %w", manifestFile, err.Error())
 	}
 
 	return manifestData, nil

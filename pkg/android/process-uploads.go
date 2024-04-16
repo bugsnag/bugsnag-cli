@@ -5,6 +5,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
+	"fmt"
 )
 
 func UploadAndroidNdk(
@@ -38,7 +39,7 @@ func UploadAndroidNdk(
 
 		fileFieldData["soFile"] = file
 
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err = server.ProcessFileRequest(fmt.Sprintf("%s/ndk-symbol", endpoint), uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 		if err != nil {
 			return err
