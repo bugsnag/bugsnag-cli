@@ -1,6 +1,6 @@
 # Changelog
 
-## TBD
+## 2.2.0 (2024-04-16)
 
 ### Enhancements
 
