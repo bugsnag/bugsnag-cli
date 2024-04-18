@@ -48,66 +48,43 @@ func ProcessAndroidNDK(
 	var objCopyPath string
 
 	for _, path := range paths {
-		if utils.IsDir(path) {
-			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")
 
-			// Check to see if we can find app/build/intermediates/merged_native_libs from the given path
-			if !utils.FileExists(mergeNativeLibPath) {
-				return fmt.Errorf("unable to find the merged_native_libs in " + path)
-			}
+		// Search for NDK symbol files based on an expected path
+		arr := []string{"android", "app", "build", "intermediates", "merged_native_libs"}
+		mergeNativeLibPath, err = findNativeLibPath(arr, path)
 
+		if err != nil {
+			return err
+		}
+
+		if appManifestPath == "" {
 			if variant == "" {
 				variant, err = android.GetVariantDirectory(mergeNativeLibPath)
 
-				if err != nil {
-					return err
-				}
-			}
-
-			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
-
-			if err != nil {
-				return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
-			}
-
-			if appManifestPath == "" {
-				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
-				if utils.FileExists(appManifestPathExpected) {
-					appManifestPath = appManifestPathExpected
-					log.Info("Found app manifest at: " + appManifestPath)
-				}
-			}
-
-			if projectRoot == "" {
-				projectRoot = path
-			}
-
-		} else {
-			fileList = append(fileList, path)
-
-			if appManifestPath == "" {
-				if variant == "" {
-					//	Set the mergeNativeLibPath based off the file location e.g. merged_native_libs/<variant/out/lib/<arch>/
-					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
-
-					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
-						variant, err = android.GetVariantDirectory(mergeNativeLibPath)
-
-						if err == nil {
-							appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
-							if utils.FileExists(appManifestPathExpected) {
-								appManifestPath = appManifestPathExpected
-								log.Info("Found app manifest at: " + appManifestPath)
-							}
-						}
-
-						if projectRoot == "" {
-							// Setting projectRoot to the suspected root of the project
-							projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
-						}
+				if err == nil {
+					appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+					if utils.FileExists(appManifestPathExpected) {
+						appManifestPath = appManifestPathExpected
+						log.Info("Found app manifest at: " + appManifestPath)
 					}
 				}
+
+				if projectRoot == "" {
+					// Setting projectRoot to the suspected root of the project
+					projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+				}
 			}
+		}
+
+		// Ensure only files from within the directory the upload command is run from are uploaded
+		if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
+			fileList, err = utils.BuildFileList([]string{path})	
+		} else {
+			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
+		}
+
+		if err != nil {
+			return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
 		}
 	}
 
@@ -226,4 +203,30 @@ func ProcessAndroidNDK(
 	}
 
 	return nil
+}
+
+func findNativeLibPath(arr []string, path string) (string, error) {
+
+	// Look for NDK symbol files if the upload command was run from somewhere within the project root but outside the merged_native_libs directory
+	// based on the expected file path of app/build/intermediates/merged_native_libs (or android/app/build/intermediates/merged_native_libs for RN)
+	iterations := len(arr)
+	for i := 1; i <= iterations; i++ {
+		path_ending := filepath.Join(arr...)
+		mergeNativeLibPath := filepath.Join(path, path_ending)
+		if utils.FileExists(mergeNativeLibPath){
+			return mergeNativeLibPath, nil
+		}
+		arr = arr[1:]
+	}
+
+	// Look for NDK symbol files if the upload command was run from somewhere within the merged_native_libs directory
+	mergeNativeLibPath := path
+	for i := 1; i <= 6; i++ {
+		if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
+			return mergeNativeLibPath, nil
+		}
+		mergeNativeLibPath = filepath.Dir(mergeNativeLibPath)
+	}
+
+	return "", fmt.Errorf("unable to find the merged_native_libs in " + path)
 }
