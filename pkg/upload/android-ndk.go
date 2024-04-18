@@ -77,7 +77,7 @@ func ProcessAndroidNDK(
 		}
 
 		// Ensure only files from within the directory the upload command is run from are uploaded
-		if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
+		if !utils.IsDir(path) || strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
 			fileList, err = utils.BuildFileList([]string{path})	
 		} else {
 			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
@@ -226,6 +226,13 @@ func findNativeLibPath(arr []string, path string) (string, error) {
 			return mergeNativeLibPath, nil
 		}
 		mergeNativeLibPath = filepath.Dir(mergeNativeLibPath)
+	}
+
+	// If the command was run on the file itself, but a merged_native_libs directory wasn't found in the path to the file
+	// set the mergeNativeLibPath based off the file location e.g. merged_native_libs/<variant/out/lib/<arch>/
+	if !utils.IsDir(path) {
+		mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
+		return mergeNativeLibPath, nil
 	}
 
 	return "", fmt.Errorf("unable to find the merged_native_libs in " + path)
