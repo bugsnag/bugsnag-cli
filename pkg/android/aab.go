@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId string, buildUuid string, versionCode string, versionName string) (map[string]string, error) {
+func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId string, buildUuid string, noBuildUuid bool, versionCode string, versionName string) (map[string]string, error) {
 
 	var manifestData map[string]string
 	var err error
@@ -48,7 +48,7 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 			log.Info("Using " + aabUploadOptions["applicationId"] + " as application ID from AndroidManifest.xml")
 		}
 
-		if aabUploadOptions["buildUuid"] == "" {
+		if aabUploadOptions["buildUuid"] == "" && !noBuildUuid {
 			aabUploadOptions["buildUuid"] = manifestData["buildUuid"]
 			if aabUploadOptions["buildUuid"] != "" {
 				log.Info("Using " + aabUploadOptions["buildUuid"] + " as build ID from AndroidManifest.xml")
@@ -58,7 +58,7 @@ func MergeUploadOptionsFromAabManifest(path string, apiKey string, applicationId
 					log.Info("Using " + aabUploadOptions["buildUuid"] + " as build ID from dex signatures")
 				}
 			}
-		} else if aabUploadOptions["buildUuid"] == "none" {
+		} else if aabUploadOptions["buildUuid"] == "none" || noBuildUuid {
 			log.Info("No build ID will be used")
 			aabUploadOptions["buildUuid"] = ""
 		}

@@ -39,7 +39,7 @@ func GetVariantDirectory(path string) (string, error) {
 	}
 
 	if len(variants) > 1 {
-		return "", fmt.Errorf("more than one variant found. Please specify using `--variant` ")
+		return "", fmt.Errorf("more than one variant found. Please specify using `--variant`")
 	} else if len(variants) < 1 {
 		return "", fmt.Errorf("no variants found. Please specify using `--variant`")
 	}
@@ -51,4 +51,15 @@ func GetVariantDirectory(path string) (string, error) {
 	}
 
 	return variant, nil
+}
+
+func FindVariantDexFiles(mappingFilePath string, variant string) []string {
+	buildRoot := filepath.Join(filepath.Dir(mappingFilePath), "..", "..", "..", "intermediates", "dex", variant)
+
+	if utils.IsDir(buildRoot) {
+		matches, _ := filepath.Glob(filepath.Join(buildRoot, "*", "classes.dex"))
+		return matches
+	}
+
+	return []string{}
 }

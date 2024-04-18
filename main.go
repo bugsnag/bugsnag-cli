@@ -12,7 +12,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.1.1"
+var package_version = "2.2.0"
 
 func main() {
 	commands := options.CLI{}
@@ -75,6 +75,7 @@ func main() {
 			commands.ApiKey,
 			commands.Upload.AndroidAab.ApplicationId,
 			commands.Upload.AndroidAab.BuildUuid,
+			commands.Upload.AndroidAab.NoBuildUuid,
 			commands.Upload.AndroidAab.Path,
 			commands.Upload.AndroidAab.ProjectRoot,
 			commands.Upload.AndroidAab.VersionCode,
@@ -120,6 +121,7 @@ func main() {
 			commands.Upload.AndroidProguard.ApplicationId,
 			commands.Upload.AndroidProguard.AppManifest,
 			commands.Upload.AndroidProguard.BuildUuid,
+			commands.Upload.AndroidProguard.NoBuildUuid,
 			commands.Upload.AndroidProguard.DexFiles,
 			commands.Upload.AndroidProguard.Path,
 			commands.Upload.AndroidProguard.Variant,
@@ -244,6 +246,7 @@ func main() {
 			commands.Upload.UnityAndroid.ApplicationId,
 			commands.Upload.UnityAndroid.VersionCode,
 			commands.Upload.UnityAndroid.BuildUuid,
+			commands.Upload.UnityAndroid.NoBuildUuid,
 			commands.Upload.UnityAndroid.VersionName,
 			commands.Upload.UnityAndroid.ProjectRoot,
 			commands.Upload.UnityAndroid.Path,
