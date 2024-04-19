@@ -57,27 +57,33 @@ func ProcessAndroidNDK(
 			return err
 		}
 
-		if appManifestPath == "" {
+		if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
 			if variant == "" {
 				variant, err = android.GetVariantDirectory(mergeNativeLibPath)
-
-				if err == nil {
-					appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
-					if utils.FileExists(appManifestPathExpected) {
-						appManifestPath = appManifestPathExpected
-						log.Info("Found app manifest at: " + appManifestPath)
-					}
+				if err != nil {
+					return err
 				}
+			}
 
-				if projectRoot == "" {
-					// Setting projectRoot to the suspected root of the project
-					projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+			if appManifestPath == "" {
+				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+				if utils.FileExists(appManifestPathExpected) {
+					appManifestPath = appManifestPathExpected
+					log.Info("Found app manifest at: " + appManifestPath)
 				}
+					
+			}
+
+			if projectRoot == "" {
+				// Setting projectRoot to the suspected root of the project
+				projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
 			}
 		}
 
 		// Ensure only files from within the directory the upload command is run from are uploaded
-		if !utils.IsDir(path) || strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
+		if !utils.IsDir(path) {
+			fileList = append(fileList, path)
+		} else if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
 			fileList, err = utils.BuildFileList([]string{path})	
 		} else {
 			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
