@@ -83,7 +83,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool) error {
+func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool, verbose bool) error {
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
@@ -105,6 +105,11 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 		}
 	} else {
 		log.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
+		if verbose {
+			log.Info("(dryrun) Upload payload:")
+			prettyUploadOptions, _ := utils.PrettyPrintMap(uploadOptions)
+			fmt.Println(prettyUploadOptions)
+		}
 	}
 
 	return nil
@@ -121,7 +126,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool) error {
+func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool, verbose bool) error {
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 
@@ -134,6 +139,10 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 		}
 	} else {
 		log.Info("(dryrun) Skipping sending build information to " + endpoint)
+		log.Info("(dryrun) Build payload:")
+		if verbose {
+			fmt.Println(string(payload))
+		}
 	}
 
 	return nil

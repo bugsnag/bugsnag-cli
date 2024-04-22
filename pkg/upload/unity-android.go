@@ -36,6 +36,7 @@ func ProcessUnityAndroid(
 	retries int,
 	overwrite bool,
 	dryRun bool,
+	verbose bool,
 ) error {
 	var err error
 	var zipPath string
@@ -98,6 +99,7 @@ func ProcessUnityAndroid(
 			timeout,
 			overwrite,
 			dryRun,
+			verbose,
 		)
 
 		if err != nil {
@@ -151,6 +153,7 @@ func ProcessUnityAndroid(
 		timeout,
 		retries,
 		dryRun,
+		verbose,
 	)
 
 	if err != nil {

@@ -33,6 +33,7 @@ func ProcessAndroidAab(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	var manifestData map[string]string
@@ -89,6 +90,7 @@ func ProcessAndroidAab(
 				timeout,
 				overwrite,
 				dryRun,
+				verbose,
 			)
 
 			if err != nil {
@@ -120,6 +122,7 @@ func ProcessAndroidAab(
 			timeout,
 			overwrite,
 			dryRun,
+			verbose,
 		)
 
 		if err != nil {

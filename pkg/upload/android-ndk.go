@@ -37,6 +37,7 @@ func ProcessAndroidNDK(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	var fileList []string
@@ -219,6 +220,7 @@ func ProcessAndroidNDK(
 		timeout,
 		retries,
 		dryRun,
+		verbose,
 	)
 
 	if err != nil {

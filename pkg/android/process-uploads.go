@@ -19,6 +19,7 @@ func UploadAndroidNdk(
 	timeout int,
 	retries int,
 	dryRun bool,
+	verbose bool,
 ) error {
 	fileFieldData := make(map[string]string)
 
@@ -38,7 +39,7 @@ func UploadAndroidNdk(
 
 		fileFieldData["soFile"] = file
 
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, verbose)
 
 		if err != nil {
 			return err

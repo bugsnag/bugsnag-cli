@@ -37,6 +37,7 @@ func ProcessDsym(
 	timeout int,
 	retries int,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
@@ -163,11 +164,11 @@ func ProcessDsym(
 			fileFieldData := make(map[string]string)
 			fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
 
-			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun, verbose)
 
 			if err != nil {
 				if strings.Contains(err.Error(), "404 Not Found") {
-					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun, verbose)
 				}
 			}
 

@@ -20,6 +20,7 @@ func All(
 	overwrite bool,
 	apiKey string,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	// Build the file list from the path(s)
@@ -57,7 +58,7 @@ func All(
 			fileFieldData["file"] = file
 		}
 
-		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun, verbose)
 
 		if err != nil {
 

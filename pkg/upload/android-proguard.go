@@ -39,6 +39,7 @@ func ProcessAndroidProguard(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	var mappingFile string
@@ -198,12 +199,12 @@ func ProcessAndroidProguard(
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
-		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, verbose)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "404 Not Found") {
 				log.Info("Trying " + endpoint)
-				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun)
+				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, verbose)
 			}
 		}
 

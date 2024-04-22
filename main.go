@@ -63,6 +63,7 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -85,6 +86,7 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -108,6 +110,7 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -132,6 +135,7 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -156,6 +160,7 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -181,6 +186,7 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -207,6 +213,7 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -228,6 +235,7 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -255,6 +263,7 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
+			commands.Verbose,
 		)
 
 		if err != nil {
@@ -283,7 +292,7 @@ func main() {
 			log.Error("Failed to build upload url: "+err.Error(), 1)
 		}
 
-		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries)
+		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, commands.Verbose)
 
 		if err != nil {
 			log.Error(err.Error(), 1)

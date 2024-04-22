@@ -42,6 +42,7 @@ func ProcessReactNativeAndroid(
 	retries int,
 	overwrite bool,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	var err error
@@ -185,7 +186,7 @@ func ProcessReactNativeAndroid(
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, verbose)
 
 		if err != nil {
 

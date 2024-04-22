@@ -38,6 +38,7 @@ func Dart(
 	overwrite bool,
 	apiKey string,
 	dryRun bool,
+	verbose bool,
 ) error {
 
 	log.Info("Building file list from path")
@@ -72,7 +73,7 @@ func Dart(
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, verbose)
 
 			if err != nil {
 
@@ -115,7 +116,7 @@ func Dart(
 			if dryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, verbose)
 			}
 
 			if err != nil {
