@@ -53,7 +53,7 @@ Then('I should see the missing path error') do
 end
 
 Then('I should see the missing app version error') do
-  Maze.check.include(run_output, "[ERROR] missing app version, please specify using `--app-version`")
+  Maze.check.include(run_output, "[ERROR] missing app version, please specify using `--version-name`")
 end
 
 Then('I should see the no such file or directory error') do
@@ -114,6 +114,14 @@ end
 
 Then('{string} should be used as {string}') do |value, field|
   Maze.check.include(run_output, "Using #{value} as #{field} from")
+end
+
+Then('I should see the build payload') do
+  Maze.check.include(run_output,      "[INFO] (dryrun) Build payload:\n" +
+    "{\n" +
+    "    \"apiKey\": \"1234567890ABCDEF1234567890ABCDEF\",\n" +
+    "    \"appVersionCode\": \"1\",\n" +
+    "    \"sourceControl\": {\n")
 end
 
 def get_version_number(file_path)

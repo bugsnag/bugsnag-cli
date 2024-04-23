@@ -139,9 +139,10 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 		}
 	} else {
 		log.Info("(dryrun) Skipping sending build information to " + endpoint)
-		log.Info("(dryrun) Build payload:")
 		if verbose {
-			fmt.Println(string(payload))
+			log.Info("(dryrun) Build payload:")
+			prettyUploadOptions, _ := utils.PrettyPrintJson(string(payload))
+			fmt.Println(prettyUploadOptions)
 		}
 	}
 
