@@ -1,6 +1,7 @@
 package ios
 
 import (
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,7 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -20,7 +20,7 @@ type DwarfInfo struct {
 	Location string
 }
 
-func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*DwarfInfo, string, error) {
+func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logger log.Logger) ([]*DwarfInfo, string, error) {
 	var tempDir string
 	var dsymLocations []string
 	var dwarfInfo []*DwarfInfo
@@ -36,7 +36,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 		if strings.HasSuffix(strings.ToLower(path), ".zip") {
 
 			fileName := filepath.Base(path)
-			log.Info("Attempting to unzip " + fileName + " before proceeding to upload")
+			logger.Info("Attempting to unzip " + fileName + " before proceeding to upload")
 
 			var err error
 			tempDir, err = utils.ExtractFile(path, "dsym")
@@ -44,7 +44,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 			if err != nil {
 				return nil, tempDir, errors.New("Could not unzip " + fileName + " to a temporary directory, skipping")
 			} else {
-				log.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
+				logger.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
 				dsymLocations = findDsyms(tempDir)
 			}
 
@@ -80,7 +80,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 					info := getDwarfFileInfo(dsymLocation, file.Name())
 					if len(info) == 0 {
 						if ignoreMissingDwarf {
-							log.Info(fileInfo.Name() + " is not a valid DWARF file, skipping")
+							logger.Info(fileInfo.Name() + " is not a valid DWARF file, skipping")
 						} else {
 							return nil, tempDir, errors.New(fileInfo.Name() + " is not a valid DWARF file")
 						}
@@ -88,7 +88,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool) ([]*
 					dwarfInfo = append(dwarfInfo, info...)
 				} else {
 					if ignoreEmptyDsym {
-						log.Info(file.Name() + " is empty, skipping")
+						logger.Info(file.Name() + " is empty, skipping")
 					} else {
 						return nil, tempDir, errors.New(file.Name() + " is empty")
 					}

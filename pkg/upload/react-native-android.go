@@ -42,7 +42,7 @@ func ProcessReactNativeAndroid(
 	retries int,
 	overwrite bool,
 	dryRun bool,
-	verbose bool,
+	logger log.Logger,
 ) error {
 
 	var err error
@@ -141,9 +141,9 @@ func ProcessReactNativeAndroid(
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
-				log.Info("Found app manifest at: " + appManifestPath)
+				logger.Info("Found app manifest at: " + appManifestPath)
 			} else {
-				log.Info("No app manifest found at: " + appManifestPathExpected)
+				logger.Info("No app manifest found at: " + appManifestPathExpected)
 			}
 		}
 
@@ -162,17 +162,17 @@ func ProcessReactNativeAndroid(
 					}
 				}
 
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				logger.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				logger.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				logger.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 		}
 
@@ -186,7 +186,7 @@ func ProcessReactNativeAndroid(
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, verbose)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)
 
 		if err != nil {
 

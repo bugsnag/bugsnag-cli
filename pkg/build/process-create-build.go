@@ -36,7 +36,7 @@ func ProcessCreateBuild(
 	dryRun bool,
 	timeout int,
 	retries int,
-	verbose bool,
+	logger log.Logger,
 ) error {
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
@@ -44,9 +44,9 @@ func ProcessCreateBuild(
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	log.Info("Build information:\n" + prettyBuildPayload)
+	logger.Info("Build information:\n" + prettyBuildPayload)
 
-	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, verbose)
+	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, logger)
 	if err != nil {
 		return err
 	}

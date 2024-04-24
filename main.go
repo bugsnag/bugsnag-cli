@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -23,7 +24,7 @@ func main() {
 		os.Args = append(os.Args, "--help")
 	}
 
-	ctx := kong.Parse(&commands,
+	kongCtx := kong.Parse(&commands,
 		kong.ConfigureHelp(kong.HelpOptions{
 			Compact: true,
 		}),
@@ -31,27 +32,32 @@ func main() {
 			"version": package_version,
 		})
 
+	// Init Logger
+	loggerCommonFields := map[string]interface{}{}
+	loggerCtx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
+	logger := log.NewLoggerWrapper("logrus", loggerCtx, commands.Verbose)
+
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
 	if err != nil {
-		log.Error("Failed to build upload url: "+err.Error(), 1)
+		logger.Error("Failed to build upload url: " + err.Error())
 	}
 
 	if commands.DryRun {
-		log.Info("Performing dry run - no data will be sent to BugSnag")
+		logger.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
 	if commands.FailOnUploadError {
-		log.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release. All commands now fail if the upload is unsuccessful.")
+		logger.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release. All commands now fail if the upload is unsuccessful.")
 	}
 
-	switch ctx.Command() {
+	switch kongCtx.Command() {
 
 	case "upload all <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("missing api key, please specify using `--api-key`", 1)
+			logger.Error("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.All(
@@ -63,11 +69,11 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload android-aab <path>":
@@ -86,11 +92,11 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload android-ndk <path>", "upload android-ndk":
@@ -110,11 +116,11 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload android-proguard <path>", "upload android-proguard":
@@ -135,17 +141,17 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload dart <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("missing api key, please specify using `--api-key`", 1)
+			logger.Error("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.Dart(
@@ -160,11 +166,11 @@ func main() {
 			commands.Upload.Overwrite,
 			commands.ApiKey,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload react-native-android", "upload react-native-android <path>":
@@ -186,11 +192,11 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload react-native-ios", "upload react-native-ios <path>":
@@ -213,11 +219,11 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload dsym", "upload dsym <path>":
@@ -235,17 +241,17 @@ func main() {
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "upload unity-android <path>":
 
 		if commands.ApiKey == "" {
-			log.Error("missing api key, please specify using `--api-key`", 1)
+			logger.Error("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.ProcessUnityAndroid(
@@ -263,11 +269,11 @@ func main() {
 			commands.Upload.Retries,
 			commands.Upload.Overwrite,
 			commands.DryRun,
-			commands.Verbose,
+			logger,
 		)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	case "create-build", "create-build <path>":
@@ -275,39 +281,39 @@ func main() {
 		CreateBuildOptions, err := build.GatherBuildInfo(commands)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 		// Validate Build Info
 		err = CreateBuildOptions.Validate()
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 		// Get Endpoint URL
 		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
-			log.Error("Failed to build upload url: "+err.Error(), 1)
+			logger.Error("Failed to build upload url: " + err.Error())
 		}
 
-		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, commands.Verbose)
+		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, logger)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
-		log.Success("Build created")
+		logger.Info("Build created")
 
 	case "create-android-build-id", "create-android-build-id <path>":
 		err := build.PrintAndroidBuildId(commands.CreateAndroidBuildId.Path)
 
 		if err != nil {
-			log.Error(err.Error(), 1)
+			logger.Error(err.Error())
 		}
 
 	default:
-		println(ctx.Command())
+		println(kongCtx.Command())
 	}
 }

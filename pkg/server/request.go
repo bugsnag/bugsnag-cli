@@ -83,33 +83,31 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool, verbose bool) error {
+func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool, logger log.Logger) error {
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
 	}
 
 	if !dryRun {
-		log.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
+		logger.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
 
-		err = processRequest(req, timeout, retries)
+		err = processRequest(req, timeout, retries, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "409") {
-				log.Warn("Duplicate file detected, skipping upload of " + filepath.Base(fileName))
+				logger.Warn("Duplicate file detected, skipping upload of " + filepath.Base(fileName))
 			} else {
 				return err
 			}
 		} else {
-			log.Success("Uploaded " + filepath.Base(fileName))
+			logger.Info("Uploaded " + filepath.Base(fileName))
 		}
 	} else {
-		log.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
-		if verbose {
-			log.Info("(dryrun) Upload payload:")
-			prettyUploadOptions, _ := utils.PrettyPrintMap(uploadOptions)
-			fmt.Println(prettyUploadOptions)
-		}
+		logger.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
+		logger.Info("(dryrun) Upload payload:")
+		prettyUploadOptions, _ := utils.PrettyPrintMap(uploadOptions)
+		logger.Debug(prettyUploadOptions)
 	}
 
 	return nil
@@ -126,24 +124,22 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool, verbose bool) error {
+func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool, logger log.Logger) error {
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 
 	if !dryRun {
-		log.Info("Sending build information to " + endpoint)
+		logger.Info("Sending build information to " + endpoint)
 
-		err := processRequest(req, timeout, retries)
+		err := processRequest(req, timeout, retries, logger)
 		if err != nil {
 			return err
 		}
 	} else {
-		log.Info("(dryrun) Skipping sending build information to " + endpoint)
-		if verbose {
-			log.Info("(dryrun) Build payload:")
-			prettyUploadOptions, _ := utils.PrettyPrintJson(string(payload))
-			fmt.Println(prettyUploadOptions)
-		}
+		logger.Info("(dryrun) Skipping sending build information to " + endpoint)
+		logger.Info("(dryrun) Build payload:")
+		prettyUploadOptions, _ := utils.PrettyPrintJson(string(payload))
+		fmt.Println(prettyUploadOptions)
 	}
 
 	return nil
@@ -160,11 +156,11 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 //
 // Returns:
 //   - error: An error indicating the reason for failure or nil if the request is successful.
-func processRequest(request *http.Request, timeout int, retryCount int) error {
+func processRequest(request *http.Request, timeout int, retryCount int, logger log.Logger) error {
 	var err error
 	i := 0
 	for {
-		err = sendRequest(request, timeout)
+		err = sendRequest(request, timeout, logger)
 		if err == nil {
 			return nil
 		}
@@ -175,7 +171,7 @@ func processRequest(request *http.Request, timeout int, retryCount int) error {
 			break
 		}
 
-		log.Warn("Request Failed, Retrying...")
+		logger.Warn("Request Failed, Retrying...")
 
 		time.Sleep(time.Second)
 	}
@@ -195,7 +191,7 @@ func processRequest(request *http.Request, timeout int, retryCount int) error {
 //
 // Returns:
 //   - error: An error if any step of the request processing fails. Nil if the process is successful.
-func sendRequest(request *http.Request, timeout int) error {
+func sendRequest(request *http.Request, timeout int, logger log.Logger) error {
 	client := &http.Client{
 		Timeout: time.Duration(timeout) * time.Second,
 	}
@@ -220,7 +216,7 @@ func sendRequest(request *http.Request, timeout int) error {
 		}
 
 		for _, warning := range warnings {
-			log.Warn(warning.(string))
+			logger.Warn(warning.(string))
 		}
 	}
 

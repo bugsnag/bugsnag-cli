@@ -39,7 +39,7 @@ func ProcessAndroidProguard(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
-	verbose bool,
+	logger log.Logger,
 ) error {
 
 	var mappingFile string
@@ -73,7 +73,7 @@ func ProcessAndroidProguard(
 				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					appManifestPath = appManifestPathExpected
-					log.Info("Found app manifest at: " + appManifestPath)
+					logger.Info("Found app manifest at: " + appManifestPath)
 				}
 			}
 
@@ -91,7 +91,7 @@ func ProcessAndroidProguard(
 							appManifestPathExpected = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 							if utils.FileExists(appManifestPathExpected) {
 								appManifestPath = appManifestPathExpected
-								log.Info("Found app manifest at: " + appManifestPath)
+								logger.Info("Found app manifest at: " + appManifestPath)
 							}
 						}
 					}
@@ -103,7 +103,7 @@ func ProcessAndroidProguard(
 		// Check to see if we need to read the manifest file due to missing options
 		if appManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
-			log.Info("Reading data from AndroidManifest.xml")
+			logger.Info("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
@@ -118,7 +118,7 @@ func ProcessAndroidProguard(
 				}
 
 				if apiKey != "" {
-					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+					logger.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 				}
 			}
 
@@ -126,13 +126,13 @@ func ProcessAndroidProguard(
 				applicationId = manifestData.ApplicationId
 
 				if applicationId != "" {
-					log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+					logger.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 				}
 			}
 
 			if noBuildUuid {
 				buildUuid = ""
-				log.Info("No build ID will be used")
+				logger.Info("No build ID will be used")
 			} else if buildUuid == "" {
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
@@ -158,10 +158,10 @@ func ProcessAndroidProguard(
 					buildUuid = fmt.Sprintf("%x", signature)
 
 					if buildUuid != "" {
-						log.Info("Using " + buildUuid + " as build ID from classes.dex")
+						logger.Info("Using " + buildUuid + " as build ID from classes.dex")
 					}
 				} else {
-					log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+					logger.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
 				}
 			}
 
@@ -169,7 +169,7 @@ func ProcessAndroidProguard(
 				versionCode = manifestData.VersionCode
 
 				if versionCode != "" {
-					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+					logger.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 				}
 			}
 
@@ -177,12 +177,12 @@ func ProcessAndroidProguard(
 				versionName = manifestData.VersionName
 
 				if versionName != "" {
-					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+					logger.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 				}
 			}
 		}
 
-		log.Info("Compressing " + mappingFile)
+		logger.Info("Compressing " + mappingFile)
 
 		outputFile, err := utils.GzipCompress(mappingFile)
 
@@ -199,12 +199,12 @@ func ProcessAndroidProguard(
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
-		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, verbose)
+		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "404 Not Found") {
-				log.Info("Trying " + endpoint)
-				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, verbose)
+				logger.Info("Trying " + endpoint)
+				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, logger)
 			}
 		}
 

@@ -44,7 +44,7 @@ func ProcessReactNativeIos(
 	retries int,
 	overwrite bool,
 	dryRun bool,
-	verbose bool,
+	logger log.Logger,
 ) error {
 
 	var rootDirPath string
@@ -91,20 +91,20 @@ func ProcessReactNativeIos(
 				if scheme != "" {
 					_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
 					if err != nil {
-						log.Warn(err.Error())
+						logger.Warn(err.Error())
 					}
 				} else {
 					// Otherwise, try to find it
 					scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 					if err != nil {
-						log.Warn(err.Error())
+						logger.Warn(err.Error())
 					}
 				}
 
 				if scheme != "" {
 					buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 					if err != nil {
-						log.Warn(err.Error())
+						logger.Warn(err.Error())
 					}
 				}
 			} else {
@@ -121,14 +121,14 @@ func ProcessReactNativeIos(
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					log.Info("Found Info.plist at expected location: " + plistPath)
+					logger.Info("Found Info.plist at expected location: " + plistPath)
 				} else {
 					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)
 					if utils.FileExists(plistPathExpected) {
 						plistPath = plistPathExpected
-						log.Info("Found Info.plist at: " + plistPath)
+						logger.Info("Found Info.plist at: " + plistPath)
 					} else {
-						log.Info("No Info.plist found at: " + plistPathExpected)
+						logger.Info("No Info.plist found at: " + plistPathExpected)
 					}
 				}
 			}
@@ -146,14 +146,14 @@ func ProcessReactNativeIos(
 				possibleBundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
 				if utils.FileExists(possibleBundleFilePath) {
 					bundlePath = possibleBundleFilePath
-					log.Info("Found bundle file at: " + bundlePath)
+					logger.Info("Found bundle file at: " + bundlePath)
 				} else {
 					possibleBundleFilePath = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), "main.jsbundle")
 					if utils.FileExists(possibleBundleFilePath) {
 						bundlePath = possibleBundleFilePath
-						log.Info("Found bundle file at: " + bundlePath)
+						logger.Info("Found bundle file at: " + bundlePath)
 					} else {
-						log.Info("No bundle file found at: " + possibleBundleFilePath)
+						logger.Info("No bundle file found at: " + possibleBundleFilePath)
 					}
 				}
 			}
@@ -179,9 +179,9 @@ func ProcessReactNativeIos(
 			possibleSourceMapPath := filepath.Join(sourceMapDirPath, "sourcemaps", "main.jsbundle.map")
 			if utils.FileExists(possibleSourceMapPath) {
 				sourceMapPath = possibleSourceMapPath
-				log.Info("Found source map at: " + sourceMapPath)
+				logger.Info("Found source map at: " + sourceMapPath)
 			} else {
-				log.Info("No source map found at: " + possibleSourceMapPath)
+				logger.Info("No source map found at: " + possibleSourceMapPath)
 			}
 		}
 
@@ -200,18 +200,18 @@ func ProcessReactNativeIos(
 			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
 			if bundleVersion == "" {
 				bundleVersion = plistData.BundleVersion
-				log.Info("Using bundle version from Info.plist: " + bundleVersion)
+				logger.Info("Using bundle version from Info.plist: " + bundleVersion)
 			}
 
 			if versionName == "" {
 				versionName = plistData.VersionName
-				log.Info("Using version name from Info.plist: " + versionName)
+				logger.Info("Using version name from Info.plist: " + versionName)
 
 			}
 
 			if apiKey == "" {
 				apiKey = plistData.BugsnagProjectDetails.ApiKey
-				log.Info("Using API key from Info.plist: " + apiKey)
+				logger.Info("Using API key from Info.plist: " + apiKey)
 			}
 
 		}
@@ -228,7 +228,7 @@ func ProcessReactNativeIos(
 	fileFieldData["sourceMap"] = sourceMapPath
 	fileFieldData["bundle"] = bundlePath
 
-	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, verbose)
+	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)
 
 	if err != nil {
 

@@ -37,7 +37,7 @@ func ProcessAndroidNDK(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
-	verbose bool,
+	logger log.Logger,
 ) error {
 
 	var fileList []string
@@ -75,7 +75,7 @@ func ProcessAndroidNDK(
 				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					appManifestPath = appManifestPathExpected
-					log.Info("Found app manifest at: " + appManifestPath)
+					logger.Info("Found app manifest at: " + appManifestPath)
 				}
 			}
 
@@ -98,7 +98,7 @@ func ProcessAndroidNDK(
 							appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 							if utils.FileExists(appManifestPathExpected) {
 								appManifestPath = appManifestPathExpected
-								log.Info("Found app manifest at: " + appManifestPath)
+								logger.Info("Found app manifest at: " + appManifestPath)
 							}
 						}
 
@@ -113,13 +113,13 @@ func ProcessAndroidNDK(
 	}
 
 	if projectRoot != "" {
-		log.Info("Using " + projectRoot + " as the project root")
+		logger.Info("Using " + projectRoot + " as the project root")
 	}
 
 	// Check to see if we need to read the manifest file due to missing options
 	if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
 
-		log.Info("Reading data from AndroidManifest.xml")
+		logger.Info("Reading data from AndroidManifest.xml")
 		manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 		if err != nil {
@@ -134,7 +134,7 @@ func ProcessAndroidNDK(
 			}
 
 			if apiKey != "" {
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				logger.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
 
 			}
 		}
@@ -143,7 +143,7 @@ func ProcessAndroidNDK(
 			applicationId = manifestData.ApplicationId
 
 			if applicationId != "" {
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+				logger.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
 			}
 		}
 
@@ -151,7 +151,7 @@ func ProcessAndroidNDK(
 			versionCode = manifestData.VersionCode
 
 			if versionCode != "" {
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				logger.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
 			}
 		}
 
@@ -159,7 +159,7 @@ func ProcessAndroidNDK(
 			versionName = manifestData.VersionName
 
 			if versionName != "" {
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				logger.Info("Using " + versionName + " as version name from AndroidManifest.xml")
 			}
 		}
 	}
@@ -183,10 +183,10 @@ func ProcessAndroidNDK(
 					return err
 				}
 
-				log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
+				logger.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
 			}
 
-			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
+			logger.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
 
 			if workingDir == "" {
 				workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
@@ -220,7 +220,7 @@ func ProcessAndroidNDK(
 		timeout,
 		retries,
 		dryRun,
-		verbose,
+		logger,
 	)
 
 	if err != nil {
