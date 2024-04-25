@@ -83,6 +83,8 @@ steps:
 
   - label: React Native iOS Integration Tests
     depends_on: build
+    env:
+      XCODE_VERSION: 15.3.0
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
@@ -99,7 +101,7 @@ steps:
     agents:
       queue: macos-13-arm
     env:
-      XCODE_VERSION: 15.2.0
+      XCODE_VERSION: 15.3.0
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
