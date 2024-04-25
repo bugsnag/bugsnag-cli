@@ -98,8 +98,6 @@ steps:
 
   - label: dSYM Integration Tests
     depends_on: build
-    agents:
-      queue: macos-13-arm
     env:
       XCODE_VERSION: 15.3.0
     commands:
