@@ -7,7 +7,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func findNativeLibPath(arr []string, path string) (string, error) {
+func FindNativeLibPath(arr []string, path string) (string, error) {
 
 	// Look for NDK symbol files if the upload command was run from somewhere within the project root but outside the merged_native_libs directory
 	// based on the expected file path of app/build/intermediates/merged_native_libs (or android/app/build/intermediates/merged_native_libs for RN)

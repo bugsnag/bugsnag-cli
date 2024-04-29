@@ -51,7 +51,7 @@ func ProcessAndroidNDK(
 
 		// Search for NDK symbol files based on an expected path
 		arr := []string{"android", "app", "build", "intermediates", "merged_native_libs"}
-		mergeNativeLibPath, err = android.findNativeLibPath(arr, path)
+		mergeNativeLibPath, err = android.FindNativeLibPath(arr, path)
 
 		if err != nil {
 			return err
