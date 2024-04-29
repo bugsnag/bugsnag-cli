@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"strings"

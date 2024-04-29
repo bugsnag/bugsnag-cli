@@ -7,8 +7,6 @@ import (
 	"strings"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
