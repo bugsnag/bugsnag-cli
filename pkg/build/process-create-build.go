@@ -33,11 +33,11 @@ type Payload struct {
 func ProcessCreateBuild(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int, retries int) error {
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
-		return fmt.Errorf("Failed to create build information payload: " + err.Error())
+		return fmt.Errorf("Failed to create build information payload: %s", err.Error())
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	log.Info("Build information:\n" + prettyBuildPayload)
+	log.Info(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
 	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun)
 	if err != nil {

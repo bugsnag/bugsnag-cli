@@ -60,7 +60,7 @@ func ProcessReactNativeAndroid(
 			if utils.FileExists(buildDirPath) {
 				rootDirPath = filepath.Join(path, "..")
 			} else if bundlePath == "" || sourceMapPath == "" {
-				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+				return fmt.Errorf("unable to find bundle files or source maps in within %s", path)
 			}
 		}
 
@@ -104,7 +104,7 @@ func ProcessReactNativeAndroid(
 		}
 
 		if !utils.FileExists(bundlePath) {
-			return fmt.Errorf("unable to find index.android.bundle at " + bundlePath)
+			return fmt.Errorf("unable to find index.android.bundle at %s", bundlePath)
 		}
 
 		if sourceMapPath == "" {
@@ -133,16 +133,16 @@ func ProcessReactNativeAndroid(
 		}
 
 		if !utils.FileExists(sourceMapPath) {
-			return fmt.Errorf("unable to find index.android.bundle at " + sourceMapPath)
+			return fmt.Errorf("unable to find index.android.bundle at %s", sourceMapPath)
 		}
 
 		if appManifestPath == "" {
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
-				log.Info("Found app manifest at: " + appManifestPath)
+				log.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 			} else {
-				log.Info("No app manifest found at: " + appManifestPathExpected)
+				log.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
@@ -161,17 +161,17 @@ func ProcessReactNativeAndroid(
 					}
 				}
 
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				log.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				log.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				log.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 			}
 		}
 
@@ -185,7 +185,7 @@ func ProcessReactNativeAndroid(
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(fmt.Sprintf("%s/react-native-source-map", endpoint), uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
 
 		if err != nil {
 
