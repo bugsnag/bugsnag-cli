@@ -14,9 +14,9 @@ const White = "\033[37m"
 
 func LogMessage(message string, status string, color string) {
 	if isatty.IsTerminal(os.Stdout.Fd()) {
-		fmt.Println("[", color, status, Reset, "] ", message)
+		fmt.Printf("[%s%s%s] %s", color, status, Reset, message)
 	} else {
-		fmt.Println("[", status, "] ", message)
+		fmt.Printf("[%s] %s", status, message)
 	}
 }
 
