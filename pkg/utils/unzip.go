@@ -18,7 +18,7 @@ func Unzip(path, outputPath string) error {
 
 	for _, f := range archive.File {
 		filePath := filepath.Join(outputPath, f.Name)
-		if !strings.HasPrefix(filePath, filepath.Clean(outputPath)+string(os.PathSeparator)) {
+		if !strings.HasPrefix(filePath, fmt.Sprintf("%s%s", filepath.Clean(outputPath), string(os.PathSeparator))) {
 			return fmt.Errorf("invalid file path")
 		}
 		if f.FileInfo().IsDir() {

@@ -51,7 +51,7 @@ func ProcessAndroidProguard(
 			mappingPath := filepath.Join(path, "app", "build", "outputs", "mapping")
 
 			if !utils.FileExists(mappingPath) {
-				return fmt.Errorf("unable to find the mapping directory in " + path)
+				return fmt.Errorf("unable to find the mapping directory in %s", path)
 			}
 
 			if variant == "" {
@@ -72,7 +72,7 @@ func ProcessAndroidProguard(
 				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					appManifestPath = appManifestPathExpected
-					log.Info("Found app manifest at: " + appManifestPath)
+					log.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 				}
 			}
 
@@ -90,7 +90,7 @@ func ProcessAndroidProguard(
 							appManifestPathExpected = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 							if utils.FileExists(appManifestPathExpected) {
 								appManifestPath = appManifestPathExpected
-								log.Info("Found app manifest at: " + appManifestPath)
+								log.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 							}
 						}
 					}
@@ -117,7 +117,7 @@ func ProcessAndroidProguard(
 				}
 
 				if apiKey != "" {
-					log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+					log.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 				}
 			}
 
@@ -125,7 +125,7 @@ func ProcessAndroidProguard(
 				applicationId = manifestData.ApplicationId
 
 				if applicationId != "" {
-					log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+					log.Info(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
 				}
 			}
 
@@ -157,10 +157,10 @@ func ProcessAndroidProguard(
 					buildUuid = fmt.Sprintf("%x", signature)
 
 					if buildUuid != "" {
-						log.Info("Using " + buildUuid + " as build ID from classes.dex")
+						log.Info(fmt.Sprintf("Using %s as build ID from classes.dex", buildUuid))
 					}
 				} else {
-					log.Info("Using " + buildUuid + " as build UUID from AndroidManifest.xml")
+					log.Info(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", buildUuid))
 				}
 			}
 
@@ -168,7 +168,7 @@ func ProcessAndroidProguard(
 				versionCode = manifestData.VersionCode
 
 				if versionCode != "" {
-					log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+					log.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 				}
 			}
 
@@ -176,12 +176,12 @@ func ProcessAndroidProguard(
 				versionName = manifestData.VersionName
 
 				if versionName != "" {
-					log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+					log.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 				}
 			}
 		}
 
-		log.Info("Compressing " + mappingFile)
+		log.Info(fmt.Sprintf("Compressing %s", mappingFile))
 
 		outputFile, err := utils.GzipCompress(mappingFile)
 
@@ -198,11 +198,11 @@ func ProcessAndroidProguard(
 		fileFieldData := make(map[string]string)
 		fileFieldData["proguard"] = outputFile
 
-		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun)
+		err = server.ProcessFileRequest(fmt.Sprintf("%s/proguard", endpoint), uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "404 Not Found") {
-				log.Info("Trying " + endpoint)
+				log.Info(fmt.Sprintf("Trying %s", endpoint))
 				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun)
 			}
 		}

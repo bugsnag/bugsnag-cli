@@ -21,7 +21,7 @@ func GetAndroidNDKRoot(path string) (string, error) {
 	}
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return path, fmt.Errorf(path + " does not exist on the system")
+		return path, fmt.Errorf("%s does not exist on the system", path)
 	}
 
 	return path, nil

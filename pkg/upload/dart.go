@@ -58,7 +58,7 @@ func Dart(
 
 		// Start processing the android symbol file
 		if isAndroidPlatform {
-			log.Info("Processing android symbol file: " + file)
+			log.Info(fmt.Sprintf("Processing android symbol file: %s", file))
 
 			var buildId string
 			buildId, err = GetBuildIdFromElfFile(file)
@@ -72,7 +72,7 @@ func Dart(
 			fileFieldData := make(map[string]string)
 			fileFieldData["symbolFile"] = file
 
-			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+			err := server.ProcessFileRequest(fmt.Sprintf("%s/dart-symbol", endpoint), uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 
 			if err != nil {
 
@@ -84,7 +84,7 @@ func Dart(
 
 		// Process iOS file
 		if isIosPlatform {
-			log.Info("Processing iOS symbol file: " + file)
+			log.Info(fmt.Sprintf("Processing iOS symbol file: %s", file))
 
 			if iosAppPath == "" {
 				iosAppPath, err = GetIosAppPath(file)
@@ -115,7 +115,7 @@ func Dart(
 			if dryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+				err = server.ProcessFileRequest(fmt.Sprintf("%s/dart-symbol", endpoint), uploadOptions, fileFieldData, timeout, retries, file, dryRun)
 			}
 
 			if err != nil {
@@ -125,7 +125,7 @@ func Dart(
 
 			continue
 		}
-		log.Info("Skipping " + file)
+		log.Info(fmt.Sprintf("Skipping %s", file))
 	}
 
 	return nil
