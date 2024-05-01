@@ -35,3 +35,29 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
     And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Uploading Android AAB file when command is run from project root
+    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/
+    And I wait to receive 1 sourcemaps
+    Then the sourcemap is valid for the Android Build API
+    And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "versionCode" equals "1"
+    And the sourcemap payload field "versionName" equals "1.0"
+    And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Uploading Android AAB file when command is run from within app directory
+    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app/
+    And I wait to receive 1 sourcemaps
+    Then the sourcemap is valid for the Android Build API
+    And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "versionCode" equals "1"
+    And the sourcemap payload field "versionName" equals "1.0"
+    And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Uploading Android AAB file when more than a single AAB is found
+    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/aab/
+    Then I should see the path ambiguous error
