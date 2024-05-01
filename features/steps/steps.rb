@@ -17,11 +17,11 @@ when os.downcase.include?('darwin')
 end
 
 When('I run bugsnag-cli') do
-  @output = `bin/#{arch}-#{os}-#{binary} --no-ansi 2>&1`
+  @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/#{arch}-#{os}-#{binary} #{flags} --no-ansi 2>&1`
+  @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
   puts @output
 end
 
