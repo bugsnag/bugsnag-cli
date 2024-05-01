@@ -43,8 +43,7 @@ func ProcessAndroidAab(
 	for _, path := range paths {
 		// Check to see if we are dealing with a .aab file and extract it into a temp directory
 		if filepath.Ext(path) == ".aab" {
-
-			logger.Info("Extracting " + filepath.Base(path) + " into a temporary directory")
+			logger.Info(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(path)))
 			aabDir, err = utils.ExtractFile(path, "aab")
 
 			defer os.RemoveAll(aabDir)
@@ -55,7 +54,7 @@ func ProcessAndroidAab(
 		} else if utils.IsDir(path) {
 			aabDir = path
 		} else {
-			return fmt.Errorf(path + " is not an AAB file/directory")
+			return fmt.Errorf("%s is not an AAB file/directory", path)
 		}
 	}
 

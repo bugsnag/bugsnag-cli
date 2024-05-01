@@ -61,7 +61,7 @@ func ProcessReactNativeAndroid(
 			if utils.FileExists(buildDirPath) {
 				rootDirPath = filepath.Join(path, "..")
 			} else if bundlePath == "" || sourceMapPath == "" {
-				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+				return fmt.Errorf("unable to find bundle files or source maps in within %s", path)
 			}
 		}
 
@@ -105,7 +105,7 @@ func ProcessReactNativeAndroid(
 		}
 
 		if !utils.FileExists(bundlePath) {
-			return fmt.Errorf("unable to find index.android.bundle at " + bundlePath)
+			return fmt.Errorf("unable to find index.android.bundle at %s", bundlePath)
 		}
 
 		if sourceMapPath == "" {
@@ -134,16 +134,16 @@ func ProcessReactNativeAndroid(
 		}
 
 		if !utils.FileExists(sourceMapPath) {
-			return fmt.Errorf("unable to find index.android.bundle at " + sourceMapPath)
+			return fmt.Errorf("unable to find index.android.bundle at %s", sourceMapPath)
 		}
 
 		if appManifestPath == "" {
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
-				logger.Info("Found app manifest at: " + appManifestPath)
+				logger.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 			} else {
-				logger.Info("No app manifest found at: " + appManifestPathExpected)
+				logger.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
@@ -161,18 +161,17 @@ func ProcessReactNativeAndroid(
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
-
-				logger.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
+				logger.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				logger.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				logger.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				logger.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				logger.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 			}
 		}
 

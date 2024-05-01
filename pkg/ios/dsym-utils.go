@@ -1,13 +1,12 @@
 package ios
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
@@ -36,15 +35,15 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 		if strings.HasSuffix(strings.ToLower(path), ".zip") {
 
 			fileName := filepath.Base(path)
-			logger.Info("Attempting to unzip " + fileName + " before proceeding to upload")
+			logger.Info(fmt.Sprintf("Attempting to unzip %s before proceeding to upload", fileName))
 
 			var err error
 			tempDir, err = utils.ExtractFile(path, "dsym")
 
 			if err != nil {
-				return nil, tempDir, errors.New("Could not unzip " + fileName + " to a temporary directory, skipping")
+				return nil, tempDir, fmt.Errorf("Could not unzip %s to a temporary directory, skipping", fileName)
 			} else {
-				logger.Info("Unzipped " + fileName + " to " + tempDir + " for uploading")
+				logger.Info(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
 				dsymLocations = findDsyms(tempDir)
 			}
 
@@ -58,7 +57,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	// If we have found dSYMs, use dwarfdump to get the UUID etc for each dSYM
 	if len(dsymLocations) > 0 {
 		if !isDwarfDumpInstalled() {
-			return nil, tempDir, errors.New("Unable to locate dwarfdump on this system.")
+			return nil, tempDir, fmt.Errorf("Unable to locate dwarfdump on this system.")
 		}
 
 		for _, dsymLocation := range dsymLocations {
@@ -80,17 +79,17 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 					info := getDwarfFileInfo(dsymLocation, file.Name())
 					if len(info) == 0 {
 						if ignoreMissingDwarf {
-							logger.Info(fileInfo.Name() + " is not a valid DWARF file, skipping")
+							logger.Info(fmt.Sprintf("%s is not a valid DWARF file, skipping", fileInfo.Name()))
 						} else {
-							return nil, tempDir, errors.New(fileInfo.Name() + " is not a valid DWARF file")
+							return nil, tempDir, fmt.Errorf("%s is not a valid DWARF file", fileInfo.Name())
 						}
 					}
 					dwarfInfo = append(dwarfInfo, info...)
 				} else {
 					if ignoreEmptyDsym {
-						logger.Info(file.Name() + " is empty, skipping")
+						logger.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
 					} else {
-						return nil, tempDir, errors.New(file.Name() + " is empty")
+						return nil, tempDir, fmt.Errorf("%s is empty", file.Name())
 					}
 				}
 			}

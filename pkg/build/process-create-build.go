@@ -40,11 +40,11 @@ func ProcessCreateBuild(
 ) error {
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
-		return fmt.Errorf("Failed to create build information payload: " + err.Error())
+		return fmt.Errorf("Failed to create build information payload: %s", err.Error())
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	logger.Info("Build information:\n" + prettyBuildPayload)
+	logger.Info(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
 	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, logger)
 	if err != nil {

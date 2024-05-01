@@ -59,7 +59,7 @@ func Dart(
 
 		// Start processing the android symbol file
 		if isAndroidPlatform {
-			logger.Info("Processing android symbol file: " + file)
+			logger.Info(fmt.Sprintf("Processing android symbol file: %s", file))
 
 			var buildId string
 			buildId, err = GetBuildIdFromElfFile(file)
@@ -85,7 +85,7 @@ func Dart(
 
 		// Process iOS file
 		if isIosPlatform {
-			logger.Info("Processing iOS symbol file: " + file)
+			logger.Info(fmt.Sprintf("Processing iOS symbol file: %s", file))
 
 			if iosAppPath == "" {
 				iosAppPath, err = GetIosAppPath(file)
@@ -126,7 +126,7 @@ func Dart(
 
 			continue
 		}
-		logger.Info("Skipping " + file)
+		logger.Info(fmt.Sprintf("Skipping %s", file))
 	}
 
 	return nil

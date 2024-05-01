@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -41,7 +42,7 @@ func main() {
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
 	if err != nil {
-		logger.Error("Failed to build upload url: " + err.Error())
+		logger.Error(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
 	}
 
 	if commands.DryRun {
@@ -295,7 +296,7 @@ func main() {
 		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
-			logger.Error("Failed to build upload url: " + err.Error())
+			logger.Error(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
 		}
 
 		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, logger)

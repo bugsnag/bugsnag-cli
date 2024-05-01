@@ -90,13 +90,13 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 	}
 
 	if !dryRun {
-		logger.Info("Uploading " + filepath.Base(fileName) + " to " + endpoint)
+		logger.Info(fmt.Sprintf("Uploading %s to %s", filepath.Base(fileName), endpoint))
 
 		err = processRequest(req, timeout, retries, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "409") {
-				logger.Warn("Duplicate file detected, skipping upload of " + filepath.Base(fileName))
+				logger.Warn(fmt.Sprintf("Duplicate file detected, skipping upload of %s", filepath.Base(fileName)))
 			} else {
 				return err
 			}
@@ -104,7 +104,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 			logger.Info("Uploaded " + filepath.Base(fileName))
 		}
 	} else {
-		logger.Info("(dryrun) Skipping upload of " + filepath.Base(fileName) + " to " + endpoint)
+		logger.Info(fmt.Sprintf("(dryrun) Skipping upload of %s to %s", filepath.Base(fileName), endpoint))
 		logger.Info("(dryrun) Upload payload:")
 		prettyUploadOptions, _ := utils.PrettyPrintMap(uploadOptions)
 		logger.Debug(prettyUploadOptions)
@@ -129,14 +129,14 @@ func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries i
 	req.Header.Add("Content-Type", "application/json")
 
 	if !dryRun {
-		logger.Info("Sending build information to " + endpoint)
+		logger.Info(fmt.Sprintf("Sending build information to %s", endpoint))
 
 		err := processRequest(req, timeout, retries, logger)
 		if err != nil {
 			return err
 		}
 	} else {
-		logger.Info("(dryrun) Skipping sending build information to " + endpoint)
+		logger.Info(fmt.Sprintf("(dryrun) Skipping sending build information to %s", endpoint))
 		logger.Info("(dryrun) Build payload:")
 		prettyUploadOptions, _ := utils.PrettyPrintJson(string(payload))
 		fmt.Println(prettyUploadOptions)

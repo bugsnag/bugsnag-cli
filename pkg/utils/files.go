@@ -110,17 +110,17 @@ func FindLatestFileWithSuffix(directory string, targetSuffix string) (string, er
 	}
 
 	if newestFile == "" {
-		return "", fmt.Errorf("Unable to find " + targetSuffix + " files in " + directory)
+		return "", fmt.Errorf("Unable to find %s files in %s", targetSuffix, directory)
 	}
 
 	return newestFile, err
 }
 
 func ExtractFile(file string, slug string) (string, error) {
-	tempDir, err := os.MkdirTemp("", "bugsnag-cli-"+slug+"-unpacking-*")
+	tempDir, err := os.MkdirTemp("", fmt.Sprintf("bugsnag-cli-%s-unpacking-*", slug))
 
 	if err != nil {
-		return "", fmt.Errorf("error creating temporary working directory " + err.Error())
+		return "", fmt.Errorf("error creating temporary working directory %s", err.Error())
 	}
 
 	err = Unzip(file, tempDir)

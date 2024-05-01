@@ -1,7 +1,7 @@
 package upload
 
 import (
-	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -68,7 +68,7 @@ func ProcessDsym(
 
 		if xcodeProjPath != "" {
 			projectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, projectRoot)
-			logger.Info("Defaulting to '" + projectRoot + "' as the project root")
+			logger.Info(fmt.Sprintf("Defaulting to '%s' as the project root", projectRoot))
 
 			// Get build settings and dsymPath
 
@@ -102,17 +102,17 @@ func ProcessDsym(
 				_, err := os.Stat(possibleDsymPath)
 				if err == nil {
 					dsymPath = possibleDsymPath
-					logger.Info("Using dSYM path: " + dsymPath)
+					logger.Info(fmt.Sprintf("Using dSYM path: %s", dsymPath))
 				}
 			}
 		}
 
 		if projectRoot == "" {
-			return errors.New("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
+			return fmt.Errorf("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 		}
 
 		if dsymPath == "" {
-			return errors.New("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
+			return fmt.Errorf("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
 		}
 
 		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf, logger)
@@ -120,7 +120,7 @@ func ProcessDsym(
 		if err != nil {
 			return err
 		} else if len(dwarfInfo) == 0 {
-			return errors.New("No dSYM files found in: " + dsymPath)
+			return fmt.Errorf("No dSYM files found in: %s", dsymPath)
 		}
 
 		// If the Info.plist path is not defined, we need to build the path to Info.plist from build settings values
@@ -129,9 +129,9 @@ func ProcessDsym(
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					logger.Info("Found Info.plist at expected location: " + plistPath)
+					logger.Info(fmt.Sprintf("Found Info.plist at expected location: %s", plistPath))
 				} else {
-					logger.Info("No Info.plist found at expected location: " + plistPathExpected)
+					logger.Info(fmt.Sprintf("No Info.plist found at expected location: %s", plistPathExpected))
 				}
 			}
 		}
@@ -147,14 +147,14 @@ func ProcessDsym(
 			if apiKey == "" {
 				apiKey = plistData.BugsnagProjectDetails.ApiKey
 				if apiKey != "" {
-					logger.Info("Using API key from Info.plist: " + apiKey)
+					logger.Info(fmt.Sprintf("Using API key from Info.plist: %s", apiKey))
 				}
 			}
 		}
 
 		for _, dsym := range dwarfInfo {
-			dsymInfo := "(UUID: " + dsym.UUID + ", Name: " + dsym.Name + ", Arch: " + dsym.Arch + ")"
-			logger.Info("Uploading dSYM " + dsymInfo)
+			dsymInfo := fmt.Sprintf("(UUID: %s, Name: %s, Arch: %s)", dsym.UUID, dsym.Name, dsym.Arch)
+			logger.Info(fmt.Sprintf("Uploading dSYM %s", dsymInfo))
 
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {

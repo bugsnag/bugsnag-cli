@@ -2,7 +2,6 @@ package upload
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
 
@@ -62,7 +61,7 @@ func ProcessReactNativeIos(
 				rootDirPath = filepath.Join(path, "..")
 
 			} else if bundlePath == "" || sourceMapPath == "" {
-				return fmt.Errorf("unable to find bundle files or source maps in within " + path)
+				return fmt.Errorf("unable to find bundle files or source maps in within %s", path)
 			}
 		}
 
@@ -77,7 +76,7 @@ func ProcessReactNativeIos(
 			// Validate workspacePath (if provided) or attempt to find one
 			if xcodeProjPath != "" {
 				if !utils.FileExists(xcodeProjPath) {
-					return errors.New("unable to find the specified Xcode project file: " + xcodeProjPath)
+					return fmt.Errorf("unable to find the specified Xcode project file: %s", xcodeProjPath)
 				}
 			} else {
 				if ios.IsPathAnXcodeProjectOrWorkspace(filepath.Join(rootDirPath, "ios")) {
@@ -108,27 +107,27 @@ func ProcessReactNativeIos(
 					}
 				}
 			} else {
-				return errors.New("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
+				return fmt.Errorf("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
 
 			// Check to see if we have the Info.Plist path
 			if plistPath != "" {
 				if !utils.FileExists(plistPath) {
-					return errors.New("unable to find specified Info.plist file: " + plistPath)
+					return fmt.Errorf("unable to find specified Info.plist file: %s", plistPath)
 				}
 			} else if buildSettings != nil {
 				// If not, we need to build it from build settings values
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					logger.Info("Found Info.plist at expected location: " + plistPath)
+					logger.Info(fmt.Sprintf("Found Info.plist at expected location: %s", plistPath))
 				} else {
 					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)
 					if utils.FileExists(plistPathExpected) {
 						plistPath = plistPathExpected
-						logger.Info("Found Info.plist at: " + plistPath)
+						logger.Info(fmt.Sprintf("Found Info.plist at: %s", plistPath))
 					} else {
-						logger.Info("No Info.plist found at: " + plistPathExpected)
+						logger.Info(fmt.Sprintf("No Info.plist found at: %s", plistPathExpected))
 					}
 				}
 			}
@@ -138,7 +137,7 @@ func ProcessReactNativeIos(
 		// Check that the bundle file exists and error out if it doesn't
 		if bundlePath != "" {
 			if !utils.FileExists(bundlePath) {
-				return errors.New("unable to find specified bundle file: " + bundlePath)
+				return fmt.Errorf("unable to find specified bundle file: %s", bundlePath)
 			}
 		} else {
 			// Set a bundlePath if it's not defined and check that it exists before proceeding
@@ -146,14 +145,14 @@ func ProcessReactNativeIos(
 				possibleBundleFilePath := filepath.Join(buildSettings.ConfigurationBuildDir, "main.jsbundle")
 				if utils.FileExists(possibleBundleFilePath) {
 					bundlePath = possibleBundleFilePath
-					logger.Info("Found bundle file at: " + bundlePath)
+					logger.Info(fmt.Sprintf("Found bundle file at: %s", bundlePath))
 				} else {
 					possibleBundleFilePath = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), "main.jsbundle")
 					if utils.FileExists(possibleBundleFilePath) {
 						bundlePath = possibleBundleFilePath
-						logger.Info("Found bundle file at: " + bundlePath)
+						logger.Info(fmt.Sprintf("Found bundle file at: %s", bundlePath))
 					} else {
-						logger.Info("No bundle file found at: " + possibleBundleFilePath)
+						logger.Info(fmt.Sprintf("No bundle file found at: %s", possibleBundleFilePath))
 					}
 				}
 			}
@@ -161,13 +160,13 @@ func ProcessReactNativeIos(
 
 		// Check that we now have a bundle path
 		if bundlePath == "" {
-			return errors.New("Could not find a bundle file, please specify the path by using --bundle-path")
+			return fmt.Errorf("Could not find a bundle file, please specify the path by using --bundle-path")
 		}
 
 		// Check that the source map file exists and error out if it doesn't
 		if sourceMapPath != "" {
 			if !utils.FileExists(sourceMapPath) {
-				return errors.New("unable to find specified source map: " + sourceMapPath)
+				return fmt.Errorf("unable to find specified source map: %s", sourceMapPath)
 			}
 		} else {
 			// Use SOURCEMAP_FILE environment variable, if defined, or use the build directory
@@ -179,15 +178,15 @@ func ProcessReactNativeIos(
 			possibleSourceMapPath := filepath.Join(sourceMapDirPath, "sourcemaps", "main.jsbundle.map")
 			if utils.FileExists(possibleSourceMapPath) {
 				sourceMapPath = possibleSourceMapPath
-				logger.Info("Found source map at: " + sourceMapPath)
+				logger.Info(fmt.Sprintf("Found source map at: %s", sourceMapPath))
 			} else {
-				logger.Info("No source map found at: " + possibleSourceMapPath)
+				logger.Info(fmt.Sprintf("No source map found at: %s", possibleSourceMapPath))
 			}
 		}
 
 		// Check that we now have a source map path
 		if sourceMapPath == "" {
-			return errors.New("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
+			return fmt.Errorf("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
 		}
 
 		if plistPath != "" && (apiKey == "" || versionName == "" || bundleVersion == "") {
@@ -200,18 +199,18 @@ func ProcessReactNativeIos(
 			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
 			if bundleVersion == "" {
 				bundleVersion = plistData.BundleVersion
-				logger.Info("Using bundle version from Info.plist: " + bundleVersion)
+				logger.Info(fmt.Sprintf("Using bundle version from Info.plist: %s", bundleVersion))
 			}
 
 			if versionName == "" {
 				versionName = plistData.VersionName
-				logger.Info("Using version name from Info.plist: " + versionName)
+				logger.Info(fmt.Sprintf("Using version name from Info.plist: %s", versionName))
 
 			}
 
 			if apiKey == "" {
 				apiKey = plistData.BugsnagProjectDetails.ApiKey
-				logger.Info("Using API key from Info.plist: " + apiKey)
+				logger.Info(fmt.Sprintf("Using API key from Info.plist: %s", apiKey))
 			}
 
 		}
