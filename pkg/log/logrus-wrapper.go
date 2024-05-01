@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"github.com/mattn/go-isatty"
 	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
@@ -52,6 +53,8 @@ func NewLogrusLogger(ctx context.Context, verbose bool, noAnsi bool) *LogrusLogg
 	logger.Out = os.Stdout
 
 	if noAnsi {
+		logger.Formatter = &NoAnsiCustomFormatter{}
+	} else if isatty.IsTerminal(os.Stdout.Fd()) {
 		logger.Formatter = &NoAnsiCustomFormatter{}
 	} else {
 		logger.Formatter = &CustomFormatter{}
