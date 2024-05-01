@@ -42,7 +42,7 @@ func main() {
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
 
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
+		logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
 	}
 
 	if commands.DryRun {
@@ -58,7 +58,7 @@ func main() {
 	case "upload all <path>":
 
 		if commands.ApiKey == "" {
-			logger.Error("missing api key, please specify using `--api-key`")
+			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.All(
@@ -74,7 +74,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload android-aab <path>":
@@ -97,7 +97,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload android-ndk <path>", "upload android-ndk":
@@ -121,7 +121,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload android-proguard <path>", "upload android-proguard":
@@ -146,13 +146,13 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload dart <path>":
 
 		if commands.ApiKey == "" {
-			logger.Error("missing api key, please specify using `--api-key`")
+			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.Dart(
@@ -171,7 +171,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload react-native-android", "upload react-native-android <path>":
@@ -197,7 +197,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload react-native-ios", "upload react-native-ios <path>":
@@ -224,7 +224,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload dsym", "upload dsym <path>":
@@ -246,13 +246,13 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "upload unity-android <path>":
 
 		if commands.ApiKey == "" {
-			logger.Error("missing api key, please specify using `--api-key`")
+			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.ProcessUnityAndroid(
@@ -274,7 +274,7 @@ func main() {
 		)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	case "create-build", "create-build <path>":
@@ -282,27 +282,27 @@ func main() {
 		CreateBuildOptions, err := build.GatherBuildInfo(commands)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		// Validate Build Info
 		err = CreateBuildOptions.Validate()
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		// Get Endpoint URL
 		endpoint, err = utils.BuildEndpointUrl(commands.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
-			logger.Error(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
+			logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
 		}
 
 		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, logger)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		logger.Info("Build created")
@@ -311,7 +311,7 @@ func main() {
 		err := build.PrintAndroidBuildId(commands.CreateAndroidBuildId.Path)
 
 		if err != nil {
-			logger.Error(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 	default:

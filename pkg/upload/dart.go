@@ -46,7 +46,7 @@ func Dart(
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
-		logger.Error("error building file list")
+		logger.Fatal("error building file list")
 	}
 
 	logger.Info("File list built")
