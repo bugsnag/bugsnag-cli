@@ -1,20 +1,17 @@
 package log
 
-import "context"
+import (
+	"context"
+)
 
 type LoggerWrapper struct {
 	logger Logger
 }
 
-func NewLoggerWrapper(loggerType string, ctx context.Context, verbose bool) *LoggerWrapper {
+func NewLoggerWrapper(ctx context.Context, verbose bool, noAnsi bool) *LoggerWrapper {
 	var logger Logger
 
-	switch loggerType {
-	case "logrus":
-		logger = NewLogrusLogger(loggerType, ctx, verbose)
-	default:
-		logger = NewLogrusLogger(loggerType, ctx, verbose)
-	}
+	logger = NewLogrusLogger(ctx, verbose, noAnsi)
 
 	return &LoggerWrapper{logger: logger}
 }

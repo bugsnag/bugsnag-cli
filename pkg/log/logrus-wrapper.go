@@ -14,6 +14,7 @@ type LogrusLogger struct {
 
 // CustomFormatter is a custom logrus formatter
 type CustomFormatter struct{}
+type NoAnsiCustomFormatter struct{}
 
 // Format formats the log entry
 func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
@@ -38,10 +39,24 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(logMessage), nil
 }
 
-func NewLogrusLogger(loggerType string, ctx context.Context, verbose bool) *LogrusLogger {
+// Format formats the log entry
+func (f *NoAnsiCustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	// Customize the log format here
+	logMessage := "[" + strings.ToUpper(entry.Level.String()) + "] " + entry.Message + "\n"
+
+	return []byte(logMessage), nil
+}
+
+func NewLogrusLogger(ctx context.Context, verbose bool, noAnsi bool) *LogrusLogger {
 	logger := logrus.New()
 	logger.Out = os.Stdout
-	logger.Formatter = &CustomFormatter{}
+
+	if noAnsi {
+		logger.Formatter = &NoAnsiCustomFormatter{}
+	} else {
+		logger.Formatter = &CustomFormatter{}
+
+	}
 
 	// Set the log level to debug if verbose is true
 	if verbose {

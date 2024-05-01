@@ -36,7 +36,7 @@ func main() {
 	// Init Logger
 	loggerCommonFields := map[string]interface{}{}
 	loggerCtx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
-	logger := log.NewLoggerWrapper("logrus", loggerCtx, commands.Verbose)
+	logger := log.NewLoggerWrapper(loggerCtx, commands.Verbose, commands.NoAnsi)
 
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
