@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"github.com/mattn/go-isatty"
 	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
@@ -17,46 +18,66 @@ type CustomFormatter struct{}
 type NoAnsiCustomFormatter struct{}
 
 // Format formats the log entry
+//func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+//	// Define colors for different log levels
+//	var levelColor string
+//	switch entry.Level {
+//	case logrus.DebugLevel, logrus.TraceLevel:
+//		levelColor = "\x1b[37;1m" // White
+//	case logrus.InfoLevel:
+//		levelColor = "\x1b[32;1m" // Green
+//	case logrus.WarnLevel:
+//		levelColor = "\x1b[33;1m" // Yellow
+//	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
+//		levelColor = "\x1b[31;1m" // Red
+//	default:
+//		levelColor = "\x1b[0m" // Reset
+//	}
+//
+//	// Customize the log format here
+//	logMessage := "[" + levelColor + strings.ToUpper(entry.Level.String()) + "\x1b[0m] " + entry.Message + "\n"
+//
+//	return []byte(logMessage), nil
+//}
+
 func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	// Define colors for different log levels
-	var levelColor string
-	switch entry.Level {
-	case logrus.DebugLevel, logrus.TraceLevel:
-		levelColor = "\x1b[37;1m" // White
-	case logrus.InfoLevel:
-		levelColor = "\x1b[32;1m" // Green
-	case logrus.WarnLevel:
-		levelColor = "\x1b[33;1m" // Yellow
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		levelColor = "\x1b[31;1m" // Red
-	default:
-		levelColor = "\x1b[0m" // Reset
+	output := ""
+
+	// Check if output is a TTY
+	isTerminal := isatty.IsTerminal(os.Stdout.Fd())
+
+	output += "["
+
+	// Add level with color if output is a TTY
+	if isTerminal {
+		switch entry.Level {
+		case logrus.PanicLevel, logrus.FatalLevel, logrus.ErrorLevel:
+			output += "\x1b[31m" // red
+		case logrus.WarnLevel:
+			output += "\x1b[33m" // yellow
+		case logrus.InfoLevel:
+			output += "\x1b[36m" // cyan
+		case logrus.DebugLevel, logrus.TraceLevel:
+			output += "\x1b[32m" // green
+		}
 	}
 
-	// Customize the log format here
-	logMessage := "[" + levelColor + strings.ToUpper(entry.Level.String()) + "\x1b[0m] " + entry.Message + "\n"
+	output += strings.ToUpper(entry.Level.String())
 
-	return []byte(logMessage), nil
+	// Reset color if output is a TTY
+	if isTerminal {
+		output += "\x1b[0m"
+	}
+
+	output += "] " + entry.Message + "\n"
+
+	return []byte(output), nil
 }
 
-// Format formats the log entry
-func (f *NoAnsiCustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	// Customize the log format here
-	logMessage := "[" + strings.ToUpper(entry.Level.String()) + "] " + entry.Message + "\n"
-
-	return []byte(logMessage), nil
-}
-
-func NewLogrusLogger(ctx context.Context, verbose bool, noAnsi bool) *LogrusLogger {
+func NewLogrusLogger(ctx context.Context, verbose bool) *LogrusLogger {
 	logger := logrus.New()
 	logger.Out = os.Stdout
-
-	if noAnsi {
-		logger.Formatter = &NoAnsiCustomFormatter{}
-	} else {
-		logger.Formatter = &CustomFormatter{}
-
-	}
+	logger.Formatter = &CustomFormatter{}
 
 	// Set the log level to debug if verbose is true
 	if verbose {

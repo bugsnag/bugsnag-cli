@@ -8,10 +8,10 @@ type LoggerWrapper struct {
 	logger Logger
 }
 
-func NewLoggerWrapper(ctx context.Context, verbose bool, noAnsi bool) *LoggerWrapper {
+func NewLoggerWrapper(ctx context.Context, verbose bool) *LoggerWrapper {
 	var logger Logger
 
-	logger = NewLogrusLogger(ctx, verbose, noAnsi)
+	logger = NewLogrusLogger(ctx, verbose)
 
 	return &LoggerWrapper{logger: logger}
 }
