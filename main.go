@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -33,11 +32,7 @@ func main() {
 			"version": package_version,
 		})
 
-	// Init Logger
-	loggerCommonFields := map[string]interface{}{}
-	loggerCtx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
-
-	logger := log.NewLoggerWrapper(loggerCtx, commands.Verbose)
+	logger := log.NewLoggerWrapper(commands.Verbose)
 
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)
