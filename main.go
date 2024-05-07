@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/mattn/go-isatty"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -36,6 +37,11 @@ func main() {
 	// Init Logger
 	loggerCommonFields := map[string]interface{}{}
 	loggerCtx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
+
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		commands.NoAnsi = true
+	}
+
 	logger := log.NewLoggerWrapper(loggerCtx, commands.Verbose, commands.NoAnsi)
 
 	// Build connection URI
