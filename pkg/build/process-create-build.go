@@ -44,7 +44,7 @@ func ProcessCreateBuild(
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	logger.Info(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
+	logger.Debug(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
 	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, logger)
 	if err != nil {

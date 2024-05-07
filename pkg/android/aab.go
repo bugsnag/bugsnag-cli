@@ -36,7 +36,7 @@ func MergeUploadOptionsFromAabManifest(
 		if utils.FileExists(aabManifestPathExpected) {
 			aabManifestPath = aabManifestPathExpected
 
-			logger.Info("Reading data from AndroidManifest.xml")
+			logger.Debug("Reading data from AndroidManifest.xml")
 
 			manifestData, err = ReadAabManifest(filepath.Join(aabManifestPath))
 
@@ -49,37 +49,37 @@ func MergeUploadOptionsFromAabManifest(
 
 		if aabUploadOptions["apiKey"] == "" && manifestData["apiKey"] != "" {
 			aabUploadOptions["apiKey"] = manifestData["apiKey"]
-			logger.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", manifestData["apiKey"]))
+			logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", manifestData["apiKey"]))
 		}
 
 		if aabUploadOptions["applicationId"] == "" && manifestData["applicationId"] != "" {
 			aabUploadOptions["applicationId"] = manifestData["applicationId"]
-			logger.Info(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", aabUploadOptions["applicationId"]))
+			logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", aabUploadOptions["applicationId"]))
 		}
 
 		if aabUploadOptions["buildUuid"] == "" && !noBuildUuid {
 			aabUploadOptions["buildUuid"] = manifestData["buildUuid"]
 			if aabUploadOptions["buildUuid"] != "" {
-				logger.Info(fmt.Sprintf("Using %s as build ID from AndroidManifest.xml", aabUploadOptions["buildUuid"]))
+				logger.Debug(fmt.Sprintf("Using %s as build ID from AndroidManifest.xml", aabUploadOptions["buildUuid"]))
 			} else {
 				aabUploadOptions["buildUuid"] = GetDexBuildId(filepath.Join(path, "base", "dex"))
 				if aabUploadOptions["buildUuid"] != "" {
-					logger.Info(fmt.Sprintf("Using %s as build ID from dex signatures", aabUploadOptions["buildUuid"]))
+					logger.Debug(fmt.Sprintf("Using %s as build ID from dex signatures", aabUploadOptions["buildUuid"]))
 				}
 			}
 		} else if aabUploadOptions["buildUuid"] == "none" || noBuildUuid {
-			logger.Info("No build ID will be used")
+			logger.Debug("No build ID will be used")
 			aabUploadOptions["buildUuid"] = ""
 		}
 
 		if aabUploadOptions["versionCode"] == "" && manifestData["versionCode"] != "" {
 			aabUploadOptions["versionCode"] = manifestData["versionCode"]
-			logger.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", aabUploadOptions["versionCode"]))
+			logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", aabUploadOptions["versionCode"]))
 		}
 
 		if aabUploadOptions["versionName"] == "" && manifestData["versionName"] != "" {
 			aabUploadOptions["versionName"] = manifestData["versionName"]
-			logger.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", aabUploadOptions["versionName"]))
+			logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", aabUploadOptions["versionName"]))
 		}
 	}
 	return aabUploadOptions, nil

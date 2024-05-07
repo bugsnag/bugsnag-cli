@@ -126,7 +126,7 @@ func Dart(
 
 			continue
 		}
-		logger.Info(fmt.Sprintf("Skipping %s", file))
+		logger.Debug(fmt.Sprintf("Skipping %s", file))
 	}
 
 	return nil

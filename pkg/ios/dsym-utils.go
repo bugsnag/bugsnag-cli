@@ -35,7 +35,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 		if strings.HasSuffix(strings.ToLower(path), ".zip") {
 
 			fileName := filepath.Base(path)
-			logger.Info(fmt.Sprintf("Attempting to unzip %s before proceeding to upload", fileName))
+			logger.Debug(fmt.Sprintf("Attempting to unzip %s before proceeding to upload", fileName))
 
 			var err error
 			tempDir, err = utils.ExtractFile(path, "dsym")
@@ -43,7 +43,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 			if err != nil {
 				return nil, tempDir, fmt.Errorf("Could not unzip %s to a temporary directory, skipping", fileName)
 			} else {
-				logger.Info(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
+				logger.Debug(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
 				dsymLocations = findDsyms(tempDir)
 			}
 

@@ -141,9 +141,9 @@ func ProcessReactNativeAndroid(
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
-				logger.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+				logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 			} else {
-				logger.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
@@ -161,17 +161,17 @@ func ProcessReactNativeAndroid(
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
-				logger.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
+				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				logger.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				logger.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 			}
 		}
 

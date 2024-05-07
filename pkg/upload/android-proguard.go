@@ -103,7 +103,7 @@ func ProcessAndroidProguard(
 		// Check to see if we need to read the manifest file due to missing options
 		if appManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
 
-			logger.Info("Reading data from AndroidManifest.xml")
+			logger.Debug("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 			if err != nil {
@@ -118,7 +118,7 @@ func ProcessAndroidProguard(
 				}
 
 				if apiKey != "" {
-					logger.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
+					logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 				}
 			}
 
@@ -126,7 +126,7 @@ func ProcessAndroidProguard(
 				applicationId = manifestData.ApplicationId
 
 				if applicationId != "" {
-					logger.Info(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
+					logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
 				}
 			}
 
@@ -158,10 +158,10 @@ func ProcessAndroidProguard(
 					buildUuid = fmt.Sprintf("%x", signature)
 
 					if buildUuid != "" {
-						logger.Info(fmt.Sprintf("Using %s as build ID from classes.dex", buildUuid))
+						logger.Debug(fmt.Sprintf("Using %s as build ID from classes.dex", buildUuid))
 					}
 				} else {
-					logger.Info(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", buildUuid))
+					logger.Debug(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", buildUuid))
 				}
 			}
 
@@ -170,7 +170,7 @@ func ProcessAndroidProguard(
 
 				if versionCode != "" {
 
-					logger.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 				}
 			}
 
@@ -178,7 +178,7 @@ func ProcessAndroidProguard(
 				versionName = manifestData.VersionName
 
 				if versionName != "" {
-					logger.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 				}
 			}
 		}

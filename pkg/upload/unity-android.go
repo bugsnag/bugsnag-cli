@@ -70,7 +70,7 @@ func ProcessUnityAndroid(
 
 	if aabPath != "" {
 
-		logger.Info(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(aabPath)))
+		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(aabPath)))
 
 		aabDir, err := utils.ExtractFile(aabPath, "aab")
 
@@ -108,7 +108,7 @@ func ProcessUnityAndroid(
 		}
 	}
 
-	logger.Info(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
+	logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
 
 	if manifestData == nil {
 		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
