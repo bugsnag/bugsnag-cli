@@ -17,29 +17,6 @@ type LogrusLogger struct {
 type CustomFormatter struct{}
 type NoAnsiCustomFormatter struct{}
 
-// Format formats the log entry
-//func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-//	// Define colors for different log levels
-//	var levelColor string
-//	switch entry.Level {
-//	case logrus.DebugLevel, logrus.TraceLevel:
-//		levelColor = "\x1b[37;1m" // White
-//	case logrus.InfoLevel:
-//		levelColor = "\x1b[32;1m" // Green
-//	case logrus.WarnLevel:
-//		levelColor = "\x1b[33;1m" // Yellow
-//	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-//		levelColor = "\x1b[31;1m" // Red
-//	default:
-//		levelColor = "\x1b[0m" // Reset
-//	}
-//
-//	// Customize the log format here
-//	logMessage := "[" + levelColor + strings.ToUpper(entry.Level.String()) + "\x1b[0m] " + entry.Message + "\n"
-//
-//	return []byte(logMessage), nil
-//}
-
 func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	output := ""
 
