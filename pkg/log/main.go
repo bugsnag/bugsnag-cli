@@ -8,10 +8,12 @@ type LoggerWrapper struct {
 	logger Logger
 }
 
+const commonFieldsKey string = "commonFields"
+
 func NewLoggerWrapper(verbose bool) *LoggerWrapper {
 	// Init Logger
 	loggerCommonFields := map[string]interface{}{}
-	ctx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
+	ctx := context.WithValue(context.Background(), commonFieldsKey, loggerCommonFields)
 
 	logger := NewLogrusLogger(ctx, verbose)
 
