@@ -1,6 +1,0 @@
-issues:
-  exclude-rules:
-    # Exclude SA1029: should not use built-in type string as key for value; define your own type to avoid collisions
-    - path: "pkg/log/main.go"
-      text: "SA1029"
-      linters: ["staticcheck"]
