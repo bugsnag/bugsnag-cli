@@ -29,7 +29,7 @@ func All(
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
-		logger.Fatal(" error building file list")
+		logger.Fatal("Error building file list")
 	}
 
 	logger.Info("File list built..")
