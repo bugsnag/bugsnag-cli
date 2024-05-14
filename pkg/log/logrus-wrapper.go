@@ -1,7 +1,6 @@
 package log
 
 import (
-	"context"
 	"github.com/mattn/go-isatty"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -10,7 +9,6 @@ import (
 
 type LogrusLogger struct {
 	logger *logrus.Logger
-	ctx    context.Context
 }
 
 // CustomFormatter is a custom logrus formatter
