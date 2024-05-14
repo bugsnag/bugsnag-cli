@@ -126,7 +126,7 @@ func Dart(
 
 			continue
 		}
-		logger.Debug(fmt.Sprintf("Skipping %s", file))
+		logger.Debug(fmt.Sprintf("Skipping %s - unsupported platform", file))
 	}
 
 	return nil
