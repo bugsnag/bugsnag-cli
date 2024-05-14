@@ -30,16 +30,23 @@ type Payload struct {
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessCreateBuild(buildOptions CreateBuildInfo, endpoint string, dryRun bool, timeout int, retries int) error {
+func ProcessCreateBuild(
+	buildOptions CreateBuildInfo,
+	endpoint string,
+	dryRun bool,
+	timeout int,
+	retries int,
+	logger log.Logger,
+) error {
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
 		return fmt.Errorf("Failed to create build information payload: %s", err.Error())
 	}
 
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
-	log.Info(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
+	logger.Debug(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
-	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun)
+	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, logger)
 	if err != nil {
 		return err
 	}

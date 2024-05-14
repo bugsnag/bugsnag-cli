@@ -1,10 +1,10 @@
 package upload
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
-	"fmt"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -37,6 +37,7 @@ func ProcessDsym(
 	timeout int,
 	retries int,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 
 	var buildSettings *ios.XcodeBuildSettings
@@ -67,7 +68,7 @@ func ProcessDsym(
 
 		if xcodeProjPath != "" {
 			projectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, projectRoot)
-			log.Info(fmt.Sprintf("Defaulting to '%s' as the project root", projectRoot))
+			logger.Debug(fmt.Sprintf("Defaulting to '%s' as the project root", projectRoot))
 
 			// Get build settings and dsymPath
 
@@ -75,20 +76,20 @@ func ProcessDsym(
 			if scheme != "" {
 				_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
 				if err != nil {
-					log.Warn(err.Error())
+					logger.Warn(err.Error())
 				}
 			} else {
 				// Otherwise, try to find it
 				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
-					log.Warn(err.Error())
+					logger.Warn(err.Error())
 				}
 			}
 
 			if scheme != "" {
 				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
 				if err != nil {
-					log.Warn(err.Error())
+					logger.Warn(err.Error())
 				}
 			}
 
@@ -101,7 +102,7 @@ func ProcessDsym(
 				_, err := os.Stat(possibleDsymPath)
 				if err == nil {
 					dsymPath = possibleDsymPath
-					log.Info(fmt.Sprintf("Using dSYM path: %s", dsymPath))
+					logger.Debug(fmt.Sprintf("Using dSYM path: %s", dsymPath))
 				}
 			}
 		}
@@ -114,7 +115,7 @@ func ProcessDsym(
 			return fmt.Errorf("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
 		}
 
-		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf)
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf, logger)
 		tempDirs = append(tempDirs, tempDir)
 		if err != nil {
 			return err
@@ -128,9 +129,9 @@ func ProcessDsym(
 				plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 				if utils.FileExists(plistPathExpected) {
 					plistPath = plistPathExpected
-					log.Info(fmt.Sprintf("Found Info.plist at expected location: %s", plistPath))
+					logger.Debug(fmt.Sprintf("Found Info.plist at expected location: %s", plistPath))
 				} else {
-					log.Info(fmt.Sprintf("No Info.plist found at expected location: %s", plistPathExpected))
+					logger.Debug(fmt.Sprintf("No Info.plist found at expected location: %s", plistPathExpected))
 				}
 			}
 		}
@@ -146,14 +147,14 @@ func ProcessDsym(
 			if apiKey == "" {
 				apiKey = plistData.BugsnagProjectDetails.ApiKey
 				if apiKey != "" {
-					log.Info(fmt.Sprintf("Using API key from Info.plist: %s", apiKey))
+					logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", apiKey))
 				}
 			}
 		}
 
 		for _, dsym := range dwarfInfo {
 			dsymInfo := fmt.Sprintf("(UUID: %s, Name: %s, Arch: %s)", dsym.UUID, dsym.Name, dsym.Arch)
-			log.Info(fmt.Sprintf("Uploading dSYM %s", dsymInfo))
+			logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {
@@ -163,11 +164,11 @@ func ProcessDsym(
 			fileFieldData := make(map[string]string)
 			fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
 
-			err = server.ProcessFileRequest(fmt.Sprintf("%s/dsym", endpoint), uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun, logger)
 
 			if err != nil {
 				if strings.Contains(err.Error(), "404 Not Found") {
-					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun)
+					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun, logger)
 				}
 			}
 

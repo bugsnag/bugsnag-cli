@@ -5,7 +5,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
-	"fmt"
 )
 
 func UploadAndroidNdk(
@@ -20,13 +19,14 @@ func UploadAndroidNdk(
 	timeout int,
 	retries int,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 	fileFieldData := make(map[string]string)
 
 	numberOfFiles := len(fileList)
 
 	if numberOfFiles < 1 {
-		log.Info("No NDK files found to process")
+		logger.Info("No NDK files found to process")
 		return nil
 	}
 
@@ -39,7 +39,7 @@ func UploadAndroidNdk(
 
 		fileFieldData["soFile"] = file
 
-		err = server.ProcessFileRequest(fmt.Sprintf("%s/ndk-symbol", endpoint), uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
 
 		if err != nil {
 			return err

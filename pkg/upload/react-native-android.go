@@ -42,6 +42,7 @@ func ProcessReactNativeAndroid(
 	retries int,
 	overwrite bool,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 
 	var err error
@@ -140,9 +141,9 @@ func ProcessReactNativeAndroid(
 			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				appManifestPath = appManifestPathExpected
-				log.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+				logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 			} else {
-				log.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
@@ -160,18 +161,17 @@ func ProcessReactNativeAndroid(
 						apiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
-
-				log.Info(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
+				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 
 			if versionName == "" {
 				versionName = manifestData.VersionName
-				log.Info(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 			}
 
 			if versionCode == "" {
 				versionCode = manifestData.VersionCode
-				log.Info(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 			}
 		}
 
@@ -185,7 +185,7 @@ func ProcessReactNativeAndroid(
 		fileFieldData["sourceMap"] = sourceMapPath
 		fileFieldData["bundle"] = bundlePath
 
-		err = server.ProcessFileRequest(fmt.Sprintf("%s/react-native-source-map", endpoint), uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)
 
 		if err != nil {
 
