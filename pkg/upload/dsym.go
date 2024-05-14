@@ -154,7 +154,7 @@ func ProcessDsym(
 
 		for _, dsym := range dwarfInfo {
 			dsymInfo := fmt.Sprintf("(UUID: %s, Name: %s, Arch: %s)", dsym.UUID, dsym.Name, dsym.Arch)
-			logger.Info(fmt.Sprintf("Uploading dSYM %s", dsymInfo))
+			logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
 			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
 			if err != nil {
