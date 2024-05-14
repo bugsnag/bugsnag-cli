@@ -70,8 +70,6 @@ func (l *LogrusLogger) Debug(msg string) {
 }
 
 func (l *LogrusLogger) Info(msg string) {
-	l.addContextCommonFields(nil)
-
 	l.logger.WithFields(nil).Info(msg)
 }
 
@@ -85,14 +83,4 @@ func (l *LogrusLogger) Error(msg string) {
 
 func (l *LogrusLogger) Fatal(msg string) {
 	l.logger.WithFields(nil).Fatal(msg)
-}
-
-func (l *LogrusLogger) addContextCommonFields(fields map[string]interface{}) {
-	if l.ctx != nil {
-		for k, v := range l.ctx.Value("commonFields").(map[string]interface{}) {
-			if _, ok := fields[k]; !ok {
-				fields[k] = v
-			}
-		}
-	}
 }

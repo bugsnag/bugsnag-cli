@@ -23,16 +23,11 @@ func All(
 	logger log.Logger,
 ) error {
 
-	// Build the file list from the path(s)
-	logger.Info("building file list...")
-
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
 		logger.Fatal("Error building file list")
 	}
-
-	logger.Info("File list built..")
 
 	// Build UploadOptions list
 	uploadOptions := make(map[string]string)

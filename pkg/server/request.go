@@ -101,7 +101,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 				return err
 			}
 		} else {
-			logger.Info("Uploaded " + filepath.Base(fileName))
+			logger.Info(fmt.Sprintf("Uploaded " + filepath.Base(fileName)))
 		}
 	} else {
 		logger.Info(fmt.Sprintf("(dryrun) Skipping upload of %s to %s", filepath.Base(fileName), endpoint))

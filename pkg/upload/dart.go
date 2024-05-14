@@ -41,15 +41,11 @@ func Dart(
 	logger log.Logger,
 ) error {
 
-	logger.Info("Building file list from path")
-
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
 		logger.Fatal("error building file list")
 	}
-
-	logger.Info("File list built")
 
 	for _, file := range fileList {
 
