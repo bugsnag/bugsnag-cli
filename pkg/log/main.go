@@ -1,21 +1,11 @@
 package log
 
-import (
-	"context"
-)
-
 type LoggerWrapper struct {
 	logger Logger
 }
 
 func NewLoggerWrapper(verbose bool) *LoggerWrapper {
-	// Initialize common fields map
-	loggerCommonFields := map[string]interface{}{}
-
-	// Create a context with common fields
-	ctx := context.WithValue(context.Background(), "commonFields", loggerCommonFields)
-
-	logger := NewLogrusLogger(ctx, verbose)
+	logger := NewLogrusLogger(verbose)
 
 	return &LoggerWrapper{logger: logger}
 }

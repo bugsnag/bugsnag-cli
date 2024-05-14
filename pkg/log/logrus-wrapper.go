@@ -51,7 +51,7 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(output), nil
 }
 
-func NewLogrusLogger(ctx context.Context, verbose bool) *LogrusLogger {
+func NewLogrusLogger(verbose bool) *LogrusLogger {
 	logger := logrus.New()
 	logger.Out = os.Stdout
 	logger.Formatter = &CustomFormatter{}
@@ -61,7 +61,7 @@ func NewLogrusLogger(ctx context.Context, verbose bool) *LogrusLogger {
 		logger.SetLevel(logrus.DebugLevel)
 	}
 
-	return &LogrusLogger{logger: logger, ctx: ctx}
+	return &LogrusLogger{logger: logger}
 }
 
 func (l *LogrusLogger) Debug(msg string) {
