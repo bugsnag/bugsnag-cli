@@ -61,7 +61,7 @@ func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
 		AppVersionCode:   opts.CreateBuild.AndroidBuildOptions.VersionCode,
 		AppBundleVersion: opts.CreateBuild.IosBuildOptions.BundleVersion,
 		SourceControl: SourceControl{
-			Provider:   opts.CreateBuild.Provider,
+			Provider:   utils.SourceControl(opts.CreateBuild.Provider),
 			Repository: opts.CreateBuild.Repository,
 			Revision:   opts.CreateBuild.Revision,
 		},

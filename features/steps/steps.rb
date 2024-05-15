@@ -60,6 +60,10 @@ Then('I should see the no such file or directory error') do
   Maze.check.include(run_output, "error: <path>: stat /path/to/no/file: no such file or directory")
 end
 
+Then('I should see the not an accepted value for the source control provider warning') do
+  Maze.check.include(run_output, "is not an accepted value for the source control provider, proceeding without a provider")
+end
+
 Then('the sourcemap is valid for the Proguard Build API') do
   steps %(
     Then the sourcemap is valid for the Android Build API
