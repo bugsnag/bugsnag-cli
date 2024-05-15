@@ -12,7 +12,7 @@ func BuildObjcopyPath(path string) (string, error) {
 	ndkVersion, err := GetNdkVersion(path)
 
 	if err != nil {
-		return "", fmt.Errorf("unable to determine ndk version from " + path)
+		return "", fmt.Errorf("unable to determine ndk version from %s", path)
 	}
 
 	if ndkVersion < 24 {
@@ -27,7 +27,7 @@ func BuildObjcopyPath(path string) (string, error) {
 		}
 
 		if directoryMatches == nil {
-			return "", fmt.Errorf("Unable to find objcopy within: " + path)
+			return "", fmt.Errorf("Unable to find objcopy within: %s", path)
 		}
 
 		if runtime.GOOS == "windows" {
