@@ -40,3 +40,7 @@ Feature: Bugsnag CLI create-build behavior
     And the builds payload field "appVersion" equals "1.2.3"
     And the builds payload field "sourceControl.provider" is null
 
+  Scenario: Starting bugsnag-cli create-build and passing an Android manifest file with dry-run and verbose
+    When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:9339/builds --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --dry-run --verbose
+    Then I should see the build payload
+    And I wait to receive 0 builds

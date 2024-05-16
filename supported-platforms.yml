@@ -8,6 +8,16 @@
   ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe'
   BINARY_NAME: 'bugsnag-cli.exe'
 
+- TYPE: 'Windows_NT'
+  ARCHITECTURE: 'x64'
+  ARTIFACT_NAME: 'x86_64-windows-bugsnag-cli.exe'
+  BINARY_NAME: 'bugsnag-cli.exe'
+
+- TYPE: 'Windows_NT'
+  ARCHITECTURE: 'i386'
+  ARTIFACT_NAME: 'i386-windows-bugsnag-cli.exe'
+  BINARY_NAME: 'bugsnag-cli.exe'
+  
 - TYPE: 'Linux'
   ARCHITECTURE: 'x64'
   ARTIFACT_NAME: 'x86_64-linux-bugsnag-cli'

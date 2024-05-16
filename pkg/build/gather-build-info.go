@@ -49,7 +49,7 @@ func (opts CreateBuildInfo) Validate() error {
 	}
 
 	if opts.AppVersion == "" {
-		return fmt.Errorf("missing app version, please specify using `--app-version`")
+		return fmt.Errorf("missing app version, please specify using `--version-name`")
 	}
 
 	return nil

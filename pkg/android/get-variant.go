@@ -47,7 +47,7 @@ func GetVariantDirectory(path string) (string, error) {
 	variant := variants[0]
 
 	if !utils.FileExists(filepath.Join(path, variant)) {
-		return "", fmt.Errorf("variant path " + filepath.Join(path, variant) + " doesn't exist on the system")
+		return "", fmt.Errorf("variant path %s doesn't exist on the system", filepath.Join(path, variant))
 	}
 
 	return variant, nil

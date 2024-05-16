@@ -58,7 +58,7 @@ func GetClassesDexFromDir(dexDir string) []string {
 
 	dexFiles := []string{filename}
 	for dexIndex := 2; ; dexIndex++ {
-		filename = filepath.Join(dexDir, "classes"+strconv.Itoa(dexIndex)+".dex")
+		filename = filepath.Join(dexDir, fmt.Sprintf("classes%s.dex", strconv.Itoa(dexIndex)))
 		if !utils.FileExists(filename) {
 			break
 		} else {

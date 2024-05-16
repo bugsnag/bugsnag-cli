@@ -4,11 +4,11 @@ Feature: Basic CLI behavior
     When I run bugsnag-cli
     Then I should see the help banner
 
-  Scenario: Starting bugsnag-cli upload all on mac without an API Key
+  Scenario: Starting bugsnag-cli upload all on mac without a path
     When I run bugsnag-cli with upload all
     Then I should see the missing path error
 
-  Scenario: Starting bugsnag-cli upload all on mac without a path
+  Scenario: Starting bugsnag-cli upload all on mac without an API Key
     When I run bugsnag-cli with upload all features/dart/fixtures/app-debug-info/app.android-arm.symbols
     Then I should see the API Key error
 
