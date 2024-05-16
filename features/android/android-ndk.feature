@@ -33,6 +33,28 @@ Feature: Android NDK Integration Test
     And the sourcemap payload field "versionName" equals "1.0"
     And the sourcemap payload field "overwrite" equals "true"
 
+  Scenario: Upload multiple Android NDK sourcemaps when command is run from within app directory
+    When I run bugsnag-cli with upload android-ndk --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app
+    And I wait to receive 16 sourcemaps
+    Then the sourcemap is valid for the NDK Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "appId" equals "com.example.bugsnag.android"
+    And the sourcemap payload field "versionCode" equals "1"
+    And the sourcemap payload field "versionName" equals "1.0"
+    And the sourcemap payload field "overwrite" equals "true"
+
+  Scenario: Upload multiple Android NDK sourcemaps when command is run from within x86 directory
+    When I run bugsnag-cli with upload android-ndk --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app/build/intermediates/merged_native_libs/release/out/lib/x86
+    And I wait to receive 4 sourcemaps
+    Then the sourcemap is valid for the NDK Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "appId" equals "com.example.bugsnag.android"
+    And the sourcemap payload field "versionCode" equals "1"
+    And the sourcemap payload field "versionName" equals "1.0"
+    And the sourcemap payload field "overwrite" equals "true"
+
   Scenario: Upload multiple Android NDK sourcemaps providing no flags to the CLI
     When I run bugsnag-cli with upload android-ndk --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/
     And I wait to receive 16 sourcemaps
