@@ -5,7 +5,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 )
 
-func SourceControl(provider string) string {
+func SourceControl(provider string, logger log.Logger) string {
 	if provider == "" {
 		return provider
 	}
@@ -13,7 +13,7 @@ func SourceControl(provider string) string {
 	case "github", "github-enterprise", "bitbucket", "bitbucket-server", "gitlab", "gitlab-onpremise":
 		return provider
 	default:
-		log.Warn(fmt.Sprintf("%s is not an accepted value for the source control provider, proceeding without a provider", provider))
+		logger.Warn(fmt.Sprintf("%s is not an accepted value for the source control provider, proceeding without a provider", provider))
 		return ""
 	}
 }

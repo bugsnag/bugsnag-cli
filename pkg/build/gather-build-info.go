@@ -5,6 +5,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 )
 
 type SourceControl struct {
@@ -55,13 +56,13 @@ func (opts CreateBuildInfo) Validate() error {
 	return nil
 }
 
-func PopulateFromCliOpts(opts options.CLI) CreateBuildInfo {
+func PopulateFromCliOpts(opts options.CLI, logger log.Logger) CreateBuildInfo {
 	return CreateBuildInfo{
 		ApiKey:           opts.ApiKey,
 		AppVersionCode:   opts.CreateBuild.AndroidBuildOptions.VersionCode,
 		AppBundleVersion: opts.CreateBuild.IosBuildOptions.BundleVersion,
 		SourceControl: SourceControl{
-			Provider:   utils.SourceControl(opts.CreateBuild.Provider),
+			Provider:   utils.SourceControl(opts.CreateBuild.Provider, logger),
 			Repository: opts.CreateBuild.Repository,
 			Revision:   opts.CreateBuild.Revision,
 		},
@@ -112,7 +113,7 @@ func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 	}
 }
 
-func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
+func GatherBuildInfo(opts options.CLI, logger log.Logger) (CreateBuildInfo, error) {
 	var androidManifestPath string
 	var err error
 	var BaseOptions CreateBuildInfo
@@ -135,7 +136,7 @@ func GatherBuildInfo(opts options.CLI) (CreateBuildInfo, error) {
 		BaseOptions = PopulateFromAndroidManifest(androidManifestPath).Override(BaseOptions)
 	}
 
-	UserBuildOptions := PopulateFromCliOpts(opts)
+	UserBuildOptions := PopulateFromCliOpts(opts, logger)
 
 	return UserBuildOptions.Override(BaseOptions), nil
 }
