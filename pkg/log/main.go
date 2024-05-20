@@ -4,8 +4,8 @@ type LoggerWrapper struct {
 	logger Logger
 }
 
-func NewLoggerWrapper(verbose bool, logLevel string) *LoggerWrapper {
-	logger := NewLogrusLogger(verbose, logLevel)
+func NewLoggerWrapper(logLevel string) *LoggerWrapper {
+	logger := NewLogrusLogger(logLevel)
 
 	return &LoggerWrapper{logger: logger}
 }

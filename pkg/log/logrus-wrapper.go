@@ -1,6 +1,7 @@
 package log
 
 import (
+	"fmt"
 	"github.com/mattn/go-isatty"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -49,18 +50,15 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(output), nil
 }
 
-func NewLogrusLogger(verbose bool, logLevel string) *LogrusLogger {
+func NewLogrusLogger(logLevel string) *LogrusLogger {
 	logger := logrus.New()
 	logger.Out = os.Stdout
 	logger.Formatter = &CustomFormatter{}
 
-	// Set the log level to debug if verbose is true or logLevel is set
-	if verbose {
-		logger.SetLevel(logrus.DebugLevel)
-	} else if logLevel != "" {
+	if logLevel != "" {
 		level, err := logrus.ParseLevel(logLevel)
 		if err != nil {
-			logger.Fatal("Invalid log level")
+			logger.Fatal(fmt.Sprintf("%s is an invalid log level", logLevel))
 		}
 		logger.SetLevel(level)
 	}
