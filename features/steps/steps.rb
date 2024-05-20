@@ -152,3 +152,11 @@ When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
   puts @output
 end
+
+Then(/^I should only see the fatal log level messages$/) do
+  Maze.check.include(run_output, "[FATAL]")
+  Maze.check.not_include(run_output, "[ERROR]")
+  Maze.check.not_include(run_output, "[WARN]")
+  Maze.check.not_include(run_output, "[INFO]")
+  Maze.check.not_include(run_output, "[DEBUG]")
+end
