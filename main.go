@@ -32,7 +32,7 @@ func main() {
 			"version": package_version,
 		})
 
-	logger := log.NewLoggerWrapper(commands.Verbose)
+	logger := log.NewLoggerWrapper(commands.Verbose, commands.LogLevel)
 
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)

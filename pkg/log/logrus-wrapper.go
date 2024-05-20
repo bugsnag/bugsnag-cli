@@ -49,14 +49,20 @@ func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(output), nil
 }
 
-func NewLogrusLogger(verbose bool) *LogrusLogger {
+func NewLogrusLogger(verbose bool, logLevel string) *LogrusLogger {
 	logger := logrus.New()
 	logger.Out = os.Stdout
 	logger.Formatter = &CustomFormatter{}
 
-	// Set the log level to debug if verbose is true
+	// Set the log level to debug if verbose is true or logLevel is set
 	if verbose {
 		logger.SetLevel(logrus.DebugLevel)
+	} else if logLevel != "" {
+		level, err := logrus.ParseLevel(logLevel)
+		if err != nil {
+			logger.Fatal("Invalid log level")
+		}
+		logger.SetLevel(level)
 	}
 
 	return &LogrusLogger{logger: logger}
