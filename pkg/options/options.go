@@ -14,6 +14,7 @@ type Globals struct {
 	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
 	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
 	Verbose           bool              `name:"verbose" help:"Print verbose output"`
+	LogLevel          string            `help:"Sets the log level to debug, info, warn or fatal" default:"info"`
 	DryRun            bool              `help:"Validate but do not process"`
 }
 
