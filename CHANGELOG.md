@@ -2,6 +2,8 @@
 
 ## 2.3.0 (2024-06-04)
 
+### Enhancements
+
 - Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
 
 ## 2.2.0 (2024-04-17)
