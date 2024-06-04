@@ -4,11 +4,11 @@ Feature: Basic CLI behavior
     When I run bugsnag-cli
     Then I should see the help banner
 
-  Scenario: Starting bugsnag-cli upload all on mac without an API Key
+  Scenario: Starting bugsnag-cli upload all on mac without a path
     When I run bugsnag-cli with upload all
     Then I should see the missing path error
 
-  Scenario: Starting bugsnag-cli upload all on mac without a path
+  Scenario: Starting bugsnag-cli upload all on mac without an API Key
     When I run bugsnag-cli with upload all features/dart/fixtures/app-debug-info/app.android-arm.symbols
     Then I should see the API Key error
 
@@ -19,3 +19,8 @@ Feature: Basic CLI behavior
   Scenario: Starting bugsnag-cli and checking the version
     When I run bugsnag-cli with --version
     Then the version number should match the version set in main.go
+
+  Scenario: Starting bugsnag-cli upload and setting the log level to fatal
+    When I run bugsnag-cli with upload android-ndk --api-key=1234567890ABCDEF1234567890ABCDEF features/android/fixtures/app/build/outputs/mapping/release
+    Then I should only see the fatal log level messages
+

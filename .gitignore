@@ -11,4 +11,5 @@ package-lock.json
 
 .idea/
 maze_output/
+maze-runner.log
 features/android/fixtures/app/build/outputs/mapping/release/mapping.txt.gz

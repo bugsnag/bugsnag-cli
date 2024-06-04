@@ -13,3 +13,12 @@ func PrettyPrintJson(str string) (string, error) {
 	}
 	return prettyJSON.String(), nil
 }
+
+// PrettyPrintMap
+func PrettyPrintMap(item map[string]string) (string, error) {
+	prettyJSON, err := json.MarshalIndent(item, "", "    ")
+	if err != nil {
+		return "", err
+	}
+	return string(prettyJSON), nil
+}

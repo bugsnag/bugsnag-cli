@@ -20,18 +20,14 @@ func All(
 	overwrite bool,
 	apiKey string,
 	dryRun bool,
+	logger log.Logger,
 ) error {
-
-	// Build the file list from the path(s)
-	log.Info("building file list...")
 
 	fileList, err := utils.BuildFileList(paths)
 
 	if err != nil {
-		log.Error(" error building file list", 1)
+		logger.Fatal("Error building file list")
 	}
-
-	log.Info("File list built..")
 
 	// Build UploadOptions list
 	uploadOptions := make(map[string]string)
@@ -57,7 +53,7 @@ func All(
 			fileFieldData["file"] = file
 		}
 
-		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
 
 		if err != nil {
 

@@ -13,6 +13,8 @@ type Globals struct {
 	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
 	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
 	Version           utils.VersionFlag `name:"version" help:"Print version information and quit"`
+	Verbose           bool              `name:"verbose" help:"Print verbose output"`
+	LogLevel          string            `help:"Sets the log level to debug, info, warn or fatal" default:"info"`
 	DryRun            bool              `help:"Validate but do not process"`
 }
 
@@ -46,13 +48,13 @@ type CreateAndroidBuildId struct {
 }
 
 type AndroidBuildOptions struct {
-	VersionCode string     `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
+	VersionCode string     `help:"The version code for the application (Android only)." aliases:"app-version-code,version-code" xor:"version-code,bundle-version"`
 	AppManifest utils.Path `help:"The path to the Android manifest file"`
 	AndroidAab  utils.Path `help:"The path to the Android AAB file"`
 }
 
 type IosBuildOptions struct {
-	BundleVersion string `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
+	BundleVersion string `help:"The bundle version for the application (iOS only)." aliases:"app-bundle-version,bundle-version"`
 }
 
 type CreateBuild struct {
@@ -63,7 +65,7 @@ type CreateBuild struct {
 	Repository        string            `help:"The URL of the repository containing the source code being deployed."`
 	Revision          string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
 	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
-	VersionName       string            `help:"The version of the application." xor:"app-version,version-name"`
+	VersionName       string            `help:"The version of the application." aliases:"app-version,version-name"`
 	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the releaseStage"`
 	Timeout           int               `help:"Number of seconds to wait before failing an upload request" default:"300"`
 	Retries           int               `help:"Number of retry attempts before failing an upload request" default:"0"`

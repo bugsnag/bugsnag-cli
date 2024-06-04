@@ -3,6 +3,7 @@ package utils
 import (
 	"os/exec"
 	"strings"
+	"fmt"
 )
 
 // GetRepoUrl - Gets the URl of a git repo.
@@ -23,7 +24,7 @@ func GetRepoUrl(repoPath string) string {
 			return ""
 		}
 		remotes := strings.Split(string(remoteCmdOutput), "\n")
-		remoteOriginCmd = exec.Command(gitLocation, "-C", repoPath, "config", "--get", "remote."+remotes[0]+".url")
+		remoteOriginCmd = exec.Command(gitLocation, "-C", repoPath, "config", "--get", fmt.Sprintf("remote.%s.url", remotes[0]))
 		remoteOriginCmdOutput, err = remoteOriginCmd.CombinedOutput()
 		if err != nil {
 			return ""
