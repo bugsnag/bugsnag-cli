@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 (TBD)
+## 2.3.0 (2024-06-04)
 
 - Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
 
