@@ -9,6 +9,7 @@ import (
 type Paths []string
 type Path string
 type Provider string
+type LogLevels string
 
 // Validate that the path(s) exist
 func (p Paths) Validate() error {
@@ -28,6 +29,7 @@ func (p Path) Validate() error {
 	return nil
 }
 
+// ContainsString Check if a string is in a slice
 func ContainsString(slice []string, target string) bool {
 	for _, element := range slice {
 		if strings.Contains(element, target) {
@@ -45,5 +47,12 @@ func (p *Provider) Validate() error {
 		return fmt.Errorf("missing source control provider, please specify using `--provider`. Accepted values are: github, github-enterprise, bitbucket, bitbucket-server, gitlab, gitlab-onpremise")
 	default:
 		return fmt.Errorf("%s is not an accepted value for the source control provider. Accepted values are: github, github-enterprise, bitbucket, bitbucket-server, gitlab, gitlab-onpremise", *p)
+// Validate that the log level is valid
+func (l LogLevels) Validate() error {
+	switch strings.ToLower(string(l)) {
+	case "debug", "info", "warn", "fatal":
+		return nil
+	default:
+		return fmt.Errorf("invalid log level: %s", l)
 	}
 }

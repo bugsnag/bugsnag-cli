@@ -19,3 +19,8 @@ Feature: Basic CLI behavior
   Scenario: Starting bugsnag-cli and checking the version
     When I run bugsnag-cli with --version
     Then the version number should match the version set in main.go
+
+  Scenario: Starting bugsnag-cli upload and setting the log level to fatal
+    When I run bugsnag-cli with upload android-ndk --api-key=1234567890ABCDEF1234567890ABCDEF features/android/fixtures/app/build/outputs/mapping/release
+    Then I should only see the fatal log level messages
+

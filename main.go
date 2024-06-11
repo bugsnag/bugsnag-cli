@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.2.0"
+var package_version = "2.3.0"
 
 func main() {
 	commands := options.CLI{}
@@ -32,7 +32,11 @@ func main() {
 			"version": package_version,
 		})
 
-	logger := log.NewLoggerWrapper(commands.Verbose)
+	if commands.Verbose {
+		commands.LogLevel = "debug"
+	}
+
+	logger := log.NewLoggerWrapper(commands.LogLevel)
 
 	// Build connection URI
 	endpoint, err := utils.BuildEndpointUrl(commands.UploadAPIRootUrl, commands.Port)

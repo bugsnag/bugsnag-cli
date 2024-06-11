@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.3.0 (2024-06-04)
+
+### Enhancements
+
+- Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
+- Allow more flexible path searching when uploading NDK symbol files [98](https://github.com/bugsnag/bugsnag-cli/pull/98)
+
+### Fixes
+
+- Fix the error message when `--version-name` is missing [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
+
 ## 2.2.0 (2024-04-17)
 
 ### Enhancements
