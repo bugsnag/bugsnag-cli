@@ -60,6 +60,10 @@ Then('I should see the no such file or directory error') do
   Maze.check.include(run_output, "error: <path>: stat /path/to/no/file: no such file or directory")
 end
 
+Then('I should see the path ambiguous error') do
+  Maze.check.include(run_output, "Path ambiguous: more than one AAB file was found")
+end
+
 Then('the sourcemap is valid for the Proguard Build API') do
   steps %(
     Then the sourcemap is valid for the Android Build API

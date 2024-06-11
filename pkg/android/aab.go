@@ -7,6 +7,33 @@ import (
 	"path/filepath"
 )
 
+func FindAabPath(arr []string, path string) (string, error) {
+
+	// Look for AAB file based on an expected path
+	iterations := len(arr)
+	for i := 1; i <= iterations; i++ {
+		path_ending := filepath.Join(arr...)
+		combinedPath := filepath.Join(path, path_ending)
+		matchingPaths, err := filepath.Glob(combinedPath)
+
+		if err != nil {
+			return "", err
+		}
+		if matchingPaths != nil {
+			if len(matchingPaths) > 1 {
+				// Return an error if more than one AAB file was found
+				return "", fmt.Errorf("Path ambiguous: more than one AAB file was found within %s", filepath.Dir(combinedPath))
+			}
+			if len(matchingPaths) == 1 {
+				aabPath := matchingPaths[0]
+				return aabPath, nil
+			}
+		}
+		arr = arr[1:]
+	}
+	return "", fmt.Errorf("No AAB file was found")
+}
+
 func MergeUploadOptionsFromAabManifest(
 	path string,
 	apiKey string,

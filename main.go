@@ -77,7 +77,7 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-	case "upload android-aab <path>":
+	case "upload android-aab <path>", "upload android-aab":
 
 		err := upload.ProcessAndroidAab(
 			commands.ApiKey,
