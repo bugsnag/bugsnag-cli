@@ -36,6 +36,7 @@ func ProcessUnityAndroid(
 	retries int,
 	overwrite bool,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 	var err error
 	var zipPath string
@@ -63,12 +64,13 @@ func ProcessUnityAndroid(
 				aabPath, _ = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
 			}
 		} else {
-			return fmt.Errorf(path + " is not a .symbols.zip file or containing directory")
+			return fmt.Errorf("%s is not a .symbols.zip file or containing directory", path)
 		}
 	}
 
 	if aabPath != "" {
-		log.Info("Extracting " + filepath.Base(aabPath) + " into a temporary directory")
+
+		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(aabPath)))
 
 		aabDir, err := utils.ExtractFile(aabPath, "aab")
 
@@ -78,7 +80,7 @@ func ProcessUnityAndroid(
 
 		defer os.RemoveAll(aabDir)
 
-		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
+		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
 
 		if err != nil {
 			return err
@@ -98,6 +100,7 @@ func ProcessUnityAndroid(
 			timeout,
 			overwrite,
 			dryRun,
+			logger,
 		)
 
 		if err != nil {
@@ -105,10 +108,10 @@ func ProcessUnityAndroid(
 		}
 	}
 
-	log.Info("Extracting " + filepath.Base(zipPath) + " into a temporary directory")
+	logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
 
 	if manifestData == nil {
-		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
+		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
 	}
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
@@ -151,6 +154,7 @@ func ProcessUnityAndroid(
 		timeout,
 		retries,
 		dryRun,
+		logger,
 	)
 
 	if err != nil {

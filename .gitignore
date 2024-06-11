@@ -8,7 +8,10 @@ bin/**/**
 node_modules/
 package-lock.json
 
+# Xcode
+**/XCBuildData/
 
 .idea/
 maze_output/
+maze-runner.log
 features/android/fixtures/app/build/outputs/mapping/release/mapping.txt.gz

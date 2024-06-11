@@ -33,6 +33,7 @@ func ProcessAndroidAab(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 
 	var manifestData map[string]string
@@ -53,9 +54,9 @@ func ProcessAndroidAab(
 			}
 		}
 		if filepath.Ext(path) != ".aab" {
-			return fmt.Errorf(path + " is not an AAB file/directory")
+			return fmt.Errorf("%s is not an AAB file/directory", path)
 		}
-		log.Info("Extracting " + filepath.Base(path) + " into a temporary directory")
+		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(path)))
 		aabDir, err = utils.ExtractFile(path, "aab")
 
 		defer os.RemoveAll(aabDir)
@@ -65,7 +66,7 @@ func ProcessAndroidAab(
 		}
 	}
 
-	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
 
 	if err != nil {
 		return err
@@ -96,16 +97,17 @@ func ProcessAndroidAab(
 				timeout,
 				overwrite,
 				dryRun,
+				logger,
 			)
 
 			if err != nil {
 				return err
 			}
 		} else {
-			log.Info("No NDK (.so) files detected for upload.")
+			logger.Info("No NDK (.so) files detected for upload.")
 		}
 	} else {
-		log.Info("No NDK (.so) files detected for upload.")
+		logger.Info("No NDK (.so) files detected for upload.")
 	}
 
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
@@ -127,13 +129,14 @@ func ProcessAndroidAab(
 			timeout,
 			overwrite,
 			dryRun,
+			logger,
 		)
 
 		if err != nil {
 			return err
 		}
 	} else {
-		log.Info("No Proguard (mapping.txt) file detected for upload.")
+		logger.Info("No Proguard (mapping.txt) file detected for upload.")
 	}
 
 	return nil

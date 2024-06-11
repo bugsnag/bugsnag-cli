@@ -37,6 +37,7 @@ func ProcessAndroidNDK(
 	timeout int,
 	overwrite bool,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 
 	var fileList []string
@@ -48,77 +49,60 @@ func ProcessAndroidNDK(
 	var objCopyPath string
 
 	for _, path := range paths {
-		if utils.IsDir(path) {
-			mergeNativeLibPath = filepath.Join(path, "app", "build", "intermediates", "merged_native_libs")
 
-			// Check to see if we can find app/build/intermediates/merged_native_libs from the given path
-			if !utils.FileExists(mergeNativeLibPath) {
-				return fmt.Errorf("unable to find the merged_native_libs in " + path)
-			}
+		// Search for NDK symbol files based on an expected path
+		arr := []string{"android", "app", "build", "intermediates", "merged_native_libs"}
+		mergeNativeLibPath, err = android.FindNativeLibPath(arr, path)
 
+		if err != nil {
+			return err
+		}
+
+		if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
 			if variant == "" {
 				variant, err = android.GetVariantDirectory(mergeNativeLibPath)
-
 				if err != nil {
 					return err
 				}
 			}
 
-			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
-
-			if err != nil {
-				return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
-			}
-
 			if appManifestPath == "" {
-				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					appManifestPath = appManifestPathExpected
-					log.Info("Found app manifest at: " + appManifestPath)
+					logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 				}
+					
 			}
 
 			if projectRoot == "" {
-				projectRoot = path
+				// Setting projectRoot to the suspected root of the project
+				projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
 			}
+		}
 
-		} else {
+		// Ensure only files from within the directory the upload command is run from are uploaded
+		if !utils.IsDir(path) {
 			fileList = append(fileList, path)
+		} else if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
+			fileList, err = utils.BuildFileList([]string{path})	
+		} else {
+			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
+		}
 
-			if appManifestPath == "" {
-				if variant == "" {
-					//	Set the mergeNativeLibPath based off the file location e.g. merged_native_libs/<variant/out/lib/<arch>/
-					mergeNativeLibPath = filepath.Join(path, "..", "..", "..", "..", "..")
-
-					if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
-						variant, err = android.GetVariantDirectory(mergeNativeLibPath)
-
-						if err == nil {
-							appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
-							if utils.FileExists(appManifestPathExpected) {
-								appManifestPath = appManifestPathExpected
-								log.Info("Found app manifest at: " + appManifestPath)
-							}
-						}
-
-						if projectRoot == "" {
-							// Setting projectRoot to the suspected root of the project
-							projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
-						}
-					}
-				}
-			}
+		if err != nil {
+			return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
 		}
 	}
 
 	if projectRoot != "" {
-		log.Info("Using " + projectRoot + " as the project root")
+		logger.Debug(fmt.Sprintf("Using %s as the project root", projectRoot))
 	}
 
 	// Check to see if we need to read the manifest file due to missing options
 	if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
 
-		log.Info("Reading data from AndroidManifest.xml")
+		logger.Debug("Reading data from AndroidManifest.xml")
 		manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
 
 		if err != nil {
@@ -133,8 +117,7 @@ func ProcessAndroidNDK(
 			}
 
 			if apiKey != "" {
-				log.Info("Using " + apiKey + " as API key from AndroidManifest.xml")
-
+				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 		}
 
@@ -142,7 +125,7 @@ func ProcessAndroidNDK(
 			applicationId = manifestData.ApplicationId
 
 			if applicationId != "" {
-				log.Info("Using " + applicationId + " as application ID from AndroidManifest.xml")
+				logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
 			}
 		}
 
@@ -150,7 +133,7 @@ func ProcessAndroidNDK(
 			versionCode = manifestData.VersionCode
 
 			if versionCode != "" {
-				log.Info("Using " + versionCode + " as version code from AndroidManifest.xml")
+				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
 			}
 		}
 
@@ -158,7 +141,7 @@ func ProcessAndroidNDK(
 			versionName = manifestData.VersionName
 
 			if versionName != "" {
-				log.Info("Using " + versionName + " as version name from AndroidManifest.xml")
+				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
 			}
 		}
 	}
@@ -181,17 +164,16 @@ func ProcessAndroidNDK(
 				if err != nil {
 					return err
 				}
-
-				log.Info("Located objcopy within Android NDK path: " + androidNdkRoot)
+				logger.Debug(fmt.Sprintf("Located objcopy within Android NDK path: %s", androidNdkRoot))
 			}
 
-			log.Info("Extracting debug info from " + filepath.Base(file) + " using objcopy")
+			logger.Debug(fmt.Sprintf("Extracting debug info from %s using objcopy", filepath.Base(file)))
 
 			if workingDir == "" {
 				workingDir, err = os.MkdirTemp("", "bugsnag-cli-ndk-*")
 
 				if err != nil {
-					return fmt.Errorf("error creating temporary working directory " + err.Error())
+					return fmt.Errorf("error creating temporary working directory %s", err.Error())
 				}
 
 				defer os.RemoveAll(workingDir)
@@ -200,7 +182,7 @@ func ProcessAndroidNDK(
 			outputFile, err := android.Objcopy(objCopyPath, file, workingDir)
 
 			if err != nil {
-				return fmt.Errorf("failed to process file, " + file + " using objcopy : " + err.Error())
+				return fmt.Errorf("failed to process file, %s using objcopy : %s", file, err.Error())
 			}
 
 			symbolFileList = append(symbolFileList, outputFile)
@@ -219,6 +201,7 @@ func ProcessAndroidNDK(
 		timeout,
 		retries,
 		dryRun,
+		logger,
 	)
 
 	if err != nil {

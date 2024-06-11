@@ -19,13 +19,14 @@ func UploadAndroidNdk(
 	timeout int,
 	retries int,
 	dryRun bool,
+	logger log.Logger,
 ) error {
 	fileFieldData := make(map[string]string)
 
 	numberOfFiles := len(fileList)
 
 	if numberOfFiles < 1 {
-		log.Info("No NDK files found to process")
+		logger.Info("No NDK files found to process")
 		return nil
 	}
 
@@ -38,7 +39,7 @@ func UploadAndroidNdk(
 
 		fileFieldData["soFile"] = file
 
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun)
+		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
 
 		if err != nil {
 			return err

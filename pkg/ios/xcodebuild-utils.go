@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -117,10 +118,10 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
 		} else {
-			return nil, errors.New("Unable to locate xcodeproj or xcworkspace in the given path")
+			return nil, fmt.Errorf("Unable to locate xcodeproj or xcworkspace in the given path")
 		}
 	} else {
-		return nil, errors.New("Unable to locate xcodebuild on this system.")
+		return nil, fmt.Errorf("Unable to locate xcodebuild on this system.")
 	}
 
 	output, err := cmd.Output()
