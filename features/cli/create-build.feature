@@ -33,12 +33,11 @@ Feature: Bugsnag CLI create-build behavior
 
   Scenario: Starting bugsnag-cli create-build with invalid source control provider
     When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:9339/builds --api-key=1234567890ABCDEF1234567890ABCDEF --version-name=1.2.3 --provider=test
-    And I wait to receive 1 builds
-    Then the build is valid for the Builds API
-    And I should see the not an accepted value for the source control provider warning
-    And the builds payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the builds payload field "appVersion" equals "1.2.3"
-    And the builds payload field "sourceControl.provider" is null
+    Then I should see the not an accepted value for the source control provider error
+
+  Scenario: Starting bugsnag-cli create-build with no source control provider
+    When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:9339/builds --api-key=1234567890ABCDEF1234567890ABCDEF --version-name=1.2.3 --provider=
+    Then I should see the missing source control provider error
 
   Scenario: Starting bugsnag-cli create-build and passing an Android manifest file with dry-run and verbose
     When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:9339/builds --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --dry-run --verbose
