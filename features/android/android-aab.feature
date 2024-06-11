@@ -70,7 +70,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uploading Android AAB file when command is run from project root
-    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/
+    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/ --verbose
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Android Build API
     And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
@@ -81,7 +81,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uploading Android AAB file when command is run from within app directory
-    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app/
+    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app/ --verbose
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Android Build API
     And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
