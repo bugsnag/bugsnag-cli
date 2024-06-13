@@ -39,7 +39,7 @@ type CLI struct {
 		Dsym               upload.Dsym                   `cmd:"" help:"Upload dSYMs for iOS"`
 		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
-	CreateBuild          CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application. If providing source control information, accepted values for provider are: github, github-enterprise, bitbucket, bitbucket-server, gitlab, gitlab-onpremise"`
+	CreateBuild          CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	CreateAndroidBuildId CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
 }
 

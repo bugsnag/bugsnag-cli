@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Restrict input for the `--provider` option for `create-build` [102](https://github.com/bugsnag/bugsnag-cli/pull/102)
+
 ## 2.3.0 (2024-06-04)
 
 ### Enhancements
