@@ -68,6 +68,10 @@ Then('I should see the missing source control provider error') do
   Maze.check.include(run_output, "error: --provider: missing source control provider, please specify using `--provider`. Accepted values are: github, github-enterprise, bitbucket, bitbucket-server, gitlab, gitlab-onpremise")
 end
 
+Then('I should see the path ambiguous error') do
+  Maze.check.include(run_output, "Path ambiguous: more than one AAB file was found")
+end
+
 Then('the sourcemap is valid for the Proguard Build API') do
   steps %(
     Then the sourcemap is valid for the Android Build API
