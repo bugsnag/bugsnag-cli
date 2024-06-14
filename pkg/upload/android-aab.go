@@ -13,7 +13,7 @@ type AndroidAabMapping struct {
 	ApplicationId string      `help:"Module application identifier"`
 	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
 	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
-	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path" default:"."`
 	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
 	VersionCode   string      `help:"Module version code"`
 	VersionName   string      `help:"Module version name"`
@@ -41,20 +41,28 @@ func ProcessAndroidAab(
 	var err error
 
 	for _, path := range paths {
-		// Check to see if we are dealing with a .aab file and extract it into a temp directory
-		if filepath.Ext(path) == ".aab" {
-			logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(path)))
-			aabDir, err = utils.ExtractFile(path, "aab")
 
-			defer os.RemoveAll(aabDir)
+		// Look for AAB file if the upload command was run somewhere within the project root
+		// based on an expected path of ${dir}/build/outputs/bundle/release/${dir}-release.aab
+		// or ${dir}/build/outputs/bundle/release/${dir}-release-dexguard.aab
+		if utils.IsDir(path) {
+			arr := []string{"*", "build", "outputs", "bundle", "release", "*-release*.aab"}
+			path, err = android.FindAabPath(arr, path)
 
 			if err != nil {
 				return err
 			}
-		} else if utils.IsDir(path) {
-			aabDir = path
-		} else {
+		}
+		if filepath.Ext(path) != ".aab" {
 			return fmt.Errorf("%s is not an AAB file/directory", path)
+		}
+		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(path)))
+		aabDir, err = utils.ExtractFile(path, "aab")
+
+		defer os.RemoveAll(aabDir)
+
+		if err != nil {
+			return err
 		}
 	}
 
