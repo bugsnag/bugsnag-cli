@@ -8,7 +8,7 @@
 
 ### Fixes
 
-- Ensure that the binary is correctly installed when installing via PNPM and YARN [109](https://github.com/bugsnag/bugsnag-cli/pull/109)
+- Ensure that the binary is correctly installed when installing via PNPM and Yarn [109](https://github.com/bugsnag/bugsnag-cli/pull/109)
 
 ## 2.3.0 (2024-06-04)
 
