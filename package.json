@@ -1,8 +1,11 @@
 {
   "name": "@bugsnag/cli",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "BugSnag CLI",
   "main": "install.js",
+  "bin": {
+    "bugsnag-cli": "bin/bugsnag-cli"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-cli.git"

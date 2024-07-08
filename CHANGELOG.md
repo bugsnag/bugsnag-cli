@@ -1,10 +1,25 @@
 # Changelog
 
+## 2.4.0 (2024-07-08)
+
+### Enhancements
+
+- Restrict input for the `--provider` option for `create-build` [102](https://github.com/bugsnag/bugsnag-cli/pull/102)
+
+### Fixes
+
+- Ensure that the binary is correctly installed when installing via PNPM and Yarn [109](https://github.com/bugsnag/bugsnag-cli/pull/109)
+
 ## 2.3.0 (2024-06-04)
 
 ### Enhancements
 
 - Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
+- Allow more flexible path searching when uploading NDK symbol files [98](https://github.com/bugsnag/bugsnag-cli/pull/98)
+
+### Fixes
+
+- Fix the error message when `--version-name` is missing [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
 
 ## 2.2.0 (2024-04-17)
 
@@ -13,7 +28,6 @@
 - `upload android-proguard` will now attempt to automatically locate the `classes.dex` files if no build-uuid or dex-files are found or specified [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
 - Added the `--no-build-uuid` option to the `upload android-*` options [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
 - Added `Windows_NT` to `supported-platforms.yml` [95](https://github.com/bugsnag/bugsnag-cli/pull/95)
-- Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
 
 ## 2.1.1 (2023-03-22)
 

@@ -8,6 +8,8 @@ bin/**/**
 node_modules/
 package-lock.json
 
+# Xcode
+**/XCBuildData/
 
 .idea/
 maze_output/

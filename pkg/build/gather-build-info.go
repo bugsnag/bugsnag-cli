@@ -2,15 +2,16 @@ package build
 
 import (
 	"fmt"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 type SourceControl struct {
-	Provider   string `json:"provider,omitempty"`
-	Repository string `json:"repository,omitempty"`
-	Revision   string `json:"revision,omitempty"`
+	Provider   utils.Provider `json:"provider,omitempty"`
+	Repository string         `json:"repository,omitempty"`
+	Revision   string         `json:"revision,omitempty"`
 }
 
 type CreateBuildInfo struct {
@@ -31,7 +32,7 @@ func (opts CreateBuildInfo) Override(base CreateBuildInfo) CreateBuildInfo {
 		AppVersionCode:   utils.ThisOrThat(opts.AppVersionCode, base.AppVersionCode).(string),
 		AppBundleVersion: utils.ThisOrThat(opts.AppBundleVersion, base.AppBundleVersion).(string),
 		SourceControl: SourceControl{
-			Provider:   utils.ThisOrThat(opts.SourceControl.Provider, base.SourceControl.Provider).(string),
+			Provider:   utils.ThisOrThat(opts.SourceControl.Provider, base.SourceControl.Provider).(utils.Provider),
 			Repository: utils.ThisOrThat(opts.SourceControl.Repository, base.SourceControl.Repository).(string),
 			Revision:   utils.ThisOrThat(opts.SourceControl.Revision, base.SourceControl.Revision).(string),
 		},

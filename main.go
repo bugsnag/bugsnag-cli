@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.3.0"
+var package_version = "2.4.0"
 
 func main() {
 	commands := options.CLI{}
@@ -77,7 +77,7 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-	case "upload android-aab <path>":
+	case "upload android-aab <path>", "upload android-aab":
 
 		err := upload.ProcessAndroidAab(
 			commands.ApiKey,
