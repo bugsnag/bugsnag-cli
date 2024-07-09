@@ -1,8 +1,14 @@
 # Changelog
 
-## TBD
+## 2.4.0 (2024-07-08)
+
+### Enhancements
 
 - Restrict input for the `--provider` option for `create-build` [102](https://github.com/bugsnag/bugsnag-cli/pull/102)
+
+### Fixes
+
+- Ensure that the binary is correctly installed when installing via PNPM and Yarn [109](https://github.com/bugsnag/bugsnag-cli/pull/109)
 
 ## 2.3.0 (2024-06-04)
 
