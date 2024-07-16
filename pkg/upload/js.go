@@ -99,12 +99,15 @@ func ResolveSourceMapPaths(jsOptions JsOptions, outputPath string, projectRoot s
 	}
 
 	var sourceMapPaths []string
-	filepath.WalkDir(outputPath, func(fullPath string, dirEntry fs.DirEntry, err error) error {
+	err := filepath.WalkDir(outputPath, func(fullPath string, dirEntry fs.DirEntry, err error) error {
 		if !dirEntry.IsDir() && strings.HasSuffix(dirEntry.Name(), ".map") && !strings.HasSuffix(dirEntry.Name(), ".css.map") {
 			sourceMapPaths = append(sourceMapPaths, fullPath)
 		}
 		return nil
 	})
+	if err != nil {
+		return []string{}, err
+	}
 	if len(sourceMapPaths) == 0 {
 		logger.Debug(fmt.Sprintf("No main source map found in: %s", outputPath))
 	} else {
