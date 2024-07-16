@@ -227,6 +227,23 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload js", "upload js <path>":
+
+		err := upload.ProcessJs(
+			commands.ApiKey,
+			commands.Upload.Js,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+			logger,
+		)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload dsym", "upload dsym <path>":
 
 		err := upload.ProcessDsym(
