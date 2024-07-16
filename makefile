@@ -143,3 +143,11 @@ features/base-fixtures/rn0_72/ios/archive:
 	cd features/base-fixtures/rn0_72/ios/../ && npm i && bundle install
 	cd features/base-fixtures/rn0_72/ios/ && pod install
 	cd features/base-fixtures/rn0_72/ios/ && xcrun xcodebuild -scheme rn0_72 -workspace rn0_72.xcworkspace -configuration Release -archivePath "../rn0_72.xcarchive" -allowProvisioningUpdates archive
+
+.PHONY: features/base-fixtures/js-webpack4
+features/base-fixtures/js-webpack4:
+	cd $@ && npm i && npm run build
+
+.PHONY: features/base-fixtures/js-webpack5
+features/base-fixtures/js-webpack5:
+	cd $@ && npm i && npm run build
