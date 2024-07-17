@@ -19,11 +19,11 @@ var androidSymbolFileRegex = regexp.MustCompile("android-([^;]*).symbols")
 var iosSymbolFileRegex = regexp.MustCompile("ios-([^;]*).symbols")
 
 type DartSymbolOptions struct {
-	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	IosAppPath    utils.Path  `help:"(optional) the path to the built iOS app." type:"path"`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path"`
+	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)" xor:"app-bundle-version,bundle-version"`
+	IosAppPath    utils.Path  `help:"The path to the iOS application binary, used to determine a unique build ID." type:"path"`
 	VersionName   string      `help:"The version of the application." xor:"app-version,version-name"`
-	VersionCode   string      `help:"The version code for the application (Android only)." xor:"app-version-code,version-code"`
-	BundleVersion string      `help:"The bundle version for the application (iOS only)." xor:"app-bundle-version,bundle-version"`
+	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
 }
 
 func Dart(

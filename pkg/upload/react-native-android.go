@@ -2,9 +2,10 @@ package upload
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -13,16 +14,16 @@ import (
 )
 
 type ReactNativeAndroid struct {
-	AppManifest  string      `help:"(required) Path to directory or file to upload" type:"path"`
-	Bundle       string      `help:"Path to the bundle file" type:"path"`
-	CodeBundleId string      `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
-	Dev          bool        `help:"Indicates whether the application is a debug or release build"`
-	Path         utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	ProjectRoot  string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	SourceMap    string      `help:"Path to the source map file" type:"path"`
-	Variant      string      `help:"Build type, like 'debug' or 'release'"`
-	VersionName  string      `help:"The version name of the application."`
-	VersionCode  string      `help:"The version code for the application (Android only)."`
+	Path         utils.Paths `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
+	AppManifest  string      `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	Bundle       string      `help:"The path to the bundled JavaScript file to upload" type:"path"`
+	CodeBundleId string      `help:"A unique identifier for the JavaScript bundle"`
+	Dev          bool        `help:"Indicates whether this is a debug or release build"`
+	ProjectRoot  string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	SourceMap    string      `help:"The path to the source map file to upload" type:"path"`
+	Variant      string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode  string      `help:"The version code of this build of the application"`
+	VersionName  string      `help:"The version of the application"`
 }
 
 func ProcessReactNativeAndroid(
