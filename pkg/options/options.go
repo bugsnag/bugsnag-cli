@@ -7,8 +7,6 @@ import (
 
 // Global CLI options
 type Globals struct {
-	UploadAPIRootUrl  string            `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
-	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
 	Port              int               `help:"Port number for the upload server" default:"443"`
 	ApiKey            string            `help:"(required) Bugsnag integration API key for this application"`
 	FailOnUploadError bool              `help:"Stops the upload when a mapping file fails to upload to Bugsnag successfully" default:"false"`
@@ -24,9 +22,10 @@ type CLI struct {
 
 	Upload struct {
 		// shared options
-		Overwrite bool `help:"Whether to overwrite any existing symbol file with a matching ID"`
-		Timeout   int  `help:"Number of seconds to wait before failing an upload request" default:"300"`
-		Retries   int  `help:"Number of retry attempts before failing an upload request" default:"0"`
+		UploadAPIRootUrl string `help:"Bugsnag On-Premise upload server URL. Can contain port number" default:"https://upload.bugsnag.com"`
+		Overwrite        bool   `help:"Whether to overwrite any existing symbol file with a matching ID"`
+		Timeout          int    `help:"Number of seconds to wait before failing an upload request" default:"300"`
+		Retries          int    `help:"Number of retry attempts before failing an upload request" default:"0"`
 
 		// required options
 		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
@@ -58,6 +57,7 @@ type IosBuildOptions struct {
 }
 
 type CreateBuild struct {
+	BuildApiRootUrl   string            `help:"Bugsnag On-Premise build server URL. Can contain port number" default:"https://build.bugsnag.com"`
 	BuilderName       string            `help:"The name of the entity that triggered the build. Could be a user, system etc."`
 	Metadata          map[string]string `help:"Additional build information"`
 	ReleaseStage      string            `help:"The release stage (eg, production, staging) that is being released (if applicable)."`

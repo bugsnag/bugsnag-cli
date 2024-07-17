@@ -5,6 +5,7 @@
 ### Fixes
 
 - Ensure that extracted `.aab` files can be processed by the Android AAB upload function [114](https://github.com/bugsnag/bugsnag-cli/pull/114)
+- Dont show `--upload-api-root-url` and `--build-api-root-url` flags in the general help output [115](https://github.com/bugsnag/bugsnag-cli/pull/115)
 
 ## 2.4.0 (2024-07-08)
 
