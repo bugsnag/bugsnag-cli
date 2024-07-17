@@ -14,7 +14,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Automatically resolves the version number based on the package.json
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com features/js/fixtures/js-webpack5/dist
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --project-root=features/js/fixtures/js-webpack5 features/js/fixtures/js-webpack5/dist
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -27,7 +27,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Resolves the path specified as the map
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com features/js/fixtures/js-webpack5/dist/main.js.map
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --project-root=features/js/fixtures/js-webpack5 features/js/fixtures/js-webpack5/dist/main.js.map
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -40,7 +40,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Searches in the dist folder automatically
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com features/js/fixtures/js-webpack5/
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --project-root=features/js/fixtures/js-webpack5 features/js/fixtures/js-webpack5/
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -52,11 +52,24 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack5"
     And the sourcemap payload field "overwrite" equals "true"
 
+  Scenario: Uses the working directory as project root
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com features/js/fixtures/js-webpack5/
+    And I wait to receive 1 sourcemaps
+    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "appVersion" equals "1.2.3"
+    And the sourcemap payload field "minifiedUrl" equals "example.com"
+    And the sourcemap payload field "sourceMap" is valid json
+    And the sourcemap payload field "minifiedFile" is not empty
+    And the sourcemap payload field "projectRoot" ends with "bugsnag-cli"
+    And the sourcemap payload field "overwrite" equals "true"
+
   Scenario: Build and Upload js webpack5 sourcemaps
     When I make the "features/base-fixtures/js-webpack5"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com features/base-fixtures/js-webpack5/dist/main.js.map
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --project-root=features/base-fixtures/js-webpack5 features/base-fixtures/js-webpack5/dist/main.js.map
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
