@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -38,31 +37,36 @@ func ProcessAndroidAab(
 
 	var manifestData map[string]string
 	var aabDir string
+	var aabFile string
 	var err error
 
 	for _, path := range paths {
-
 		// Look for AAB file if the upload command was run somewhere within the project root
 		// based on an expected path of ${dir}/build/outputs/bundle/release/${dir}-release.aab
 		// or ${dir}/build/outputs/bundle/release/${dir}-release-dexguard.aab
 		if utils.IsDir(path) {
-			arr := []string{"*", "build", "outputs", "bundle", "release", "*-release*.aab"}
-			path, err = android.FindAabPath(arr, path)
+			if utils.FileExists(filepath.Join(path, "BUNDLE-METADATA")) {
+				aabDir = path
+			} else {
+				arr := []string{"*", "build", "outputs", "bundle", "release", "*-release*.aab"}
+				aabFile, err = android.FindAabPath(arr, path)
+
+				if err != nil {
+					return err
+				}
+			}
+		} else if filepath.Ext(path) == ".aab" {
+			aabFile = path
+		}
+
+		if aabFile != "" && aabDir == "" {
+			aabDir, err = utils.ExtractFile(aabFile, "aab")
+
+			defer os.RemoveAll(aabDir)
 
 			if err != nil {
 				return err
 			}
-		}
-		if filepath.Ext(path) != ".aab" {
-			return fmt.Errorf("%s is not an AAB file/directory", path)
-		}
-		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(path)))
-		aabDir, err = utils.ExtractFile(path, "aab")
-
-		defer os.RemoveAll(aabDir)
-
-		if err != nil {
-			return err
 		}
 	}
 
