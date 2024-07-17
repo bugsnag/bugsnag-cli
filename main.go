@@ -231,7 +231,14 @@ func main() {
 
 		err := upload.ProcessJs(
 			commands.ApiKey,
-			commands.Upload.Js,
+
+			commands.Upload.Js.VersionName,
+			commands.Upload.Js.BundleUrl,
+			commands.Upload.Js.SourceMap,
+			commands.Upload.Js.Bundle,
+			commands.Upload.Js.ProjectRoot,
+			commands.Upload.Js.Path,
+
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

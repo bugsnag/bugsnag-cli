@@ -25,9 +25,9 @@ type JsOptions struct {
 }
 
 // Resolve the project if it isn't specified using the currend working directory
-func resolveProjectRoot(jsOptions JsOptions, path string) string {
-	if jsOptions.ProjectRoot != "" {
-		return jsOptions.ProjectRoot
+func resolveProjectRoot(projectRoot string, path string) string {
+	if projectRoot != "" {
+		return projectRoot
 	}
 	workingDirectory, err := os.Getwd()
 	if err != nil {
@@ -37,9 +37,9 @@ func resolveProjectRoot(jsOptions JsOptions, path string) string {
 }
 
 // Attempt to parse information from the package.json file if values aren't provided on the command line
-func ResolveVersion(jsOptions JsOptions, projectRoot string, logger log.Logger) (string, error) {
-	if jsOptions.VersionName != "" {
-		return jsOptions.VersionName, nil
+func ResolveVersion(versionName string, projectRoot string, logger log.Logger) (string, error) {
+	if versionName != "" {
+		return versionName, nil
 	}
 	checkPath, err := filepath.Abs(projectRoot)
 	if err != nil {
@@ -80,9 +80,9 @@ func ResolveVersion(jsOptions JsOptions, projectRoot string, logger log.Logger) 
 }
 
 // Attempt to find the source maps by walking the build directory if it is not passed in to the command line
-func ResolveSourceMapPaths(jsOptions JsOptions, outputPath string, projectRoot string, logger log.Logger) ([]string, error) {
-	if jsOptions.SourceMap != "" {
-		sourceMap := jsOptions.SourceMap
+func ResolveSourceMapPaths(sourceMap string, outputPath string, projectRoot string, logger log.Logger) ([]string, error) {
+	if sourceMap != "" {
+		sourceMap := sourceMap
 		if !path.IsAbs(sourceMap) {
 			sourceMap = filepath.Join(projectRoot, sourceMap)
 		}
@@ -112,12 +112,13 @@ func ResolveSourceMapPaths(jsOptions JsOptions, outputPath string, projectRoot s
 }
 
 // Attempt to find the bundle path by changing the extension of the source map if the bundle path is not passed in to the command line
-func ResolveBundlePath(jsOptions JsOptions, sourceMapPath string) (string, error) {
-	if jsOptions.Bundle != "" {
-		if utils.FileExists(jsOptions.Bundle) {
-			return jsOptions.Bundle, nil
+func ResolveBundlePath(
+	bundle string, sourceMapPath string) (string, error) {
+	if bundle != "" {
+		if utils.FileExists(bundle) {
+			return bundle, nil
 		} else {
-			return "", fmt.Errorf("unable to find specified bundle: %s", jsOptions.Bundle)
+			return "", fmt.Errorf("unable to find specified bundle: %s", bundle)
 		}
 	}
 
@@ -134,7 +135,8 @@ func ResolveBundlePath(jsOptions JsOptions, sourceMapPath string) (string, error
 
 // Upload a single source map
 func UploadSingleSourceMap(
-	jsOptions JsOptions,
+	bundleUrl string,
+	bundle string,
 	sourceMapPath string,
 	apiKey string,
 	appVersion string,
@@ -147,12 +149,12 @@ func UploadSingleSourceMap(
 	logger log.Logger,
 ) {
 
-	bundlePath, err := ResolveBundlePath(jsOptions, sourceMapPath)
+	bundlePath, err := ResolveBundlePath(bundle, sourceMapPath)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 
-	uploadOptions, err := utils.BuildJsUploadOptions(apiKey, appVersion, jsOptions.BundleUrl, projectRoot, overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(apiKey, appVersion, bundleUrl, projectRoot, overwrite)
 
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -173,7 +175,12 @@ func UploadSingleSourceMap(
 
 func ProcessJs(
 	apiKey string,
-	jsOptions JsOptions,
+	versionName string,
+	bundleUrl string,
+	sourceMap string,
+	bundle string,
+	projectRoot string,
+	Path utils.Paths,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -182,7 +189,7 @@ func ProcessJs(
 	logger log.Logger,
 ) error {
 
-	for _, path := range jsOptions.Path {
+	for _, path := range Path {
 
 		outputPath := path
 
@@ -192,15 +199,15 @@ func ProcessJs(
 		}
 
 		// Set a default value for projectRoot if it's not defined
-		projectRoot := resolveProjectRoot(jsOptions, path)
+		projectRoot := resolveProjectRoot(projectRoot, path)
 
-		appVersion, err := ResolveVersion(jsOptions, projectRoot, logger)
+		appVersion, err := ResolveVersion(versionName, projectRoot, logger)
 		if err != nil {
 			return err
 		}
 
 		// Check that the source map(s) exists and error out if it doesn't
-		sourceMapPaths, err := ResolveSourceMapPaths(jsOptions, outputPath, projectRoot, logger)
+		sourceMapPaths, err := ResolveSourceMapPaths(sourceMap, outputPath, projectRoot, logger)
 		if err != nil {
 			return err
 		}
@@ -211,7 +218,7 @@ func ProcessJs(
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			UploadSingleSourceMap(jsOptions, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+			UploadSingleSourceMap(bundleUrl, bundle, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
 		}
 
 	}
