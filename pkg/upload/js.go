@@ -24,25 +24,16 @@ type JsOptions struct {
 	Path        utils.Paths `arg:"" name:"path" help:"Path to a directory of source maps and bundles to upload" type:"path" default:"."`
 }
 
-// Resolve the project root by walking up from the path specified until a package.json is found
-func resolveProjectRoot(jsOptions JsOptions, path string) (string, error) {
+// Resolve the project if it isn't specified using the currend working directory
+func resolveProjectRoot(jsOptions JsOptions, path string) string {
 	if jsOptions.ProjectRoot != "" {
-		return jsOptions.ProjectRoot, nil
+		return jsOptions.ProjectRoot
 	}
-	checkPath, err := filepath.Abs(path)
+	workingDirectory, err := os.Getwd()
 	if err != nil {
-		return "", fmt.Errorf("unable to make project root an absolute path %s", path)
+		return path
 	}
-	// Walk up the folder structure as far as possible
-	for filepath.Dir(checkPath) != checkPath {
-		packageJson := filepath.Join(checkPath, "package.json")
-		if !utils.FileExists(packageJson) {
-			checkPath = filepath.Dir(checkPath)
-			continue
-		}
-		return checkPath, nil
-	}
-	return path, nil
+	return workingDirectory
 }
 
 // Attempt to parse information from the package.json file if values aren't provided on the command line
@@ -201,10 +192,7 @@ func ProcessJs(
 		}
 
 		// Set a default value for projectRoot if it's not defined
-		projectRoot, err := resolveProjectRoot(jsOptions, path)
-		if err != nil {
-			return err
-		}
+		projectRoot := resolveProjectRoot(jsOptions, path)
 
 		appVersion, err := ResolveVersion(jsOptions, projectRoot, logger)
 		if err != nil {
