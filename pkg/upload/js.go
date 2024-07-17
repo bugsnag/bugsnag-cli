@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -24,7 +23,7 @@ type JsOptions struct {
 	Path        utils.Paths `arg:"" name:"path" help:"Path to a directory of source maps and bundles to upload" type:"path" default:"."`
 }
 
-// Resolve the project if it isn't specified using the currend working directory
+// Resolve the project if it isn't specified using the current working directory
 func resolveProjectRoot(projectRoot string, path string) string {
 	if projectRoot != "" {
 		return projectRoot
@@ -37,13 +36,14 @@ func resolveProjectRoot(projectRoot string, path string) string {
 }
 
 // Attempt to parse information from the package.json file if values aren't provided on the command line
-func ResolveVersion(versionName string, projectRoot string, logger log.Logger) (string, error) {
+func resolveVersion(versionName string, path string, logger log.Logger) string {
 	if versionName != "" {
-		return versionName, nil
+		return versionName
 	}
-	checkPath, err := filepath.Abs(projectRoot)
+	checkPath, err := filepath.Abs(path)
 	if err != nil {
-		return "", fmt.Errorf("unable to make project root an absolute path %s", projectRoot)
+		logger.Warn(fmt.Sprintf("unable to make project root an absolute path %s: %s", path, err))
+		return ""
 	}
 	// Walk up the folder structure as far as possible
 	for filepath.Dir(checkPath) != checkPath {
@@ -55,37 +55,33 @@ func ResolveVersion(versionName string, projectRoot string, logger log.Logger) (
 		file, err := os.Open(packageJson)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("unable to open %s: %s", packageJson, err))
-			return "", nil
+			return ""
 		}
 		byteValue, err := io.ReadAll(file)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("unable to read %s: %s", packageJson, err))
-			return "", nil
+			return ""
 		}
 		var parsedPackageJson map[string]interface{}
 		err = json.Unmarshal(byteValue, &parsedPackageJson)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("unable to parse %s: %s", packageJson, err))
-			return "", nil
+			return ""
 		}
 		if parsedPackageJson["version"] == nil {
-			logger.Warn(fmt.Sprintf("missing version in %s", packageJson))
-			return "", nil
+			logger.Warn(fmt.Sprintf("no version found in %s", packageJson))
+			return ""
 		}
 		appVersion := parsedPackageJson["version"].(string)
 		logger.Info(fmt.Sprintf("Using app version from %s: %s", packageJson, appVersion))
-		return appVersion, nil
+		return appVersion
 	}
-	return "", nil
+	return ""
 }
 
 // Attempt to find the source maps by walking the build directory if it is not passed in to the command line
-func ResolveSourceMapPaths(sourceMap string, outputPath string, projectRoot string, logger log.Logger) ([]string, error) {
+func resolveSourceMapPaths(sourceMap string, outputPath string, logger log.Logger) ([]string, error) {
 	if sourceMap != "" {
-		sourceMap := sourceMap
-		if !path.IsAbs(sourceMap) {
-			sourceMap = filepath.Join(projectRoot, sourceMap)
-		}
 		if utils.FileExists(sourceMap) {
 			return []string{sourceMap}, nil
 		} else {
@@ -112,7 +108,7 @@ func ResolveSourceMapPaths(sourceMap string, outputPath string, projectRoot stri
 }
 
 // Attempt to find the bundle path by changing the extension of the source map if the bundle path is not passed in to the command line
-func ResolveBundlePath(
+func resolveBundlePath(
 	bundle string, sourceMapPath string) (string, error) {
 	if bundle != "" {
 		if utils.FileExists(bundle) {
@@ -134,7 +130,7 @@ func ResolveBundlePath(
 }
 
 // Upload a single source map
-func UploadSingleSourceMap(
+func uploadSingleSourceMap(
 	bundleUrl string,
 	bundle string,
 	sourceMapPath string,
@@ -149,7 +145,7 @@ func UploadSingleSourceMap(
 	logger log.Logger,
 ) {
 
-	bundlePath, err := ResolveBundlePath(bundle, sourceMapPath)
+	bundlePath, err := resolveBundlePath(bundle, sourceMapPath)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -201,24 +197,21 @@ func ProcessJs(
 		// Set a default value for projectRoot if it's not defined
 		projectRoot := resolveProjectRoot(projectRoot, path)
 
-		appVersion, err := ResolveVersion(versionName, projectRoot, logger)
-		if err != nil {
-			return err
-		}
+		appVersion := resolveVersion(versionName, path, logger)
 
 		// Check that the source map(s) exists and error out if it doesn't
-		sourceMapPaths, err := ResolveSourceMapPaths(sourceMap, outputPath, projectRoot, logger)
+		sourceMapPaths, err := resolveSourceMapPaths(sourceMap, outputPath, logger)
 		if err != nil {
 			return err
 		}
 
 		// Check that we now have a source map path
 		if len(sourceMapPaths) == 0 {
-			return fmt.Errorf("could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
+			return fmt.Errorf("could not find a source map, please specify the path by using --source-map")
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			UploadSingleSourceMap(bundleUrl, bundle, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+			uploadSingleSourceMap(bundleUrl, bundle, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
 		}
 
 	}
