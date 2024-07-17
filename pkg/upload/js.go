@@ -63,25 +63,29 @@ func ResolveVersion(jsOptions JsOptions, projectRoot string, logger log.Logger) 
 		}
 		file, err := os.Open(packageJson)
 		if err != nil {
-			return "", fmt.Errorf("unable to open package.json %s", packageJson)
+			logger.Warn(fmt.Sprintf("unable to open %s: %s", packageJson, err))
+			return "", nil
 		}
 		byteValue, err := io.ReadAll(file)
 		if err != nil {
-			return "", fmt.Errorf("unable to read package.json %s", packageJson)
+			logger.Warn(fmt.Sprintf("unable to read %s: %s", packageJson, err))
+			return "", nil
 		}
 		var parsedPackageJson map[string]interface{}
 		err = json.Unmarshal(byteValue, &parsedPackageJson)
 		if err != nil {
-			return "", fmt.Errorf("unable to parse package.json %s %s", packageJson, err)
+			logger.Warn(fmt.Sprintf("unable to parse %s: %s", packageJson, err))
+			return "", nil
 		}
 		if parsedPackageJson["version"] == nil {
-			return "", fmt.Errorf("package.json is missing the version %s", packageJson)
+			logger.Warn(fmt.Sprintf("missing version in %s", packageJson))
+			return "", nil
 		}
 		appVersion := parsedPackageJson["version"].(string)
-		logger.Info(fmt.Sprintf("Using app version from package.json: %s", appVersion))
+		logger.Info(fmt.Sprintf("Using app version from %s: %s", packageJson, appVersion))
 		return appVersion, nil
 	}
-	return "", fmt.Errorf("unable to locate package.json to resolve version in %s", projectRoot)
+	return "", nil
 }
 
 // Attempt to find the source maps by walking the build directory if it is not passed in to the command line
