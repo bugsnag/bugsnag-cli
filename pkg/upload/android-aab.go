@@ -54,19 +54,17 @@ func ProcessAndroidAab(
 				if err != nil {
 					return err
 				}
-
-				if filepath.Ext(path) != ".aab" {
-					return fmt.Errorf("%s is not an AAB file/directory", path)
-				} else {
-					aabDir, err = utils.ExtractFile(path, "aab")
-
-					defer os.RemoveAll(aabDir)
-
-					if err != nil {
-						return err
-					}
-				}
 			}
+		} else if filepath.Ext(path) == ".aab" {
+			aabDir, err = utils.ExtractFile(path, "aab")
+
+			defer os.RemoveAll(aabDir)
+
+			if err != nil {
+				return err
+			}
+		} else {
+			return fmt.Errorf("%s is not an AAB file/directory", path)
 		}
 	}
 
