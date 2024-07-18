@@ -234,6 +234,7 @@ func main() {
 
 			commands.Upload.Js.VersionName,
 			commands.Upload.Js.BundleUrl,
+			commands.Upload.Js.BaseUrl,
 			commands.Upload.Js.SourceMap,
 			commands.Upload.Js.Bundle,
 			commands.Upload.Js.ProjectRoot,

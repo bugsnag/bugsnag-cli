@@ -17,6 +17,7 @@ import (
 type JsOptions struct {
 	VersionName string      `help:"The version of the app that the source map applies to. Defaults to the version in the package.json file (if found)."`
 	BundleUrl   string      `help:"URL of the minified JavaScript file that the source map relates to. Asterisks can be used as a wildcard."`
+	BaseUrl     string      `help:"The base URL of the minified files. The relative path is appended onto this for each file. Asterisks can be used as a wildcard."`
 	SourceMap   string      `help:"Path to the source map file. This usually has the .min.js extension." type:"path"`
 	Bundle      string      `help:"Path to the minified JavaScript file that the source map relates to. If this is not provided then the file will be obtained when an error event is received." type:"path"`
 	ProjectRoot string      `help:"Path of the root directory on the file system where the source map was built. This will be stripped from the file name in the displayed stack traces." type:"path"`
@@ -102,7 +103,7 @@ func resolveSourceMapPaths(sourceMap string, outputPath string, logger log.Logge
 	if len(sourceMapPaths) == 0 {
 		logger.Debug(fmt.Sprintf("No main source map found in: %s", outputPath))
 	} else {
-		logger.Debug(fmt.Sprintf("Found source maps: %s", strings.Join(sourceMapPaths, ", ")))
+		logger.Info(fmt.Sprintf("Found source maps: %s", strings.Join(sourceMapPaths, ", ")))
 	}
 	return sourceMapPaths, nil
 }
@@ -132,6 +133,8 @@ func resolveBundlePath(
 // Upload a single source map
 func uploadSingleSourceMap(
 	bundleUrl string,
+	baseUrl string,
+	outputPath string,
 	bundle string,
 	sourceMapPath string,
 	apiKey string,
@@ -150,7 +153,17 @@ func uploadSingleSourceMap(
 		logger.Fatal(err.Error())
 	}
 
-	uploadOptions, err := utils.BuildJsUploadOptions(apiKey, appVersion, bundleUrl, projectRoot, overwrite)
+	url := bundleUrl
+	if baseUrl != "" {
+		relativePath, err := filepath.Rel(outputPath, bundlePath)
+		if err != nil {
+			logger.Warn(fmt.Sprintf("cannot make path relative to create URL, skipping: %v", err))
+			return
+		}
+		url = baseUrl + relativePath
+	}
+
+	uploadOptions, err := utils.BuildJsUploadOptions(apiKey, appVersion, url, projectRoot, overwrite)
 
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -173,6 +186,7 @@ func ProcessJs(
 	apiKey string,
 	versionName string,
 	bundleUrl string,
+	baseUrl string,
 	sourceMap string,
 	bundle string,
 	projectRoot string,
@@ -210,8 +224,21 @@ func ProcessJs(
 			return fmt.Errorf("could not find a source map, please specify the path by using --source-map")
 		}
 
+		// Ensure that exactly one of --bundle-url and --base-url is specified
+		if bundleUrl == "" && baseUrl == "" {
+			return fmt.Errorf("missing minified URL, please specify using either `--bundle-url` or `--base-url`")
+		} else if bundleUrl != "" && baseUrl != "" {
+			return fmt.Errorf("cannot specify both `--bundle-url` and `--base-url` at the same time")
+		}
+
+		// Add a slash if it is not already on the end of the base URL
+		if len(baseUrl) > 0 && baseUrl[len(baseUrl)-1] != '/' {
+			baseUrl += "/"
+		}
+
 		for _, sourceMapPath := range sourceMapPaths {
-			uploadSingleSourceMap(bundleUrl, bundle, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+
+			uploadSingleSourceMap(bundleUrl, baseUrl, outputPath, bundle, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
 		}
 
 	}
