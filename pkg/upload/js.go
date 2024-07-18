@@ -42,7 +42,7 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 	}
 	checkPath, err := filepath.Abs(path)
 	if err != nil {
-		logger.Warn(fmt.Sprintf("unable to make project root an absolute path %s: %s", path, err))
+		logger.Warn(fmt.Sprintf("unable to make an absolute path %s: %s", path, err))
 		return ""
 	}
 	// Walk up the folder structure as far as possible
