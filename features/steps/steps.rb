@@ -98,6 +98,13 @@ Then('the sourcemap is valid for the React Native Build API') do
   )
 end
 
+Then('the sourcemap is valid for the JS Build API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "appVersion" is not null
+  )
+end
+
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
@@ -122,6 +129,16 @@ Then('the sourcemaps Content-Type header is valid multipart form-data') do
   expected = /^multipart\/form-data; boundary=([^;]+)/
   actual = Maze::Server.sourcemaps.current[:request]['content-type']
   Maze.check.match(expected, actual)
+end
+
+Then('the sourcemap payload field "sourceMap" is valid json') do
+  require 'json'
+  decoded = JSON.parse(Maze::Server.sourcemaps.current[:body]['sourceMap'])
+  Maze.check.not_equal(decoded['mappings'].length, 0)
+end
+
+Then('the sourcemap payload field "minifiedFile" is not empty') do
+  Maze.check.not_equal(Maze::Server.sourcemaps.current[:body]['minifiedFile'].length, 0)
 end
 
 Then('{string} should be used as {string}') do |value, field|
