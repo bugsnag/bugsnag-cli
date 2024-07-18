@@ -12,17 +12,17 @@ import (
 )
 
 type ReactNativeIos struct {
-	VersionName   string      `help:"The version of the application."`
-	BundleVersion string      `help:"Bundle version for the application. (iOS only)"`
-	Scheme        string      `help:"The name of the scheme to use when building the application."`
-	SourceMap     string      `help:"Path to the source map file" type:"path"`
-	Bundle        string      `help:"Path to the bundle file" type:"path"`
-	Plist         string      `help:"Path to the Info.plist file" type:"path"`
-	XcodeProject  string      `help:"Path to the .xcworkspace file" type:"path"`
-	CodeBundleID  string      `help:"A unique identifier to identify a code bundle release when using tools like CodePush"`
-	Dev           bool        `help:"Indicates whether the application is a debug or release build"`
-	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
+	Bundle        string      `help:"The path to the bundled JavaScript file to upload" type:"path"`
+	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)"`
+	CodeBundleID  string      `help:"A unique identifier for the JavaScript bundle"`
+	Dev           bool        `help:"Indicates whether this is a debug or release build"`
+	Plist         string      `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Scheme        string      `help:"The name of the Xcode scheme used to build the application"`
+	SourceMap     string      `help:"The path to the source map file to upload" type:"path"`
+	VersionName   string      `help:"The version of the application"`
+	XcodeProject  string      `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 }
 
 func ProcessReactNativeIos(

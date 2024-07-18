@@ -13,15 +13,14 @@ import (
 )
 
 type Dsym struct {
-	VersionName        string      `help:"The version of the application."`
-	Scheme             string      `help:"The name of the scheme to use when building the application."`
-	Dev                bool        `help:"Indicates whether the application is a debug or release build"`
-	XcodeProject       utils.Path  `help:"Path to the dSYM" type:"path"`
-	Plist              utils.Path  `help:"Path to the Info.plist file" type:"path"`
-	ProjectRoot        string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
+	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
-	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a *.dSYM file is found, rather than the expected *.dSYM directory"`
-	Path               utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
+	Plist              utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	Scheme             string      `help:"The name of the Xcode scheme used to build the application"`
+	VersionName        string      `help:"The version of the application"`
+	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	ProjectRoot        string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 }
 
 func ProcessDsym(
