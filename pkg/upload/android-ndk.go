@@ -12,14 +12,14 @@ import (
 )
 
 type AndroidNdkMapping struct {
-	ApplicationId  string      `help:"Module application identifier"`
-	AndroidNdkRoot string      `help:"Path to Android NDK installation ($ANDROID_NDK_ROOT)"`
-	AppManifest    string      `help:"Path to app manifest file" type:"path"`
-	Path           utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	ProjectRoot    string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	Variant        string      `help:"Build type, like 'debug' or 'release'"`
-	VersionCode    string      `help:"Module version code"`
-	VersionName    string      `help:"Module version name"`
+	Path           utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	ApplicationId  string      `help:"A unique application ID, usually the package name, of the application"`
+	AndroidNdkRoot string      `help:"The path to your NDK installation, used to access the objcopy tool for extracting symbol information"`
+	AppManifest    string      `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	ProjectRoot    string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Variant        string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode    string      `help:"The version code of this build of the application"`
+	VersionName    string      `help:"The version of the application"`
 }
 
 func ProcessAndroidNDK(
@@ -72,7 +72,7 @@ func ProcessAndroidNDK(
 					appManifestPath = appManifestPathExpected
 					logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
 				}
-					
+
 			}
 
 			if projectRoot == "" {
@@ -85,7 +85,7 @@ func ProcessAndroidNDK(
 		if !utils.IsDir(path) {
 			fileList = append(fileList, path)
 		} else if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
-			fileList, err = utils.BuildFileList([]string{path})	
+			fileList, err = utils.BuildFileList([]string{path})
 		} else {
 			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
 		}

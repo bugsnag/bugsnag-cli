@@ -2,23 +2,24 @@ package upload
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/android"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/android"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 type UnityAndroid struct {
-	AabPath       utils.Path  `help:"Path to Android AAB file to upload with your Unity symbols"`
-	ApplicationId string      `help:"Module application identifier"`
-	Path          utils.Paths `arg:"" name:"path" help:"(required) Path to Unity symbols zip file or directory to upload" type:"path"`
-	ProjectRoot   string      `help:"path to remove from the beginning of the filenames in the mapping file" type:"path"`
-	VersionCode   string      `help:"Module version code"`
-	VersionName   string      `help:"Module version name"`
-	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
+	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	VersionCode   string      `help:"The version code of this build of the application"`
+	VersionName   string      `help:"The version of the application"`
 }
 
 func ProcessUnityAndroid(
