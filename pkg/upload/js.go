@@ -103,7 +103,7 @@ func resolveSourceMapPaths(sourceMap string, outputPath string, logger log.Logge
 	if len(sourceMapPaths) == 0 {
 		logger.Debug(fmt.Sprintf("No main source map found in: %s", outputPath))
 	} else {
-		logger.Info(fmt.Sprintf("Found source maps: %s", strings.Join(sourceMapPaths, ", ")))
+		logger.Debug(fmt.Sprintf("Found source maps: %s", strings.Join(sourceMapPaths, ", ")))
 	}
 	return sourceMapPaths, nil
 }
