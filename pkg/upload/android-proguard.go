@@ -196,8 +196,8 @@ func ProcessAndroidProguard(
 			return err
 		}
 
-		fileFieldData := make(map[string]string)
-		fileFieldData["proguard"] = outputFile
+		fileFieldData := make(map[string]server.FileField)
+		fileFieldData["proguard"] = server.LocalFile(outputFile)
 
 		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, timeout, retries, outputFile, dryRun, logger)
 

@@ -66,8 +66,8 @@ func Dart(
 			// Build Upload options
 			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, version, versionCode)
 
-			fileFieldData := make(map[string]string)
-			fileFieldData["symbolFile"] = file
+			fileFieldData := make(map[string]server.FileField)
+			fileFieldData["symbolFile"] = server.LocalFile(file)
 
 			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
 
@@ -106,8 +106,8 @@ func Dart(
 			// Build Upload options
 			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, version, bundleVersion)
 
-			fileFieldData := make(map[string]string)
-			fileFieldData["symbolFile"] = file
+			fileFieldData := make(map[string]server.FileField)
+			fileFieldData["symbolFile"] = server.LocalFile(file)
 
 			if dryRun {
 				err = nil

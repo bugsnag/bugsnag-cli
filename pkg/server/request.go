@@ -17,6 +17,51 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
+type FileField interface {
+	writeToForm(writer *multipart.Writer, key string) error
+}
+
+type LocalFile string
+
+func (localFile LocalFile) writeToForm(writer *multipart.Writer, key string) error {
+	file, err := os.Open(string(localFile))
+	if err != nil {
+		return err
+	}
+
+	part, err := writer.CreateFormFile(key, filepath.Base(file.Name()))
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return err
+	}
+
+	file.Close()
+	return nil
+}
+
+type InMemoryFile struct {
+	Path string
+	Data []byte
+}
+
+func (inMemoryFile InMemoryFile) writeToForm(writer *multipart.Writer, key string) error {
+	part, err := writer.CreateFormFile(key, inMemoryFile.Path)
+	if err != nil {
+		return err
+	}
+
+	_, err = part.Write(inMemoryFile.Data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // buildFileRequest constructs an HTTP request for file upload with specified field data.
 //
 // Parameters:
@@ -27,28 +72,13 @@ import (
 // Returns:
 //   - *http.Request: The constructed HTTP request.
 //   - error: An error if any step of the request construction fails.
-func buildFileRequest(url string, fieldData map[string]string, fileFieldData map[string]string) (*http.Request, error) {
+func buildFileRequest(url string, fieldData map[string]string, fileFieldData map[string]FileField) (*http.Request, error) {
 	body := &bytes.Buffer{}
 
 	writer := multipart.NewWriter(body)
 
 	for key, value := range fileFieldData {
-		file, err := os.Open(value)
-		if err != nil {
-			return nil, err
-		}
-
-		part, err := writer.CreateFormFile(key, filepath.Base(file.Name()))
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = io.Copy(part, file)
-		if err != nil {
-			return nil, err
-		}
-
-		file.Close()
+		value.writeToForm(writer, key)
 	}
 
 	for key, value := range fieldData {
@@ -83,7 +113,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]string, timeout int, retries int, fileName string, dryRun bool, logger log.Logger) error {
+func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, timeout int, retries int, fileName string, dryRun bool, logger log.Logger) error {
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
