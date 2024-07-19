@@ -160,8 +160,8 @@ func ProcessDsym(
 				return err
 			}
 
-			fileFieldData := make(map[string]string)
-			fileFieldData["dsym"] = filepath.Join(dsym.Location, dsym.Name)
+			fileFieldData := make(map[string]server.FileField)
+			fileFieldData["dsym"] = server.LocalFile(filepath.Join(dsym.Location, dsym.Name))
 
 			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, timeout, retries, dsym.UUID, dryRun, logger)
 

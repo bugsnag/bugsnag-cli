@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -108,6 +109,101 @@ func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.L
 	return sourceMapPaths, nil
 }
 
+// Reads a JSON source map into memory. Required in order to check if the sourcesContent exists.
+func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, error) {
+	logger.Debug(fmt.Sprintf("Reading sourcemap %s", path))
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return map[string]interface{}{}, err
+	}
+	var sourceMapContents map[string]interface{}
+	err = json.Unmarshal(data, &sourceMapContents)
+	if err != nil {
+		return map[string]interface{}{}, err
+	}
+	return sourceMapContents, nil
+}
+
+func addSourcesContent(section map[string]interface{}, relativePath string, logger log.Logger) {
+	untypedSources, hasSources := section["sources"]
+	if !hasSources {
+		logger.Warn("Source map doesn't have required sources field")
+		return
+	}
+	sources, sourcesValid := untypedSources.([]interface{})
+	if !sourcesValid {
+		logger.Warn("Sources aren't an array")
+		return
+	}
+
+	// Skip if the sources content is already valid
+	untypedSourcesContent, hasSourcesContent := section["sourcesContent"]
+	if hasSourcesContent {
+		sourcesContent, sourcesContentValid := untypedSourcesContent.([]interface{})
+		if sourcesContentValid && len(sourcesContent) == len(sources) {
+			logger.Debug("SourcesContent is already populated")
+			return
+		}
+	}
+
+	var sourcesContent []*string
+	for _, sourcePath := range sources {
+		sourcePath, isString := sourcePath.(string)
+		// Skip null values
+		if !isString {
+			sourcesContent = append(sourcesContent, nil)
+			continue
+		}
+		// Handle the default webpack prefix in accordance with https://webpack.js.org/configuration/output/#outputdevtoolmodulefilenametemplate
+		sourcePath, isWebpack := strings.CutPrefix(sourcePath, "webpack://")
+		if isWebpack {
+			// Remove the namespace
+			firstSlash := strings.Index(sourcePath, "/")
+			if firstSlash != -1 && firstSlash+1 < len(sourcePath) {
+				sourcePath = sourcePath[firstSlash+1:]
+			}
+
+			// Skip virtual webpack files
+			if strings.Contains(sourcePath, "/webpack/") {
+				sourcesContent = append(sourcesContent, nil)
+				continue
+			}
+
+			// Remove any loaders
+			questionMark := strings.LastIndex(sourcePath, "?")
+			if questionMark-1 > 0 {
+				sourcePath = sourcePath[:questionMark-1]
+			}
+		}
+		if !path.IsAbs(sourcePath) {
+			sourcePath = path.Join(relativePath, sourcePath)
+		}
+		content, err := os.ReadFile(sourcePath)
+		if err != nil {
+			logger.Warn(fmt.Sprintf("Cannot read source file '%s' when searching relative to '%s'.", sourcePath, relativePath))
+			sourcesContent = append(sourcesContent, nil)
+		} else {
+			contentString := string(content)
+			sourcesContent = append(sourcesContent, &contentString)
+		}
+	}
+
+	section["sourcesContent"] = sourcesContent
+}
+
+// If the source map doesn't have sourcesContent then attempt to add it
+func AddSources(sourceMapContents map[string]interface{}, relativePath string, logger log.Logger) {
+	if sections, exists := sourceMapContents["sections"]; exists {
+		if sources, ok := sections.([]map[string]interface{}); ok {
+			for _, section := range sources {
+				addSourcesContent(section, relativePath, logger)
+			}
+		}
+	} else {
+		addSourcesContent(sourceMapContents, relativePath, logger)
+	}
+}
+
 // Attempt to find the bundle path by changing the extension of the source map if the bundle path is not passed in to the command line
 func resolveBundlePath(bundlePath string, sourceMapPath string) (string, error) {
 	if bundlePath != "" {
@@ -146,7 +242,22 @@ func uploadSingleSourceMap(
 	logger log.Logger,
 ) {
 
-	bundlePath, err := resolveBundlePath(bundlePath, sourceMapPath)
+	sourceMapContents, err := ReadSourceMap(sourceMapPath, logger)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	AddSources(sourceMapContents, projectRoot, logger)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	encodedSourceMap, err := json.Marshal(sourceMapContents)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	bundlePath, err = resolveBundlePath(bundlePath, sourceMapPath)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -163,10 +274,10 @@ func uploadSingleSourceMap(
 		logger.Fatal(err.Error())
 	}
 
-	fileFieldData := make(map[string]string)
-	fileFieldData["sourceMap"] = sourceMapPath
+	fileFieldData := make(map[string]server.FileField)
+	fileFieldData["sourceMap"] = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
 	if bundlePath != "" {
-		fileFieldData["minifiedFile"] = bundlePath
+		fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 	}
 
 	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)

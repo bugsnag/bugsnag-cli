@@ -21,7 +21,7 @@ func UploadAndroidNdk(
 	dryRun bool,
 	logger log.Logger,
 ) error {
-	fileFieldData := make(map[string]string)
+	fileFieldData := make(map[string]server.FileField)
 
 	numberOfFiles := len(fileList)
 
@@ -37,7 +37,7 @@ func UploadAndroidNdk(
 			return err
 		}
 
-		fileFieldData["soFile"] = file
+		fileFieldData["soFile"] = server.LocalFile(file)
 
 		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
 
