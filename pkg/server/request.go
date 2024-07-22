@@ -78,7 +78,10 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 	writer := multipart.NewWriter(body)
 
 	for key, value := range fileFieldData {
-		value.writeToForm(writer, key)
+		err := value.writeToForm(writer, key)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for key, value := range fieldData {
