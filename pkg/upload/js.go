@@ -154,10 +154,6 @@ func uploadSingleSourceMap(
 	url := bundleUrl
 	if baseUrl != "" {
 		_, fileName := filepath.Split(bundlePath)
-		if err != nil {
-			logger.Warn(fmt.Sprintf("cannot make path relative to create URL, skipping: %v", err))
-			return
-		}
 		url = baseUrl + fileName
 	}
 
