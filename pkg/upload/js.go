@@ -124,7 +124,8 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 	return sourceMapContents, nil
 }
 
-func addSourcesContent(section map[string]interface{}, relativePath string, logger log.Logger) {
+// Based on the source map specification https://bit.ly/sourcemap
+func addSourcesContent(section map[string]interface{}, projectRoot string, logger log.Logger) {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
 		logger.Warn("Source map doesn't have required sources field")
@@ -176,11 +177,11 @@ func addSourcesContent(section map[string]interface{}, relativePath string, logg
 			}
 		}
 		if !path.IsAbs(sourcePath) {
-			sourcePath = path.Join(relativePath, sourcePath)
+			sourcePath = path.Join(projectRoot, sourcePath)
 		}
 		content, err := os.ReadFile(sourcePath)
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Cannot read source file '%s' when searching relative to '%s'.", sourcePath, relativePath))
+			logger.Warn(fmt.Sprintf("Cannot read referenced source file '%s'.", sourcePath))
 			sourcesContent = append(sourcesContent, nil)
 		} else {
 			contentString := string(content)
@@ -192,15 +193,16 @@ func addSourcesContent(section map[string]interface{}, relativePath string, logg
 }
 
 // If the source map doesn't have sourcesContent then attempt to add it
-func AddSources(sourceMapContents map[string]interface{}, relativePath string, logger log.Logger) {
+func AddSources(sourceMapContents map[string]interface{}, projectRoot string, logger log.Logger) {
+	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
 		if sources, ok := sections.([]map[string]interface{}); ok {
 			for _, section := range sources {
-				addSourcesContent(section, relativePath, logger)
+				addSourcesContent(section, projectRoot, logger)
 			}
 		}
 	} else {
-		addSourcesContent(sourceMapContents, relativePath, logger)
+		addSourcesContent(sourceMapContents, projectRoot, logger)
 	}
 }
 
@@ -248,9 +250,6 @@ func uploadSingleSourceMap(
 	}
 
 	AddSources(sourceMapContents, projectRoot, logger)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
 
 	encodedSourceMap, err := json.Marshal(sourceMapContents)
 	if err != nil {
