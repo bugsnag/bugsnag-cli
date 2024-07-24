@@ -12,15 +12,15 @@ import (
 )
 
 type AndroidProguardMapping struct {
-	ApplicationId string      `help:"Module application identifier"`
-	AppManifest   string      `help:"Path to app manifest file" type:"path"`
-	BuildUuid     string      `help:"Module Build UUID" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Upload with no Build UUID" xor:"build-uuid,no-build-uuid"`
-	DexFiles      []string    `help:"Path to classes.dex files or directory" type:"path" default:""`
-	Path          utils.Paths `arg:"" name:"path" help:"Path to directory or file to upload" type:"path" default:"."`
-	Variant       string      `help:"Build type, like 'debug' or 'release'"`
-	VersionCode   string      `help:"Module version code"`
-	VersionName   string      `help:"Module version name"`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	AppManifest   string      `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	DexFiles      []string    `help:"The path to classes.dex files or directory used to calculate a build UUID" type:"path" default:""`
+	Variant       string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode   string      `help:"The version code of this build of the application"`
+	VersionName   string      `help:"The version of the application"`
 }
 
 func ProcessAndroidProguard(
