@@ -255,30 +255,32 @@ func uploadSingleSourceMap(
 	overwrite bool,
 	dryRun bool,
 	logger log.Logger,
-) {
+) error {
 
 	sourceMapContents, err := ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
-		logger.Fatal(err.Error())
+		return err
 	}
 
 	var sourceMapFile server.FileField
 
 	sourceMapModified := AddSources(sourceMapContents, sourceMapPath, projectRoot, logger)
 	if sourceMapModified {
+		logger.Info(fmt.Sprintf("Added sources content to source map from %s", sourceMapPath))
 		encodedSourceMap, err := json.Marshal(sourceMapContents)
 		if err != nil {
-			logger.Fatal(err.Error())
+			return fmt.Errorf("failed generate valid source map JSON with original sources added: %s", err.Error())
 		}
 		sourceMapFile = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
 	} else {
 		// Directly use the local file if the source map wasn't modified.
+		logger.Info(fmt.Sprintf("Uploading unmodified source map from %s", sourceMapPath))
 		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
 	bundlePath, err = resolveBundlePath(bundlePath, sourceMapPath, logger)
 	if err != nil {
-		logger.Fatal(err.Error())
+		return err
 	}
 
 	url := bundleUrl
@@ -291,7 +293,7 @@ func uploadSingleSourceMap(
 	uploadOptions, err := utils.BuildJsUploadOptions(apiKey, appVersion, url, projectRoot, overwrite)
 
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("failed to build upload options: %s", err.Error()))
+		return fmt.Errorf("failed to build upload options: %s", err.Error())
 	}
 
 	fileFieldData := make(map[string]server.FileField)
@@ -303,8 +305,10 @@ func uploadSingleSourceMap(
 	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)
 
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("encountered error when uploading js sourcemap: %s", err.Error()))
+		return fmt.Errorf("encountered error when uploading js sourcemap: %s", err.Error())
 	}
+
+	return nil
 }
 
 func ProcessJs(
@@ -367,7 +371,10 @@ func ProcessJs(
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			uploadSingleSourceMap(bundleUrl, baseUrl, bundlePath, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+			err := uploadSingleSourceMap(bundleUrl, baseUrl, bundlePath, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+			if err != nil {
+				return err
+			}
 		}
 
 	}
