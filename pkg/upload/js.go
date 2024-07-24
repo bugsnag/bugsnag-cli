@@ -16,11 +16,11 @@ import (
 )
 
 type JsOptions struct {
+	Path        utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
 	BaseUrl     string      `help:"For directory-based uploads, the URL of the base directory for the minified JavaScript files that the source maps relate to. The relative path is appended onto this for each file. Asterisks can be used as a wildcard."`
 	Bundle      string      `help:"Path to the minified JavaScript file that the source map relates to. If this is not provided then the file will be obtained when an error event is received." type:"path"`
 	BundleUrl   string      `help:"For single file uploads, the URL of the minified JavaScript file that the source map relates to. Asterisks can be used as a wildcard."`
-	Path        utils.Paths `arg:"" name:"path" help:"Path to a directory of source maps and bundles to upload" type:"path" default:"."`
-	ProjectRoot string      `help:"Path of the root directory on the file system where the source map was built. This will be stripped from the file name in the displayed stack traces." type:"path"`
+	ProjectRoot string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 	SourceMap   string      `help:"Path to the source map file. This usually has the .min.js extension." type:"path"`
 	VersionName string      `help:"The version of the app that the source map applies to. Defaults to the version in the package.json file (if found)."`
 }
