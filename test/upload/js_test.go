@@ -12,12 +12,13 @@ func TestPopulateSourceMap(t *testing.T) {
 	t.Log("Testing populating source map")
 	logger := log.NewLoggerWrapper("debug")
 
-	results, err := upload.ReadSourceMap("../testdata/js-nosources/dist/main.js.map", logger)
+	sourceMapPath := "../testdata/js-nosources/dist/main.js.map"
+	results, err := upload.ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
 		t.Error(err)
 	}
 
-	modified := upload.AddSources(results, "../testdata/js-nosources", logger)
+	modified := upload.AddSources(results, sourceMapPath, "../testdata/js-nosources", logger)
 	if !modified {
 		t.Error("Source map should have been modified")
 	}
