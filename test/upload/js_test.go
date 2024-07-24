@@ -17,13 +17,16 @@ func TestPopulateSourceMap(t *testing.T) {
 		t.Error(err)
 	}
 
-	upload.AddSources(results, "../testdata/js-nosources", logger)
+	modified := upload.AddSources(results, "../testdata/js-nosources", logger)
+	if !modified {
+		t.Error("Source map should have been modified")
+	}
 
 	if len(results["sources"].([]interface{})) != 3 {
 		t.Error("Sources is not 3 long")
 	}
 	contents := results["sourcesContent"].([]*string)
-	if len(contents) != 33 {
+	if len(contents) != 3 {
 		t.Error("SourcesContent is not 3 long")
 	}
 	if !strings.Contains(*contents[2], "const element = document.createElement('div');") {

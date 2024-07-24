@@ -124,17 +124,17 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 	return sourceMapContents, nil
 }
 
-// Based on the source map specification https://bit.ly/sourcemap
-func addSourcesContent(section map[string]interface{}, projectRoot string, logger log.Logger) {
+// Based on the source map specification https://bit.ly/sourcemap. Returns if the source map was modified.
+func addSourcesContent(section map[string]interface{}, projectRoot string, logger log.Logger) bool {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
 		logger.Warn("Source map doesn't have required sources field")
-		return
+		return false
 	}
 	sources, sourcesValid := untypedSources.([]interface{})
 	if !sourcesValid {
 		logger.Warn("Sources aren't an array")
-		return
+		return false
 	}
 
 	// Skip if the sources content is already valid
@@ -143,7 +143,7 @@ func addSourcesContent(section map[string]interface{}, projectRoot string, logge
 		sourcesContent, sourcesContentValid := untypedSourcesContent.([]interface{})
 		if sourcesContentValid && len(sourcesContent) == len(sources) {
 			logger.Debug("SourcesContent is already populated")
-			return
+			return false
 		}
 	}
 
@@ -165,7 +165,7 @@ func addSourcesContent(section map[string]interface{}, projectRoot string, logge
 			}
 
 			// Skip virtual webpack files
-			if strings.Contains(sourcePath, "/webpack/") {
+			if strings.Contains(sourcePath, "webpack/") {
 				sourcesContent = append(sourcesContent, nil)
 				continue
 			}
@@ -190,20 +190,25 @@ func addSourcesContent(section map[string]interface{}, projectRoot string, logge
 	}
 
 	section["sourcesContent"] = sourcesContent
+	return true
 }
 
-// If the source map doesn't have sourcesContent then attempt to add it
-func AddSources(sourceMapContents map[string]interface{}, projectRoot string, logger log.Logger) {
+// If the source map doesn't have sourcesContent then attempt to add it. Returns true if a modifcation was performed.
+func AddSources(sourceMapContents map[string]interface{}, projectRoot string, logger log.Logger) bool {
 	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
 		if sources, ok := sections.([]map[string]interface{}); ok {
+			anyModified := false
 			for _, section := range sources {
-				addSourcesContent(section, projectRoot, logger)
+				modified := addSourcesContent(section, projectRoot, logger)
+				anyModified = modified || anyModified
 			}
+			return anyModified
 		}
 	} else {
-		addSourcesContent(sourceMapContents, projectRoot, logger)
+		return addSourcesContent(sourceMapContents, projectRoot, logger)
 	}
+	return false
 }
 
 // Attempt to find the bundle path by changing the extension of the source map if the bundle path is not passed in to the command line
@@ -249,11 +254,18 @@ func uploadSingleSourceMap(
 		logger.Fatal(err.Error())
 	}
 
-	AddSources(sourceMapContents, projectRoot, logger)
+	var sourceMapFile server.FileField
 
-	encodedSourceMap, err := json.Marshal(sourceMapContents)
-	if err != nil {
-		logger.Fatal(err.Error())
+	sourceMapModified := AddSources(sourceMapContents, projectRoot, logger)
+	if sourceMapModified {
+		encodedSourceMap, err := json.Marshal(sourceMapContents)
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+		sourceMapFile = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
+	} else {
+		// Directly use the local file if the source map wasn't modified.
+		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
 	bundlePath, err = resolveBundlePath(bundlePath, sourceMapPath)
@@ -274,7 +286,7 @@ func uploadSingleSourceMap(
 	}
 
 	fileFieldData := make(map[string]server.FileField)
-	fileFieldData["sourceMap"] = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
+	fileFieldData["sourceMap"] = sourceMapFile
 	if bundlePath != "" {
 		fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 	}
