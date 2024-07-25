@@ -1,5 +1,11 @@
 # Changelog
 
+## TBD
+
+### Enhancements
+
+- Add support for JavaScript source maps [121](https://github.com/bugsnag/bugsnag-cli/pull/121)
+
 ## 2.4.1 (2024-07-17)
 
 ### Fixes
