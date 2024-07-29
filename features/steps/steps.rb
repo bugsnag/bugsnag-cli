@@ -22,7 +22,6 @@ end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
   @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
-  puts @output
 end
 
 Then('I should see a log level of {string} when no dSYM files could be found') do |log_level|
@@ -162,7 +161,6 @@ end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
-  puts @output
 end
 
 Then(/^I should only see the fatal log level messages$/) do
@@ -171,4 +169,43 @@ Then(/^I should only see the fatal log level messages$/) do
   Maze.check.not_include(run_output, "[WARN]")
   Maze.check.not_include(run_output, "[INFO]")
   Maze.check.not_include(run_output, "[DEBUG]")
+end
+
+Given(/^I package the bugsnag\-cli$/) do
+  @output = `npm pack`
+  @bugsnag_cli_package_path = "#{Dir.pwd}/#{@output.strip}"
+end
+
+And(/^I init a new nodejs project$/) do
+  @base_dir = Dir.pwd
+  # Make a new directory in feature/cli/fixtures
+  Dir.mkdir("#{Dir.pwd}/features/cli/fixture/")
+  # Change directory to new directory
+  Dir.chdir("#{Dir.pwd}/features/cli/fixture/")
+  @output = `npm init -y`
+end
+
+Then(/^I install the bugsnag\-cli via npm in the new project$/) do
+  @output = `npm install #{@bugsnag_cli_package_path}`
+end
+
+Then(/^I install the bugsnag\-cli via yarn in the new project$/) do
+  @output = `yarn add #{@bugsnag_cli_package_path}`
+end
+
+Then(/^I install the bugsnag\-cli via pnpm in the new project$/) do
+  @output = `pnpm add #{@bugsnag_cli_package_path}`
+end
+
+Then('the node_modules bin directory should contain {string}') do |arg|
+  Maze.check.include(`ls node_modules/.bin`, arg)
+end
+
+Then(/^I clean up the project$/) do
+  # Change directory to feature/cli
+  Dir.chdir(@base_dir)
+  # Remove the fixture directory
+  FileUtils.rm_rf("#{Dir.pwd}/features/cli/fixture")
+  # Remove the bugsnag-cli package
+  FileUtils.rm(@bugsnag_cli_package_path)
 end
