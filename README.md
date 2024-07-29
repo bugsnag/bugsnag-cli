@@ -90,6 +90,14 @@ To get unminified stack traces for JavaScript code in your React Native app buil
 
 See the [`upload react-native-ios`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/) command reference for full usage information.
 
+### JavaScript source maps
+
+To get unminified stack traces for JavaScript code on the web, source maps must be generated and uploaded to BugSnag.
+
+    $ bugsnag-cli upload js
+
+See the [`upload js`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-js/) command reference for full usage information.
+
 ### Dart symbols for Flutter
 
 If you are stripping debug symbols from your Dart code when building your Flutter apps, you will need to upload symbol files in order to see full stacktraces using the following command:

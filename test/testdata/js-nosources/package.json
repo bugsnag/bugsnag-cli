@@ -1,0 +1,14 @@
+{
+  "name": "js",
+  "version": "1.2.3",
+  "private": true,
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "mini-css-extract-plugin": "^2.9.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0"
+  }
+}

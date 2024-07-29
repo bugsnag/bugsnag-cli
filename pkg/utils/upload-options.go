@@ -141,6 +141,36 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 	return uploadOptions, nil
 }
 
+func BuildJsUploadOptions(apiKey string, versionName string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if versionName != "" {
+		uploadOptions["appVersion"] = versionName
+	}
+
+	if bundleUrl != "" {
+		uploadOptions["minifiedUrl"] = bundleUrl
+	} else {
+		return nil, fmt.Errorf("missing minified URL, please specify using `--bundle-url`")
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	return uploadOptions, nil
+}
+
 // BuildAndroidNDKUploadOptions - Builds the upload options for processing NDK files
 func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)

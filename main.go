@@ -227,6 +227,31 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload js", "upload js <path>":
+
+		err := upload.ProcessJs(
+			commands.ApiKey,
+
+			commands.Upload.Js.VersionName,
+			commands.Upload.Js.BundleUrl,
+			commands.Upload.Js.BaseUrl,
+			commands.Upload.Js.SourceMap,
+			commands.Upload.Js.Bundle,
+			commands.Upload.Js.ProjectRoot,
+			commands.Upload.Js.Path,
+
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+			logger,
+		)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload dsym", "upload dsym <path>":
 
 		err := upload.ProcessDsym(
