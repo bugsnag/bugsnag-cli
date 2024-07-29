@@ -82,6 +82,14 @@ type Js struct {
 	VersionName string      `help:"The version of the app that the source map applies to. Defaults to the version in the package.json file (if found)."`
 }
 
+type ReactNative struct {
+	Path            utils.Paths                `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
+	ProjectRoot     string                     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Shared          ReactNativeShared          `embed:""`
+	AndroidSpecific ReactNativeAndroidSpecific `embed:"" prefix:"android-"`
+	IosSpecific     ReactNativeIosSpecific     `embed:"" prefix:"ios-"`
+}
+
 type ReactNativeAndroidSpecific struct {
 	AppManifest string `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
 	Variant     string `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
@@ -151,6 +159,7 @@ type CLI struct {
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		Dsym               Dsym                   `cmd:"" help:"Upload dSYMs for iOS"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
+		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
