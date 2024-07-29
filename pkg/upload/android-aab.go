@@ -21,13 +21,7 @@ type AndroidAabMapping struct {
 
 func ProcessAndroidAab(
 	apiKey string,
-	applicationId string,
-	buildUuid string,
-	noBuildUuid bool,
-	paths []string,
-	projectRoot string,
-	versionCode string,
-	versionName string,
+	options AndroidAabMapping,
 	endpoint string,
 	retries int,
 	timeout int,
@@ -41,7 +35,7 @@ func ProcessAndroidAab(
 	var aabFile string
 	var err error
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 		// Look for AAB file if the upload command was run somewhere within the project root
 		// based on an expected path of ${dir}/build/outputs/bundle/release/${dir}-release.aab
 		// or ${dir}/build/outputs/bundle/release/${dir}-release-dexguard.aab
@@ -71,7 +65,7 @@ func ProcessAndroidAab(
 		}
 	}
 
-	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, options.ApplicationId, options.BuildUuid, options.NoBuildUuid, options.VersionCode, options.VersionName, logger)
 
 	if err != nil {
 		return err
@@ -89,14 +83,13 @@ func ProcessAndroidAab(
 		if len(soFileList) > 0 {
 			err = ProcessAndroidNDK(
 				manifestData["apiKey"],
-				manifestData["applicationId"],
-				"",
-				"",
-				soFileList,
-				projectRoot,
-				"",
-				manifestData["versionCode"],
-				manifestData["versionName"],
+				AndroidNdkMapping{
+					ApplicationId: manifestData["applicationId"],
+					Path:          soFileList,
+					ProjectRoot:   options.ProjectRoot,
+					VersionCode:   manifestData["versionCode"],
+					VersionName:   manifestData["versionName"],
+				},
 				endpoint,
 				retries,
 				timeout,
@@ -120,15 +113,15 @@ func ProcessAndroidAab(
 	if utils.FileExists(mappingFilePath) {
 		err = ProcessAndroidProguard(
 			manifestData["apiKey"],
-			manifestData["applicationId"],
-			"",
-			manifestData["buildUuid"],
-			noBuildUuid,
-			[]string{filepath.Join(aabDir, "base", "dex")},
-			[]string{mappingFilePath},
-			"",
-			manifestData["versionCode"],
-			manifestData["versionName"],
+			AndroidProguardMapping{
+				ApplicationId: manifestData["applicationId"],
+				BuildUuid:     manifestData["buildUuid"],
+				NoBuildUuid:   options.NoBuildUuid,
+				DexFiles:      []string{filepath.Join(aabDir, "base", "dex")},
+				Path:          []string{mappingFilePath},
+				VersionCode:   manifestData["versionCode"],
+				VersionName:   manifestData["versionName"],
+			},
 			endpoint,
 			retries,
 			timeout,

@@ -27,11 +27,7 @@ type DartSymbolOptions struct {
 }
 
 func Dart(
-	paths []string,
-	version string,
-	versionCode string,
-	bundleVersion string,
-	iosAppPath string,
+	options DartSymbolOptions,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -41,7 +37,7 @@ func Dart(
 	logger log.Logger,
 ) error {
 
-	fileList, err := utils.BuildFileList(paths)
+	fileList, err := utils.BuildFileList(options.Path)
 
 	if err != nil {
 		logger.Fatal("error building file list")
@@ -64,7 +60,7 @@ func Dart(
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, version, versionCode)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, options.VersionName, options.VersionCode)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
@@ -83,6 +79,7 @@ func Dart(
 		if isIosPlatform {
 			logger.Info(fmt.Sprintf("Processing iOS symbol file: %s", file))
 
+			iosAppPath := string(options.IosAppPath)
 			if iosAppPath == "" {
 				iosAppPath, err = GetIosAppPath(file)
 
@@ -104,7 +101,7 @@ func Dart(
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, version, bundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, options.VersionName, options.BundleVersion)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)

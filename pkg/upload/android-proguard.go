@@ -25,15 +25,7 @@ type AndroidProguardMapping struct {
 
 func ProcessAndroidProguard(
 	apiKey string,
-	applicationId string,
-	appManifestPath string,
-	buildUuid string,
-	noBuildUuid bool,
-	dexFiles []string,
-	paths []string,
-	variant string,
-	versionCode string,
-	versionName string,
+	options AndroidProguardMapping,
 	endpoint string,
 	retries int,
 	timeout int,
@@ -46,7 +38,7 @@ func ProcessAndroidProguard(
 	var appManifestPathExpected string
 	var err error
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 		if utils.IsDir(path) {
 
 			mappingPath := filepath.Join(path, "app", "build", "outputs", "mapping")
@@ -55,43 +47,43 @@ func ProcessAndroidProguard(
 				return fmt.Errorf("unable to find the mapping directory in %s", path)
 			}
 
-			if variant == "" {
-				variant, err = android.GetVariantDirectory(mappingPath)
+			if options.Variant == "" {
+				options.Variant, err = android.GetVariantDirectory(mappingPath)
 
 				if err != nil {
 					return err
 				}
 			}
 
-			mappingFile = filepath.Join(mappingPath, variant, "mapping.txt")
+			mappingFile = filepath.Join(mappingPath, options.Variant, "mapping.txt")
 
 			if !utils.FileExists(mappingFile) {
 				return fmt.Errorf("unable to find mapping file in the specified project directory")
 			}
 
-			if appManifestPath == "" {
-				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+			if options.AppManifest == "" {
+				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", options.Variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
-					appManifestPath = appManifestPathExpected
-					logger.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+					options.AppManifest = appManifestPathExpected
+					logger.Info(fmt.Sprintf("Found app manifest at: %s", options.AppManifest))
 				}
 			}
 
 		} else {
 			mappingFile = path
 
-			if appManifestPath == "" {
-				if variant == "" {
-					//	Set the mergeNativeLibPath based off the file location e.g. outputs/mapping/<variant>/mapping.txt
+			if options.AppManifest == "" {
+				if options.Variant == "" {
+					//	Set the mergeNativeLibPath based off the file location e.g. outputs/mapping/<options.Variant>/mapping.txt
 					mergedManifestPath := filepath.Join(path, "..", "..", "..", "..", "intermediates", "merged_manifests")
 
 					if filepath.Base(mergedManifestPath) == "merged_manifests" {
-						variant, err = android.GetVariantDirectory(mergedManifestPath)
+						options.Variant, err = android.GetVariantDirectory(mergedManifestPath)
 						if err == nil {
-							appManifestPathExpected = filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
+							appManifestPathExpected = filepath.Join(mergedManifestPath, options.Variant, "AndroidManifest.xml")
 							if utils.FileExists(appManifestPathExpected) {
-								appManifestPath = appManifestPathExpected
-								logger.Info(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+								options.AppManifest = appManifestPathExpected
+								logger.Info(fmt.Sprintf("Found app manifest at: %s", options.AppManifest))
 							}
 						}
 					}
@@ -101,10 +93,10 @@ func ProcessAndroidProguard(
 		}
 
 		// Check to see if we need to read the manifest file due to missing options
-		if appManifestPath != "" && (apiKey == "" || applicationId == "" || buildUuid == "" || versionCode == "" || versionName == "") {
+		if options.AppManifest != "" && (apiKey == "" || options.ApplicationId == "" || options.BuildUuid == "" || options.VersionCode == "" || options.VersionName == "") {
 
 			logger.Debug("Reading data from AndroidManifest.xml")
-			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
+			manifestData, err := android.ParseAndroidManifestXML(options.AppManifest)
 
 			if err != nil {
 				return err
@@ -122,30 +114,30 @@ func ProcessAndroidProguard(
 				}
 			}
 
-			if applicationId == "" {
-				applicationId = manifestData.ApplicationId
+			if options.ApplicationId == "" {
+				options.ApplicationId = manifestData.ApplicationId
 
-				if applicationId != "" {
-					logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
+				if options.ApplicationId != "" {
+					logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", options.ApplicationId))
 				}
 			}
 
-			if noBuildUuid {
-				buildUuid = ""
+			if options.NoBuildUuid {
+				options.BuildUuid = ""
 				logger.Info("No build ID will be used")
-			} else if buildUuid == "" {
+			} else if options.BuildUuid == "" {
 				for i := range manifestData.Application.MetaData.Name {
 					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
-						buildUuid = manifestData.Application.MetaData.Value[i]
+						options.BuildUuid = manifestData.Application.MetaData.Value[i]
 					}
 				}
 
-				if len(dexFiles) == 0 && variant != "" {
-					dexFiles = android.FindVariantDexFiles(mappingFile, variant)
+				if len(options.DexFiles) == 0 && options.Variant != "" {
+					options.DexFiles = android.FindVariantDexFiles(mappingFile, options.Variant)
 				}
 
-				if buildUuid == "" && len(dexFiles) > 0 {
-					safeDexFile, err := android.GetDexFiles(dexFiles)
+				if options.BuildUuid == "" && len(options.DexFiles) > 0 {
+					safeDexFile, err := android.GetDexFiles(options.DexFiles)
 					if err != nil {
 						return err
 					}
@@ -155,30 +147,30 @@ func ProcessAndroidProguard(
 						return err
 					}
 
-					buildUuid = fmt.Sprintf("%x", signature)
+					options.BuildUuid = fmt.Sprintf("%x", signature)
 
-					if buildUuid != "" {
-						logger.Debug(fmt.Sprintf("Using %s as build ID from classes.dex", buildUuid))
+					if options.BuildUuid != "" {
+						logger.Debug(fmt.Sprintf("Using %s as build ID from classes.dex", options.BuildUuid))
 					}
 				} else {
-					logger.Debug(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", buildUuid))
+					logger.Debug(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", options.BuildUuid))
 				}
 			}
 
-			if versionCode == "" {
-				versionCode = manifestData.VersionCode
+			if options.VersionCode == "" {
+				options.VersionCode = manifestData.VersionCode
 
-				if versionCode != "" {
+				if options.VersionCode != "" {
 
-					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", options.VersionCode))
 				}
 			}
 
-			if versionName == "" {
-				versionName = manifestData.VersionName
+			if options.VersionName == "" {
+				options.VersionName = manifestData.VersionName
 
-				if versionName != "" {
-					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+				if options.VersionName != "" {
+					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", options.VersionName))
 				}
 			}
 		}
@@ -190,7 +182,7 @@ func ProcessAndroidProguard(
 			return err
 		}
 
-		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, applicationId, versionName, versionCode, buildUuid, overwrite)
+		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(apiKey, options.ApplicationId, options.VersionName, options.VersionCode, options.BuildUuid, overwrite)
 
 		if err != nil {
 			return err

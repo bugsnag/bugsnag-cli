@@ -17,7 +17,7 @@ type Dsym struct {
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	Plist              utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	Scheme             string      `help:"The name of the Xcode scheme used to build the application"`
+	Scheme             string      `help:"The name of the Xcode options.Scheme used to build the application"`
 	VersionName        string      `help:"The version of the application"`
 	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 	ProjectRoot        string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
@@ -25,13 +25,7 @@ type Dsym struct {
 
 func ProcessDsym(
 	apiKey string,
-	scheme string,
-	xcodeProjPath string,
-	plistPath string,
-	projectRoot string,
-	ignoreMissingDwarf bool,
-	ignoreEmptyDsym bool,
-	paths []string,
+	options Dsym,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -48,6 +42,8 @@ func ProcessDsym(
 	var dsymPath string
 	var err error
 	var tempDir string
+	xcodeProjPath := string(options.XcodeProject)
+	plistPath := string(options.Plist)
 
 	// Performs an automatic cleanup of temporary directories at the end
 	defer func() {
@@ -56,7 +52,7 @@ func ProcessDsym(
 		}
 	}()
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			if xcodeProjPath == "" {
 				xcodeProjPath = path
@@ -66,27 +62,27 @@ func ProcessDsym(
 		}
 
 		if xcodeProjPath != "" {
-			projectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, projectRoot)
-			logger.Debug(fmt.Sprintf("Defaulting to '%s' as the project root", projectRoot))
+			options.ProjectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, options.ProjectRoot)
+			logger.Debug(fmt.Sprintf("Defaulting to '%s' as the project root", options.ProjectRoot))
 
 			// Get build settings and dsymPath
 
-			// If scheme is set explicitly, check if it exists
-			if scheme != "" {
-				_, err := ios.IsSchemeInPath(xcodeProjPath, scheme)
+			// If options.Scheme is set explicitly, check if it exists
+			if options.Scheme != "" {
+				_, err := ios.IsSchemeInPath(xcodeProjPath, options.Scheme)
 				if err != nil {
 					logger.Warn(err.Error())
 				}
 			} else {
 				// Otherwise, try to find it
-				scheme, err = ios.GetDefaultScheme(xcodeProjPath)
+				options.Scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					logger.Warn(err.Error())
 				}
 			}
 
-			if scheme != "" {
-				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, scheme)
+			if options.Scheme != "" {
+				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, options.Scheme)
 				if err != nil {
 					logger.Warn(err.Error())
 				}
@@ -106,7 +102,7 @@ func ProcessDsym(
 			}
 		}
 
-		if projectRoot == "" {
+		if options.ProjectRoot == "" {
 			return fmt.Errorf("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
 		}
 
@@ -114,7 +110,7 @@ func ProcessDsym(
 			return fmt.Errorf("No dSYM locations detected. Please provide a valid dSYM path or an Xcode project/workspace path")
 		}
 
-		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, ignoreEmptyDsym, ignoreMissingDwarf, logger)
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, options.IgnoreEmptyDsym, options.IgnoreMissingDwarf, logger)
 		tempDirs = append(tempDirs, tempDir)
 		if err != nil {
 			return err
@@ -155,7 +151,7 @@ func ProcessDsym(
 			dsymInfo := fmt.Sprintf("(UUID: %s, Name: %s, Arch: %s)", dsym.UUID, dsym.Name, dsym.Arch)
 			logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
-			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, projectRoot)
+			uploadOptions, err = utils.BuildDsymUploadOptions(apiKey, options.ProjectRoot)
 			if err != nil {
 				return err
 			}

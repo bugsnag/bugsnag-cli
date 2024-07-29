@@ -24,14 +24,7 @@ type AndroidNdkMapping struct {
 
 func ProcessAndroidNDK(
 	apiKey string,
-	applicationId string,
-	androidNdkRoot string,
-	appManifestPath string,
-	paths []string,
-	projectRoot string,
-	variant string,
-	versionCode string,
-	versionName string,
+	options AndroidNdkMapping,
 	endpoint string,
 	retries int,
 	timeout int,
@@ -48,7 +41,7 @@ func ProcessAndroidNDK(
 	var appManifestPathExpected string
 	var objCopyPath string
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 
 		// Search for NDK symbol files based on an expected path
 		arr := []string{"android", "app", "build", "intermediates", "merged_native_libs"}
@@ -59,51 +52,51 @@ func ProcessAndroidNDK(
 		}
 
 		if filepath.Base(mergeNativeLibPath) == "merged_native_libs" {
-			if variant == "" {
-				variant, err = android.GetVariantDirectory(mergeNativeLibPath)
+			if options.Variant == "" {
+				options.Variant, err = android.GetVariantDirectory(mergeNativeLibPath)
 				if err != nil {
 					return err
 				}
 			}
 
-			if appManifestPath == "" {
-				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", variant, "AndroidManifest.xml")
+			if options.AppManifest == "" {
+				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", options.Variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
-					appManifestPath = appManifestPathExpected
-					logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+					options.AppManifest = appManifestPathExpected
+					logger.Debug(fmt.Sprintf("Found app manifest at: %s", options.AppManifest))
 				}
 
 			}
 
-			if projectRoot == "" {
-				// Setting projectRoot to the suspected root of the project
-				projectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
+			if options.ProjectRoot == "" {
+				// Setting options.ProjectRoot to the suspected root of the project
+				options.ProjectRoot = filepath.Join(mergeNativeLibPath, "..", "..", "..", "..")
 			}
 		}
 
 		// Ensure only files from within the directory the upload command is run from are uploaded
 		if !utils.IsDir(path) {
 			fileList = append(fileList, path)
-		} else if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", variant)) {
+		} else if strings.Contains(path, fmt.Sprintf("merged_native_libs/%s", options.Variant)) {
 			fileList, err = utils.BuildFileList([]string{path})
 		} else {
-			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, variant)})
+			fileList, err = utils.BuildFileList([]string{filepath.Join(mergeNativeLibPath, options.Variant)})
 		}
 
 		if err != nil {
-			return fmt.Errorf("error building file list for variant: " + variant + ". " + err.Error())
+			return fmt.Errorf("error building file list for options.Variant: " + options.Variant + ". " + err.Error())
 		}
 	}
 
-	if projectRoot != "" {
-		logger.Debug(fmt.Sprintf("Using %s as the project root", projectRoot))
+	if options.ProjectRoot != "" {
+		logger.Debug(fmt.Sprintf("Using %s as the project root", options.ProjectRoot))
 	}
 
 	// Check to see if we need to read the manifest file due to missing options
-	if appManifestPath != "" && (apiKey == "" || applicationId == "" || versionCode == "" || versionName == "") {
+	if options.AppManifest != "" && (apiKey == "" || options.ApplicationId == "" || options.VersionCode == "" || options.VersionName == "") {
 
 		logger.Debug("Reading data from AndroidManifest.xml")
-		manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
+		manifestData, err := android.ParseAndroidManifestXML(options.AppManifest)
 
 		if err != nil {
 			return err
@@ -121,27 +114,27 @@ func ProcessAndroidNDK(
 			}
 		}
 
-		if applicationId == "" {
-			applicationId = manifestData.ApplicationId
+		if options.ApplicationId == "" {
+			options.ApplicationId = manifestData.ApplicationId
 
-			if applicationId != "" {
-				logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", applicationId))
+			if options.ApplicationId != "" {
+				logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", options.ApplicationId))
 			}
 		}
 
-		if versionCode == "" {
-			versionCode = manifestData.VersionCode
+		if options.VersionCode == "" {
+			options.VersionCode = manifestData.VersionCode
 
-			if versionCode != "" {
-				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+			if options.VersionCode != "" {
+				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", options.VersionCode))
 			}
 		}
 
-		if versionName == "" {
-			versionName = manifestData.VersionName
+		if options.VersionName == "" {
+			options.VersionName = manifestData.VersionName
 
-			if versionName != "" {
-				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+			if options.VersionName != "" {
+				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", options.VersionName))
 			}
 		}
 	}
@@ -153,18 +146,18 @@ func ProcessAndroidNDK(
 		} else if filepath.Ext(file) == ".so" {
 			// Check NDK path is set
 			if objCopyPath == "" {
-				androidNdkRoot, err = android.GetAndroidNDKRoot(androidNdkRoot)
+				options.AndroidNdkRoot, err = android.GetAndroidNDKRoot(options.AndroidNdkRoot)
 
 				if err != nil {
 					return err
 				}
 
-				objCopyPath, err = android.BuildObjcopyPath(androidNdkRoot)
+				objCopyPath, err = android.BuildObjcopyPath(options.AndroidNdkRoot)
 
 				if err != nil {
 					return err
 				}
-				logger.Debug(fmt.Sprintf("Located objcopy within Android NDK path: %s", androidNdkRoot))
+				logger.Debug(fmt.Sprintf("Located objcopy within Android NDK path: %s", options.AndroidNdkRoot))
 			}
 
 			logger.Debug(fmt.Sprintf("Extracting debug info from %s using objcopy", filepath.Base(file)))
@@ -192,10 +185,10 @@ func ProcessAndroidNDK(
 	err = android.UploadAndroidNdk(
 		symbolFileList,
 		apiKey,
-		applicationId,
-		versionName,
-		versionCode,
-		projectRoot,
+		options.ApplicationId,
+		options.VersionName,
+		options.VersionCode,
+		options.ProjectRoot,
 		overwrite,
 		endpoint,
 		timeout,

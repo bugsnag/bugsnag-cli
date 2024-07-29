@@ -24,14 +24,7 @@ type UnityAndroid struct {
 
 func ProcessUnityAndroid(
 	apiKey string,
-	aabPath string,
-	applicationId string,
-	versionCode string,
-	buildUuid string,
-	noBuildUuid bool,
-	versionName string,
-	projectRoot string,
-	paths []string,
+	options UnityAndroid,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -44,8 +37,9 @@ func ProcessUnityAndroid(
 	var archList []string
 	var symbolFileList []string
 	var manifestData map[string]string
+	var aabPath = string(options.AabPath)
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 		if utils.IsDir(path) {
 			zipPath, err = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
@@ -81,7 +75,7 @@ func ProcessUnityAndroid(
 
 		defer os.RemoveAll(aabDir)
 
-		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, options.ApplicationId, options.BuildUuid, options.NoBuildUuid, options.VersionCode, options.VersionName, logger)
 
 		if err != nil {
 			return err
@@ -89,13 +83,15 @@ func ProcessUnityAndroid(
 
 		err = ProcessAndroidAab(
 			manifestData["apiKey"],
-			manifestData["applicationId"],
-			manifestData["buildUuid"],
-			noBuildUuid,
-			[]string{aabDir},
-			projectRoot,
-			manifestData["versionCode"],
-			manifestData["versionName"],
+			AndroidAabMapping{
+				ApplicationId: manifestData["applicationId"],
+				BuildUuid:     manifestData["buildUuid"],
+				NoBuildUuid:   options.NoBuildUuid,
+				Path:          []string{aabDir},
+				ProjectRoot:   options.ProjectRoot,
+				VersionCode:   manifestData["versionCode"],
+				VersionName:   manifestData["versionName"],
+			},
 			endpoint,
 			retries,
 			timeout,
@@ -112,7 +108,7 @@ func ProcessUnityAndroid(
 	logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
 
 	if manifestData == nil {
-		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, options.ApplicationId, options.BuildUuid, options.NoBuildUuid, options.VersionCode, options.VersionName, logger)
 	}
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
@@ -149,7 +145,7 @@ func ProcessUnityAndroid(
 		manifestData["applicationId"],
 		manifestData["versionName"],
 		manifestData["versionCode"],
-		projectRoot,
+		options.ProjectRoot,
 		overwrite,
 		endpoint,
 		timeout,

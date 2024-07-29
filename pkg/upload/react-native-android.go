@@ -28,16 +28,7 @@ type ReactNativeAndroid struct {
 
 func ProcessReactNativeAndroid(
 	apiKey string,
-	appManifestPath string,
-	bundlePath string,
-	codeBundleId string,
-	dev bool,
-	paths []string,
-	projectRoot string,
-	variant string,
-	versionName string,
-	versionCode string,
-	sourceMapPath string,
+	options ReactNativeAndroid,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -53,7 +44,7 @@ func ProcessReactNativeAndroid(
 	var bundleDirPath string
 	var variantFileFormat string
 
-	for _, path := range paths {
+	for _, path := range options.Path {
 
 		buildDirPath := filepath.Join(path, "android", "app", "build")
 		rootDirPath = path
@@ -61,25 +52,25 @@ func ProcessReactNativeAndroid(
 			buildDirPath = filepath.Join(path, "app", "build")
 			if utils.FileExists(buildDirPath) {
 				rootDirPath = filepath.Join(path, "..")
-			} else if bundlePath == "" || sourceMapPath == "" {
+			} else if options.Bundle == "" || options.SourceMap == "" {
 				return fmt.Errorf("unable to find bundle files or source maps in within %s", path)
 			}
 		}
 
-		if projectRoot == "" {
-			projectRoot = rootDirPath
+		if options.ProjectRoot == "" {
+			options.ProjectRoot = rootDirPath
 		}
 
-		if bundlePath == "" {
+		if options.Bundle == "" {
 			if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")) {
-				// RN version < 0.70 - generated/assets/react/<variant>/index.android.bundle
+				// RN version < 0.70 - generated/assets/react/<options.Variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets", "react")
 			} else if utils.IsDir(filepath.Join(buildDirPath, "ASSETS")) {
-				// RN versions < 0.72 - ASSETS/createBundle<variant>JsAndAssets/index.android.bundle
+				// RN versions < 0.72 - ASSETS/createBundle<options.Variant>JsAndAssets/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "ASSETS")
 				variantFileFormat = "createBundle%sJsAndAssets"
 			} else if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")) {
-				// RN versions >= 0.72 - generated/assets/<variant>/index.android.bundle
+				// RN versions >= 0.72 - generated/assets/<options.Variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets")
 				variantFileFormat = "createBundle%sJsAndAssets"
 			} else {
@@ -87,7 +78,7 @@ func ProcessReactNativeAndroid(
 			}
 
 			if bundleDirPath != "" {
-				if variant == "" {
+				if options.Variant == "" {
 					variantDirName, err = android.GetVariantDirectory(bundleDirPath)
 					if err != nil {
 						return err
@@ -95,38 +86,38 @@ func ProcessReactNativeAndroid(
 				} else {
 					if variantFileFormat != "" {
 						variantDirName = fmt.Sprintf(variantFileFormat,
-							cases.Title(language.Und, cases.NoLower).String(variant))
+							cases.Title(language.Und, cases.NoLower).String(options.Variant))
 
 					} else {
-						variantDirName = variant
+						variantDirName = options.Variant
 					}
 				}
-				bundlePath = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
+				options.Bundle = filepath.Join(bundleDirPath, variantDirName, "index.android.bundle")
 			}
 		}
 
-		if !utils.FileExists(bundlePath) {
-			return fmt.Errorf("unable to find index.android.bundle at %s", bundlePath)
+		if !utils.FileExists(options.Bundle) {
+			return fmt.Errorf("unable to find index.android.bundle at %s", options.Bundle)
 		}
 
-		if sourceMapPath == "" {
+		if options.SourceMap == "" {
 			sourceMapDirPath := filepath.Join(buildDirPath, "generated", "sourcemaps", "react")
 
-			if variant == "" {
-				variant, err = android.GetVariantDirectory(sourceMapDirPath)
+			if options.Variant == "" {
+				options.Variant, err = android.GetVariantDirectory(sourceMapDirPath)
 				if err != nil {
 					return err
 				}
 			}
 
-			sourceMapPath = filepath.Join(sourceMapDirPath, variant, "index.android.bundle.map")
+			options.SourceMap = filepath.Join(sourceMapDirPath, options.Variant, "index.android.bundle.map")
 		} else {
-			if variant == "" {
-				//	Set the variant based off the source map file location
-				sourceMapDirPath := filepath.Join(sourceMapPath, "..", "..")
+			if options.Variant == "" {
+				//	Set the options.Variant based off the source map file location
+				sourceMapDirPath := filepath.Join(options.SourceMap, "..", "..")
 
 				if filepath.Base(sourceMapDirPath) == "react" {
-					variant, err = android.GetVariantDirectory(sourceMapDirPath)
+					options.Variant, err = android.GetVariantDirectory(sourceMapDirPath)
 					if err != nil {
 						return err
 					}
@@ -134,23 +125,23 @@ func ProcessReactNativeAndroid(
 			}
 		}
 
-		if !utils.FileExists(sourceMapPath) {
-			return fmt.Errorf("unable to find index.android.bundle at %s", sourceMapPath)
+		if !utils.FileExists(options.SourceMap) {
+			return fmt.Errorf("unable to find index.android.bundle at %s", options.SourceMap)
 		}
 
-		if appManifestPath == "" {
-			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", variant, "AndroidManifest.xml")
+		if options.AppManifest == "" {
+			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", options.Variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
-				appManifestPath = appManifestPathExpected
-				logger.Debug(fmt.Sprintf("Found app manifest at: %s", appManifestPath))
+				options.AppManifest = appManifestPathExpected
+				logger.Debug(fmt.Sprintf("Found app manifest at: %s", options.AppManifest))
 			} else {
 				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
-		if appManifestPath != "" && (apiKey == "" || versionName == "" || versionCode == "") {
+		if options.AppManifest != "" && (apiKey == "" || options.VersionName == "" || options.VersionCode == "") {
 
-			manifestData, err := android.ParseAndroidManifestXML(appManifestPath)
+			manifestData, err := android.ParseAndroidManifestXML(options.AppManifest)
 
 			if err != nil {
 				return err
@@ -165,28 +156,28 @@ func ProcessReactNativeAndroid(
 				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", apiKey))
 			}
 
-			if versionName == "" {
-				versionName = manifestData.VersionName
-				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", versionName))
+			if options.VersionName == "" {
+				options.VersionName = manifestData.VersionName
+				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", options.VersionName))
 			}
 
-			if versionCode == "" {
-				versionCode = manifestData.VersionCode
-				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", versionCode))
+			if options.VersionCode == "" {
+				options.VersionCode = manifestData.VersionCode
+				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", options.VersionCode))
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeUploadOptions(apiKey, versionName, versionCode, codeBundleId, dev, projectRoot, overwrite, "android")
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(apiKey, options.VersionName, options.VersionCode, options.CodeBundleId, options.Dev, options.ProjectRoot, overwrite, "android")
 
 		if err != nil {
 			return err
 		}
 
 		fileFieldData := make(map[string]server.FileField)
-		fileFieldData["sourceMap"] = server.LocalFile(sourceMapPath)
-		fileFieldData["bundle"] = server.LocalFile(bundlePath)
+		fileFieldData["sourceMap"] = server.LocalFile(options.SourceMap)
+		fileFieldData["bundle"] = server.LocalFile(options.Bundle)
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, sourceMapPath, dryRun, logger)
+		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, timeout, retries, options.SourceMap, dryRun, logger)
 
 		if err != nil {
 

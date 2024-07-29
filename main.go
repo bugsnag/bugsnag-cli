@@ -81,13 +81,7 @@ func main() {
 
 		err := upload.ProcessAndroidAab(
 			commands.ApiKey,
-			commands.Upload.AndroidAab.ApplicationId,
-			commands.Upload.AndroidAab.BuildUuid,
-			commands.Upload.AndroidAab.NoBuildUuid,
-			commands.Upload.AndroidAab.Path,
-			commands.Upload.AndroidAab.ProjectRoot,
-			commands.Upload.AndroidAab.VersionCode,
-			commands.Upload.AndroidAab.VersionName,
+			commands.Upload.AndroidAab,
 			endpoint,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
@@ -104,14 +98,7 @@ func main() {
 
 		err := upload.ProcessAndroidNDK(
 			commands.ApiKey,
-			commands.Upload.AndroidNdk.ApplicationId,
-			commands.Upload.AndroidNdk.AndroidNdkRoot,
-			commands.Upload.AndroidNdk.AppManifest,
-			commands.Upload.AndroidNdk.Path,
-			commands.Upload.AndroidNdk.ProjectRoot,
-			commands.Upload.AndroidNdk.Variant,
-			commands.Upload.AndroidNdk.VersionCode,
-			commands.Upload.AndroidNdk.VersionName,
+			commands.Upload.AndroidNdk,
 			endpoint,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
@@ -128,15 +115,7 @@ func main() {
 
 		err := upload.ProcessAndroidProguard(
 			commands.ApiKey,
-			commands.Upload.AndroidProguard.ApplicationId,
-			commands.Upload.AndroidProguard.AppManifest,
-			commands.Upload.AndroidProguard.BuildUuid,
-			commands.Upload.AndroidProguard.NoBuildUuid,
-			commands.Upload.AndroidProguard.DexFiles,
-			commands.Upload.AndroidProguard.Path,
-			commands.Upload.AndroidProguard.Variant,
-			commands.Upload.AndroidProguard.VersionCode,
-			commands.Upload.AndroidProguard.VersionName,
+			commands.Upload.AndroidProguard,
 			endpoint,
 			commands.Upload.Retries,
 			commands.Upload.Timeout,
@@ -156,11 +135,7 @@ func main() {
 		}
 
 		err := upload.Dart(
-			commands.Upload.DartSymbol.Path,
-			commands.Upload.DartSymbol.VersionName,
-			commands.Upload.DartSymbol.VersionCode,
-			commands.Upload.DartSymbol.BundleVersion,
-			string(commands.Upload.DartSymbol.IosAppPath),
+			commands.Upload.DartSymbol,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
@@ -178,16 +153,7 @@ func main() {
 
 		err := upload.ProcessReactNativeAndroid(
 			commands.ApiKey,
-			commands.Upload.ReactNativeAndroid.AppManifest,
-			commands.Upload.ReactNativeAndroid.Bundle,
-			commands.Upload.ReactNativeAndroid.CodeBundleId,
-			commands.Upload.ReactNativeAndroid.Dev,
-			commands.Upload.ReactNativeAndroid.Path,
-			commands.Upload.ReactNativeAndroid.ProjectRoot,
-			commands.Upload.ReactNativeAndroid.Variant,
-			commands.Upload.ReactNativeAndroid.VersionName,
-			commands.Upload.ReactNativeAndroid.VersionCode,
-			commands.Upload.ReactNativeAndroid.SourceMap,
+			commands.Upload.ReactNativeAndroid,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
@@ -204,17 +170,7 @@ func main() {
 
 		err := upload.ProcessReactNativeIos(
 			commands.ApiKey,
-			commands.Upload.ReactNativeIos.VersionName,
-			commands.Upload.ReactNativeIos.BundleVersion,
-			commands.Upload.ReactNativeIos.Scheme,
-			commands.Upload.ReactNativeIos.SourceMap,
-			commands.Upload.ReactNativeIos.Bundle,
-			commands.Upload.ReactNativeIos.Plist,
-			commands.Upload.ReactNativeIos.XcodeProject,
-			commands.Upload.ReactNativeIos.CodeBundleID,
-			commands.Upload.ReactNativeIos.Dev,
-			commands.Upload.ReactNativeIos.ProjectRoot,
-			commands.Upload.ReactNativeIos.Path,
+			commands.Upload.ReactNativeIos,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
@@ -232,13 +188,7 @@ func main() {
 		err := upload.ProcessJs(
 			commands.ApiKey,
 
-			commands.Upload.Js.VersionName,
-			commands.Upload.Js.BundleUrl,
-			commands.Upload.Js.BaseUrl,
-			commands.Upload.Js.SourceMap,
-			commands.Upload.Js.Bundle,
-			commands.Upload.Js.ProjectRoot,
-			commands.Upload.Js.Path,
+			commands.Upload.Js,
 
 			endpoint,
 			commands.Upload.Timeout,
@@ -256,13 +206,7 @@ func main() {
 
 		err := upload.ProcessDsym(
 			commands.ApiKey,
-			commands.Upload.Dsym.Scheme,
-			string(commands.Upload.Dsym.XcodeProject),
-			string(commands.Upload.Dsym.Plist),
-			commands.Upload.Dsym.ProjectRoot,
-			commands.Upload.Dsym.IgnoreMissingDwarf,
-			commands.Upload.Dsym.IgnoreEmptyDsym,
-			commands.Upload.Dsym.Path,
+			commands.Upload.Dsym,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
@@ -282,14 +226,7 @@ func main() {
 
 		err := upload.ProcessUnityAndroid(
 			commands.ApiKey,
-			string(commands.Upload.UnityAndroid.AabPath),
-			commands.Upload.UnityAndroid.ApplicationId,
-			commands.Upload.UnityAndroid.VersionCode,
-			commands.Upload.UnityAndroid.BuildUuid,
-			commands.Upload.UnityAndroid.NoBuildUuid,
-			commands.Upload.UnityAndroid.VersionName,
-			commands.Upload.UnityAndroid.ProjectRoot,
-			commands.Upload.UnityAndroid.Path,
+			commands.Upload.UnityAndroid,
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,

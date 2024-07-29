@@ -313,13 +313,7 @@ func uploadSingleSourceMap(
 
 func ProcessJs(
 	apiKey string,
-	versionName string,
-	bundleUrl string,
-	baseUrl string,
-	sourceMapPath string,
-	bundlePath string,
-	projectRoot string,
-	Path utils.Paths,
+	options JsOptions,
 	endpoint string,
 	timeout int,
 	retries int,
@@ -328,18 +322,18 @@ func ProcessJs(
 	logger log.Logger,
 ) error {
 
-	for _, path := range Path {
+	for _, path := range options.Path {
 
 		outputPath := path
 
 		// Set a default value for projectRoot if it's not defined
-		projectRoot := resolveProjectRoot(projectRoot, path)
-		logger.Debug(fmt.Sprintf("Using project root %s", projectRoot))
+		options.ProjectRoot = resolveProjectRoot(options.ProjectRoot, path)
+		logger.Debug(fmt.Sprintf("Using project root %s", options.ProjectRoot))
 
-		appVersion := resolveVersion(versionName, path, logger)
+		appVersion := resolveVersion(options.VersionName, path, logger)
 
 		// Check that the source map(s) exists and error out if it doesn't
-		sourceMapPaths, err := resolveSourceMapPaths(sourceMapPath, outputPath, logger)
+		sourceMapPaths, err := resolveSourceMapPaths(options.SourceMap, outputPath, logger)
 		if err != nil {
 			return err
 		}
@@ -350,28 +344,28 @@ func ProcessJs(
 		}
 
 		// Ensure that the correct one of --bundle-url and --base-url is specified
-		isFile := utils.FileExists(sourceMapPath) || !utils.IsDir(outputPath)
+		isFile := utils.FileExists(options.SourceMap) || !utils.IsDir(outputPath)
 
-		if isFile && bundleUrl == "" {
+		if isFile && options.BundleUrl == "" {
 			return fmt.Errorf("`--bundle-url` must be set when uploading a file")
 		}
-		if isFile && baseUrl != "" {
+		if isFile && options.BaseUrl != "" {
 			return fmt.Errorf("`--base-url` must not be set when uploading a file")
 		}
-		if !isFile && baseUrl == "" {
+		if !isFile && options.BaseUrl == "" {
 			return fmt.Errorf("`--base-url` must be set when uploading from a directory")
 		}
-		if !isFile && bundleUrl != "" {
+		if !isFile && options.BundleUrl != "" {
 			return fmt.Errorf("`--bundle-url` must not be set when uploading from a directory")
 		}
 
 		// Add a slash if it is not already on the end of the base URL
-		if len(baseUrl) > 0 && baseUrl[len(baseUrl)-1] != '/' {
-			baseUrl += "/"
+		if len(options.BaseUrl) > 0 && options.BaseUrl[len(options.BaseUrl)-1] != '/' {
+			options.BaseUrl += "/"
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			err := uploadSingleSourceMap(bundleUrl, baseUrl, bundlePath, sourceMapPath, apiKey, appVersion, projectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
+			err := uploadSingleSourceMap(options.BundleUrl, options.BaseUrl, options.Bundle, sourceMapPath, apiKey, appVersion, options.ProjectRoot, endpoint, timeout, retries, overwrite, dryRun, logger)
 			if err != nil {
 				return err
 			}
