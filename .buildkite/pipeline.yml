@@ -26,6 +26,8 @@ steps:
 
   - label: CLI Integration Tests
     depends_on: build
+    env:
+      NODE_VERSION: 18
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
