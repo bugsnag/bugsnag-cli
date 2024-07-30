@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
@@ -18,26 +19,9 @@ import (
 var androidSymbolFileRegex = regexp.MustCompile("android-([^;]*).symbols")
 var iosSymbolFileRegex = regexp.MustCompile("ios-([^;]*).symbols")
 
-type DartSymbolOptions struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path"`
-	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)" xor:"app-bundle-version,bundle-version"`
-	IosAppPath    utils.Path  `help:"The path to the iOS application binary, used to determine a unique build ID." type:"path"`
-	VersionName   string      `help:"The version of the application." xor:"app-version,version-name"`
-	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
-}
-
-func Dart(
-	options DartSymbolOptions,
-	endpoint string,
-	timeout int,
-	retries int,
-	overwrite bool,
-	apiKey string,
-	dryRun bool,
-	logger log.Logger,
-) error {
-
-	fileList, err := utils.BuildFileList(options.Path)
+func Dart(options options.CLI, endpoint string, logger log.Logger) error {
+	dartOptions := options.Upload.DartSymbol
+	fileList, err := utils.BuildFileList(dartOptions.Path)
 
 	if err != nil {
 		logger.Fatal("error building file list")
@@ -60,12 +44,12 @@ func Dart(
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "android", overwrite, options.VersionName, options.VersionCode)
+			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "android", options.Upload.Overwrite, dartOptions.VersionName, dartOptions.VersionCode)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
 
-			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
+			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
 
 			if err != nil {
 
@@ -79,7 +63,7 @@ func Dart(
 		if isIosPlatform {
 			logger.Info(fmt.Sprintf("Processing iOS symbol file: %s", file))
 
-			iosAppPath := string(options.IosAppPath)
+			iosAppPath := string(dartOptions.IosAppPath)
 			if iosAppPath == "" {
 				iosAppPath, err = GetIosAppPath(file)
 
@@ -101,15 +85,15 @@ func Dart(
 			}
 
 			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(apiKey, buildId, "ios", overwrite, options.VersionName, options.BundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "ios", options.Upload.Overwrite, dartOptions.VersionName, dartOptions.BundleVersion)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
 
-			if dryRun {
+			if options.DryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
+				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
 			}
 
 			if err != nil {

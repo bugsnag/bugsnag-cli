@@ -61,17 +61,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.All(
-			commands.Upload.All.Path,
-			commands.Upload.All.UploadOptions,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.All(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -79,16 +69,7 @@ func main() {
 
 	case "upload android-aab <path>", "upload android-aab":
 
-		err := upload.ProcessAndroidAab(
-			commands.ApiKey,
-			commands.Upload.AndroidAab,
-			endpoint,
-			commands.Upload.Retries,
-			commands.Upload.Timeout,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessAndroidAab(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -96,16 +77,7 @@ func main() {
 
 	case "upload android-ndk <path>", "upload android-ndk":
 
-		err := upload.ProcessAndroidNDK(
-			commands.ApiKey,
-			commands.Upload.AndroidNdk,
-			endpoint,
-			commands.Upload.Retries,
-			commands.Upload.Timeout,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessAndroidNDK(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -113,16 +85,7 @@ func main() {
 
 	case "upload android-proguard <path>", "upload android-proguard":
 
-		err := upload.ProcessAndroidProguard(
-			commands.ApiKey,
-			commands.Upload.AndroidProguard,
-			endpoint,
-			commands.Upload.Retries,
-			commands.Upload.Timeout,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessAndroidProguard(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -134,16 +97,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.Dart(
-			commands.Upload.DartSymbol,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.ApiKey,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.Dart(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -151,16 +105,7 @@ func main() {
 
 	case "upload react-native-android", "upload react-native-android <path>":
 
-		err := upload.ProcessReactNativeAndroid(
-			commands.ApiKey,
-			commands.Upload.ReactNativeAndroid,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessReactNativeAndroid(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -168,16 +113,7 @@ func main() {
 
 	case "upload react-native-ios", "upload react-native-ios <path>":
 
-		err := upload.ProcessReactNativeIos(
-			commands.ApiKey,
-			commands.Upload.ReactNativeIos,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessReactNativeIos(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -185,18 +121,7 @@ func main() {
 
 	case "upload js", "upload js <path>":
 
-		err := upload.ProcessJs(
-			commands.ApiKey,
-
-			commands.Upload.Js,
-
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessJs(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -204,15 +129,7 @@ func main() {
 
 	case "upload dsym", "upload dsym <path>":
 
-		err := upload.ProcessDsym(
-			commands.ApiKey,
-			commands.Upload.Dsym,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessDsym(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -224,16 +141,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.ProcessUnityAndroid(
-			commands.ApiKey,
-			commands.Upload.UnityAndroid,
-			endpoint,
-			commands.Upload.Timeout,
-			commands.Upload.Retries,
-			commands.Upload.Overwrite,
-			commands.DryRun,
-			logger,
-		)
+		err := upload.ProcessUnityAndroid(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

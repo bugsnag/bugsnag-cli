@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -116,16 +117,16 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, timeout int, retries int, fileName string, dryRun bool, logger log.Logger) error {
+func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
 	}
 
-	if !dryRun {
+	if !options.DryRun {
 		logger.Info(fmt.Sprintf("Uploading %s to %s", filepath.Base(fileName), endpoint))
 
-		err = processRequest(req, timeout, retries, logger)
+		err = processRequest(req, options.Upload.Timeout, options.Upload.Retries, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "409") {
