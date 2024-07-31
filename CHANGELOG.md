@@ -1,6 +1,6 @@
 # Changelog
 
-## TBD
+## 2.5.0 (2024-07-31)
 
 ### Enhancements
 
