@@ -171,41 +171,38 @@ Then(/^I should only see the fatal log level messages$/) do
   Maze.check.not_include(run_output, "[DEBUG]")
 end
 
-Given(/^I package the bugsnag\-cli$/) do
-  @output = `npm pack`
-  @bugsnag_cli_package_path = "#{Dir.pwd}/#{@output.strip}"
-end
-
-And(/^I init a new nodejs project$/) do
+Before('@installation') do
   @base_dir = Dir.pwd
-  # Make a new directory in feature/cli/fixtures
-  Dir.mkdir("#{Dir.pwd}/features/cli/fixture/")
-  # Change directory to new directory
-  Dir.chdir("#{Dir.pwd}/features/cli/fixture/")
-  @output = `npm init -y`
+  @output = `npm pack`
+  @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
 end
 
-Then(/^I install the bugsnag\-cli via npm in the new project$/) do
-  @output = `npm install #{@bugsnag_cli_package_path}`
+When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
+  case package_manager
+  when 'npm'
+    @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+    Dir.mkdir(@fixture_dir)
+    Dir.chdir(@fixture_dir)
+    @init_output = `npm init -y`
+    @install_output = `npm install #{@bugsnag_cli_package_path}`
+    Dir.chdir(@base_dir)
+  when 'yarn'
+    @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+    Dir.mkdir(@fixture_dir)
+    Dir.chdir(@fixture_dir)
+    @init_output = `yarn init -y`
+    @install_output = `yarn add #{@bugsnag_cli_package_path}`
+    Dir.chdir(@base_dir)
+  when 'pnpm'
+    @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+    Dir.mkdir(@fixture_dir)
+    Dir.chdir(@fixture_dir)
+    @init_output = `pnpm init -y`
+    @install_output = `pnpm add #{@bugsnag_cli_package_path}`
+    Dir.chdir(@base_dir)
+  end
 end
 
-Then(/^I install the bugsnag\-cli via yarn in the new project$/) do
-  @output = `yarn add #{@bugsnag_cli_package_path}`
-end
-
-Then(/^I install the bugsnag\-cli via pnpm in the new project$/) do
-  @output = `pnpm add #{@bugsnag_cli_package_path}`
-end
-
-Then('the {string} directory should contain {string}') do |arg|
-  Maze.check.include(`ls node_modules/.bin`, arg)
-end
-
-Then(/^I clean up the project$/) do
-  # Change directory to feature/cli
-  Dir.chdir(@base_dir)
-  # Remove the fixture directory
-  FileUtils.rm_rf("#{Dir.pwd}/features/cli/fixture")
-  # Remove the bugsnag-cli package
-  FileUtils.rm(@bugsnag_cli_package_path)
+Then('the {string} directory should contain {string}') do |directory, package|
+  Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
 end
