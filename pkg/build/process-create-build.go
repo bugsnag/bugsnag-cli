@@ -37,7 +37,7 @@ func ProcessCreateBuild(
 	options options.CLI,
 	logger log.Logger,
 ) error {
-	buildPayload, err := json.Marshal(buildOptions)
+	buildPayload, err := json.Marshal(options.CreateBuild)
 	if err != nil {
 		return fmt.Errorf("Failed to create build information payload: %s", err.Error())
 	}
