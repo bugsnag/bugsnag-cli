@@ -44,13 +44,13 @@ func All(
 
 	for _, file := range fileList {
 
-		fileFieldData := make(map[string]string)
+		fileFieldData := make(map[string]server.FileField)
 
 		if uploadOptions["fileNameField"] != "" {
-			fileFieldData[uploadOptions["fileNameField"]] = file
+			fileFieldData[uploadOptions["fileNameField"]] = server.LocalFile(file)
 			delete(uploadOptions, "fileNameField")
 		} else {
-			fileFieldData["file"] = file
+			fileFieldData["file"] = server.LocalFile(file)
 		}
 
 		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)

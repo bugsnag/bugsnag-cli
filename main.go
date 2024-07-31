@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.4.1"
+var package_version = "2.5.0"
 
 func main() {
 	commands := options.CLI{}
@@ -215,6 +215,31 @@ func main() {
 			commands.Upload.ReactNativeIos.Dev,
 			commands.Upload.ReactNativeIos.ProjectRoot,
 			commands.Upload.ReactNativeIos.Path,
+			endpoint,
+			commands.Upload.Timeout,
+			commands.Upload.Retries,
+			commands.Upload.Overwrite,
+			commands.DryRun,
+			logger,
+		)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "upload js", "upload js <path>":
+
+		err := upload.ProcessJs(
+			commands.ApiKey,
+
+			commands.Upload.Js.VersionName,
+			commands.Upload.Js.BundleUrl,
+			commands.Upload.Js.BaseUrl,
+			commands.Upload.Js.SourceMap,
+			commands.Upload.Js.Bundle,
+			commands.Upload.Js.ProjectRoot,
+			commands.Upload.Js.Path,
+
 			endpoint,
 			commands.Upload.Timeout,
 			commands.Upload.Retries,
