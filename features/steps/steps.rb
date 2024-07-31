@@ -197,7 +197,7 @@ Then(/^I install the bugsnag\-cli via pnpm in the new project$/) do
   @output = `pnpm add #{@bugsnag_cli_package_path}`
 end
 
-Then('the node_modules bin directory should contain {string}') do |arg|
+Then('the {string} directory should contain {string}') do |arg|
   Maze.check.include(`ls node_modules/.bin`, arg)
 end
 
