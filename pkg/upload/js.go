@@ -232,9 +232,7 @@ func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logge
 }
 
 // Upload a single source map
-func uploadSingleSourceMap(options options.CLI, endpoint string, logger log.Logger) error {
-	jsOptions := options.Upload.Js
-
+func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint string, logger log.Logger) error {
 	sourceMapContents, err := ReadSourceMap(jsOptions.SourceMap, logger)
 	if err != nil {
 		return err
@@ -335,7 +333,7 @@ func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
 
 		for _, sourceMapPath := range sourceMapPaths {
 			jsOptions.SourceMap = sourceMapPath
-			err := uploadSingleSourceMap(options, endpoint, logger)
+			err := uploadSingleSourceMap(options, jsOptions, endpoint, logger)
 			if err != nil {
 				return err
 			}
