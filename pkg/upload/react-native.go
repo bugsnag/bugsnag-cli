@@ -11,7 +11,7 @@ import (
 func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.Logger) error {
 	reactNativeOptions := globalOptions.Upload.ReactNative
 
-	// Some commands must be run from either the android/ or ios/ subdirectory.
+	// The commands must be run from either the android/ or ios/ subdirectory.
 	androidPath := []string{}
 	iosPath := []string{}
 	for _, basePath := range reactNativeOptions.Path {
@@ -19,19 +19,29 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		iosPath = append(iosPath, filepath.Join(basePath, "ios"))
 	}
 
-	logger.Info("Uploading React Native Android")
-	globalOptions.Upload.ReactNativeAndroid = options.ReactNativeAndroid{Path: reactNativeOptions.Path, ProjectRoot: reactNativeOptions.ProjectRoot, ReactNative: reactNativeOptions.Shared, Android: reactNativeOptions.AndroidSpecific}
+	logger.Info("Uploading JavaScript source maps for Android")
+	globalOptions.Upload.ReactNativeAndroid = options.ReactNativeAndroid{
+		Path:        androidPath,
+		ProjectRoot: reactNativeOptions.ProjectRoot,
+		ReactNative: reactNativeOptions.Shared,
+		Android:     reactNativeOptions.AndroidSpecific,
+	}
 	if err := ProcessReactNativeAndroid(globalOptions, endpoint, logger); err != nil {
 		return err
 	}
 
-	logger.Info("Uploading React Native iOS")
-	globalOptions.Upload.ReactNativeIos = options.ReactNativeIos{Path: reactNativeOptions.Path, ProjectRoot: reactNativeOptions.ProjectRoot, ReactNative: reactNativeOptions.Shared, Ios: reactNativeOptions.IosSpecific}
+	logger.Info("Uploading JavaScript source maps for iOS")
+	globalOptions.Upload.ReactNativeIos = options.ReactNativeIos{
+		Path:        iosPath,
+		ProjectRoot: reactNativeOptions.ProjectRoot,
+		ReactNative: reactNativeOptions.Shared,
+		Ios:         reactNativeOptions.IosSpecific,
+	}
 	if err := ProcessReactNativeIos(globalOptions, endpoint, logger); err != nil {
 		return err
 	}
 
-	logger.Info("Uploading Android NDK")
+	logger.Info("Uploading Android NDK symbols")
 	// Missing: ApplicationId AndroidNdkRoot
 	globalOptions.Upload.AndroidNdk = options.AndroidNdkMapping{
 		Path:        androidPath,
@@ -45,7 +55,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		return err
 	}
 
-	logger.Info("Uploading Android Proguard")
+	logger.Info("Uploading Android Proguard mappings")
 	// Missing: ApplicationId BuildUuid NoBuildUuid DexFiles
 	globalOptions.Upload.AndroidProguard = options.AndroidProguardMapping{
 		Path:        androidPath,
@@ -58,7 +68,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		return err
 	}
 
-	logger.Info("Uploading DSYM")
+	logger.Info("Uploading iOS dSYMs")
 	// Missing: IgnoreEmptyDsym IgnoreMissingDwarf
 	globalOptions.Upload.Dsym = options.Dsym{
 		Path:         iosPath,
