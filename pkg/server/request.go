@@ -111,9 +111,8 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //   - endpoint: The target URL for the file upload.
 //   - uploadOptions: A map containing options for building the file request.
 //   - fileFieldData: A map containing data associated with the file field.
-//   - timeout: The maximum time allowed for the HTTP request.
 //   - fileName: The name of the file to be uploaded.
-//   - dryRun: If true, the function performs a dry run without actually sending the file.
+//   - options: used to determine dry run, timeout, and retries.
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
@@ -153,19 +152,18 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 // Parameters:
 //   - endpoint: The target URL for the HTTP POST request.
 //   - payload: The payload to be sent in the request body.
-//   - timeout: The maximum time allowed for the HTTP request.
-//   - dryRun: If true, the function performs a dry run without actually sending the request.
+//   - options: used to determine dry run, timeout, and retries.
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(endpoint string, payload []byte, timeout int, retries int, dryRun bool, logger log.Logger) error {
+func ProcessBuildRequest(endpoint string, payload []byte, options options.CLI, logger log.Logger) error {
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 
-	if !dryRun {
+	if !options.DryRun {
 		logger.Info(fmt.Sprintf("Sending build information to %s", endpoint))
 
-		err := processRequest(req, timeout, retries, logger)
+		err := processRequest(req, options.Upload.Timeout, options.Upload.Retries, logger)
 		if err != nil {
 			return err
 		}

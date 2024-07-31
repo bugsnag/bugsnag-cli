@@ -169,7 +169,7 @@ func main() {
 			logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
 		}
 
-		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands.DryRun, commands.CreateBuild.Timeout, commands.CreateBuild.Retries, logger)
+		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

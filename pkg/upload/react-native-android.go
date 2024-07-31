@@ -92,7 +92,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 			androidOptions.ReactNative.SourceMap = filepath.Join(sourceMapDirPath, androidOptions.Android.Variant, "index.android.bundle.map")
 		} else {
 			if androidOptions.Android.Variant == "" {
-				//	Set the options.Variant based off the source map file location
+				// Set options.Variant based off the source map file location
 				sourceMapDirPath := filepath.Join(androidOptions.ReactNative.SourceMap, "..", "..")
 
 				if filepath.Base(sourceMapDirPath) == "react" {
