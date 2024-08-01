@@ -6,42 +6,19 @@ import (
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type AndroidAabMapping struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the AAB file to upload (or directory containing it)" type:"path" default:"."`
-	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
-	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
-	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
-	VersionCode   string      `help:"The version code of this build of the application"`
-	VersionName   string      `help:"The version of the application"`
-}
-
-func ProcessAndroidAab(
-	apiKey string,
-	applicationId string,
-	buildUuid string,
-	noBuildUuid bool,
-	paths []string,
-	projectRoot string,
-	versionCode string,
-	versionName string,
-	endpoint string,
-	retries int,
-	timeout int,
-	overwrite bool,
-	dryRun bool,
-	logger log.Logger,
-) error {
+func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Logger) error {
 
 	var manifestData map[string]string
 	var aabDir string
 	var aabFile string
 	var err error
+	aabOptions := globalOptions.Upload.AndroidAab
 
-	for _, path := range paths {
+	for _, path := range aabOptions.Path {
 		// Look for AAB file if the upload command was run somewhere within the project root
 		// based on an expected path of ${dir}/build/outputs/bundle/release/${dir}-release.aab
 		// or ${dir}/build/outputs/bundle/release/${dir}-release-dexguard.aab
@@ -71,7 +48,7 @@ func ProcessAndroidAab(
 		}
 	}
 
-	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+	manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, globalOptions.ApiKey, aabOptions.ApplicationId, aabOptions.BuildUuid, aabOptions.NoBuildUuid, aabOptions.VersionCode, aabOptions.VersionName, logger)
 
 	if err != nil {
 		return err
@@ -87,23 +64,15 @@ func ProcessAndroidAab(
 		}
 
 		if len(soFileList) > 0 {
-			err = ProcessAndroidNDK(
-				manifestData["apiKey"],
-				manifestData["applicationId"],
-				"",
-				"",
-				soFileList,
-				projectRoot,
-				"",
-				manifestData["versionCode"],
-				manifestData["versionName"],
-				endpoint,
-				retries,
-				timeout,
-				overwrite,
-				dryRun,
-				logger,
-			)
+			globalOptions.Upload.AndroidNdk = options.AndroidNdkMapping{
+				ApplicationId: manifestData["applicationId"],
+				Path:          soFileList,
+				ProjectRoot:   aabOptions.ProjectRoot,
+				VersionCode:   manifestData["versionCode"],
+				VersionName:   manifestData["versionName"],
+			}
+			globalOptions.ApiKey = manifestData["apiKey"]
+			err = ProcessAndroidNDK(globalOptions, endpoint, logger)
 
 			if err != nil {
 				return err
@@ -118,24 +87,17 @@ func ProcessAndroidAab(
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
-		err = ProcessAndroidProguard(
-			manifestData["apiKey"],
-			manifestData["applicationId"],
-			"",
-			manifestData["buildUuid"],
-			noBuildUuid,
-			[]string{filepath.Join(aabDir, "base", "dex")},
-			[]string{mappingFilePath},
-			"",
-			manifestData["versionCode"],
-			manifestData["versionName"],
-			endpoint,
-			retries,
-			timeout,
-			overwrite,
-			dryRun,
-			logger,
-		)
+		globalOptions.Upload.AndroidProguard = options.AndroidProguardMapping{
+			ApplicationId: manifestData["applicationId"],
+			BuildUuid:     manifestData["buildUuid"],
+			NoBuildUuid:   aabOptions.NoBuildUuid,
+			DexFiles:      []string{filepath.Join(aabDir, "base", "dex")},
+			Path:          []string{mappingFilePath},
+			VersionCode:   manifestData["versionCode"],
+			VersionName:   manifestData["versionName"],
+		}
+		globalOptions.ApiKey = manifestData["apiKey"]
+		err = ProcessAndroidProguard(globalOptions, endpoint, logger)
 
 		if err != nil {
 			return err
