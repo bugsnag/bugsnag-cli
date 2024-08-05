@@ -103,6 +103,14 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload react-native", "upload react-native <path>":
+
+		err := upload.ProcessReactNative(commands, endpoint, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload react-native-android", "upload react-native-android <path>":
 
 		err := upload.ProcessReactNativeAndroid(commands, endpoint, logger)
