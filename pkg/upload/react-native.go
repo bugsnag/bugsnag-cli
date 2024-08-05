@@ -41,20 +41,6 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		return err
 	}
 
-	logger.Info("Uploading Android NDK symbols")
-	// Missing: ApplicationId AndroidNdkRoot
-	globalOptions.Upload.AndroidNdk = options.AndroidNdkMapping{
-		Path:        androidPath,
-		VersionName: reactNativeOptions.Shared.VersionName,
-		ProjectRoot: reactNativeOptions.ProjectRoot,
-		AppManifest: reactNativeOptions.AndroidSpecific.AppManifest,
-		Variant:     reactNativeOptions.AndroidSpecific.Variant,
-		VersionCode: reactNativeOptions.AndroidSpecific.VersionCode,
-	}
-	if err := ProcessAndroidNDK(globalOptions, endpoint, logger); err != nil {
-		return err
-	}
-
 	logger.Info("Uploading Android Proguard mappings")
 	// Missing: ApplicationId BuildUuid NoBuildUuid DexFiles
 	globalOptions.Upload.AndroidProguard = options.AndroidProguardMapping{
@@ -79,6 +65,20 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		XcodeProject: utils.Path(reactNativeOptions.IosSpecific.XcodeProject),
 	}
 	if err := ProcessDsym(globalOptions, endpoint, logger); err != nil {
+		return err
+	}
+
+	logger.Info("Uploading Android NDK symbols")
+	// Missing: ApplicationId AndroidNdkRoot
+	globalOptions.Upload.AndroidNdk = options.AndroidNdkMapping{
+		Path:        androidPath,
+		VersionName: reactNativeOptions.Shared.VersionName,
+		ProjectRoot: reactNativeOptions.ProjectRoot,
+		AppManifest: reactNativeOptions.AndroidSpecific.AppManifest,
+		Variant:     reactNativeOptions.AndroidSpecific.Variant,
+		VersionCode: reactNativeOptions.AndroidSpecific.VersionCode,
+	}
+	if err := ProcessAndroidNDK(globalOptions, endpoint, logger); err != nil {
 		return err
 	}
 
