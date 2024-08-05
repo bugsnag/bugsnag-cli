@@ -1,7 +1,6 @@
 package options
 
 import (
-	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -14,6 +13,121 @@ type Globals struct {
 	Port              int               `help:"The port number for the BugSnag upload server" default:"443"`
 	Verbose           bool              `name:"verbose" help:"Sets the level of the logging to its highest."`
 	Version           utils.VersionFlag `name:"version" help:"Prints the version information for this CLI"`
+}
+
+type DiscoverAndUploadAny struct {
+	Path          utils.Paths       `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
+	UploadOptions map[string]string `help:"Additional arguments to pass to the upload request" mapsep:","`
+}
+
+type AndroidAabMapping struct {
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the AAB file to upload (or directory containing it)" type:"path" default:"."`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	VersionCode   string      `help:"The version code of this build of the application"`
+	VersionName   string      `help:"The version of the application"`
+}
+
+type AndroidNdkMapping struct {
+	Path           utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	ApplicationId  string      `help:"A unique application ID, usually the package name, of the application"`
+	AndroidNdkRoot string      `help:"The path to your NDK installation, used to access the objcopy tool for extracting symbol information"`
+	AppManifest    string      `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	ProjectRoot    string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Variant        string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode    string      `help:"The version code of this build of the application"`
+	VersionName    string      `help:"The version of the application"`
+}
+
+type AndroidProguardMapping struct {
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	AppManifest   string      `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	DexFiles      []string    `help:"The path to classes.dex files or directory used to calculate a build UUID" type:"path" default:""`
+	Variant       string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode   string      `help:"The version code of this build of the application"`
+	VersionName   string      `help:"The version of the application"`
+}
+
+type DartSymbol struct {
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path"`
+	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)" xor:"app-bundle-version,bundle-version"`
+	IosAppPath    utils.Path  `help:"The path to the iOS application binary, used to determine a unique build ID." type:"path"`
+	VersionName   string      `help:"The version of the application." xor:"app-version,version-name"`
+	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
+}
+
+type Dsym struct {
+	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
+	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	Plist              utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	Scheme             string      `help:"The name of the Xcode options.Scheme used to build the application"`
+	VersionName        string      `help:"The version of the application"`
+	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	ProjectRoot        string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+}
+
+type Js struct {
+	Path        utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	BaseUrl     string      `help:"For directory-based uploads, the URL of the base directory for the minified JavaScript files that the source maps relate to. The relative path is appended onto this for each file. Asterisks can be used as a wildcard."`
+	Bundle      string      `help:"Path to the minified JavaScript file that the source map relates to. If this is not provided then the file will be obtained when an error event is received." type:"path"`
+	BundleUrl   string      `help:"For single file uploads, the URL of the minified JavaScript file that the source map relates to. Asterisks can be used as a wildcard."`
+	ProjectRoot string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	SourceMap   string      `help:"Path to the source map file. This usually has the .min.js extension." type:"path"`
+	VersionName string      `help:"The version of the app that the source map applies to. Defaults to the version in the package.json file (if found)."`
+}
+
+type ReactNativeAndroidSpecific struct {
+	AppManifest string `help:"The path to a manifest file (AndroidManifest.xml) from which to obtain build information" type:"path"`
+	Variant     string `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
+	VersionCode string `help:"The version code of this build of the application"`
+}
+
+type ReactNativeAndroid struct {
+	Path        utils.Paths `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
+	ProjectRoot string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+
+	ReactNative ReactNativeShared          `embed:""`
+	Android     ReactNativeAndroidSpecific `embed:""`
+}
+
+type ReactNativeShared struct {
+	Bundle       string `help:"The path to the bundled JavaScript file to upload" type:"path"`
+	CodeBundleId string `help:"A unique identifier for the JavaScript bundle"`
+	Dev          bool   `help:"Indicates whether this is a debug or release build"`
+	SourceMap    string `help:"The path to the source map file to upload" type:"path"`
+	VersionName  string `help:"The version of the application"`
+}
+
+type ReactNativeIosSpecific struct {
+	BundleVersion string `help:"The bundle version of this build of the application (Apple platforms only)"`
+	Plist         string `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	Scheme        string `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
+	XcodeProject  string `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+}
+
+type ReactNativeIos struct {
+	Path        utils.Paths `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
+	ProjectRoot string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+
+	ReactNative ReactNativeShared      `embed:""`
+	Ios         ReactNativeIosSpecific `embed:""`
+}
+
+type UnityAndroid struct {
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
+	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	VersionCode   string      `help:"The version code of this build of the application"`
+	VersionName   string      `help:"The version of the application"`
 }
 
 // Unique CLI options
@@ -30,15 +144,16 @@ type CLI struct {
 		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number" default:"https://upload.bugsnag.com"`
 
 		// required options
-		All                upload.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-		AndroidAab         upload.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-		AndroidNdk         upload.AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		AndroidProguard    upload.AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
-		DartSymbol         upload.DartSymbolOptions      `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		Dsym               upload.Dsym                   `cmd:"" help:"Upload dSYMs for iOS"`
-		ReactNativeAndroid upload.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		ReactNativeIos     upload.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
-		UnityAndroid       upload.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		All                DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+		AndroidAab         AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+		AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
+		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
+		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+		Dsym               Dsym                   `cmd:"" help:"Upload dSYMs for iOS"`
+		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
+		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
+		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }
 

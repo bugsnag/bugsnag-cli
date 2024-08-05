@@ -3,7 +3,9 @@ package build
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
@@ -25,17 +27,14 @@ type Payload struct {
 // Parameters:
 //   - buildOptions: An instance of CreateBuildInfo containing information for the build.
 //   - endpoint: The target URL for the HTTP request.
-//   - dryRun: If true, the function performs a dry run without actually sending the request.
-//   - timeout: The maximum time allowed for the HTTP request.
+//   - options: CLI options used for this command.
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
 func ProcessCreateBuild(
 	buildOptions CreateBuildInfo,
 	endpoint string,
-	dryRun bool,
-	timeout int,
-	retries int,
+	options options.CLI,
 	logger log.Logger,
 ) error {
 	buildPayload, err := json.Marshal(buildOptions)
@@ -46,7 +45,7 @@ func ProcessCreateBuild(
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
 	logger.Debug(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
-	err = server.ProcessBuildRequest(endpoint, buildPayload, timeout, retries, dryRun, logger)
+	err = server.ProcessBuildRequest(endpoint, buildPayload, options, logger)
 	if err != nil {
 		return err
 	}

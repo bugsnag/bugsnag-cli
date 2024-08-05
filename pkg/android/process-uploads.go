@@ -1,10 +1,12 @@
 package android
 
 import (
+	"path/filepath"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
 )
 
 func UploadAndroidNdk(
@@ -14,14 +16,11 @@ func UploadAndroidNdk(
 	versionName string,
 	versionCode string,
 	projectRoot string,
-	overwrite bool,
 	endpoint string,
-	timeout int,
-	retries int,
-	dryRun bool,
+	options options.CLI,
 	logger log.Logger,
 ) error {
-	fileFieldData := make(map[string]string)
+	fileFieldData := make(map[string]server.FileField)
 
 	numberOfFiles := len(fileList)
 
@@ -31,15 +30,15 @@ func UploadAndroidNdk(
 	}
 
 	for _, file := range fileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), options.Upload.Overwrite)
 
 		if err != nil {
 			return err
 		}
 
-		fileFieldData["soFile"] = file
+		fileFieldData["soFile"] = server.LocalFile(file)
 
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
+		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
 
 		if err != nil {
 			return err

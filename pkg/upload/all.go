@@ -2,28 +2,15 @@ package upload
 
 import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type DiscoverAndUploadAny struct {
-	Path          utils.Paths       `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
-	UploadOptions map[string]string `help:"Additional arguments to pass to the upload request" mapsep:","`
-}
-
-func All(
-	paths []string,
-	options map[string]string,
-	endpoint string,
-	timeout int,
-	retries int,
-	overwrite bool,
-	apiKey string,
-	dryRun bool,
-	logger log.Logger,
+func All(options options.CLI, endpoint string, logger log.Logger,
 ) error {
-
-	fileList, err := utils.BuildFileList(paths)
+	allOptions := options.Upload.All
+	fileList, err := utils.BuildFileList(allOptions.Path)
 
 	if err != nil {
 		logger.Fatal("Error building file list")
@@ -32,28 +19,28 @@ func All(
 	// Build UploadOptions list
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = apiKey
+	uploadOptions["apiKey"] = options.ApiKey
 
-	if overwrite {
+	if options.Upload.Overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 
-	for key, value := range options {
+	for key, value := range allOptions.UploadOptions {
 		uploadOptions[key] = value
 	}
 
 	for _, file := range fileList {
 
-		fileFieldData := make(map[string]string)
+		fileFieldData := make(map[string]server.FileField)
 
 		if uploadOptions["fileNameField"] != "" {
-			fileFieldData[uploadOptions["fileNameField"]] = file
+			fileFieldData[uploadOptions["fileNameField"]] = server.LocalFile(file)
 			delete(uploadOptions, "fileNameField")
 		} else {
-			fileFieldData["file"] = file
+			fileFieldData["file"] = server.LocalFile(file)
 		}
 
-		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, timeout, retries, file, dryRun, logger)
+		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, file, options, logger)
 
 		if err != nil {
 

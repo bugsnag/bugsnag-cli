@@ -8,44 +8,20 @@ import (
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type UnityAndroid struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
-	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
-	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
-	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
-	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
-	VersionCode   string      `help:"The version code of this build of the application"`
-	VersionName   string      `help:"The version of the application"`
-}
-
-func ProcessUnityAndroid(
-	apiKey string,
-	aabPath string,
-	applicationId string,
-	versionCode string,
-	buildUuid string,
-	noBuildUuid bool,
-	versionName string,
-	projectRoot string,
-	paths []string,
-	endpoint string,
-	timeout int,
-	retries int,
-	overwrite bool,
-	dryRun bool,
-	logger log.Logger,
-) error {
+func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+	unityOptions := globalOptions.Upload.UnityAndroid
 	var err error
 	var zipPath string
 	var archList []string
 	var symbolFileList []string
 	var manifestData map[string]string
+	var aabPath = string(unityOptions.AabPath)
 
-	for _, path := range paths {
+	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
 			zipPath, err = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
@@ -81,28 +57,23 @@ func ProcessUnityAndroid(
 
 		defer os.RemoveAll(aabDir)
 
-		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+		manifestData, err = android.MergeUploadOptionsFromAabManifest(aabDir, globalOptions.ApiKey, unityOptions.ApplicationId, unityOptions.BuildUuid, unityOptions.NoBuildUuid, unityOptions.VersionCode, unityOptions.VersionName, logger)
 
 		if err != nil {
 			return err
 		}
 
-		err = ProcessAndroidAab(
-			manifestData["apiKey"],
-			manifestData["applicationId"],
-			manifestData["buildUuid"],
-			noBuildUuid,
-			[]string{aabDir},
-			projectRoot,
-			manifestData["versionCode"],
-			manifestData["versionName"],
-			endpoint,
-			retries,
-			timeout,
-			overwrite,
-			dryRun,
-			logger,
-		)
+		globalOptions.ApiKey = manifestData["apiKey"]
+		globalOptions.Upload.AndroidAab = options.AndroidAabMapping{
+			ApplicationId: manifestData["applicationId"],
+			BuildUuid:     manifestData["buildUuid"],
+			NoBuildUuid:   unityOptions.NoBuildUuid,
+			Path:          []string{aabDir},
+			ProjectRoot:   unityOptions.ProjectRoot,
+			VersionCode:   manifestData["versionCode"],
+			VersionName:   manifestData["versionName"],
+		}
+		err = ProcessAndroidAab(globalOptions, endpoint, logger)
 
 		if err != nil {
 			return err
@@ -112,7 +83,7 @@ func ProcessUnityAndroid(
 	logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
 
 	if manifestData == nil {
-		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", apiKey, applicationId, buildUuid, noBuildUuid, versionCode, versionName, logger)
+		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", globalOptions.ApiKey, unityOptions.ApplicationId, unityOptions.BuildUuid, unityOptions.NoBuildUuid, unityOptions.VersionCode, unityOptions.VersionName, logger)
 	}
 
 	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
@@ -149,12 +120,9 @@ func ProcessUnityAndroid(
 		manifestData["applicationId"],
 		manifestData["versionName"],
 		manifestData["versionCode"],
-		projectRoot,
-		overwrite,
+		unityOptions.ProjectRoot,
 		endpoint,
-		timeout,
-		retries,
-		dryRun,
+		globalOptions,
 		logger,
 	)
 
