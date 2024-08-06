@@ -178,31 +178,23 @@ Before('@installation') do
 end
 
 When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
-  package_managers = {
-    'npm' => {
-      'init' => 'npm init -y',
-      'install' => "npm install #{@bugsnag_cli_package_path}"
-    },
-    'yarn' => {
-      'init' => 'yarn init -y',
-      'install' => "yarn add #{@bugsnag_cli_package_path}"
-    },
-    'pnpm' => {
-      'init' => 'pnpm init -y',
-      'install' => "pnpm add #{@bugsnag_cli_package_path}"
-    }
-  }
+  @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+  Dir.mkdir(@fixture_dir)
+  Dir.chdir(@fixture_dir)
 
-  if package_managers.key?(package_manager)
-    @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
-    Dir.mkdir(@fixture_dir)
-    Dir.chdir(@fixture_dir)
-    @init_output = `#{package_managers[package_manager]['init']}`
-    @install_output = `#{package_managers[package_manager]['install']}`
-    Dir.chdir(@base_dir)
-  else
-    raise "Unsupported package manager: #{package_manager}"
+  case package_manager
+  when 'npm'
+    @init_output = `npm init -y`
+    @install_output = `npm install #{@bugsnag_cli_package_path}`
+  when 'yarn'
+    @init_output = `yarn init -y`
+    @install_output = `yarn add #{@bugsnag_cli_package_path}`
+  when 'pnpm'
+    @init_output = `pnpm init -y`
+    @install_output = `pnpm add #{@bugsnag_cli_package_path}`
   end
+
+  Dir.chdir(@base_dir)
 end
 
 Then('the {string} directory should contain {string}') do |directory, package|
