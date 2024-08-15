@@ -227,6 +227,6 @@ Given('I build the Unity Android example project') do
   Dir.chdir(@base_dir)
 end
 
-And('I wait for the symbols to generate') do
+And('I wait for the Unity symbols to generate') do
   Maze.check.include(`ls #{@fixture_dir}`, 'UnityExample-1.0-v1-Mono2x.symbols.zip')
 end
