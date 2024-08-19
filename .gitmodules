@@ -1,0 +1,3 @@
+[submodule "platforms-examples"]
+	path = platforms-examples
+	url = https://github.com/bugsnag/platforms-examples.git
