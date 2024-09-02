@@ -124,11 +124,11 @@ func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 		for _, str := range outputSlice {
 			if strings.Contains(str, "UUID: ") {
 				rawDwarfInfo := strings.Split(str, " ")
-				if len(rawDwarfInfo) == 4 {
+				if len(rawDwarfInfo) > 4 {
 					dwarf := &DwarfInfo{}
 					dwarf.UUID = rawDwarfInfo[1]
 					dwarf.Arch = rawDwarfInfo[2]
-					dwarf.Name = rawDwarfInfo[3]
+					dwarf.Name = strings.Join(rawDwarfInfo[3:], " ")
 					dwarf.Location = path
 					dwarfInfo = append(dwarfInfo, dwarf)
 				}
