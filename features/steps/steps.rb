@@ -218,3 +218,15 @@ end
 Then('the {string} directory should contain {string}') do |directory, package|
   Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
 end
+
+Given('I build the Unity Android example project') do
+  @base_dir = Dir.pwd
+  @fixture_dir = "#{@base_dir}/platforms-examples/Unity"
+  Dir.chdir(@fixture_dir)
+  @output = `./build_android.sh aab`
+  Dir.chdir(@base_dir)
+end
+
+And('I wait for the Unity symbols to generate') do
+  Maze.check.include(`ls #{@fixture_dir}`, 'UnityExample-1.0-v1-IL2CPP.symbols.zip')
+end
