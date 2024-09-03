@@ -1,11 +1,11 @@
 package ios
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -130,8 +130,7 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 	}
 
 	buildSettings := strings.SplitAfterN(string(output), "Build settings for action build and target ", 2)[1]
-	buildSettingsSlice := strings.Split(strings.ReplaceAll(buildSettings, " ", ""), "\n")
-
+	buildSettingsSlice := strings.Split(buildSettings, "\n")
 	buildSettingsMap := make(map[string]*string)
 	for _, line := range buildSettingsSlice {
 		parts := strings.SplitN(line, "=", 2)

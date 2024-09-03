@@ -1,5 +1,11 @@
 # Changelog
 
+## TBD
+
+### Fixes
+
+- Allow spaces when processing and uploading dSYM files [135](https://github.com/bugsnag/bugsnag-cli/pull/135)
+
 ## 2.5.0 (2024-07-31)
 
 ### Enhancements
