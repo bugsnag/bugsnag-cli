@@ -10,7 +10,6 @@ steps:
       artifacts#v1.5.0:
         upload:
           - bin/**/*
-
   - group: ":lint: Linting"
     steps:
       - label: ":lint-roller::go: Lint Go Code"
@@ -21,10 +20,10 @@ steps:
         commands:
           - make npm-lint
 
-    # Run the unit tests
-    - label: Unit Tests
-      commands:
-        - make unit-tests
+  # Run the unit tests
+  - label: Unit Tests
+    commands:
+      - make unit-tests
 
   - label: CLI Integration Tests
     depends_on: build
