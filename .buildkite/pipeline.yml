@@ -149,6 +149,7 @@ steps:
         agents:
           queue: macos-12-arm
         commands:
+          - bundle install
           - make features/base-fixtures/rn0_72
         plugins:
           artifacts#v1.5.0:
