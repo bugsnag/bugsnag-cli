@@ -10,7 +10,7 @@ steps:
       artifacts#v1.5.0:
         upload:
           - bin/**/*
-  - group: ":lint: Linting"
+  - group: ":lint-roller: Linting"
     steps:
       - label: ":lint-roller::go: Lint Go Code"
         commands:
@@ -114,7 +114,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - group: ":react_native: React Native"
+  - group: ":react: React Native"
     steps:
       - label: React Native iOS Integration Tests
         depends_on: build
@@ -146,6 +146,8 @@ steps:
 
       - label: React Native Integration Tests
         depends_on: build
+        agents:
+          queue: macos-12-arm
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install

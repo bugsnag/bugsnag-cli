@@ -1,10 +1,10 @@
 Feature: React Native 0.72 Integration Tests
 
   Scenario: Build and Upload React Native 0.72 sourcemaps
-    When I make the "features/base-fixtures/rn0_72/android"
+    When I make the "features/base-fixtures/rn0_72"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload react-native --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/rn0_72
+    When I run bugsnag-cli with upload react-native --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --verbose --overwrite features/base-fixtures/rn0_72
     And I wait to receive 216 sourcemaps
 
     Then the sourcemap is valid for the React Native Build API
