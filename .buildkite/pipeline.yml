@@ -26,6 +26,8 @@ steps:
 
   - label: CLI Integration Tests
     depends_on: build
+    env:
+      NODE_VERSION: 18
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
@@ -117,6 +119,21 @@ steps:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/js
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - label: Unity Android Integration Tests
+    depends_on: build
+    env:
+      UNITY_VERSION: 2023.2.19f1
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/unity-android
     plugins:
       artifacts#v1.5.0:
         download:
