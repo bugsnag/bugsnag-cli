@@ -147,8 +147,9 @@ steps:
       - label: React Native Integration Tests
         depends_on: build
         commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
-          - make features/base-fixtures/rn0_72
+          - bundle exec maze-runner features/react-native
         plugins:
           artifacts#v1.5.0:
             download:
