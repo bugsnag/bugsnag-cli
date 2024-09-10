@@ -10,22 +10,25 @@ steps:
       artifacts#v1.5.0:
         upload:
           - bin/**/*
+  - group: ":lint-roller: Linting"
+    steps:
+      - label: ":lint-roller::go: Lint Go Code"
+        commands:
+          - make go-lint
+
+      - label: ":lint-roller::npm: Lint NPM Dependencies"
+        commands:
+          - make npm-lint
 
   # Run the unit tests
   - label: Unit Tests
     commands:
       - make unit-tests
 
-  - label: ":lint-roller::go: Lint Go Code"
-    commands:
-      - make go-lint
-
-  - label: ":lint-roller::npm: Lint NPM Dependencies"
-    commands:
-      - make npm-lint
-
   - label: CLI Integration Tests
     depends_on: build
+    env:
+      NODE_VERSION: 18
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
@@ -68,34 +71,6 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: React Native Android Integration Tests
-    depends_on: build
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner features/react-native-android
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: React Native iOS Integration Tests
-    depends_on: build
-    agents:
-      queue: macos-12-arm
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner features/react-native-ios
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
   - label: dSYM Integration Tests
     depends_on: build
     env:
@@ -123,3 +98,65 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
+
+  - label: Unity Android Integration Tests
+    depends_on: build
+    env:
+      UNITY_VERSION: 2023.2.19f1
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/unity-android
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - group: ":react: React Native"
+    steps:
+      - label: React Native iOS Integration Tests
+        depends_on: build
+        agents:
+          queue: macos-12-arm
+        env:
+          XCODE_VERSION: 13.4.1
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-ios
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: React Native Android Integration Tests
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: React Native Integration Tests
+        depends_on: build
+        agents:
+          queue: macos-12-arm
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*

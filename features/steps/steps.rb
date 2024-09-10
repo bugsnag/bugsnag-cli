@@ -179,7 +179,6 @@ end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
-  puts @output
 end
 
 Then(/^I should only see the fatal log level messages$/) do
@@ -188,4 +187,46 @@ Then(/^I should only see the fatal log level messages$/) do
   Maze.check.not_include(run_output, "[WARN]")
   Maze.check.not_include(run_output, "[INFO]")
   Maze.check.not_include(run_output, "[DEBUG]")
+end
+
+Before('@installation') do
+  @base_dir = Dir.pwd
+  @output = `npm pack`
+  @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
+end
+
+When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
+  @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+  Dir.mkdir(@fixture_dir)
+  Dir.chdir(@fixture_dir)
+
+  case package_manager
+  when 'npm'
+    @init_output = `npm init -y`
+    @install_output = `npm install #{@bugsnag_cli_package_path}`
+  when 'yarn'
+    @init_output = `yarn init -y`
+    @install_output = `yarn add #{@bugsnag_cli_package_path}`
+  when 'pnpm'
+    @init_output = `pnpm init -y`
+    @install_output = `pnpm add #{@bugsnag_cli_package_path}`
+  end
+
+  Dir.chdir(@base_dir)
+end
+
+Then('the {string} directory should contain {string}') do |directory, package|
+  Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
+end
+
+Given('I build the Unity Android example project') do
+  @base_dir = Dir.pwd
+  @fixture_dir = "#{@base_dir}/platforms-examples/Unity"
+  Dir.chdir(@fixture_dir)
+  @output = `./build_android.sh aab`
+  Dir.chdir(@base_dir)
+end
+
+And('I wait for the Unity symbols to generate') do
+  Maze.check.include(`ls #{@fixture_dir}`, 'UnityExample-1.0-v1-IL2CPP.symbols.zip')
 end
