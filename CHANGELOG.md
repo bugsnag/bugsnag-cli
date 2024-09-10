@@ -1,6 +1,10 @@
 # Changelog
 
-## TBD
+## 2.6.0 (2024-09-09)
+
+### Enhancements
+
+- Add React Native super command [127](https://github.com/bugsnag/bugsnag-cli/pull/127)
 
 ### Fixes
 
