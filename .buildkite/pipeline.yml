@@ -204,17 +204,20 @@ steps:
               - bin/arm64-macos-bugsnag-cli
             upload:
               - maze_output/**/*
-#      - label: React Native Integration Tests
-#        depends_on: build
-#        agents:
-#          queue: macos-12-arm
-#        commands:
-#          - chmod +x bin/arm64-macos-bugsnag-cli
-#          - bundle install
-#          - bundle exec maze-runner features/react-native
-#        plugins:
-#          artifacts#v1.5.0:
-#            download:
-#              - bin/arm64-macos-bugsnag-cli
-#            upload:
-#              - maze_output/**/*
+
+      - label: RN 0.72 Integration Tests
+        depends_on: build
+        agents:
+          queue: macos-12-arm
+        env:
+          XCODE_VERSION: 14
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
