@@ -3,9 +3,9 @@ package utils
 import (
 	"bufio"
 	"compress/gzip"
+	"fmt"
 	"io"
 	"os"
-	"fmt"
 )
 
 func GzipCompress(file string) (string, error) {
