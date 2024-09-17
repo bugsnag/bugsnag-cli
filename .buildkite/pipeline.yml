@@ -135,6 +135,8 @@ steps:
 
       - label: React Native Android Integration Tests
         depends_on: build
+        agents:
+          queue: macos-12-arm
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
