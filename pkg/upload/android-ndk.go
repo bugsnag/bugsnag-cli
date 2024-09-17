@@ -66,7 +66,7 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 		}
 
 		if err != nil {
-			return fmt.Errorf("error building file list for options.Variant: " + ndkOptions.Variant + ". " + err.Error())
+			return fmt.Errorf("error building file list for options.Variant: %s. %w", ndkOptions.Variant, err)
 		}
 	}
 

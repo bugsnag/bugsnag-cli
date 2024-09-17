@@ -54,7 +54,7 @@ npm-lint:
 
 .PHONY: go-lint
 go-lint:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.55.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
 	golangci-lint run
 
 .PHONY: bump

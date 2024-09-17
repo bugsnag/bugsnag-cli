@@ -2,7 +2,7 @@ agents:
   queue: macos-14
 
 steps:
-  - label: Build CLI Binaries
+  - label: ":hammer: CLI Binaries"
     key: build
     commands:
       - make build-all
@@ -10,12 +10,12 @@ steps:
       artifacts#v1.5.0:
         upload:
           - bin/**/*
+
   - group: ":lint-roller: Linting"
     steps:
       - label: ":lint-roller::go: Lint Go Code"
         commands:
           - make go-lint
-
       - label: ":lint-roller::npm: Lint NPM Dependencies"
         commands:
           - make npm-lint
@@ -25,14 +25,13 @@ steps:
     commands:
       - make unit-tests
 
-  - label: CLI Integration Tests
+  - label: ":terminal: CLI Integration Tests"
     depends_on: build
     env:
       NODE_VERSION: 18
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - env
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/cli
     plugins:
       artifacts#v1.5.0:
@@ -41,11 +40,11 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: Android Integration Tests
+  - label: ":android: Integration Tests"
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/android
     env:
       JAVA_VERSION: 17
@@ -56,14 +55,14 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: Dart Integration Tests
+  - label: ":dartlang: Integration Tests"
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/dart
     env:
-      FLUTTER_BIN: "/opt/flutter/3.10.0/bin/flutter"
+      FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
     plugins:
       artifacts#v1.5.0:
         download:
@@ -74,10 +73,10 @@ steps:
   - label: dSYM Integration Tests
     depends_on: build
     env:
-      XCODE_VERSION: 15.3.0
+      XCODE_VERSION: 15
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/dsym
     plugins:
       artifacts#v1.5.0:
@@ -86,7 +85,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: JavaScript Integration Tests
+  - label: ":javascript: Integration Tests"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
@@ -99,7 +98,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: Unity Android Integration Tests
+  - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
       UNITY_VERSION: 2023.2.19f1
@@ -116,16 +115,16 @@ steps:
 
   - group: ":react: React Native"
     steps:
-      - label: React Native iOS Integration Tests
+      - label: "RN 0.69 :ios: Integration Tests"
         depends_on: build
         agents:
           queue: macos-12-arm
         env:
-          XCODE_VERSION: 13.4.1
+          XCODE_VERSION: 13
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
-          - bundle exec maze-runner features/react-native-ios
+          - bundle exec maze-runner features/react-native-ios/rn0_69.feature
         plugins:
           artifacts#v1.5.0:
             download:
@@ -133,14 +132,16 @@ steps:
             upload:
               - maze_output/**/*
 
-      - label: React Native Android Integration Tests
+      - label: "RN 0.70 :ios: Integration Tests"
         depends_on: build
         agents:
           queue: macos-12-arm
+        env:
+          XCODE_VERSION: 13
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
-          - bundle exec maze-runner features/react-native-android
+          - bundle exec maze-runner features/react-native-ios/rn0_70.feature
         plugins:
           artifacts#v1.5.0:
             download:
@@ -148,10 +149,68 @@ steps:
             upload:
               - maze_output/**/*
 
-      - label: React Native Integration Tests
+      - label: "RN 0.72 :ios: Integration Tests"
         depends_on: build
         agents:
           queue: macos-12-arm
+        env:
+          XCODE_VERSION: 14
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-ios/rn0_72.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: "RN 0.69 :android: Integration Tests"
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_69.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: "RN 0.70 :android: Integration Tests"
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_70.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: "RN 0.72 :android: Integration Tests"
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_72.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: RN 0.72 Integration Tests
+        depends_on: build
+        agents:
+          queue: macos-12-arm
+        env:
+          XCODE_VERSION: 14
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
