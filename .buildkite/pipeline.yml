@@ -40,21 +40,21 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
-#
-#  - label: Android Integration Tests
-#    depends_on: build
-#    commands:
-#      - chmod +x bin/arm64-macos-bugsnag-cli
-#      - bundle install
-#      - bundle exec maze-runner features/android
-#    env:
-#      JAVA_VERSION: 17
-#    plugins:
-#      artifacts#v1.5.0:
-#        download:
-#          - bin/arm64-macos-bugsnag-cli
-#        upload:
-#          - maze_output/**/*
+
+  - label: Android Integration Tests
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/android
+    env:
+      JAVA_VERSION: 17
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
 #
 #  - label: Dart Integration Tests
 #    depends_on: build
