@@ -12,21 +12,21 @@ steps:
         upload:
           - bin/**/*
 
-#  - group: ":lint-roller: Linting"
-#    steps:
-#      - label: ":lint-roller::go: Lint Go Code"
-#        commands:
-#          - make go-lint
-#
-#      - label: ":lint-roller::npm: Lint NPM Dependencies"
-#        commands:
-#          - make npm-lint
-#
-#  # Run the unit tests
-#  - label: Unit Tests
-#    commands:
-#      - make unit-tests
-#
+  - group: ":lint-roller: Linting"
+    steps:
+      - label: ":lint-roller::go: Lint Go Code"
+        commands:
+          - make go-lint
+
+      - label: ":lint-roller::npm: Lint NPM Dependencies"
+        commands:
+          - make npm-lint
+
+  # Run the unit tests
+  - label: Unit Tests
+    commands:
+      - make unit-tests
+
 #  - label: CLI Integration Tests
 #    depends_on: build
 #    env:
