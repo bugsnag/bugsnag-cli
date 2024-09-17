@@ -27,7 +27,7 @@ steps:
     commands:
       - make unit-tests
 
-  - label: CLI Integration Tests
+  - label: ":terminal: CLI Integration Tests"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
@@ -41,7 +41,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: Android Integration Tests
+  - label: ":android: Integration Tests"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
@@ -55,22 +55,22 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
-#
-#  - label: Dart Integration Tests
-#    depends_on: build
-#    commands:
-#      - chmod +x bin/arm64-macos-bugsnag-cli
-#      - bundle install
-#      - bundle exec maze-runner features/dart
-#    env:
-#      FLUTTER_BIN: "/opt/flutter/3.10.0/bin/flutter"
-#    plugins:
-#      artifacts#v1.5.0:
-#        download:
-#          - bin/arm64-macos-bugsnag-cli
-#        upload:
-#          - maze_output/**/*
-#
+
+  - label: ":dartlang: Integration Tests"
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/dart
+    env:
+      FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
 #  - label: dSYM Integration Tests
 #    depends_on: build
 #    env:
