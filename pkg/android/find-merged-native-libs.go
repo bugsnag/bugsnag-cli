@@ -3,7 +3,7 @@ package android
 import (
 	"fmt"
 	"path/filepath"
-	
+
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -15,7 +15,7 @@ func FindNativeLibPath(arr []string, path string) (string, error) {
 	for i := 1; i <= iterations; i++ {
 		path_ending := filepath.Join(arr...)
 		mergeNativeLibPath := filepath.Join(path, path_ending)
-		if utils.FileExists(mergeNativeLibPath){
+		if utils.FileExists(mergeNativeLibPath) {
 			return mergeNativeLibPath, nil
 		}
 		arr = arr[1:]
@@ -37,5 +37,5 @@ func FindNativeLibPath(arr []string, path string) (string, error) {
 		return mergeNativeLibPath, nil
 	}
 
-	return "", fmt.Errorf("unable to find the merged_native_libs in " + path)
+	return "", fmt.Errorf("unable to find the merged_native_libs in %s", path)
 }
