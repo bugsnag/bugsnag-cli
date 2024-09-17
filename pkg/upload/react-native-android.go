@@ -135,14 +135,16 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", options.ApiKey))
 			}
 
-			if androidOptions.ReactNative.VersionName == "" {
-				androidOptions.ReactNative.VersionName = manifestData.VersionName
-				logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", androidOptions.ReactNative.VersionName))
-			}
+			if androidOptions.ReactNative.CodeBundleId == "" {
+				if androidOptions.ReactNative.VersionName == "" {
+					androidOptions.ReactNative.VersionName = manifestData.VersionName
+					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", androidOptions.ReactNative.VersionName))
+				}
 
-			if androidOptions.Android.VersionCode == "" {
-				androidOptions.Android.VersionCode = manifestData.VersionCode
-				logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", androidOptions.Android.VersionCode))
+				if androidOptions.Android.VersionCode == "" {
+					androidOptions.Android.VersionCode = manifestData.VersionCode
+					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", androidOptions.Android.VersionCode))
+				}
 			}
 		}
 
