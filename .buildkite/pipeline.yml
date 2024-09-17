@@ -30,9 +30,7 @@ steps:
   - label: ":terminal: CLI Integration Tests"
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - env
       - bundle exec maze-runner features/cli
     plugins:
       artifacts#v1.5.0:
@@ -44,7 +42,6 @@ steps:
   - label: ":android: Integration Tests"
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/android
     env:
@@ -59,7 +56,6 @@ steps:
   - label: ":dartlang: Integration Tests"
     depends_on: build
     commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
       - bundle exec maze-runner features/dart
     env:
@@ -71,21 +67,20 @@ steps:
         upload:
           - maze_output/**/*
 
-#  - label: dSYM Integration Tests
-#    depends_on: build
-#    env:
-#      XCODE_VERSION: 15.3.0
-#    commands:
-#      - chmod +x bin/arm64-macos-bugsnag-cli
-#      - bundle install
-#      - bundle exec maze-runner features/dsym
-#    plugins:
-#      artifacts#v1.5.0:
-#        download:
-#          - bin/arm64-macos-bugsnag-cli
-#        upload:
-#          - maze_output/**/*
-#
+  - label: dSYM Integration Tests
+    depends_on: build
+    env:
+      XCODE_VERSION: 15
+    commands:
+      - bundle install
+      - bundle exec maze-runner features/dsym
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
 #  - label: JavaScript Integration Tests
 #    depends_on: build
 #    commands:
