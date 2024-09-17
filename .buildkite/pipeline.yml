@@ -114,9 +114,9 @@ steps:
           - maze_output/**/*
 
   - group: ":react: React Native"
+    depends_on: build
     steps:
       - label: "RN 0.69 :ios: Integration Tests"
-        depends_on: build
         agents:
           queue: macos-12-arm
         env:
@@ -133,7 +133,6 @@ steps:
               - maze_output/**/*
 
       - label: "RN 0.70 :ios: Integration Tests"
-        depends_on: build
         agents:
           queue: macos-12-arm
         env:
@@ -150,7 +149,6 @@ steps:
               - maze_output/**/*
 
       - label: "RN 0.72 :ios: Integration Tests"
-        depends_on: build
         agents:
           queue: macos-12-arm
         env:
@@ -167,7 +165,6 @@ steps:
               - maze_output/**/*
 
       - label: "RN 0.69 :android: Integration Tests"
-        depends_on: build
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
@@ -180,7 +177,6 @@ steps:
               - maze_output/**/*
 
       - label: "RN 0.70 :android: Integration Tests"
-        depends_on: build
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
@@ -193,7 +189,6 @@ steps:
               - maze_output/**/*
 
       - label: "RN 0.72 :android: Integration Tests"
-        depends_on: build
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
@@ -206,7 +201,6 @@ steps:
               - maze_output/**/*
 
       - label: RN 0.72 Integration Tests
-        depends_on: build
         agents:
           queue: macos-12-arm
         env:
