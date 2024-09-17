@@ -115,16 +115,50 @@ steps:
 
   - group: ":react: React Native"
     steps:
-      - label: React Native iOS Integration Tests
+      - label: RN 0.69 iOS Integration Tests
         depends_on: build
-#        agents:
-#          queue: macos-12-arm
-#        env:
-#          XCODE_VERSION: 13.4.1
+        #        agents:
+        #          queue: macos-12-arm
+        #        env:
+        #          XCODE_VERSION: 13.4.1
         commands:
           - chmod +x bin/arm64-macos-bugsnag-cli
           - bundle install
-          - bundle exec maze-runner features/react-native-ios
+          - bundle exec maze-runner features/react-native-ios/rn0_69.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: RN 0.70 iOS Integration Tests
+        depends_on: build
+        #        agents:
+        #          queue: macos-12-arm
+        #        env:
+        #          XCODE_VERSION: 13.4.1
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-ios/rn0_70.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: RN 0.72 iOS Integration Tests
+        depends_on: build
+        #        agents:
+        #          queue: macos-12-arm
+        #        env:
+        #          XCODE_VERSION: 13.4.1
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-ios/rn0_72.feature
         plugins:
           artifacts#v1.5.0:
             download:
