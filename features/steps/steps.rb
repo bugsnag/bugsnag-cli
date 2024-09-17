@@ -179,6 +179,7 @@ end
 
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
+  puts @output
 end
 
 Then(/^I should only see the fatal log level messages$/) do
