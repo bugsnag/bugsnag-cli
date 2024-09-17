@@ -6,7 +6,6 @@ steps:
     key: build
     commands:
       - make build-all
-      - chmod +x bin/*
     plugins:
       artifacts#v1.5.0:
         upload:
@@ -17,7 +16,6 @@ steps:
       - label: ":lint-roller::go: Lint Go Code"
         commands:
           - make go-lint
-
       - label: ":lint-roller::npm: Lint NPM Dependencies"
         commands:
           - make npm-lint
@@ -29,8 +27,11 @@ steps:
 
   - label: ":terminal: CLI Integration Tests"
     depends_on: build
+    env:
+      NODE_VERSION: 18
     commands:
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/cli
     plugins:
       artifacts#v1.5.0:
@@ -43,6 +44,7 @@ steps:
     depends_on: build
     commands:
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/android
     env:
       JAVA_VERSION: 17
@@ -57,6 +59,7 @@ steps:
     depends_on: build
     commands:
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/dart
     env:
       FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
@@ -73,6 +76,7 @@ steps:
       XCODE_VERSION: 15
     commands:
       - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle exec maze-runner features/dsym
     plugins:
       artifacts#v1.5.0:
