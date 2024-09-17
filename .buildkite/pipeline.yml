@@ -85,7 +85,7 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: JavaScript Integration Tests
+  - label: ":javascript: Integration Tests"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
@@ -97,22 +97,22 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
-#
-#  - label: Unity Android Integration Tests
-#    depends_on: build
-#    env:
-#      UNITY_VERSION: 2023.2.19f1
-#    commands:
-#      - chmod +x bin/arm64-macos-bugsnag-cli
-#      - bundle install
-#      - bundle exec maze-runner features/unity-android
-#    plugins:
-#      artifacts#v1.5.0:
-#        download:
-#          - bin/arm64-macos-bugsnag-cli
-#        upload:
-#          - maze_output/**/*
-#
+
+  - label: Unity Android Integration Tests
+    depends_on: build
+    env:
+      UNITY_VERSION: 2023.2.19f1
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/unity-android
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
 #  - group: ":react: React Native"
 #    steps:
 #      - label: React Native iOS Integration Tests
