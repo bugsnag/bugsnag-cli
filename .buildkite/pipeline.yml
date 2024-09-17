@@ -166,19 +166,44 @@ steps:
             upload:
               - maze_output/**/*
 
-#      - label: React Native Android Integration Tests
-#        depends_on: build
-#        commands:
-#          - chmod +x bin/arm64-macos-bugsnag-cli
-#          - bundle install
-#          - bundle exec maze-runner features/react-native-android
-#        plugins:
-#          artifacts#v1.5.0:
-#            download:
-#              - bin/arm64-macos-bugsnag-cli
-#            upload:
-#              - maze_output/**/*
-#
+      - label: RN 0.69 Android Integration Tests
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_69.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: RN 0.70 Android Integration Tests
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_70.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: RN 0.72 Android Integration Tests
+        depends_on: build
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner features/react-native-android/rn0_72.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
 #      - label: React Native Integration Tests
 #        depends_on: build
 #        agents:
@@ -187,6 +212,20 @@ steps:
 #          - chmod +x bin/arm64-macos-bugsnag-cli
 #          - bundle install
 #          - bundle exec maze-runner features/react-native
+#        plugins:
+#          artifacts#v1.5.0:
+#            download:
+#              - bin/arm64-macos-bugsnag-cli
+#            upload:
+#              - maze_output/**/*
+
+
+#      - label: React Native Android Integration Tests
+#        depends_on: build
+#        commands:
+#          - chmod +x bin/arm64-macos-bugsnag-cli
+#          - bundle install
+#          - bundle exec maze-runner features/react-native-android
 #        plugins:
 #          artifacts#v1.5.0:
 #            download:
