@@ -135,6 +135,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", options.ApiKey))
 			}
 
+			// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from AndroidManifest.xml
 			if androidOptions.ReactNative.CodeBundleId == "" {
 				if androidOptions.ReactNative.VersionName == "" {
 					androidOptions.ReactNative.VersionName = manifestData.VersionName
