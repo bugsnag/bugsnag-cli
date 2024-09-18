@@ -113,17 +113,17 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	uploadOptions["appVersion"] = appVersion
-
-	if platform == "android" {
-		uploadOptions["appVersionCode"] = versionCode
-
-	} else if platform == "ios" {
-		uploadOptions["appBundleVersion"] = versionCode
-	}
-
+	// If codeBundleId is set, use that instead of appVersion and versionCode
 	if codeBundleId != "" {
 		uploadOptions["codeBundleId"] = codeBundleId
+	} else {
+		uploadOptions["appVersion"] = appVersion
+
+		if platform == "android" {
+			uploadOptions["appVersionCode"] = versionCode
+		} else if platform == "ios" {
+			uploadOptions["appBundleVersion"] = versionCode
+		}
 	}
 
 	if dev {

@@ -164,16 +164,19 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				return err
 			}
 
-			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
-			if iosOptions.Ios.BundleVersion == "" {
-				iosOptions.Ios.BundleVersion = plistData.BundleVersion
-				logger.Debug(fmt.Sprintf("Using bundle version from Info.plist: %s", iosOptions.Ios.BundleVersion))
-			}
+			// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from the plist
+			if iosOptions.ReactNative.CodeBundleId == "" {
+				// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+				if iosOptions.Ios.BundleVersion == "" {
+					iosOptions.Ios.BundleVersion = plistData.BundleVersion
+					logger.Debug(fmt.Sprintf("Using bundle version from Info.plist: %s", iosOptions.Ios.BundleVersion))
+				}
 
-			if iosOptions.ReactNative.VersionName == "" {
-				iosOptions.ReactNative.VersionName = plistData.VersionName
-				logger.Debug(fmt.Sprintf("Using version name from Info.plist: %s", iosOptions.ReactNative.VersionName))
+				if iosOptions.ReactNative.VersionName == "" {
+					iosOptions.ReactNative.VersionName = plistData.VersionName
+					logger.Debug(fmt.Sprintf("Using version name from Info.plist: %s", iosOptions.ReactNative.VersionName))
 
+				}
 			}
 
 			if options.ApiKey == "" {
