@@ -1,7 +1,7 @@
 Feature: React Native 0.69 Android Integration Tests
 
   Scenario: Upload a single React Native 0.69 Android sourcemap using all CLI flags
-    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/react-native-android/fixtures/rn0_69/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --bundle=features/react-native-android/fixtures/rn0_69/android/app/build/generated/assets/react/release/index.android.bundle --code-bundle-id=1.0-15 --dev --source-map=features/react-native-android/fixtures/rn0_69/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map --variant=release --version-name=1.0 --version-code=1
+    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/react-native-android/fixtures/rn0_69/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --bundle=features/react-native-android/fixtures/rn0_69/android/app/build/generated/assets/react/release/index.android.bundle  --dev --source-map=features/react-native-android/fixtures/rn0_69/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map --variant=release --version-name=1.0 --version-code=1
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
