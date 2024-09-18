@@ -1,4 +1,8 @@
 # Changelog
+## 2.6.1 (2024-09-18)
+
+# Fixes
+- Ensure that we only pass either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` to the upload API. [140](https://github.com/bugsnag/bugsnag-cli/pull/140)
 
 ## 2.6.0 (2024-09-09)
 

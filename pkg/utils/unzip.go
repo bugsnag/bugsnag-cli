@@ -30,21 +30,21 @@ func Unzip(path, outputPath string) error {
 		}
 
 		if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-			return fmt.Errorf(err.Error())
+			return fmt.Errorf("%w", err)
 		}
 
 		outputPathFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
 		if err != nil {
-			return fmt.Errorf(err.Error())
+			return fmt.Errorf("%w", err)
 		}
 
 		fileInArchive, err := f.Open()
 		if err != nil {
-			return fmt.Errorf(err.Error())
+			return fmt.Errorf("%w", err)
 		}
 
 		if _, err := io.Copy(outputPathFile, fileInArchive); err != nil {
-			return fmt.Errorf(err.Error())
+			return fmt.Errorf("%w", err)
 		}
 
 		outputPathFile.Close()

@@ -1,9 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
-	"fmt"
 )
 
 // GetRepoUrl - Gets the URl of a git repo.
