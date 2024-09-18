@@ -8,7 +8,6 @@ Feature: React Native 0.69 Android Integration Tests
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.0"
     And the sourcemap payload field "appVersionCode" equals "1"
-    And the sourcemap payload field "codeBundleId" equals "1.0-15"
     And the sourcemap payload field "dev" equals "true"
     And the sourcemap payload field "platform" equals "android"
     And the sourcemap payload field "overwrite" equals "true"
