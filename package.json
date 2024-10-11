@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "2.6.1",
+  "version": "2.6.4-alpha",
   "description": "BugSnag CLI",
   "main": "install.js",
   "bin": {
