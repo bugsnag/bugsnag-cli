@@ -4,7 +4,7 @@
   "description": "BugSnag CLI",
   "main": "install.js",
   "bin": {
-    "bugsnag-cli": "./.bin/bugsnag-cli"
+    "bugsnag-cli": "bin/bugsnag-cli"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "files": [
     "install.js",
+    "bin/bugsnag-cli",
     "supported-platforms.yml"
   ],
   "scripts": {
