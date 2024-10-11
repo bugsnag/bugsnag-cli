@@ -1,7 +1,12 @@
 # Changelog
+## TBD
+
+### Fixes
+- Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
+
 ## 2.6.1 (2024-09-18)
 
-# Fixes
+### Fixes
 - Ensure that we only pass either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` to the upload API. [140](https://github.com/bugsnag/bugsnag-cli/pull/140)
 
 ## 2.6.0 (2024-09-09)
