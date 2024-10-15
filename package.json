@@ -25,6 +25,7 @@
   },
   "files": [
     "install.js",
+    "bin/bugsnag-cli",
     "supported-platforms.yml"
   ],
   "scripts": {

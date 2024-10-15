@@ -51,7 +51,7 @@ const getPlatformMetadata = () => {
 
 const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     try {
-        const binDir = path.resolve(process.cwd(),'..','..','.bin');
+        const binDir = path.resolve(process.cwd(),'bin');
         if (!fs.existsSync(binDir)) {
             fs.mkdirSync(binDir, { recursive: true });
         }
@@ -69,6 +69,6 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
 const platformMetadata = getPlatformMetadata();
 const repoUrl = removeGitPrefixAndSuffix(repository.url);
 const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`;
-const binaryOutputPath = path.join(process.cwd(),'..','..','.bin', platformMetadata.BINARY_NAME);
+const binaryOutputPath = path.join(process.cwd(),'bin', platformMetadata.BINARY_NAME);
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath);
