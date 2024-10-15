@@ -1,5 +1,5 @@
 # Changelog
-## TBD
+## 2.6.2 (TBD)
 
 ### Fixes
 - Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
