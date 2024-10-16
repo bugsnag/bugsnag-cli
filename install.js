@@ -1,8 +1,9 @@
-const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const yaml = require('js-yaml');
+const createWriteStream = require('fs').createWriteStream;
+const Readable = require('stream').Readable;
 
 const supportedPlatformsConfig = fs.readFileSync(path.join(__dirname, 'supported-platforms.yml'), 'utf8');
 const { name, repository, version } = require('./package.json');
@@ -56,9 +57,14 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
             fs.mkdirSync(binDir, { recursive: true });
         }
 
-        const response = await axios.get(downloadUrl, { responseType: 'arraybuffer' });
-        const binaryData = response.data;
-        fs.writeFileSync(outputPath, binaryData, 'binary');
+        const fileName = downloadUrl.split("/").pop();
+        const resp = await fetch(downloadUrl);
+
+        if (resp.ok && resp.body) {
+            let writer = createWriteStream(outputPath);
+            Readable.fromWeb(resp.body).pipe(writer);
+        }
+
         fs.chmodSync(outputPath, '755');
         console.log('Binary downloaded successfully!');
     } catch (err) {
