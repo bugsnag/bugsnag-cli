@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "BugSnag CLI",
   "main": "install.js",
   "bin": {
@@ -20,11 +20,11 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
-    "axios": "^1.7.4",
     "js-yaml": "^4.1.0"
   },
   "files": [
     "install.js",
+    "bin/bugsnag-cli",
     "supported-platforms.yml"
   ],
   "scripts": {

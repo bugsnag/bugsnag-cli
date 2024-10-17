@@ -1,7 +1,13 @@
 # Changelog
+## 2.6.2 (2024-10-17)
+
+### Fixes
+- Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
+- Replace the axios dependency with fetch to reduce the size of the package. [145](https://github.com/bugsnag/bugsnag-cli/pull/144)
+
 ## 2.6.1 (2024-09-18)
 
-# Fixes
+### Fixes
 - Ensure that we only pass either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` to the upload API. [140](https://github.com/bugsnag/bugsnag-cli/pull/140)
 
 ## 2.6.0 (2024-09-09)
