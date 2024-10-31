@@ -52,7 +52,7 @@ Feature: React Native 0.69 iOS Integration Tests
     When I make the "features/base-fixtures/rn0_69/ios/archive"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --dev --scheme=rn0_69 features/base-fixtures/rn0_69
+    When I run bugsnag-cli with upload react-native-ios --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/rn0_69
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
