@@ -20,6 +20,7 @@ type XcodeBuildSettings struct {
 	BuiltProductsDir      string `mapstructure:"BUILT_PRODUCTS_DIR"`
 	DsymName              string `mapstructure:"DWARF_DSYM_FILE_NAME"`
 	ProjectTempRoot       string `mapstructure:"PROJECT_TEMP_ROOT"`
+	ProductSettingsPath   string `mapstructure:"PRODUCT_SETTINGS_PATH"`
 }
 
 // GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty

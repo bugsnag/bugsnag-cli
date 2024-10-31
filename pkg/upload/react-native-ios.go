@@ -90,7 +90,8 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 					iosOptions.Ios.Plist = plistPathExpected
 					logger.Debug(fmt.Sprintf("Found Info.plist at expected location: %s", iosOptions.Ios.Plist))
 				} else {
-					plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", iosOptions.Ios.Scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)
+					//plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", iosOptions.Ios.Scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)
+					plistPathExpected = buildSettings.ProductSettingsPath
 					if utils.FileExists(plistPathExpected) {
 						iosOptions.Ios.Plist = plistPathExpected
 						logger.Debug(fmt.Sprintf("Found Info.plist at: %s", iosOptions.Ios.Plist))
@@ -175,7 +176,6 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				if iosOptions.ReactNative.VersionName == "" {
 					iosOptions.ReactNative.VersionName = plistData.VersionName
 					logger.Debug(fmt.Sprintf("Using version name from Info.plist: %s", iosOptions.ReactNative.VersionName))
-
 				}
 			}
 
