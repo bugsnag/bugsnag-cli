@@ -44,11 +44,12 @@ func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error 
 		}
 
 		if xcodeProjPath != "" {
-			dsymOptions.ProjectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, dsymOptions.ProjectRoot)
-			logger.Debug(fmt.Sprintf("Defaulting to '%s' as the project root", dsymOptions.ProjectRoot))
+			if dsymOptions.ProjectRoot == "" {
+				dsymOptions.ProjectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, dsymOptions.ProjectRoot)
+				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", dsymOptions.ProjectRoot))
+			}
 
 			// Get build settings and dsymPath
-
 			// If options.Scheme is set explicitly, check if it exists
 			if dsymOptions.Scheme != "" {
 				_, err := ios.IsSchemeInPath(xcodeProjPath, dsymOptions.Scheme)
@@ -85,7 +86,8 @@ func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error 
 		}
 
 		if dsymOptions.ProjectRoot == "" {
-			return fmt.Errorf("--project-root is required when uploading dSYMs from a directory that is not an Xcode project or workspace")
+			dsymOptions.ProjectRoot, _ = os.Getwd()
+			logger.Info(fmt.Sprintf("Setting `--project-root` to current working directory: %s", dsymOptions.ProjectRoot))
 		}
 
 		if dsymPath == "" {
