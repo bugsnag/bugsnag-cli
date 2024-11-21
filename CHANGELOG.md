@@ -5,6 +5,10 @@
 
 - Default the `--project-root` to the current working directory for the `upload dsym` command. [148](https://github.com/bugsnag/bugsnag-cli/pull/148)
 
+### Fixes
+
+- Add the `--code-bundle-id` option to the `upload js` command. [148](
+
 ## 2.6.2 (2024-10-17)
 
 ### Fixes
