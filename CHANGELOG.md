@@ -7,7 +7,7 @@
 
 ### Fixes
 
-- Add the `--code-bundle-id` option to the `upload js` command. [148](
+- Add the `--code-bundle-id` option to the `upload js` command. [150](https//github.com/bugsnag/bugsnag-cli/pull/150)
 
 ## 2.6.2 (2024-10-17)
 
