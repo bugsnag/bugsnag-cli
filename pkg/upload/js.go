@@ -266,7 +266,7 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 		logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", url, jsOptions.BaseUrl))
 	}
 
-	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, jsOptions.VersionName, url, jsOptions.ProjectRoot, options.Upload.Overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, jsOptions.VersionName, jsOptions.CodeBundleId, url, jsOptions.ProjectRoot, options.Upload.Overwrite)
 
 	if err != nil {
 		return fmt.Errorf("failed to build upload options: %s", err.Error())
