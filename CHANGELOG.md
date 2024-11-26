@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-- Add the `--config` option to the `upload dsym` command. [150](
+- Add the `--config` option to the `upload dsym` command. [154](https://github.com/bugsnag/bugsnag-cli/pull/154)
 
 ## 2.6.3 (2024-11-26)
 
