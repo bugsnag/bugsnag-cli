@@ -70,6 +70,7 @@ type Dsym struct {
 	VersionName        string      `help:"The version of the application"`
 	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 	ProjectRoot        string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Configuration      string      `help:"The configuration used to build the application"`
 }
 
 type Js struct {

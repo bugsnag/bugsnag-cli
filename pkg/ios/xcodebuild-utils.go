@@ -90,9 +90,9 @@ func getXcodeSchemes(path string) []string {
 }
 
 // GetXcodeBuildSettings returns a struct of the relevant build settings for a given path and scheme
-func GetXcodeBuildSettings(path, schemeName string) (*XcodeBuildSettings, error) {
+func GetXcodeBuildSettings(path, schemeName string, configuration string) (*XcodeBuildSettings, error) {
 	var buildSettings XcodeBuildSettings
-	allBuildSettings, err := getXcodeBuildSettings(path, schemeName)
+	allBuildSettings, err := getXcodeBuildSettings(path, schemeName, configuration)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func GetXcodeBuildSettings(path, schemeName string) (*XcodeBuildSettings, error)
 }
 
 // getXcodeBuildSettings parses the xcodebuild output for a given path and scheme to return a map of all build settings
-func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error) {
+func getXcodeBuildSettings(path, schemeName string, configuration string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 
 	if isXcodebuildInstalled() {
@@ -114,9 +114,17 @@ func getXcodeBuildSettings(path, schemeName string) (*map[string]*string, error)
 		}
 
 		if strings.HasSuffix(path, ".xcworkspace") {
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-scheme", schemeName, "-showBuildSettings")
+			cmdArgs := []string{"-workspace", path, "-scheme", schemeName, "-showBuildSettings"}
+			if configuration != "" {
+				cmdArgs = append(cmdArgs, "-configuration", configuration)
+			}
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
 		} else if strings.HasSuffix(path, ".xcodeproj") {
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-scheme", schemeName, "-showBuildSettings")
+			cmdArgs := []string{"-project", path, "-scheme", schemeName, "-showBuildSettings"}
+			if configuration != "" {
+				cmdArgs = append(cmdArgs, "-configuration", configuration)
+			}
+			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
 		} else {
 			return nil, fmt.Errorf("Unable to locate xcodeproj or xcworkspace in the given path")
 		}
