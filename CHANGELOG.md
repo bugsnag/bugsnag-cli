@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.0 (2024-11-26)
+
+### Enhancements
+
+- Add the `--config` option to the `upload dsym` command. [150](
+
 ## 2.6.3 (2024-11-26)
 
 ### Enhancements

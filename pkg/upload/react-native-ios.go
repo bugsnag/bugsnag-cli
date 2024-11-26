@@ -69,7 +69,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				}
 
 				if iosOptions.Ios.Scheme != "" {
-					buildSettings, err = ios.GetXcodeBuildSettings(iosOptions.Ios.XcodeProject, iosOptions.Ios.Scheme)
+					buildSettings, err = ios.GetXcodeBuildSettings(iosOptions.Ios.XcodeProject, iosOptions.Ios.Scheme, "")
 					if err != nil {
 						logger.Warn(err.Error())
 					}
