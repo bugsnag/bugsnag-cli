@@ -1,15 +1,6 @@
 # Changelog
-## 2.6.3 (2024-11-21)
-
-### Enhancements
-
-- Default the `--project-root` to the current working directory for the `upload dsym` command. [148](https://github.com/bugsnag/bugsnag-cli/pull/148)
-
-### Fixes
-
-- Add the `--code-bundle-id` option to the `upload js` command. [150](https//github.com/bugsnag/bugsnag-cli/pull/150)
-
-## 2.6.2 (2024-10-17)
+ 
+## 2.6.2 (2024-11-26)
 
 ### Fixes
 - Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
