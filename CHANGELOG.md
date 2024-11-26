@@ -1,5 +1,6 @@
 # Changelog
-## 2.6.2 (2024-10-17)
+ 
+## 2.6.2 (2024-11-26)
 
 ### Fixes
 - Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)

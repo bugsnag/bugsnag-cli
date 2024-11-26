@@ -141,7 +141,7 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 	return uploadOptions, nil
 }
 
-func BuildJsUploadOptions(apiKey string, versionName string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildJsUploadOptions(apiKey string, versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
@@ -162,6 +162,10 @@ func BuildJsUploadOptions(apiKey string, versionName string, bundleUrl string, p
 
 	if projectRoot != "" {
 		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if codeBundleId != "" {
+		uploadOptions["codeBundleId"] = codeBundleId
 	}
 
 	if overwrite {
