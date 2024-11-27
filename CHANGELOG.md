@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.7.0 (2024-11-26)
+
+### Enhancements
+
+- Add the `--configuration` option to the `upload dsym` command. [154](https://github.com/bugsnag/bugsnag-cli/pull/154)
+
 ## 2.6.3 (2024-11-26)
 
 ### Enhancements

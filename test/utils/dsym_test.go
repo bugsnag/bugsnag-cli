@@ -147,7 +147,7 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 
 	for name, tc := range tt {
 		t.Run(name, func(t *testing.T) {
-			actualResult, err := ios.GetXcodeBuildSettings(tc.pathValue, tc.scheme)
+			actualResult, err := ios.GetXcodeBuildSettings(tc.pathValue, tc.scheme, "")
 			require.NoError(t, err)
 			assert.NotNil(t, actualResult)
 

@@ -65,7 +65,7 @@ func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error 
 			}
 
 			if dsymOptions.Scheme != "" {
-				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, dsymOptions.Scheme)
+				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, dsymOptions.Scheme, options.Upload.Dsym.Configuration)
 				if err != nil {
 					logger.Warn(err.Error())
 				}
