@@ -137,7 +137,7 @@ func main() {
 
 	case "upload xcode-build", "upload xcode-build <path>":
 
-		err := upload.ProcessDsym(commands, endpoint, logger)
+		err := upload.ProcessXcodeBuild(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

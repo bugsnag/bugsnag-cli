@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error {
+func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) error {
 	dsymOptions := options.Upload.XcodeBuild
 	var buildSettings *ios.XcodeBuildSettings
 	var plistData *ios.PlistData
