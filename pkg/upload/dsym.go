@@ -14,7 +14,7 @@ import (
 )
 
 func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error {
-	dsymOptions := options.Upload.Dsym
+	dsymOptions := options.Upload.XcodeBuild
 	var buildSettings *ios.XcodeBuildSettings
 	var plistData *ios.PlistData
 	var uploadOptions map[string]string
@@ -65,7 +65,7 @@ func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error 
 			}
 
 			if dsymOptions.Scheme != "" {
-				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, dsymOptions.Scheme, options.Upload.Dsym.Configuration)
+				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, dsymOptions.Scheme, options.Upload.XcodeBuild.Configuration)
 				if err != nil {
 					logger.Warn(err.Error())
 				}

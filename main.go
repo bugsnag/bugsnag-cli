@@ -135,7 +135,7 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-	case "upload dsym", "upload dsym <path>":
+	case "upload xcode-build", "upload xcode-build <path>":
 
 		err := upload.ProcessDsym(commands, endpoint, logger)
 

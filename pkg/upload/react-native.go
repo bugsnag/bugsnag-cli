@@ -56,7 +56,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 
 	logger.Info("Uploading iOS dSYMs")
 	// Missing: IgnoreEmptyDsym IgnoreMissingDwarf
-	globalOptions.Upload.Dsym = options.Dsym{
+	globalOptions.Upload.XcodeBuild = options.XcodeBuild{
 		Path:         iosPath,
 		VersionName:  reactNativeOptions.Shared.VersionName,
 		ProjectRoot:  reactNativeOptions.ProjectRoot,

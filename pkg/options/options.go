@@ -61,7 +61,7 @@ type DartSymbol struct {
 	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
 }
 
-type Dsym struct {
+type XcodeBuild struct {
 	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
@@ -159,7 +159,7 @@ type CLI struct {
 		AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		Dsym               Dsym                   `cmd:"" help:"Upload dSYMs for iOS"`
+		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
