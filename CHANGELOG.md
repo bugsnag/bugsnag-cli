@@ -1,4 +1,9 @@
 # Changelog
+## TBD
+
+### Enhancements
+
+- Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose.
 
 ## 2.7.0 (2024-11-26)
 
