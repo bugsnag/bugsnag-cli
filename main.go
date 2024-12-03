@@ -143,6 +143,14 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload xcode-archive", "upload xcode-archive <path>":
+
+		err := upload.ProcessXcodeArchive(commands, endpoint, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload unity-android <path>":
 
 		if commands.ApiKey == "" {

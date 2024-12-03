@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// XcodeBuildSettings contains the relevant build settings required for uploading to bugsnag
+// XcodeBuildSettings contains the relevant build settings required for uploading to Bugsnag.
 type XcodeBuildSettings struct {
 	ConfigurationBuildDir string `mapstructure:"CONFIGURATION_BUILD_DIR"`
 	InfoPlistPath         string `mapstructure:"INFOPLIST_PATH"`
@@ -22,21 +22,36 @@ type XcodeBuildSettings struct {
 	ProjectTempRoot       string `mapstructure:"PROJECT_TEMP_ROOT"`
 }
 
-// GetDefaultScheme checks if a scheme is in a given path or checks current directory if path is empty
+// GetDefaultScheme determines the default Xcode scheme in a given path or the current directory if no path is provided.
+//
+// Parameters:
+// - path (string): Path to search for schemes.
+//
+// Returns:
+// - string: The name of the default scheme.
+// - error: If no schemes or multiple schemes are found.
 func GetDefaultScheme(path string) (string, error) {
 	schemes := getXcodeSchemes(path)
 
 	switch len(schemes) {
 	case 0:
-		return "", errors.Errorf("No schemes found in location '%s' please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("no schemes found in location '%s'. Please specify a scheme with --scheme", path)
 	case 1:
 		return schemes[0], nil
 	default:
-		return "", errors.Errorf("Multiple schemes found in location '%s', please define which scheme to use with --scheme", path)
+		return "", errors.Errorf("multiple schemes found in location '%s'. Please specify a scheme with --scheme", path)
 	}
 }
 
-// IsSchemeInPath checks if a scheme is in a given path or checks current directory if path is empty
+// IsSchemeInPath verifies whether a given scheme exists in a specified path or current directory.
+//
+// Parameters:
+// - path (string): Path to search for the scheme.
+// - schemeToFind (string): Scheme name to look for.
+//
+// Returns:
+// - bool: True if the scheme exists; false otherwise.
+// - error: If the scheme cannot be located.
 func IsSchemeInPath(path, schemeToFind string) (bool, error) {
 	schemes := getXcodeSchemes(path)
 	for _, scheme := range schemes {
@@ -44,28 +59,27 @@ func IsSchemeInPath(path, schemeToFind string) (bool, error) {
 			return true, nil
 		}
 	}
-
-	return false, errors.Errorf("Unable to locate scheme '%s' in location: '%s'", schemeToFind, path)
+	return false, errors.Errorf("unable to locate scheme '%s' in location '%s'", schemeToFind, path)
 }
 
-// getXcodeSchemes parses the xcodebuild output for a given path to return a slice of schemes
+// getXcodeSchemes retrieves a list of Xcode schemes by parsing the `xcodebuild` output.
+//
+// Parameters:
+// - path (string): Path to search for schemes.
+//
+// Returns:
+// - []string: A slice of scheme names.
 func getXcodeSchemes(path string) []string {
 	var cmd *exec.Cmd
 
 	if isXcodebuildInstalled() {
 		if strings.HasSuffix(path, ".xcworkspace") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-workspace", path, "-list")
-
 		} else if strings.HasSuffix(path, ".xcodeproj") {
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-project", path, "-list")
-
 		} else {
-
 			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), "-list")
-
-			// Change the working directory of the command to path if it's a directory but not .xcodeproj or .xcworkspace
-			cmd.Dir = path
-
+			cmd.Dir = path // Set working directory if path is a directory
 		}
 	} else {
 		return []string{}
@@ -77,9 +91,7 @@ func getXcodeSchemes(path string) []string {
 	}
 
 	schemes := strings.SplitAfterN(string(output), "Schemes:\n", 2)[1]
-
-	// Remove excess whitespace and double newlines before splitting into a slice
-	schemes = strings.ReplaceAll(schemes, "\n\n", "")
+	schemes = strings.ReplaceAll(schemes, "\n\n", "") // Remove extra newlines
 	schemesSlice := strings.Split(schemes, "\n")
 
 	for i, scheme := range schemesSlice {
@@ -89,8 +101,17 @@ func getXcodeSchemes(path string) []string {
 	return schemesSlice
 }
 
-// GetXcodeBuildSettings returns a struct of the relevant build settings for a given path and scheme
-func GetXcodeBuildSettings(path, schemeName string, configuration string) (*XcodeBuildSettings, error) {
+// GetXcodeBuildSettings fetches build settings for a given path, scheme, and configuration.
+//
+// Parameters:
+// - path (string): The project or workspace path.
+// - schemeName (string): The scheme to use.
+// - configuration (string): The build configuration (e.g., Debug, Release).
+//
+// Returns:
+// - *XcodeBuildSettings: A struct containing the build settings.
+// - error: If the settings cannot be retrieved or decoded.
+func GetXcodeBuildSettings(path, schemeName, configuration string) (*XcodeBuildSettings, error) {
 	var buildSettings XcodeBuildSettings
 	allBuildSettings, err := getXcodeBuildSettings(path, schemeName, configuration)
 	if err != nil {
@@ -100,12 +121,20 @@ func GetXcodeBuildSettings(path, schemeName string, configuration string) (*Xcod
 	if err != nil {
 		return nil, err
 	}
-
 	return &buildSettings, nil
 }
 
-// getXcodeBuildSettings parses the xcodebuild output for a given path and scheme to return a map of all build settings
-func getXcodeBuildSettings(path, schemeName string, configuration string) (*map[string]*string, error) {
+// getXcodeBuildSettings retrieves all build settings as a map from the `xcodebuild` output.
+//
+// Parameters:
+// - path (string): The project or workspace path.
+// - schemeName (string): The scheme to use.
+// - configuration (string): The build configuration (optional).
+//
+// Returns:
+// - *map[string]*string: A map of all build settings.
+// - error: If the settings cannot be retrieved.
+func getXcodeBuildSettings(path, schemeName, configuration string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 
 	if isXcodebuildInstalled() {
@@ -113,33 +142,36 @@ func getXcodeBuildSettings(path, schemeName string, configuration string) (*map[
 			path = FindXcodeProjOrWorkspace(path)
 		}
 
+		var cmdArgs []string
 		if strings.HasSuffix(path, ".xcworkspace") {
-			cmdArgs := []string{"-workspace", path, "-scheme", schemeName, "-showBuildSettings"}
-			if configuration != "" {
-				cmdArgs = append(cmdArgs, "-configuration", configuration)
-			}
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
+			cmdArgs = []string{"-workspace", path, "-scheme", schemeName, "-showBuildSettings"}
 		} else if strings.HasSuffix(path, ".xcodeproj") {
-			cmdArgs := []string{"-project", path, "-scheme", schemeName, "-showBuildSettings"}
-			if configuration != "" {
-				cmdArgs = append(cmdArgs, "-configuration", configuration)
-			}
-			cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
+			cmdArgs = []string{"-project", path, "-scheme", schemeName, "-showBuildSettings"}
 		} else {
-			return nil, fmt.Errorf("Unable to locate xcodeproj or xcworkspace in the given path")
+			return nil, fmt.Errorf("unable to locate .xcodeproj or .xcworkspace in the given path")
 		}
+
+		if configuration != "" {
+			cmdArgs = append(cmdArgs, "-configuration", configuration)
+		}
+
+		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
 	} else {
-		return nil, fmt.Errorf("Unable to locate xcodebuild on this system.")
+		return nil, fmt.Errorf("xcodebuild is not installed on this system")
 	}
 
 	output, err := cmd.Output()
 	if err != nil {
+		if strings.Contains(err.Error(), "exit status 65") {
+			return nil, fmt.Errorf("scheme '%s' not found in location '%s'", schemeName, path)
+		}
 		return nil, err
 	}
 
 	buildSettings := strings.SplitAfterN(string(output), "Build settings for action build and target ", 2)[1]
 	buildSettingsSlice := strings.Split(buildSettings, "\n")
 	buildSettingsMap := make(map[string]*string)
+
 	for _, line := range buildSettingsSlice {
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) == 2 {
@@ -152,6 +184,13 @@ func getXcodeBuildSettings(path, schemeName string, configuration string) (*map[
 	return &buildSettingsMap, nil
 }
 
+// IsPathAnXcodeProjectOrWorkspace checks if the given path is a .xcodeproj or .xcworkspace file.
+//
+// Parameters:
+// - path (string): The path to check.
+//
+// Returns:
+// - bool: True if the path is a valid Xcode project or workspace.
 func IsPathAnXcodeProjectOrWorkspace(path string) bool {
 	if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
 		return true
@@ -169,7 +208,14 @@ func IsPathAnXcodeProjectOrWorkspace(path string) bool {
 	return err == nil
 }
 
-// GetDefaultProjectRoot works out a value for using as project root if one isn't provided
+// GetDefaultProjectRoot determines the project root directory if none is provided.
+//
+// Parameters:
+// - path (string): The current project path.
+// - projectRoot (string): The explicitly specified project root (optional).
+//
+// Returns:
+// - string: The resolved project root directory.
 func GetDefaultProjectRoot(path, projectRoot string) string {
 	if projectRoot == "" {
 		if path == "" {
@@ -178,35 +224,32 @@ func GetDefaultProjectRoot(path, projectRoot string) string {
 		}
 
 		if utils.IsDir(path) {
-
-			// If path is pointing to a .xcodeproj or .xcworkspace directory, set the project root to one directory up
 			if strings.HasSuffix(path, ".xcodeproj") || strings.HasSuffix(path, ".xcworkspace") {
 				return filepath.Dir(path)
-
 			}
 		}
-
-		// If path is pointing to a normal directory, set that as the project root
 		return path
-
-	} else {
-		// If the project root is already set, use as-is
-		return projectRoot
 	}
+	return projectRoot
 }
 
-// isXcodebuildInstalled checks if xcodebuild is installed by checking if there is a path returned for it
+// isXcodebuildInstalled checks if the `xcodebuild` command is available on the system.
+//
+// Returns:
+// - bool: True if `xcodebuild` is installed; false otherwise.
 func isXcodebuildInstalled() bool {
 	return utils.LocationOf(utils.XCODEBUILD) != ""
 }
 
-// FindXcodeProjOrWorkspace finds the .xcodeproj or .xcworkspace file in a given directory
-// and returns the path to it
-// If neither is found, an empty string is returned
-// If both are found, the .xcworkspace file is returned
+// FindXcodeProjOrWorkspace searches for a .xcodeproj or .xcworkspace file in the specified directory.
+//
+// Parameters:
+// - path (string): The directory to search.
+//
+// Returns:
+// - string: The path to the .xcodeproj or .xcworkspace file, preferring .xcworkspace if both are found.
 func FindXcodeProjOrWorkspace(path string) string {
-	var xcodeProjPath string
-	var xcodeWorkspacePath string
+	var xcodeProjPath, xcodeWorkspacePath string
 
 	files, err := os.ReadDir(path)
 	if err != nil {
@@ -223,9 +266,6 @@ func FindXcodeProjOrWorkspace(path string) string {
 
 	if xcodeWorkspacePath != "" {
 		return xcodeWorkspacePath
-	} else if xcodeProjPath != "" {
-		return xcodeProjPath
 	}
-
-	return ""
+	return xcodeProjPath
 }
