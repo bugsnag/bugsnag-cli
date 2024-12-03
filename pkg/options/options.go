@@ -159,7 +159,8 @@ type CLI struct {
 		AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS"`
+		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS build"`
+		Dsym               XcodeBuild             `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
