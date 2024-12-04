@@ -107,7 +107,9 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
 
 	// Extract API key from Info.plist if available and not already set in options
-	plistPath = filepath.Join(xcarchivePath, "Info.plist")
+	if plistPath == "" {
+		plistPath = filepath.Join(xcarchivePath, "Info.plist")
+	}
 
 	if utils.FileExists(plistPath) && options.ApiKey == "" {
 		plistData, err = ios.GetPlistData(plistPath)
