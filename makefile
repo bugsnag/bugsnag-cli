@@ -100,14 +100,14 @@ features/base-fixtures/rn0_69/android:
 
 .PHONY: features/base-fixtures/rn0_69/ios
 features/base-fixtures/rn0_69/ios:
-	cd $@/../ && npm i 
+	cd $@/../ && npm i
 	cd $@ && bundle install
 	cd $@ && bundle exec pod install --repo-update
 	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
 
 .PHONY: features/base-fixtures/rn0_69/ios/archive
 features/base-fixtures/rn0_69/ios/archive:
-	cd features/base-fixtures/rn0_69/ && npm i 
+	cd features/base-fixtures/rn0_69/ && npm i
 	cd features/base-fixtures/rn0_69/ios/ && bundle install
 	cd features/base-fixtures/rn0_69/ios/ && bundle exec pod install --repo-update
 	cd features/base-fixtures/rn0_69/ios/ && xcrun xcodebuild -scheme rn0_69 -workspace rn0_69.xcworkspace -configuration Release -archivePath "../rn0_69.xcarchive" -allowProvisioningUpdates archive
@@ -126,7 +126,7 @@ features/base-fixtures/rn0_70/ios:
 
 .PHONY: features/base-fixtures/rn0_70/ios/archive
 features/base-fixtures/rn0_70/ios/archive:
-	cd features/base-fixtures/rn0_70/ && npm i 
+	cd features/base-fixtures/rn0_70/ && npm i
 	cd features/base-fixtures/rn0_70/ios/ && bundle install
 	cd features/base-fixtures/rn0_70/ios/ && bundle exec pod install --repo-update
 	cd features/base-fixtures/rn0_70/ios/ && xcrun xcodebuild -scheme rn0_70 -workspace rn0_70.xcworkspace -configuration Release -archivePath "../rn0_70.xcarchive" -allowProvisioningUpdates archive
@@ -142,6 +142,16 @@ features/base-fixtures/rn0_72/ios:
 	cd $@ && bundle install
 	cd $@ && bundle exec pod install --repo-update
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
+
+.PHONY: features/base-fixtures/swift-package-manager
+features/base-fixtures/swift-package-manager:
+	cd $@ && bundle install
+	cd $@ && sed -i '' -e 's/kind = branch/kind = revision/' -e "s/branch = master/revision = ${BUILDKITE_COMMIT}/" swift-package-manager.xcodeproj/project.pbxproj
+	cd $@ && bundle exec pod install --repo-update
+	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -derivedDataPath DerivedData -resolvePackageDependencies
+	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -derivedDataPath DerivedData -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
+	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Debug -destination generic/platform=iOS\ Simulator -derivedDataPath DerivedData -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
+
 
 .PHONY: features/base-fixtures/rn0_72/ios/archive
 features/base-fixtures/rn0_72/ios/archive:
