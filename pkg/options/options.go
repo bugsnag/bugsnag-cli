@@ -77,7 +77,6 @@ type XcodeArchive struct {
 	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
-	Plist              utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
 	Scheme             string      `help:"The name of the Xcode options.Scheme used to build the application"`
 	VersionName        string      `help:"The version of the application"`
 	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`

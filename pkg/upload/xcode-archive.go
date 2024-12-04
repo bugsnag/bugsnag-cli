@@ -33,9 +33,6 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	var tempDirs []string
 	var tempDir string
 
-	// Initialize plistPath from shared options if provided
-	plistPath = string(xcarchiveOptions.Plist)
-
 	// Ensure temporary directories are cleaned up after execution
 	defer func() {
 		for _, tempDir := range tempDirs {
@@ -107,9 +104,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
 
 	// Extract API key from Info.plist if available and not already set in options
-	if plistPath == "" {
-		plistPath = filepath.Join(xcarchivePath, "Info.plist")
-	}
+	plistPath = filepath.Join(xcarchivePath, "Info.plist")
 
 	if utils.FileExists(plistPath) && options.ApiKey == "" {
 		plistData, err = ios.GetPlistData(plistPath)
