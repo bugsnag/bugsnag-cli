@@ -2,15 +2,12 @@ package upload
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"os"
+	"path/filepath"
 )
 
 // ProcessXcodeBuild processes an Xcode build, locating the necessary dSYM files and uploading them
@@ -26,8 +23,6 @@ import (
 func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) error {
 	dsymOptions := options.Upload.XcodeBuild
 	var buildSettings *ios.XcodeBuildSettings
-	var plistData *ios.PlistData
-	var uploadOptions map[string]string
 
 	var dwarfInfo []*ios.DwarfInfo
 	var tempDirs []string
@@ -132,54 +127,11 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 			}
 		}
 
-		// If the Info.plist path is provided and the API key is still missing, attempt to extract it from the plist
-		if plistPath != "" && options.ApiKey == "" {
-			// Read data from the Info.plist file
-			plistData, err = ios.GetPlistData(plistPath)
-			if err != nil {
-				return err
-			}
+		err = ios.ProcessDsymUpload(plistPath, endpoint, dsymOptions.ProjectRoot, options, logger)
 
-			// Extract the Bugsnag API key from the plist if available
-			if options.ApiKey == "" {
-				options.ApiKey = plistData.BugsnagProjectDetails.ApiKey
-				if options.ApiKey != "" {
-					logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", options.ApiKey))
-				}
-			}
-		}
-
-		// Upload each dSYM file to the specified endpoint
-		for _, dsym := range dwarfInfo {
-			dsymInfo := fmt.Sprintf("(UUID: %s, Name: %s, Arch: %s)", dsym.UUID, dsym.Name, dsym.Arch)
-			logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
-
-			// Build the options for uploading the dSYM
-			uploadOptions, err = utils.BuildDsymUploadOptions(options.ApiKey, dsymOptions.ProjectRoot)
-			if err != nil {
-				return err
-			}
-
-			// Prepare the file data for uploading
-			fileFieldData := make(map[string]server.FileField)
-			fileFieldData["dsym"] = server.LocalFile(filepath.Join(dsym.Location, dsym.Name))
-
-			// Attempt to upload the dSYM file to the server
-			err = server.ProcessFileRequest(endpoint+"/dsym", uploadOptions, fileFieldData, dsym.UUID, options, logger)
-
-			// If a 404 error occurs, retry the upload to the base endpoint
-			if err != nil {
-				if strings.Contains(err.Error(), "404 Not Found") {
-					err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, dsym.UUID, options, logger)
-				}
-			}
-
-			// Return any errors that occurred during the upload process
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
