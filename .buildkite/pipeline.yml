@@ -70,14 +70,14 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: dSYM Integration Tests
+  - label: Xcode Build Integration Tests
     depends_on: build
     env:
       XCODE_VERSION: 15
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner features/dsym
+      - bundle exec maze-runner features/xcode
     plugins:
       artifacts#v1.5.0:
         download:
