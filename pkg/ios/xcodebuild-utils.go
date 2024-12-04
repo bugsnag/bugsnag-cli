@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// XcodeBuildSettings contains the relevant build settings required for uploading to Bugsnag.
+// XcodeBuildSettings contains the relevant build settings required for uploading to BugSnag.
 type XcodeBuildSettings struct {
 	ConfigurationBuildDir string `mapstructure:"CONFIGURATION_BUILD_DIR"`
 	InfoPlistPath         string `mapstructure:"INFOPLIST_PATH"`
