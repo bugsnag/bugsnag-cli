@@ -151,39 +151,6 @@ func FindLatestFileWithSuffix(directory, targetSuffix string) (string, error) {
 	return newestFile, nil
 }
 
-// FindLatestFolder searches for the most recently modified folder in a given directory.
-//
-// Parameters:
-// - directory (string): The directory to search in.
-//
-// Returns:
-// - string: The path to the newest folder.
-// - error: Any error encountered during the search.
-func FindLatestFolder(directory string) (string, error) {
-	var newestFolder string
-	var newestModTime time.Time
-
-	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() && info.ModTime().After(newestModTime) {
-			newestModTime = info.ModTime()
-			newestFolder = path
-		}
-		return nil
-	})
-
-	if err != nil {
-		return "", err
-	}
-	if newestFolder == "" {
-		return "", fmt.Errorf("unable to find folders in '%s'", directory)
-	}
-
-	return newestFolder, nil
-}
-
 // ExtractFile extracts the contents of a file into a temporary directory.
 //
 // Parameters:
