@@ -14,7 +14,7 @@ import (
 )
 
 // ProcessXcodeArchive processes an Xcode archive, locating the archive, its associated dSYM files,
-// and uploading them to a Bugsnag server.
+// and uploading them to a BugSnag server.
 //
 // Parameters:
 // - options (options.CLI): The CLI options provided by the user, including Xcode archive settings.
