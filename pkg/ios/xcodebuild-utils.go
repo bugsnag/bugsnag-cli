@@ -137,7 +137,9 @@ func GetXcodeBuildSettings(path, schemeName, configuration string) (*XcodeBuildS
 func getXcodeBuildSettings(path, schemeName, configuration string) (*map[string]*string, error) {
 	var cmd *exec.Cmd
 
-	if isXcodebuildInstalled() {
+	if !isXcodebuildInstalled() {
+		return nil, fmt.Errorf("xcodebuild is not installed on this system")
+	} else {
 		if !strings.HasSuffix(path, ".xcworkspace") && !strings.HasSuffix(path, ".xcodeproj") {
 			path = FindXcodeProjOrWorkspace(path)
 		}
@@ -156,8 +158,6 @@ func getXcodeBuildSettings(path, schemeName, configuration string) (*map[string]
 		}
 
 		cmd = exec.Command(utils.LocationOf(utils.XCODEBUILD), cmdArgs...)
-	} else {
-		return nil, fmt.Errorf("xcodebuild is not installed on this system")
 	}
 
 	output, err := cmd.Output()

@@ -47,14 +47,13 @@ func GetXcodeArchiveLocation() (string, error) {
 
 // GetLatestXcodeArchive Finds the latest .xcarchive file in a given directory + YYYY-MM-DD format
 func GetLatestXcodeArchive(path, scheme string) (string, error) {
-	if utils.IsDir(filepath.Join(path, utils.GetTodaysDate(""))) {
-		path, err := findLatestXCArchive(filepath.Join(path, utils.GetTodaysDate("")), scheme)
-		if err != nil {
-			return "", err
-		}
-		return path, nil
+	path, err := findLatestXCArchive(path, scheme)
+	if err != nil {
+		return "", err
+	} else if path == "" {
+		return "", fmt.Errorf("No xcarchive found in %s", filepath.Join(path, utils.GetTodaysDate("")))
 	}
-	return "", fmt.Errorf("No xcarchive found in %s", filepath.Join(path, utils.GetTodaysDate("")))
+	return path, nil
 }
 
 func findLatestXCArchive(folderPath, scheme string) (string, error) {
