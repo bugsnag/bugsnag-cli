@@ -143,16 +143,6 @@ features/base-fixtures/rn0_72/ios:
 	cd $@ && bundle exec pod install --repo-update
 	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
 
-.PHONY: features/base-fixtures/swift-package-manager
-features/base-fixtures/swift-package-manager:
-	cd $@ && bundle install
-	cd $@ && sed -i '' -e 's/kind = branch/kind = revision/' -e "s/branch = master/revision = ${BUILDKITE_COMMIT}/" swift-package-manager.xcodeproj/project.pbxproj
-	cd $@ && bundle exec pod install --repo-update
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -derivedDataPath DerivedData -resolvePackageDependencies
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Release -destination generic/platform=iOS -derivedDataPath DerivedData -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-	cd $@ && xcodebuild -allowProvisioningUpdates -scheme swift-package-manager -configuration Debug -destination generic/platform=iOS\ Simulator -derivedDataPath DerivedData -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
-
-
 .PHONY: features/base-fixtures/rn0_72/ios/archive
 features/base-fixtures/rn0_72/ios/archive:
 	cd features/base-fixtures/rn0_72/ && npm i
