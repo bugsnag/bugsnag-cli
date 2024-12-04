@@ -25,17 +25,16 @@ import (
 // - error: An error if the process fails at any point, otherwise nil.
 func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger) error {
 	xcarchiveOptions := options.Upload.XcodeArchive
-	var buildSettings *ios.XcodeBuildSettings
-	var plistData *ios.PlistData
-	var uploadOptions map[string]string
-
-	var dwarfInfo []*ios.DwarfInfo
-	var tempDirs []string
-	var tempDir, xcarchivePath, plistPath string
+	var xcarchivePath, plistPath string
 	var err error
+	var plistData *ios.PlistData
+	var dwarfInfo []*ios.DwarfInfo
+	var uploadOptions map[string]string
+	var tempDirs []string
+	var tempDir string
 
 	// Initialize plistPath from shared options if provided
-	plistPath = string(xcarchiveOptions.Shared.Plist)
+	plistPath = string(xcarchiveOptions.Plist)
 
 	// Ensure temporary directories are cleaned up after execution
 	defer func() {
@@ -51,27 +50,19 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 			xcarchivePath = path
 		} else if utils.IsDir(path) {
 			// If the path is a directory, explore it for an .xcarchive or an Xcode project/workspace
-			logger.Info(fmt.Sprintf("Searching for Xcode Archive in %s", path))
+			logger.Info(fmt.Sprintf("Searching for Xcode Archives in %s", path))
 
 			// Check if the directory contains an Xcode project or workspace
 			if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 				// Set the project root based on Xcode project settings
-				xcarchiveOptions.Shared.ProjectRoot = ios.GetDefaultProjectRoot(path, xcarchiveOptions.Shared.ProjectRoot)
-				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcarchiveOptions.Shared.ProjectRoot))
+				xcarchiveOptions.ProjectRoot = ios.GetDefaultProjectRoot(path, xcarchiveOptions.ProjectRoot)
+				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcarchiveOptions.ProjectRoot))
 
 				// Determine the default scheme for the project if not already provided
-				if xcarchiveOptions.Shared.Scheme == "" {
-					xcarchiveOptions.Shared.Scheme, err = ios.GetDefaultScheme(path)
+				if xcarchiveOptions.Scheme == "" {
+					xcarchiveOptions.Scheme, err = ios.GetDefaultScheme(path)
 					if err != nil {
 						return err
-					}
-				}
-
-				// Retrieve Xcode build settings if a scheme is defined
-				if xcarchiveOptions.Shared.Scheme != "" {
-					buildSettings, err = ios.GetXcodeBuildSettings(path, xcarchiveOptions.Shared.Scheme, options.Upload.XcodeBuild.Configuration)
-					if err != nil {
-						logger.Warn(err.Error())
 					}
 				}
 
@@ -81,18 +72,13 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 					logger.Warn(fmt.Sprintf("Failed to get Xcode archive location: %s", err))
 					return err
 				}
-				xcarchivePath, err = ios.GetLatestXcodeArchive(xcarchiveLocation, xcarchiveOptions.Shared.Scheme)
+				xcarchivePath, err = ios.GetLatestXcodeArchive(xcarchiveLocation, xcarchiveOptions.Scheme)
 				if err != nil {
 					return err
 				}
 
 			} else {
-				// If not a project/workspace, search the directory for an .xcarchive
-				xcarchivePath, err = utils.FindFolderWithSuffix(path, ".xcarchive")
-				if err != nil {
-					logger.Warn(fmt.Sprintf("No xcarchive found in %s", path))
-					return err
-				}
+				return fmt.Errorf("No xcarchive found in %s", path)
 			}
 		}
 	}
@@ -106,32 +92,24 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	// Locate and process dSYM files within the .xcarchive
 	dwarfInfo, tempDir, err = ios.FindDsymsInPath(
 		xcarchivePath,
-		xcarchiveOptions.Shared.IgnoreEmptyDsym,
-		xcarchiveOptions.Shared.IgnoreMissingDwarf,
+		xcarchiveOptions.IgnoreEmptyDsym,
+		xcarchiveOptions.IgnoreMissingDwarf,
 		logger,
 	)
 	tempDirs = append(tempDirs, tempDir)
 	if err != nil {
 		return err
 	}
+
 	if len(dwarfInfo) == 0 {
 		return fmt.Errorf("No dSYM files found in: %s", xcarchivePath)
 	}
 	logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
 
-	// Locate Info.plist if not explicitly provided
-	if plistPath == "" && options.ApiKey == "" && buildSettings != nil {
-		plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-		if utils.FileExists(plistPathExpected) {
-			plistPath = plistPathExpected
-			logger.Debug(fmt.Sprintf("Found Info.plist at expected location: %s", plistPath))
-		} else {
-			logger.Debug(fmt.Sprintf("No Info.plist found at expected location: %s", plistPathExpected))
-		}
-	}
-
 	// Extract API key from Info.plist if available and not already set in options
-	if plistPath != "" && options.ApiKey == "" {
+	plistPath = filepath.Join(xcarchivePath, "Info.plist")
+
+	if utils.FileExists(plistPath) && options.ApiKey == "" {
 		plistData, err = ios.GetPlistData(plistPath)
 		if err != nil {
 			return err
@@ -148,7 +126,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
 		// Build upload options for each dSYM file
-		uploadOptions, err = utils.BuildDsymUploadOptions(options.ApiKey, xcarchiveOptions.Shared.ProjectRoot)
+		uploadOptions, err = utils.BuildDsymUploadOptions(options.ApiKey, xcarchiveOptions.ProjectRoot)
 		if err != nil {
 			return err
 		}
@@ -168,6 +146,5 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 			return err
 		}
 	}
-
 	return nil
 }

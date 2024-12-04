@@ -74,11 +74,6 @@ type XcodeBuild struct {
 }
 
 type XcodeArchive struct {
-	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	Shared DsymCommon  `embed:""`
-}
-
-type DsymCommon struct {
 	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
 	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
 	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
