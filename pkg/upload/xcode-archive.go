@@ -102,7 +102,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	// Extract API key from Info.plist if available and not already set in options
 	plistPath = filepath.Join(xcarchivePath, "Info.plist")
 
-	err = ios.ProcessDsymUpload(plistPath, endpoint, xcarchiveOptions.ProjectRoot, options, logger)
+	err = ios.ProcessDsymUpload(plistPath, endpoint, xcarchiveOptions.ProjectRoot, options, dwarfInfo, logger)
 
 	if err != nil {
 		return err

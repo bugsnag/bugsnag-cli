@@ -10,9 +10,8 @@ import (
 	"strings"
 )
 
-func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.CLI, logger log.Logger) error {
+func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.CLI, dwarfInfo []*DwarfInfo, logger log.Logger) error {
 	var plistData *PlistData
-	var dwarfInfo []*DwarfInfo
 	var uploadOptions map[string]string
 
 	var err error

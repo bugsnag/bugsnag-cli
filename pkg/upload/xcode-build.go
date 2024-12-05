@@ -127,7 +127,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 			}
 		}
 
-		err = ios.ProcessDsymUpload(plistPath, endpoint, dsymOptions.ProjectRoot, options, logger)
+		err = ios.ProcessDsymUpload(plistPath, endpoint, dsymOptions.ProjectRoot, options, dwarfInfo, logger)
 
 		if err != nil {
 			return err
