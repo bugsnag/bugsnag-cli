@@ -163,11 +163,20 @@ func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 // - A slice of strings representing the paths to the located dSYM files.
 func findDsyms(root string) []string {
 	var dsyms []string
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err == nil && strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// If the file is a dSYM, add it to the list (unless it resides within the __MACOSX directory)
+		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
 			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
 		}
+
 		return nil
 	})
+	if err != nil {
+		return nil
+	}
 	return dsyms
 }
