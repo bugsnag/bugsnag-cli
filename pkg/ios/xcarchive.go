@@ -3,7 +3,6 @@ package ios
 import (
 	"bytes"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"os/exec"
 	"os/user"
@@ -51,7 +50,7 @@ func GetLatestXcodeArchive(path, scheme string) (string, error) {
 	if err != nil {
 		return "", err
 	} else if path == "" {
-		return "", fmt.Errorf("No xcarchive found in %s", filepath.Join(path, utils.GetTodaysDate("")))
+		return "", fmt.Errorf("No xcarchive found in %s", path)
 	}
 	return path, nil
 }
