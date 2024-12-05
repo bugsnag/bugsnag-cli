@@ -3,7 +3,7 @@
 
 ### Enhancements
 
-- Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose.
+- Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose. `dsym` will be removed in the next major release [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 
 ## 2.7.0 (2024-11-26)
 
