@@ -113,50 +113,6 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	return dwarfInfo, tempDir, nil
 }
 
-// processDsymLocation extracts DWARF information from a specific dSYM file or directory.
-//
-// Parameters:
-// - dsymLocation: The path to the dSYM file or directory.
-// - ignoreEmptyDsym: If true, skips empty dSYM files without raising an error.
-// - ignoreMissingDwarf: If true, skips invalid DWARF files without raising an error.
-// - logger: Logger instance for informational and debug messages.
-//
-// Returns:
-// - A slice of DwarfInfo structs containing details of DWARF files.
-// - An error if the location cannot be processed or if invalid files are found.
-func processDsymLocation(dsymLocation string, ignoreEmptyDsym, ignoreMissingDwarf bool, logger log.Logger) ([]*DwarfInfo, error) {
-	var dwarfInfo []*DwarfInfo
-	files, err := os.ReadDir(dsymLocation)
-
-	if err != nil && strings.Contains(err.Error(), "not a directory") {
-		// Process a single file
-		fileName := filepath.Base(dsymLocation)
-		return getDwarfFileInfo(filepath.Dir(dsymLocation), fileName), nil
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to read dSYM location %s: %w", dsymLocation, err)
-	}
-
-	// Process all files in the directory
-	for _, file := range files {
-		filePath := filepath.Join(dsymLocation, file.Name())
-		if fileInfo, _ := os.Stat(filePath); fileInfo != nil && fileInfo.Size() > 0 {
-			info := getDwarfFileInfo(dsymLocation, file.Name())
-			if len(info) == 0 && !ignoreMissingDwarf {
-				return nil, fmt.Errorf("%s is not a valid DWARF file", fileInfo.Name())
-			}
-			dwarfInfo = append(dwarfInfo, info...)
-		} else if fileInfo == nil || fileInfo.Size() == 0 {
-			if ignoreEmptyDsym {
-				logger.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
-			} else {
-				return nil, fmt.Errorf("%s is empty", file.Name())
-			}
-		}
-	}
-
-	return dwarfInfo, nil
-}
-
 // isDwarfDumpInstalled checks if the `dwarfdump` utility is available on the system.
 //
 // Returns:
