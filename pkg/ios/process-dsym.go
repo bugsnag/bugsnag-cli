@@ -28,11 +28,11 @@ func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.
 	var (
 		plistData     *PlistData
 		uploadOptions map[string]string
+		err           error
 	)
 
 	// Retrieve API key from Info.plist if it exists and the API key is not already set.
 	if utils.FileExists(plistPath) && options.ApiKey == "" {
-		var err error
 		plistData, err = GetPlistData(plistPath)
 		if err != nil {
 			return fmt.Errorf("failed to read plist data: %w", err)
@@ -49,7 +49,7 @@ func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.
 		logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
 		// Build upload options for the current dSYM file.
-		uploadOptions, err := utils.BuildDsymUploadOptions(options.ApiKey, projectRoot)
+		uploadOptions, err = utils.BuildDsymUploadOptions(options.ApiKey, projectRoot)
 		if err != nil {
 			return fmt.Errorf("failed to build dSYM upload options: %w", err)
 		}
