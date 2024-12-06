@@ -51,7 +51,7 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 	}
 
 	if len(output) == 0 {
-		return nil, errors.New("plutil returned empty output")
+		return nil, errors.New("plutil returned empty output reading file: %s", plistFilePath)
 	}
 
 	var plistData PlistData
