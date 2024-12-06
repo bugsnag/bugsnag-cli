@@ -84,6 +84,13 @@ features/base-fixtures/dsym:
 	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
 	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -configuration Release -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
 
+.PHONY: features/base-fixtures/dsym/archive
+features/base-fixtures/dsym/archive:
+	bundle install
+	cd features/base-fixtures/dsym && bundle install
+	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
+	cd features/base-fixtures/dsym && xcrun xcodebuild -scheme dSYM-Example -configuration Release -allowProvisioningUpdates archive
+
 .PHONY: features/base-fixtures/rn0_69
 features/base-fixtures/rn0_69: features/base-fixtures/rn0_69/android features/base-fixtures/rn0_69/ios
 
