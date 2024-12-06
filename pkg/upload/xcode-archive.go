@@ -10,11 +10,11 @@ import (
 	"path/filepath"
 )
 
-// ProcessXcodeArchive processes an Xcode archive, locating its dSYM files and uploading them
+// ProcessXcodeArchive processes an xcarchive, locating its dSYM files and uploading them
 // to a Bugsnag server.
 //
 // Parameters:
-// - options: CLI options provided by the user, including Xcode archive settings.
+// - options: CLI options provided by the user, including xcarchive settings.
 // - endpoint: The server endpoint for uploading dSYM files.
 // - logger: Logger instance for logging messages during processing.
 //
@@ -43,7 +43,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		if filepath.Ext(path) == ".xcarchive" {
 			xcarchivePath = path
 		} else if utils.IsDir(path) {
-			logger.Info(fmt.Sprintf("Searching for Xcode Archives in %s", path))
+			logger.Info(fmt.Sprintf("Searching for xcarchives in %s", path))
 			if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 				xcarchiveOptions.ProjectRoot = ios.GetDefaultProjectRoot(path, xcarchiveOptions.ProjectRoot)
 				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcarchiveOptions.ProjectRoot))

@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// GetLatestXcodeArchiveForScheme retrieves the latest Xcode archive for a given scheme.
+// GetLatestXcodeArchiveForScheme retrieves the latest xcarchive for a given scheme.
 // It determines the archive location (either custom or default) and then searches
 // for the most recently modified xcarchive matching the scheme.
 //
@@ -23,7 +23,7 @@ import (
 // - A string containing the path to the most recent xcarchive file matching the scheme.
 // - An error if the location cannot be determined or if no matching archive is found.
 func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
-	// Retrieve the Xcode archive location
+	// Retrieve the xcarchive location
 	archivePath, err := func() (string, error) {
 		// Command to read the custom archive location from Xcode preferences
 		cmd := exec.Command("defaults", "read", "com.apple.dt.Xcode", "IDECustomDistributionArchivesLocation")
@@ -37,7 +37,7 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 		if err := cmd.Run(); err != nil {
 			// If the command fails, check stderr for additional details
 			if strings.Contains(stderr.String(), "does not exist") {
-				// If the key is not set, return the default location for Xcode archives
+				// If the key is not set, return the default location for xcarchives
 				usr, err := user.Current()
 				if err != nil {
 					return "", fmt.Errorf("unable to get current user: %w", err)
@@ -62,7 +62,7 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 	}()
 
 	if err != nil {
-		return "", fmt.Errorf("failed to determine Xcode archive location: %w", err)
+		return "", fmt.Errorf("failed to determine xcarchive location: %w", err)
 	}
 
 	// Search for the latest xcarchive matching the scheme
