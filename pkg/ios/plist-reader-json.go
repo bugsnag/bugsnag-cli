@@ -57,7 +57,7 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 	var plistData PlistData
 	err = json.Unmarshal(output, &plistData)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal plist data into PlistData struct")
+		return nil, errors.Wrap(err, "unable to parse plist data in file: %s", plistFilePath)
 	}
 
 	// Validate required fields in the plist data
