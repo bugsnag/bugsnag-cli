@@ -5,7 +5,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"path/filepath"
 )
@@ -43,7 +42,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 	// Process paths provided in the CLI options
 	for _, path := range dsymOptions.Path {
 		if filepath.Ext(path) == ".xcarchive" {
-			logger.Warn(fmt.Sprintf("The specified path %s is an .xcarchive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
+			logger.Warn(fmt.Sprintf("The specified path %s is an xcarchive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
 		}
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
@@ -117,13 +116,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 
 		// Locate Info.plist if not already specified
 		if plistPath == "" && options.ApiKey == "" && buildSettings != nil {
-			plistPathExpected := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
-			if utils.FileExists(plistPathExpected) {
-				plistPath = plistPathExpected
-				logger.Debug(fmt.Sprintf("Found Info.plist at: %s", plistPath))
-			} else {
-				logger.Debug(fmt.Sprintf("Info.plist not found at: %s", plistPathExpected))
-			}
+			plistPath = filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.InfoPlistPath)
 		}
 
 		// Upload dSYM files

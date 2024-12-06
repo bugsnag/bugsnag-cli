@@ -38,7 +38,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		}
 	}()
 
-	// Search for an .xcarchive in the specified paths
+	// Search for an xcarchive in the specified paths
 	for _, path := range xcarchiveOptions.Path {
 		if filepath.Ext(path) == ".xcarchive" {
 			xcarchivePath = path
@@ -55,48 +55,43 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 					}
 				}
 
-				archiveLocation, err := ios.GetXcodeArchiveLocation()
+				xcarchivePath, err = ios.GetLatestXcodeArchiveForScheme(xcarchiveOptions.Scheme)
 				if err != nil {
-					logger.Warn(fmt.Sprintf("Error getting Xcode archive location: %s", err))
-					return err
-				}
-				xcarchivePath, err = ios.GetLatestXcodeArchive(archiveLocation, xcarchiveOptions.Scheme)
-				if err != nil {
-					return fmt.Errorf("Error locating latest .xcarchive: %w", err)
+					return fmt.Errorf("Error locating latest xcarchive: %w", err)
 				}
 			} else {
-				return fmt.Errorf("No .xcarchive found in %s", path)
+				return fmt.Errorf("No xcarchive found in %s", path)
 			}
 		}
-	}
 
-	if xcarchivePath == "" {
-		return fmt.Errorf("No .xcarchive found in specified paths")
-	}
-	logger.Info(fmt.Sprintf("Found .xcarchive at %s", xcarchivePath))
+		if xcarchivePath == "" {
+			return fmt.Errorf("No xcarchive found in specified paths")
+		}
 
-	// Locate and process dSYM files in the .xcarchive
-	dwarfInfo, tempDir, err = ios.FindDsymsInPath(
-		xcarchivePath,
-		xcarchiveOptions.IgnoreEmptyDsym,
-		xcarchiveOptions.IgnoreMissingDwarf,
-		logger,
-	)
-	tempDirs = append(tempDirs, tempDir)
-	if err != nil {
-		return fmt.Errorf("Error locating dSYM files: %w", err)
-	}
-	if len(dwarfInfo) == 0 {
-		return fmt.Errorf("No dSYM files found in: %s", xcarchivePath)
-	}
-	logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
+		logger.Info(fmt.Sprintf("Found xcarchive at %s", xcarchivePath))
 
-	// Extract API key from Info.plist if available
-	plistPath = filepath.Join(xcarchivePath, "Info.plist")
-	err = ios.ProcessDsymUpload(plistPath, endpoint, xcarchiveOptions.ProjectRoot, options, dwarfInfo, logger)
-	if err != nil {
-		return fmt.Errorf("Error uploading dSYM files: %w", err)
-	}
+		// Locate and process dSYM files in the xcarchive
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(
+			xcarchivePath,
+			xcarchiveOptions.IgnoreEmptyDsym,
+			xcarchiveOptions.IgnoreMissingDwarf,
+			logger,
+		)
+		tempDirs = append(tempDirs, tempDir)
+		if err != nil {
+			return fmt.Errorf("Error locating dSYM files: %w", err)
+		}
+		if len(dwarfInfo) == 0 {
+			return fmt.Errorf("No dSYM files found in: %s", xcarchivePath)
+		}
+		logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
 
+		// Extract API key from Info.plist if available
+		plistPath = filepath.Join(xcarchivePath, "Info.plist")
+		err = ios.ProcessDsymUpload(plistPath, endpoint, xcarchiveOptions.ProjectRoot, options, dwarfInfo, logger)
+		if err != nil {
+			return fmt.Errorf("Error uploading dSYM files: %w", err)
+		}
+	}
 	return nil
 }

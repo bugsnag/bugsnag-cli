@@ -51,13 +51,13 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 	}
 
 	if len(output) == 0 {
-		return nil, errors.New("plutil returned empty output reading file: %s", plistFilePath)
+		return nil, errors.New(fmt.Sprintf("plutil returned empty output reading file: %s", plistFilePath))
 	}
 
 	var plistData PlistData
 	err = json.Unmarshal(output, &plistData)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to parse plist data in file: %s", plistFilePath)
+		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse plist data in file: %s", plistFilePath))
 	}
 
 	// Validate required fields in the plist data
