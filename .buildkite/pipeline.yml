@@ -101,7 +101,7 @@ steps:
   - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
-      UNITY_VERSION: 2023.2.19f1
+      UNITY_VERSION: 6000.0.25f1
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install

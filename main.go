@@ -143,6 +143,14 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload xcode-archive", "upload xcode-archive <path>":
+
+		err := upload.ProcessXcodeArchive(commands, endpoint, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload dsym", "upload dsym <path>":
 
 		logger.Warn("The `upload dsym` command is deprecated and will be removed in a future release. Please use `upload xcode-build` instead.")

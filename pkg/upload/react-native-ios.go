@@ -15,6 +15,7 @@ import (
 func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logger) error {
 	iosOptions := options.Upload.ReactNativeIos
 	var rootDirPath string
+	var plistData *ios.PlistData
 	var buildSettings *ios.XcodeBuildSettings
 	var err error
 
@@ -159,7 +160,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 
 		if iosOptions.Ios.Plist != "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "") {
 			// Read data from the plist
-			plistData, err := ios.GetPlistData(iosOptions.Ios.Plist)
+			plistData, err = ios.GetPlistData(iosOptions.Ios.Plist)
 			if err != nil {
 				return err
 			}
