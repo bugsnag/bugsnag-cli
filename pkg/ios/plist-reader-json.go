@@ -60,11 +60,6 @@ func GetPlistData(plistFilePath string) (*PlistData, error) {
 		return nil, errors.Wrap(err, fmt.Sprintf("unable to parse plist data in file: %s", plistFilePath))
 	}
 
-	// Validate required fields in the plist data
-	if plistData.VersionName == "" || plistData.BundleVersion == "" {
-		return nil, fmt.Errorf("invalid plist data: missing required fields (VersionName or BundleVersion)")
-	}
-
 	return &plistData, nil
 }
 
