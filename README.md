@@ -110,6 +110,12 @@ Upload dSYM files generated from a Build in Xcode to allow BugSnag to show human
 
     $ bugsnag-cli upload xcode-build
 
+### dSYM files from an Xcode Archive (iOS, macOS, tvOS)
+
+Upload dSYM files generated from an Archive in Xcode to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
+
+    $ bugsnag-cli upload xcode-archive
+
 ### Unity Symbol Files (Android only) 
 
 The unity-android command uploads the IL2CPP symbols from the .symbols.zip file produced by the Unity build (see [Unity documentation](https://docs.unity3d.com/Manual/android-symbols.html) for more information) to the [NDK symbol API](https://d1upynpnqddd6j.cloudfront.net/api/ndk-symbol-mapping-upload/).
