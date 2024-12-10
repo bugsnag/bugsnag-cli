@@ -2,16 +2,17 @@ package ios
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// DwarfInfo stores the UUID, architecture and name of a dwarf file
+// DwarfInfo stores the UUID, architecture, name, and location of a DWARF file.
+// This information is extracted from dSYM files during processing.
 type DwarfInfo struct {
 	UUID     string
 	Arch     string
@@ -19,6 +20,19 @@ type DwarfInfo struct {
 	Location string
 }
 
+// FindDsymsInPath locates dSYM files within a specified path, processes them,
+// and retrieves DWARF information for further use.
+//
+// Parameters:
+// - path: The directory or file path to search for dSYM files.
+// - ignoreEmptyDsym: If true, skips empty dSYM files without raising an error.
+// - ignoreMissingDwarf: If true, skips invalid DWARF files without raising an error.
+// - logger: Logger instance for informational and debug messages.
+//
+// Returns:
+// - A slice of DwarfInfo structs containing details of found DWARF files.
+// - A temporary directory if a ZIP file was extracted during processing.
+// - An error if any issues occur during the process.
 func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logger log.Logger) ([]*DwarfInfo, string, error) {
 	var tempDir string
 	var dsymLocations []string
@@ -99,47 +113,52 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	return dwarfInfo, tempDir, nil
 }
 
-// isDwarfDumpInstalled checks if dwarfdump is installed by checking if there is a path returned for it
+// isDwarfDumpInstalled checks if the `dwarfdump` utility is available on the system.
+//
+// Returns:
+// - `true` if the `dwarfdump` command is found in the system's executable path.
+// - `false` otherwise.
 func isDwarfDumpInstalled() bool {
 	return utils.LocationOf(utils.DWARFDUMP) != ""
 }
 
-// getDwarfFileInfo parses dwarfdump output to easier to manage/parsable DwarfInfo structs
+// getDwarfFileInfo retrieves DWARF file information from the output of the `dwarfdump` utility.
+//
+// Parameters:
+// - path: The directory path containing the DWARF file.
+// - fileName: The name of the DWARF file to be analyzed.
+//
+// Returns:
+// - A slice of DwarfInfo structs containing extracted DWARF information.
 func getDwarfFileInfo(path, fileName string) []*DwarfInfo {
 	var dwarfInfo []*DwarfInfo
-
-	cmd := exec.Command(utils.DWARFDUMP, "-u", strings.TrimSuffix(fileName, ".zip"))
+	cmd := exec.Command(utils.DWARFDUMP, "-u", fileName)
 	cmd.Dir = path
 
 	output, _ := cmd.Output()
-	if len(output) > 0 {
-		outputStr := string(output)
-
-		outputStr = strings.TrimSuffix(outputStr, "\n")
-		outputStr = strings.ReplaceAll(outputStr, "(", "")
-		outputStr = strings.ReplaceAll(outputStr, ")", "")
-
-		outputSlice := strings.Split(outputStr, "\n")
-
-		for _, str := range outputSlice {
-			if strings.Contains(str, "UUID: ") {
-				rawDwarfInfo := strings.Split(str, " ")
-				if len(rawDwarfInfo) >= 4 {
-					dwarf := &DwarfInfo{}
-					dwarf.UUID = rawDwarfInfo[1]
-					dwarf.Arch = rawDwarfInfo[2]
-					dwarf.Name = strings.Join(rawDwarfInfo[3:], " ")
-					dwarf.Location = path
-					dwarfInfo = append(dwarfInfo, dwarf)
-				}
+	for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		if strings.Contains(line, "UUID: ") {
+			parts := strings.Fields(strings.ReplaceAll(strings.ReplaceAll(line, "(", ""), ")", ""))
+			if len(parts) >= 4 {
+				dwarfInfo = append(dwarfInfo, &DwarfInfo{
+					UUID:     parts[1],
+					Arch:     parts[2],
+					Name:     strings.Join(parts[3:], " "),
+					Location: path,
+				})
 			}
 		}
 	}
-
 	return dwarfInfo
 }
 
-// findDsyms walks the directory tree and returns a list of dSYM locations
+// findDsyms recursively searches a directory for dSYM files.
+//
+// Parameters:
+// - root: The root directory to search.
+//
+// Returns:
+// - A slice of strings representing the paths to the located dSYM files.
 func findDsyms(root string) []string {
 	var dsyms []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {

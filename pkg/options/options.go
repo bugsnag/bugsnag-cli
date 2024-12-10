@@ -62,15 +62,24 @@ type DartSymbol struct {
 }
 
 type XcodeBuild struct {
-	Path               utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	IgnoreEmptyDsym    bool        `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
-	IgnoreMissingDwarf bool        `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
-	Plist              utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	Scheme             string      `help:"The name of the Xcode options.Scheme used to build the application"`
-	VersionName        string      `help:"The version of the application"`
-	XcodeProject       utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
-	ProjectRoot        string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
-	Configuration      string      `help:"The configuration used to build the application"`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Plist         utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	VersionName   string      `help:"The version of the application"`
+	XcodeProject  utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	Configuration string      `help:"The configuration used to build the application"`
+	Shared        XcodeShared `embed:""`
+}
+
+type XcodeArchive struct {
+	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Shared XcodeShared `embed:""`
+}
+
+type XcodeShared struct {
+	IgnoreEmptyDsym    bool   `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
+	IgnoreMissingDwarf bool   `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	Scheme             string `help:"The name of the Xcode options.Scheme used to build the application"`
+	ProjectRoot        string `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 }
 
 type Js struct {
@@ -159,8 +168,9 @@ type CLI struct {
 		AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS build"`
+		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build" aliases:"dsym"`
 		Dsym               XcodeBuild             `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
+		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcarchive"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
