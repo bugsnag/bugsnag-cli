@@ -45,7 +45,7 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 				// Return default archive location under user's home directory
 				archivePath := filepath.Join(usr.HomeDir, "Library", "Developer", "Xcode", "Archives")
 				if utils.IsDir(archivePath) {
-					return filepath.Join(usr.HomeDir, "Library", "Developer", "Xcode", "Archives"), nil
+					return archivePath, nil
 				}
 			}
 			// Return error with additional details from stderr if the command fails
