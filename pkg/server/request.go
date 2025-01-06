@@ -138,7 +138,7 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 		}
 	} else {
 		logger.Info(fmt.Sprintf("(dryrun) Skipping upload of %s to %s", filepath.Base(fileName), endpoint))
-		logger.Info("(dryrun) Upload payload:")
+		logger.Debug("(dryrun) Upload payload:")
 		prettyUploadOptions, _ := utils.PrettyPrintMap(uploadOptions)
 		logger.Debug(prettyUploadOptions)
 	}
