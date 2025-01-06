@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 /**
  * Wrapper for Bugsnag CLI
  */
-class BugsnagCLI {
+class BugsnagCli {
     /**
      * Execute a Bugsnag CLI command
      * @param {string} command - The main Bugsnag CLI command (e.g., "upload").
@@ -52,7 +52,7 @@ class BugsnagCLI {
      */
     static Upload(type, options = {}, target = '') {
         const command = `upload ${type}`;
-        return BugsnagCLI.run(command, options, target);
+        return BugsnagCli.run(command, options, target);
     }
 
     /**
@@ -61,8 +61,8 @@ class BugsnagCLI {
      * @returns {Promise<string>} - Resolves with the command's stdout.
      */
     static CreateRelease(options = {}) {
-        return BugsnagCLI.run('releases create', options);
+        return BugsnagCli.run('releases create', options);
     }
 }
 
-module.exports = BugsnagCLI;
+module.exports = BugsnagCli;
