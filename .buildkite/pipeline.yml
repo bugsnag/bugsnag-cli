@@ -116,6 +116,7 @@ steps:
   - group: ":react: React Native"
     steps:
       - label: "RN 0.69 :ios: Integration Tests"
+        skip: "Skipping RN 0.69 tests due to issue with Boost https://github.com/facebook/react-native/issues/42180"
         depends_on: build
         agents:
           queue: macos-12-arm
