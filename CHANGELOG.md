@@ -2,7 +2,7 @@
 ## 2.8.0 (2025-01-06)
 
 ### Enhancements
-
+- Add the Xcode Archive Command to support the uploading of xcarchive files [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 - Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose. `dsym` will be removed in the next major release [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 
 ## 2.7.0 (2024-11-26)
