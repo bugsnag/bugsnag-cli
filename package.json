@@ -2,7 +2,7 @@
   "name": "@bugsnag/cli",
   "version": "2.7.0",
   "description": "BugSnag CLI",
-  "main": "install.js",
+  "main": "bugsnag-cli.js",
   "bin": {
     "bugsnag-cli": "bin/bugsnag-cli"
   },
@@ -24,6 +24,7 @@
   },
   "files": [
     "install.js",
+    "bugsnag-cli.js",
     "bin/bugsnag-cli",
     "supported-platforms.yml"
   ],
