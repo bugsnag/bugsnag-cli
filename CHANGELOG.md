@@ -1,5 +1,5 @@
 # Changelog
-## TBD
+## 2.8.0 (2025-01-06)
 
 ### Enhancements
 
