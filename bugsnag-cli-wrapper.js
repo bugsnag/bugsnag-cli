@@ -44,7 +44,7 @@ class BugsnagCli {
     }
 
     /**
-     * Upload artifacts to Bugsnag
+     * Upload sourcemaps to Bugsnag
      * @param {string} type - The type of upload (e.g., "js", "xcode-archive").
      * @param {Object} options - Key-value pairs of options for the upload command.
      * @param {string} target - File or folder path to upload.
@@ -53,15 +53,6 @@ class BugsnagCli {
     static Upload(type, options = {}, target = '') {
         const command = `upload ${type}`;
         return BugsnagCli.run(command, options, target);
-    }
-
-    /**
-     * Create a release in Bugsnag
-     * @param {Object} options - Key-value pairs of options for the release command.
-     * @returns {Promise<string>} - Resolves with the command's stdout.
-     */
-    static CreateRelease(options = {}) {
-        return BugsnagCli.run('releases create', options);
     }
 }
 
