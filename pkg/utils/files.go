@@ -15,10 +15,20 @@ const (
 	DWARFDUMP  = "dwarfdump"
 )
 
-// FilePathWalkDir - finds files within a given directory
+// FilePathWalkDir recursively finds all files within a given directory.
+//
+// Parameters:
+// - root (string): The root directory to start searching from.
+//
+// Returns:
+// - []string: A slice of file paths found within the directory.
+// - error: Any error encountered during the walk process.
 func FilePathWalkDir(root string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !info.IsDir() {
 			files = append(files, path)
 		}
@@ -27,14 +37,26 @@ func FilePathWalkDir(root string) ([]string, error) {
 	return files, err
 }
 
-// IsDir - Checks if a provided path is a directory or not
+// IsDir checks if the provided path is a directory.
+//
+// Parameters:
+// - path (string): The path to check.
+//
+// Returns:
+// - bool: True if the path is a directory; false otherwise.
 func IsDir(path string) bool {
 	pathInfo, err := os.Stat(path)
-
 	return err == nil && pathInfo.IsDir()
 }
 
-// BuildFileList - Builds a list of files from a given path(s)
+// BuildFileList compiles a list of files from the provided paths.
+//
+// Parameters:
+// - paths ([]string): A slice of paths to process.
+//
+// Returns:
+// - []string: A slice containing file paths from directories and standalone files.
+// - error: Any error encountered during processing.
 func BuildFileList(paths []string) ([]string, error) {
 	var fileList []string
 
@@ -53,39 +75,58 @@ func BuildFileList(paths []string) ([]string, error) {
 	return fileList, nil
 }
 
-// BuildDirectoryList - Builds a list of directories from a given path(s)
+// BuildDirectoryList compiles a list of directories from the provided paths.
+//
+// Parameters:
+// - paths ([]string): A slice of paths to process.
+//
+// Returns:
+// - []string: A slice containing the base names of subdirectories.
+// - error: Any error encountered during processing.
 func BuildDirectoryList(paths []string) ([]string, error) {
 	var directoryList []string
 
 	for _, directory := range paths {
 		if IsDir(directory) {
 			err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
-				if err == nil && info.IsDir() {
-					if directory != path {
-						directoryList = append(directoryList, filepath.Base(path))
-					}
+				if err != nil {
+					return err
+				}
+				if info.IsDir() && directory != path {
+					directoryList = append(directoryList, filepath.Base(path))
 				}
 				return nil
 			})
-
 			if err != nil {
-				return directoryList, err
+				return nil, err
 			}
 		}
 	}
 	return directoryList, nil
 }
 
-// FileExists - Checks if a given file exists on the system
+// FileExists checks if a given file exists.
+//
+// Parameters:
+// - path (string): The file path to check.
+//
+// Returns:
+// - bool: True if the file exists; false otherwise.
 func FileExists(path string) bool {
-	if _, err := os.Stat(path); err != nil {
-		return false
-	}
-	return true
+	_, err := os.Stat(path)
+	return err == nil
 }
 
-// FindLatestFileWithSuffix - Finds the latest file with a given suffix
-func FindLatestFileWithSuffix(directory string, targetSuffix string) (string, error) {
+// FindLatestFileWithSuffix searches for the most recently modified file with a given suffix.
+//
+// Parameters:
+// - directory (string): The directory to search in.
+// - targetSuffix (string): The suffix to match.
+//
+// Returns:
+// - string: The path to the newest file matching the suffix.
+// - error: Any error encountered during the search.
+func FindLatestFileWithSuffix(directory, targetSuffix string) (string, error) {
 	var newestFile string
 	var newestModTime time.Time
 
@@ -93,46 +134,54 @@ func FindLatestFileWithSuffix(directory string, targetSuffix string) (string, er
 		if err != nil {
 			return err
 		}
-
-		if !info.IsDir() && strings.HasSuffix(path, targetSuffix) {
-			// Check to see if the file that we have found is newer than the previous file
-			if info.ModTime().After(newestModTime) {
-				newestModTime = info.ModTime()
-				newestFile = path
-			}
+		if !info.IsDir() && strings.HasSuffix(path, targetSuffix) && info.ModTime().After(newestModTime) {
+			newestModTime = info.ModTime()
+			newestFile = path
 		}
-
 		return nil
 	})
 
 	if err != nil {
 		return "", err
 	}
-
 	if newestFile == "" {
-		return "", fmt.Errorf("Unable to find %s files in %s", targetSuffix, directory)
+		return "", fmt.Errorf("unable to find files with suffix '%s' in '%s'", targetSuffix, directory)
 	}
 
-	return newestFile, err
+	return newestFile, nil
 }
 
-func ExtractFile(file string, slug string) (string, error) {
+// ExtractFile extracts the contents of a file into a temporary directory.
+//
+// Parameters:
+// - file (string): The file to extract.
+// - slug (string): A unique identifier for the temporary directory.
+//
+// Returns:
+// - string: The path to the temporary directory containing the extracted files.
+// - error: Any error encountered during extraction.
+func ExtractFile(file, slug string) (string, error) {
 	tempDir, err := os.MkdirTemp("", fmt.Sprintf("bugsnag-cli-%s-unpacking-*", slug))
-
 	if err != nil {
-		return "", fmt.Errorf("error creating temporary working directory %s", err.Error())
+		return "", fmt.Errorf("error creating temporary working directory: %s", err.Error())
 	}
 
-	err = Unzip(file, tempDir)
-
-	if err != nil {
+	if err := Unzip(file, tempDir); err != nil {
 		return "", err
 	}
 
 	return tempDir, nil
 }
 
-// FindFolderWithSuffix finds a folder with a given suffix
+// FindFolderWithSuffix searches for the first folder with a specified suffix.
+//
+// Parameters:
+// - rootPath (string): The root directory to search in.
+// - targetSuffix (string): The suffix to match.
+//
+// Returns:
+// - string: The path to the matching folder.
+// - error: Any error encountered during the search.
 func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
 	var matchingFolder string
 
@@ -140,23 +189,23 @@ func FindFolderWithSuffix(rootPath, targetSuffix string) (string, error) {
 		if err != nil {
 			return err
 		}
-
 		if info.IsDir() && strings.HasSuffix(info.Name(), targetSuffix) {
 			matchingFolder = path
 			return filepath.SkipDir
 		}
-
 		return nil
 	})
 
-	if err != nil {
-		return "", err
-	}
-
-	return matchingFolder, nil
+	return matchingFolder, err
 }
 
-// LocationOf returns the path of the executable file associated with the given command.
+// LocationOf determines the path of the executable associated with a given command.
+//
+// Parameters:
+// - something (string): The command to locate.
+//
+// Returns:
+// - string: The path to the executable or an empty string if not found.
 func LocationOf(something string) string {
 	cmd := exec.Command("which", something)
 	location, _ := cmd.Output()
