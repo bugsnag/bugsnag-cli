@@ -1,6 +1,24 @@
 const { exec } = require('child_process');
 
 /**
+ *
+ * @typedef {Object} BugsnagOptions
+ * @property {string|undefined} apiKey - The API key for authentication. Optional.
+ * @property {boolean} dryRun - Whether to perform a dry run without actually uploading. Defaults to `false`.
+ * @property {boolean} failOnUploadError - Whether to fail the process on upload error. Defaults to `false`.
+ * @property {string|undefined} logLevel - The log level for output. Optional.
+ * @property {number} port - The port for the connection. Defaults to `443`.
+ * @property {boolean} verbose - Whether to enable verbose logging. Defaults to `false`.
+ * @property {boolean} overwrite - Whether to overwrite existing files. Defaults to `false`.
+ * @property {number} retries - The number of retries for failed requests. Defaults to `0`.
+ * @property {number} timeout - The timeout value in seconds for requests. Defaults to `300`.
+ * @property {string} uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`.
+ * @property {string|undefined} projectRoot - The root directory for the project. Optional.
+ * @property {boolean} dev - Whether this is a development environment. Defaults to `false`.
+ *
+ */
+
+/**
  * Wrapper for Bugsnag CLI
  */
 class BugsnagCLI {
@@ -60,20 +78,10 @@ class BugsnagCLI {
     static Upload = {
         ReactNative: Object.assign(
             /**
-             * @param {string|undefined} options.apiKey - The API key for authentication. Optional.
-             * @param {boolean} options.dryRun - Whether to perform a dry run without actually uploading. Defaults to `false`.
-             * @param {boolean} options.failOnUploadError - Whether to fail the process on upload error. Defaults to `false`.
-             * @param {string|undefined} options.logLevel - The log level for output. Optional.
-             * @param {number} options.port - The port for the connection. Defaults to `443`.
-             * @param {boolean} options.verbose - Whether to enable verbose logging. Defaults to `false`.
-             * @param {boolean} options.overwrite - Whether to overwrite existing files. Defaults to `false`.
-             * @param {number} options.retries - The number of retries for failed requests. Defaults to `0`.
-             * @param {number} options.timeout - The timeout value in seconds for requests. Defaults to `300`.
-             * @param {string} options.uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`.
-             * @param {string|undefined} options.projectRoot - The root directory for the project. Optional.
+             *
+             * @param {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
              * @param {string|undefined} options.bundle - The bundle identifier. Optional.
              * @param {string|undefined} options.codeBundleId - The code bundle identifier. Optional.
-             * @param {boolean} options.dev - Whether this is a development environment. Defaults to `false`.
              * @param {string|undefined} options.sourceMap - The source map file for the project. Optional.
              * @param {string|undefined} options.versionName - The version name for the project. Optional.
              * @param {string|undefined} options.androidAppManifest - The Android app manifest file. Optional.
@@ -90,20 +98,10 @@ class BugsnagCLI {
                 BugsnagCLI.run('upload react-native', options, target), // Default ReactNative command
             {
                 /**
-                 * @param {string|undefined} options.apiKey - The API key for authentication. Optional.
-                 * @param {boolean} options.dry-run - Whether to perform a dry run without actually uploading. Defaults to `false`.
-                 * @param {boolean} options.failOnUploadError - Whether to fail the process on upload error. Defaults to `false`.
-                 * @param {string|undefined} options.logLevel - The log level for output. Optional.
-                 * @param {number} options.port - The port for the connection. Defaults to `443`.
-                 * @param {boolean} options.verbose - Whether to enable verbose logging. Defaults to `false`.
-                 * @param {boolean} options.overwrite - Whether to overwrite existing files. Defaults to `false`.
-                 * @param {number} options.retries - The number of retries for failed requests. Defaults to `0`.
-                 * @param {number} options.timeout - The timeout value in seconds for requests. Defaults to `300`.
-                 * @param {string} options.uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`.
-                 * @param {string|undefined} options.projectRoot - The root directory for the project. Optional.
+                 *
+                 * @param {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
                  * @param {string|undefined} options.bundle - The bundle identifier. Optional.
                  * @param {string|undefined} options.codeBundleId - The code bundle identifier. Optional.
-                 * @param {boolean} options.dev - Whether this is a development environment. Defaults to `false`.
                  * @param {string|undefined} options.sourceMap - The source map file for the project. Optional.
                  * @param {string|undefined} options.versionName - The version name for the project. Optional.
                  * @param {string|undefined} options.bundleVersion - The version of the bundle. Optional.
@@ -117,20 +115,9 @@ class BugsnagCLI {
                     BugsnagCLI.run('upload react-native-ios', options, target),
                 /**
                  *
-                 * @param {string|undefined} options.apiKey - The API key for authentication. Optional.
-                 * @param {boolean} options.dryRun - Whether to perform a dry run without actually uploading. Defaults to `false`.
-                 * @param {boolean} options.failOnUploadError - Whether to fail the process on upload error. Defaults to `false`.
-                 * @param {string|undefined} options.logLevel - The log level for output. Optional.
-                 * @param {number} options.port - The port for the connection. Defaults to `443`.
-                 * @param {boolean} options.verbose - Whether to enable verbose logging. Defaults to `false`.
-                 * @param {boolean} options.overwrite - Whether to overwrite existing files. Defaults to `false`.
-                 * @param {number} options.retries - The number of retries for failed requests. Defaults to `0`.
-                 * @param {number} options.timeout - The timeout value in seconds for requests. Defaults to `300`.
-                 * @param {string} options.uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`.
-                 * @param {string|undefined} options.projectRoot - The root directory for the project. Optional.
+                 * @param {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
                  * @param {string|undefined} options.bundle - The bundle identifier. Optional.
                  * @param {string|undefined} options.codeBundleId - The code bundle identifier. Optional.
-                 * @param {boolean} options.dev'] - Whether this is a development environment. Defaults to `false`.
                  * @param {string|undefined} options.sourceMap - The source map file for the project. Optional.
                  * @param {string|undefined} options.versionName - The version name for the project. Optional.
                  * @param {string|undefined} options.appManifest - The manifest file for the app. Optional.
@@ -144,16 +131,8 @@ class BugsnagCLI {
             }
         ),
         /**
-         * @param {string|undefined} options.apiKey - The API key for authentication. Optional.
-         * @param {boolean} options.dryRun - Whether to perform a dry run without actually uploading. Defaults to `false`.
-         * @param {boolean} options.failOnUploadError - Whether to fail the process on upload error. Defaults to `false`.
-         * @param {string|undefined} options.logLevel - The log level for output. Optional.
-         * @param {number} options.port - The port for the connection. Defaults to `443`.
-         * @param {boolean} options.verbose - Whether to enable verbose logging. Defaults to `false`.
-         * @param {boolean} options.overwrite - Whether to overwrite existing files. Defaults to `false`.
-         * @param {number} options.retries - The number of retries for failed requests. Defaults to `0`.
-         * @param {number} options.timeout - The timeout value in seconds for requests. Defaults to `300`.
-         * @param {string} options.uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`.
+         *
+         * @param {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
          * @param {string|undefined} options.baseUrl - The base URL for the project. Optional.
          * @param {string|undefined} options.bundle - The bundle identifier. Optional.
          * @param {string|undefined} options.bundleUrl - The URL of the bundle. Optional.
