@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 /**
  * Wrapper for Bugsnag CLI
  */
-class BugsnagCli {
+class BugsnagCLI {
     /**
      * Execute a Bugsnag CLI command
      * @param {string} command - The main Bugsnag CLI command (e.g., "upload").
@@ -45,15 +45,22 @@ class BugsnagCli {
 
     /**
      * Upload sourcemaps to Bugsnag
-     * @param {string} type - The type of upload (e.g., "js", "xcode-archive").
-     * @param {Object} options - Key-value pairs of options for the upload command.
-     * @param {string} target - File or folder path to upload.
-     * @returns {Promise<string>} - Resolves with the command's stdout.
+     * Provides nested methods for specific upload types.
      */
-    static Upload(type, options = {}, target = '') {
-        const command = `upload ${type}`;
-        return BugsnagCli.run(command, options, target);
-    }
+    static Upload = {
+        ReactNative: Object.assign(
+            (options = {}, target = '') =>
+                BugsnagCLI.run('upload react-native', options, target), // Default ReactNative command
+            {
+                iOS: (options = {}, target = '') =>
+                    BugsnagCLI.run('upload react-native-ios', options, target),
+                Android: (options = {}, target = '') =>
+                    BugsnagCLI.run('upload react-native-android', options, target),
+            }
+        ),
+        Js: (options = {}, target = '') =>
+            BugsnagCLI.run('upload js', options, target),
+    };
 }
 
-module.exports = BugsnagCli;
+module.exports = BugsnagCLI;
