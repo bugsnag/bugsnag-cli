@@ -2,7 +2,7 @@
   "name": "@bugsnag/cli",
   "version": "2.8.0",
   "description": "BugSnag CLI",
-  "main": "install.js",
+  "main": "bugsnag-cli-wrapper.js",
   "bin": {
     "bugsnag-cli": "bin/bugsnag-cli"
   },
@@ -23,11 +23,12 @@
     "js-yaml": "^4.1.0"
   },
   "files": [
-    "install.js",
+    "bugsnag-cli-install.js",
+    "bugsnag-cli-wrapper.js",
     "bin/bugsnag-cli",
     "supported-platforms.yml"
   ],
   "scripts": {
-    "postinstall": "node install.js"
+    "postinstall": "node bugsnag-cli-install.js"
   }
 }

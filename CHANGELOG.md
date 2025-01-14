@@ -1,4 +1,9 @@
 # Changelog
+## TBD
+
+### Enhancements
+- Add a wrapper for the `npm` package to interact with the BugSnag CLI []()
+
 ## 2.8.0 (2025-01-06)
 
 ### Enhancements
