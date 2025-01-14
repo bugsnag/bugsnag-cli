@@ -1,4 +1,9 @@
 # Changelog
+## 3.0.0 (TBD)
+
+### Breaking Changes
+- The `upload dsym` command has been removed in favor of the `xcode-build` command.
+
 ## 2.8.0 (2025-01-06)
 
 ### Enhancements

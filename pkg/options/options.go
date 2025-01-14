@@ -169,7 +169,6 @@ type CLI struct {
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-		Dsym               XcodeBuild             `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
 		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcarchive"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
