@@ -20,6 +20,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	var symbolFileList []string
 	var manifestData map[string]string
 	var aabPath = string(unityOptions.AabPath)
+	var aabUploaded bool
 
 	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
@@ -75,60 +76,70 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 		}
 		err = ProcessAndroidAab(globalOptions, endpoint, logger)
 
+		aabUploaded = true
+
 		if err != nil {
-			return err
-		}
-	}
-
-	logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
-
-	if manifestData == nil {
-		manifestData, _ = android.MergeUploadOptionsFromAabManifest("", globalOptions.ApiKey, unityOptions.ApplicationId, unityOptions.BuildUuid, unityOptions.NoBuildUuid, unityOptions.VersionCode, unityOptions.VersionName, logger)
-	}
-
-	unityDir, err := utils.ExtractFile(zipPath, "unity-android")
-
-	if err != nil {
-		return err
-	}
-
-	defer os.RemoveAll(unityDir)
-
-	archList, err = utils.BuildDirectoryList([]string{unityDir})
-
-	if err != nil {
-		return err
-	}
-
-	for _, arch := range archList {
-		soPath := filepath.Join(unityDir, arch)
-		fileList, err := utils.BuildFileList([]string{soPath})
-		if err != nil {
-			return err
-		}
-		for _, file := range fileList {
-			if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
-				continue
+			if strings.Contains(err.Error(), "No NDK (.so) or Proguard (mapping.txt) files detected for upload.") {
+				aabUploaded = false
+			} else {
+				return err
 			}
-			symbolFileList = append(symbolFileList, file)
 		}
 	}
 
-	err = android.UploadAndroidNdk(
-		symbolFileList,
-		manifestData["apiKey"],
-		manifestData["applicationId"],
-		manifestData["versionName"],
-		manifestData["versionCode"],
-		unityOptions.ProjectRoot,
-		endpoint,
-		globalOptions,
-		logger,
-	)
+	if zipPath == "" && !aabUploaded {
+		return fmt.Errorf("No .symbols.zip or .aab files detected for upload")
+	} else if zipPath != "" {
 
-	if err != nil {
-		return err
+		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
+
+		if manifestData == nil {
+			manifestData, _ = android.MergeUploadOptionsFromAabManifest("", globalOptions.ApiKey, unityOptions.ApplicationId, unityOptions.BuildUuid, unityOptions.NoBuildUuid, unityOptions.VersionCode, unityOptions.VersionName, logger)
+		}
+
+		unityDir, err := utils.ExtractFile(zipPath, "unity-android")
+
+		if err != nil {
+			return err
+		}
+
+		defer os.RemoveAll(unityDir)
+
+		archList, err = utils.BuildDirectoryList([]string{unityDir})
+
+		if err != nil {
+			return err
+		}
+
+		for _, arch := range archList {
+			soPath := filepath.Join(unityDir, arch)
+			fileList, err := utils.BuildFileList([]string{soPath})
+			if err != nil {
+				return err
+			}
+			for _, file := range fileList {
+				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
+					continue
+				}
+				symbolFileList = append(symbolFileList, file)
+			}
+		}
+
+		err = android.UploadAndroidNdk(
+			symbolFileList,
+			manifestData["apiKey"],
+			manifestData["applicationId"],
+			manifestData["versionName"],
+			manifestData["versionCode"],
+			unityOptions.ProjectRoot,
+			endpoint,
+			globalOptions,
+			logger,
+		)
+
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }

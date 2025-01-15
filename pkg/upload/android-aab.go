@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -16,6 +17,8 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 	var aabDir string
 	var aabFile string
 	var err error
+	var ndkUploaded bool
+	var proguardUploaded bool
 	aabOptions := globalOptions.Upload.AndroidAab
 
 	for _, path := range aabOptions.Path {
@@ -77,11 +80,14 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 			if err != nil {
 				return err
 			}
+			ndkUploaded = true
 		} else {
 			logger.Info("No NDK (.so) files detected for upload.")
+			ndkUploaded = false
 		}
 	} else {
 		logger.Info("No NDK (.so) files detected for upload.")
+		ndkUploaded = false
 	}
 
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
@@ -102,8 +108,15 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 		if err != nil {
 			return err
 		}
+		proguardUploaded = true
 	} else {
+		proguardUploaded = false
 		logger.Info("No Proguard (mapping.txt) file detected for upload.")
+	}
+
+	// Check to see if we've uploaded anything
+	if !ndkUploaded && !proguardUploaded {
+		return fmt.Errorf("No NDK (.so) or Proguard (mapping.txt) files detected for upload.")
 	}
 
 	return nil
