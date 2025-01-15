@@ -24,7 +24,7 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 	var appManifestPathExpected string
 	var objCopyPath string
 
-	soFilePattern := `\.so.*$` // Regular expression to match strings ending in ".txt"
+	soFilePattern := `\.so.*$`
 	soFileRegex := regexp.MustCompile(soFilePattern)
 
 	for _, path := range ndkOptions.Path {
