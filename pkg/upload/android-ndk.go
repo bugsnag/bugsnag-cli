@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
@@ -22,6 +23,9 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 	var workingDir string
 	var appManifestPathExpected string
 	var objCopyPath string
+
+	soFilePattern := `\.so.*$` // Regular expression to match strings ending in ".txt"
+	soFileRegex := regexp.MustCompile(soFilePattern)
 
 	for _, path := range ndkOptions.Path {
 
@@ -125,7 +129,7 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 	for _, file := range fileList {
 		if strings.HasSuffix(file, ".so.sym") {
 			symbolFileList = append(symbolFileList, file)
-		} else if filepath.Ext(file) == ".so" || strings.HasPrefix(filepath.Ext(file), ".so.") {
+		} else if soFileRegex.MatchString(file) {
 			// Check NDK path is set
 			if objCopyPath == "" {
 				ndkOptions.AndroidNdkRoot, err = android.GetAndroidNDKRoot(ndkOptions.AndroidNdkRoot)
