@@ -125,7 +125,7 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 	for _, file := range fileList {
 		if strings.HasSuffix(file, ".so.sym") {
 			symbolFileList = append(symbolFileList, file)
-		} else if filepath.Ext(file) == ".so" {
+		} else if filepath.Ext(file) == ".so" || strings.HasPrefix(filepath.Ext(file), ".so.") {
 			// Check NDK path is set
 			if objCopyPath == "" {
 				ndkOptions.AndroidNdkRoot, err = android.GetAndroidNDKRoot(ndkOptions.AndroidNdkRoot)
