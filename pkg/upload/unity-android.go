@@ -14,7 +14,6 @@ import (
 
 func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
 	unityOptions := globalOptions.Upload.UnityAndroid
-	var err error
 	var zipPath string
 	var archList []string
 	var symbolFileList []string
@@ -24,11 +23,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 
 	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
-			zipPath, err = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
-
-			if err != nil {
-				return err
-			}
+			zipPath, _ = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
 			if aabPath == "" {
 				aabPath, _ = utils.FindLatestFileWithSuffix(path, ".aab")
