@@ -2,7 +2,8 @@
 ## TBD
 
 ### Enhancements
-- Add a wrapper for the `npm` package to interact with the BugSnag CLI []()
+- Add a wrapper for the `npm` package to interact with the BugSnag CLI [161](https://github.com/bugsnag/bugsnag-cli/pull/161)
+- Add the support for .so.* files when processing ndk symbol files [163](https://github.com/bugsnag/bugsnag-cli/pull/163)
 
 ## 2.8.0 (2025-01-06)
 
