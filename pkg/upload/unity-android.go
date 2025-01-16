@@ -19,7 +19,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	var symbolFileList []string
 	var manifestData map[string]string
 	var aabPath = string(unityOptions.AabPath)
-	var aabUploaded bool
 
 	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
@@ -71,21 +70,14 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 		}
 		err = ProcessAndroidAab(globalOptions, endpoint, logger)
 
-		aabUploaded = true
-
 		if err != nil {
-			if strings.Contains(err.Error(), "No NDK (.so) or Proguard (mapping.txt) files detected for upload.") {
-				aabUploaded = false
-			} else {
-				return err
-			}
+			return err
 		}
 	}
 
-	if zipPath == "" && !aabUploaded {
-		return fmt.Errorf("No .symbols.zip or .aab files detected for upload")
-	} else if zipPath != "" {
-
+	if zipPath == "" {
+		logger.Info("No Unity Android symbols.zip file found, skipping")
+	} else {
 		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(zipPath)))
 
 		if manifestData == nil {
