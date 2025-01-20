@@ -1,5 +1,5 @@
 # Changelog
-## TBD
+## 2.9.0 (2025-01-20)
 
 ### Enhancements
 - Add a wrapper for the `npm` package to interact with the BugSnag CLI [161](https://github.com/bugsnag/bugsnag-cli/pull/161)
