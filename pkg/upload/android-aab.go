@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -38,6 +39,7 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 		}
 
 		if aabFile != "" && aabDir == "" {
+			logger.Debug(fmt.Sprintf("Extracting AAB file: %s", aabFile))
 			aabDir, err = utils.ExtractFile(aabFile, "aab")
 
 			defer os.RemoveAll(aabDir)
@@ -57,6 +59,7 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 	soFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.debugsymbols")
 
 	if utils.FileExists(soFilePath) {
+		logger.Debug(fmt.Sprintf("Found NDK (.so) files at: %s", soFilePath))
 		soFileList, err := utils.BuildFileList([]string{soFilePath})
 
 		if err != nil {
@@ -87,6 +90,7 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 	mappingFilePath := filepath.Join(aabDir, "BUNDLE-METADATA", "com.android.tools.build.obfuscation", "proguard.map")
 
 	if utils.FileExists(mappingFilePath) {
+		logger.Debug(fmt.Sprintf("Found Proguard (mapping.txt) file at: %s", mappingFilePath))
 		globalOptions.Upload.AndroidProguard = options.AndroidProguardMapping{
 			ApplicationId: manifestData["applicationId"],
 			BuildUuid:     manifestData["buildUuid"],
