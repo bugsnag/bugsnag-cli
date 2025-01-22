@@ -3,6 +3,8 @@ agents:
 
 steps:
   - name: ':copyright: License Audit'
+    agents:
+      queue: opensource
     plugins:
       docker-compose#v3.7.0:
         run: license_finder

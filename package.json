@@ -30,5 +30,8 @@
   ],
   "scripts": {
     "postinstall": "node bugsnag-cli-install.js"
+  },
+  "devDependencies": {
+    "yaml": "^2.7.0"
   }
 }
