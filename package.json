@@ -19,9 +19,6 @@
     "access": "public"
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
-  "dependencies": {
-    "js-yaml": "^4.1.0"
-  },
   "files": [
     "bugsnag-cli-install.js",
     "bugsnag-cli-wrapper.js",
