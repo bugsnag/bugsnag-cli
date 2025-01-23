@@ -2,7 +2,7 @@
 
 ## 2.9.1 - (2025-01-23)
 
-### Patch
+### Fixes
 
 - Switch `js-yaml` to `yaml` for the NodeJS package [168](https://github.com/bugsnag/bugsnag-cli/pull/168) 
 
