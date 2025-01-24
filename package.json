@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "BugSnag CLI",
   "main": "bugsnag-cli-wrapper.js",
   "bin": {
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "yaml": "^2.7.0"
   },
   "files": [
     "bugsnag-cli-install.js",

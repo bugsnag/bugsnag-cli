@@ -1,0 +1,8 @@
+services:
+
+  license_finder:
+    build:
+      dockerfile: dockerfiles/Dockerfile.audit
+      context: .
+    volumes:
+      - ./:/scan

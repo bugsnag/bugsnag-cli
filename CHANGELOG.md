@@ -1,13 +1,23 @@
 # Changelog
+
+## 2.9.1 - (2025-01-23)
+
+### Fixes
+
+- Switch `js-yaml` to `yaml` for the NodeJS package [168](https://github.com/bugsnag/bugsnag-cli/pull/168) 
+
 ## 2.9.0 (2025-01-20)
 
 ### Enhancements
+
 - Add a wrapper for the `npm` package to interact with the BugSnag CLI [161](https://github.com/bugsnag/bugsnag-cli/pull/161)
 - Add the support for .so.* files when processing ndk symbol files [163](https://github.com/bugsnag/bugsnag-cli/pull/163)
 - Add additional logging to the Android AAB upload command [165](https://github.com/bugsnag/bugsnag-cli/pull/165)
+
 ## 2.8.0 (2025-01-06)
 
 ### Enhancements
+
 - Add the Xcode Archive Command to support the uploading of xcarchive files [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 - Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose. `dsym` will be removed in the next major release [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 
@@ -30,12 +40,14 @@
 ## 2.6.2 (2024-10-17)
 
 ### Fixes
+
 - Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
 - Replace the axios dependency with fetch to reduce the size of the package. [145](https://github.com/bugsnag/bugsnag-cli/pull/144)
 
 ## 2.6.1 (2024-09-18)
 
 ### Fixes
+
 - Ensure that we only pass either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` to the upload API. [140](https://github.com/bugsnag/bugsnag-cli/pull/140)
 
 ## 2.6.0 (2024-09-09)
