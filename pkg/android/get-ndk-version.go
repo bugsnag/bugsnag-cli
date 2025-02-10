@@ -27,7 +27,8 @@ func GetNdkVersion(ndkPath string) (int, error) {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "Pkg.Revision") {
 			// Extract version string
-			parts := strings.Split(line, " = ")
+			parts := strings.Split(line, "=")
+			parts[1] = strings.TrimSpace(parts[1])
 			if len(parts) == 2 {
 				versionStr := parts[1]
 				// Extract major version (before the first dot)
