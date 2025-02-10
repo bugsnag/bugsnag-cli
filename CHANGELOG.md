@@ -1,5 +1,10 @@
 # Changelog
 
+## TBD
+
+### Fixes
+- Get NDK version from the `source.properties` file when uploading NDK symbol files
+
 ## 2.9.1 - (2025-01-23)
 
 ### Fixes
