@@ -1,6 +1,6 @@
 # Changelog
 
-## TBD
+## 2.10.0 (2025-02-11)
 
 ### Fixes
 - Get NDK version from the `source.properties` file when uploading NDK symbol files [172](https://github.com/bugsnag/bugsnag-cli/pull/172)
