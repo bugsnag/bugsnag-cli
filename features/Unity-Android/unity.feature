@@ -18,7 +18,7 @@ Feature: Unity Android integration tests
     And I wait for the Unity symbols to generate
 
     Given I set the NDK path to the Unity bundled version
-    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF--overwrite platforms-examples/Unity/
+    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite platforms-examples/Unity/
     Then I wait to receive 5 sourcemaps
     Then the sourcemap is valid for the Android Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
