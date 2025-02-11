@@ -230,3 +230,8 @@ end
 And('I wait for the Unity symbols to generate') do
   Maze.check.include(`ls #{@fixture_dir}`, 'UnityExample-1.0-v1-IL2CPP.symbols.zip')
 end
+
+Given(/^I set the NDK path to the Unity bundled version$/) do
+#  Set the environment variable to the path of the NDK bundled with Unity
+  ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
+end
