@@ -6,7 +6,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
-
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -16,16 +15,19 @@ import (
 func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logger) error {
 	iosOptions := options.Upload.ReactNativeIos
 	var (
-		rootDirPath      string
-		plistData        *ios.PlistData
-		buildSettings    *ios.XcodeBuildSettings
+		rootDirPath string
+		plistData   *ios.PlistData
+		//buildSettings    *ios.XcodeBuildSettings
 		err              error
 		xcodeArchivePath string
+		buildDirPath     string
 	)
 
 	for _, path := range iosOptions.Path {
-		if utils.IsDir(path) {
-			buildDirPath := filepath.Join(path, "ios", "build")
+		if filepath.Ext(path) == ".xcarchive" {
+			xcodeArchivePath = path
+		} else if utils.IsDir(path) {
+			buildDirPath = filepath.Join(path, "ios", "build")
 			rootDirPath = path
 			if !utils.FileExists(buildDirPath) {
 				buildDirPath = filepath.Join(path, "build")
@@ -69,13 +71,6 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 						logger.Warn(err.Error())
 					}
 				}
-
-				if iosOptions.Ios.Scheme != "" {
-					buildSettings, err = ios.GetXcodeBuildSettings(iosOptions.Ios.XcodeProject, iosOptions.Ios.Scheme, "")
-					if err != nil {
-						logger.Warn(err.Error())
-					}
-				}
 			} else {
 				return fmt.Errorf("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
@@ -88,112 +83,108 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				return fmt.Errorf("Error locating latest xcarchive: %w", err)
 			}
 
-			logger.Debug(fmt.Sprintf("Found Xcode Archive Path: %s", xcodeArchivePath))
+		} else {
+			return fmt.Errorf("No xcarchive found in specified paths")
+		}
 
-			// Attempt to parse information from the .xcworkspace file if values aren't provided on the command line
-			if iosOptions.ReactNative.Bundle == "" || (iosOptions.Ios.Plist == "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "")) {
+		logger.Debug(fmt.Sprintf("Found Xcode Archive Path: %s", xcodeArchivePath))
 
-				// Check to see if we have the Info.Plist path
-				if iosOptions.Ios.Plist != "" {
-					if !utils.FileExists(iosOptions.Ios.Plist) {
-						return fmt.Errorf("unable to find specified Info.plist file: %s", iosOptions.Ios.Plist)
-					}
-				} else if buildSettings != nil {
-					// If not, we need to build it from build settings values
-					plistPathExpected := filepath.Join(xcodeArchivePath, "Products", "Applications", iosOptions.Ios.Scheme+".app", "Info.plist")
-					if utils.FileExists(plistPathExpected) {
-						iosOptions.Ios.Plist = plistPathExpected
-						logger.Debug(fmt.Sprintf("Found Info.plist at expected location: %s", iosOptions.Ios.Plist))
-					} else {
-						plistPathExpected = filepath.Join(buildSettings.ProjectTempRoot, "ArchiveIntermediates", iosOptions.Ios.Scheme, "BuildProductsPath", filepath.Base(buildSettings.BuiltProductsDir), buildSettings.InfoPlistPath)
-						if utils.FileExists(plistPathExpected) {
-							iosOptions.Ios.Plist = plistPathExpected
-							logger.Debug(fmt.Sprintf("Found Info.plist at: %s", iosOptions.Ios.Plist))
-						} else {
-							logger.Debug(fmt.Sprintf("No Info.plist found at: %s", plistPathExpected))
-						}
-					}
+		// Attempt to parse information from the .xcworkspace file if values aren't provided on the command line
+		if iosOptions.ReactNative.Bundle == "" || (iosOptions.Ios.Plist == "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "")) {
+			// Check to see if we have the Info.Plist path
+			if iosOptions.Ios.Plist != "" {
+				if !utils.FileExists(iosOptions.Ios.Plist) {
+					return fmt.Errorf("unable to find specified Info.plist file: %s", iosOptions.Ios.Plist)
 				}
-			}
-
-			// Check that the bundle file exists and error out if it doesn't
-			if iosOptions.ReactNative.Bundle != "" {
-				if !utils.FileExists(iosOptions.ReactNative.Bundle) {
-					return fmt.Errorf("unable to find specified bundle file: %s", iosOptions.ReactNative.Bundle)
-				}
-			} else {
-				// Set a options.Bundle if it's not defined and check that it exists before proceeding
-				if buildSettings != nil {
-					possibleBundleFilePath := filepath.Join(xcodeArchivePath, "Products", "Applications", iosOptions.Ios.Scheme+".app", "main.jsbundle")
-					if utils.FileExists(possibleBundleFilePath) {
-						iosOptions.ReactNative.Bundle = possibleBundleFilePath
-						logger.Debug(fmt.Sprintf("Found bundle file at: %s", iosOptions.ReactNative.Bundle))
-					} else {
-						logger.Debug(fmt.Sprintf("No bundle file found at: %s", possibleBundleFilePath))
-					}
-				}
-			}
-
-			// Check that we now have a bundle path
-			if iosOptions.ReactNative.Bundle == "" {
-				return fmt.Errorf("Could not find a bundle file, please specify the path by using --bundle-path")
-			}
-
-			// Check that the source map file exists and error out if it doesn't
-			if iosOptions.ReactNative.SourceMap != "" {
-				if !utils.FileExists(iosOptions.ReactNative.SourceMap) {
-					return fmt.Errorf("unable to find specified source map: %s", iosOptions.ReactNative.SourceMap)
-				}
-			} else {
-				// Use SOURCEMAP_FILE environment variable, if defined, or use the build directory
-				sourceMapDirPath := os.Getenv("SOURCEMAP_FILE")
-				if sourceMapDirPath == "" {
-					sourceMapDirPath = buildDirPath
-				}
-
-				possibleSourceMapPath := filepath.Join(sourceMapDirPath, "sourcemaps", "main.jsbundle.map")
-				if utils.FileExists(possibleSourceMapPath) {
-					iosOptions.ReactNative.SourceMap = possibleSourceMapPath
-					logger.Debug(fmt.Sprintf("Found source map at: %s", iosOptions.ReactNative.SourceMap))
+			} else if xcodeArchivePath != "" {
+				// If not, we need to build it from build settings values
+				plistPathExpected := filepath.Join(xcodeArchivePath, "Products", "Applications", iosOptions.Ios.Scheme+".app", "Info.plist")
+				if utils.FileExists(plistPathExpected) {
+					iosOptions.Ios.Plist = plistPathExpected
+					logger.Debug(fmt.Sprintf("Found Info.plist at expected location: %s", iosOptions.Ios.Plist))
 				} else {
-					logger.Debug(fmt.Sprintf("No source map found at: %s", possibleSourceMapPath))
+					logger.Debug(fmt.Sprintf("No Info.plist found at: %s", plistPathExpected))
 				}
 			}
+		}
+	}
 
-			// Check that we now have a source map path
-			if iosOptions.ReactNative.SourceMap == "" {
-				return fmt.Errorf("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
+	// Check that the bundle file exists and error out if it doesn't
+	if iosOptions.ReactNative.Bundle != "" {
+		if !utils.FileExists(iosOptions.ReactNative.Bundle) {
+			return fmt.Errorf("unable to find specified bundle file: %s", iosOptions.ReactNative.Bundle)
+		}
+	} else {
+		// Set a options.Bundle if it's not defined and check that it exists before proceeding
+		if xcodeArchivePath != "" {
+			possibleBundleFilePath := filepath.Join(xcodeArchivePath, "Products", "Applications", iosOptions.Ios.Scheme+".app", "main.jsbundle")
+			if utils.FileExists(possibleBundleFilePath) {
+				iosOptions.ReactNative.Bundle = possibleBundleFilePath
+				logger.Debug(fmt.Sprintf("Found bundle file at: %s", iosOptions.ReactNative.Bundle))
+			} else {
+				logger.Debug(fmt.Sprintf("No bundle file found at: %s", possibleBundleFilePath))
+			}
+		}
+	}
+
+	// Check that we now have a bundle path
+	if iosOptions.ReactNative.Bundle == "" {
+		return fmt.Errorf("Could not find a bundle file, please specify the path by using --bundle-path")
+	}
+
+	// Check that the source map file exists and error out if it doesn't
+	if iosOptions.ReactNative.SourceMap != "" {
+		if !utils.FileExists(iosOptions.ReactNative.SourceMap) {
+			return fmt.Errorf("unable to find specified source map: %s", iosOptions.ReactNative.SourceMap)
+		}
+	} else {
+		// Use SOURCEMAP_FILE environment variable, if defined, or use the build directory
+		sourceMapDirPath := os.Getenv("SOURCEMAP_FILE")
+		if sourceMapDirPath == "" {
+			sourceMapDirPath = buildDirPath
+		}
+
+		possibleSourceMapPath := filepath.Join(sourceMapDirPath, "sourcemaps", "main.jsbundle.map")
+		if utils.FileExists(possibleSourceMapPath) {
+			iosOptions.ReactNative.SourceMap = possibleSourceMapPath
+			logger.Debug(fmt.Sprintf("Found source map at: %s", iosOptions.ReactNative.SourceMap))
+		} else {
+			logger.Debug(fmt.Sprintf("No source map found at: %s", possibleSourceMapPath))
+		}
+	}
+
+	// Check that we now have a source map path
+	if iosOptions.ReactNative.SourceMap == "" {
+		return fmt.Errorf("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
+	}
+
+	if iosOptions.Ios.Plist != "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "") {
+		// Read data from the plist
+		plistData, err = ios.GetPlistData(iosOptions.Ios.Plist)
+		if err != nil {
+			return err
+		}
+
+		// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from the plist
+		if iosOptions.ReactNative.CodeBundleId == "" {
+			// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
+			if iosOptions.Ios.BundleVersion == "" {
+				iosOptions.Ios.BundleVersion = plistData.BundleVersion
+				logger.Debug(fmt.Sprintf("Using bundle version from Info.plist: %s", iosOptions.Ios.BundleVersion))
 			}
 
-			if iosOptions.Ios.Plist != "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "") {
-				// Read data from the plist
-				plistData, err = ios.GetPlistData(iosOptions.Ios.Plist)
-				if err != nil {
-					return err
-				}
-
-				// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from the plist
-				if iosOptions.ReactNative.CodeBundleId == "" {
-					// Check if the variables are empty, set if they are abd log that we are using setting from the plist file
-					if iosOptions.Ios.BundleVersion == "" {
-						iosOptions.Ios.BundleVersion = plistData.BundleVersion
-						logger.Debug(fmt.Sprintf("Using bundle version from Info.plist: %s", iosOptions.Ios.BundleVersion))
-					}
-
-					if iosOptions.ReactNative.VersionName == "" {
-						iosOptions.ReactNative.VersionName = plistData.VersionName
-						logger.Debug(fmt.Sprintf("Using version name from Info.plist: %s", iosOptions.ReactNative.VersionName))
-
-					}
-				}
-
-				if options.ApiKey == "" {
-					options.ApiKey = plistData.BugsnagProjectDetails.ApiKey
-					logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", options.ApiKey))
-				}
+			if iosOptions.ReactNative.VersionName == "" {
+				iosOptions.ReactNative.VersionName = plistData.VersionName
+				logger.Debug(fmt.Sprintf("Using version name from Info.plist: %s", iosOptions.ReactNative.VersionName))
 
 			}
 		}
+
+		if options.ApiKey == "" {
+			options.ApiKey = plistData.BugsnagProjectDetails.ApiKey
+			logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", options.ApiKey))
+		}
+
 	}
 
 	uploadOptions, err := utils.BuildReactNativeUploadOptions(options.ApiKey, iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, options.Upload.Overwrite, "ios")
