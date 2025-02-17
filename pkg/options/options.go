@@ -124,10 +124,11 @@ type ReactNativeShared struct {
 }
 
 type ReactNativeIosSpecific struct {
-	BundleVersion string `help:"The bundle version of this build of the application (Apple platforms only)"`
-	Plist         string `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	Scheme        string `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
-	XcodeProject  string `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	BundleVersion string     `help:"The bundle version of this build of the application (Apple platforms only)"`
+	Plist         string     `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	Scheme        string     `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
+	XcodeProject  string     `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	ArchivePath   utils.Path `help:"The path to the Xcarchive file to process" type:"path"`
 }
 
 type ReactNativeIos struct {
