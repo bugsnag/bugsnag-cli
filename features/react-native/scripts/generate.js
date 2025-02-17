@@ -3,7 +3,6 @@
 const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
-const common = require('./common')
 const androidUtils = require('./react-native/android-utils')
 const iosUtils = require('./react-native/ios-utils')
 
@@ -21,8 +20,6 @@ if (!process.env.RCT_NEW_ARCH_ENABLED || (process.env.RCT_NEW_ARCH_ENABLED !== '
     console.error('RCT_NEW_ARCH_ENABLED must be set to 1 or 0')
     process.exit(1)
 }
-
-const notifierVersion = process.env.NOTIFIER_VERSION || common.getCommitId()
 
 const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
