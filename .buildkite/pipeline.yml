@@ -182,7 +182,7 @@ steps:
           queue: "macos"
         timeout_in_minutes: 5
         commands:
-          - buildkite-agent pipeline upload .buildkite/react-native-android.pipline.yml
+          - buildkite-agent pipeline upload .buildkite/react-native-android.pipeline.yml
 
       - label: RN 0.72 Integration Tests
         depends_on: build
