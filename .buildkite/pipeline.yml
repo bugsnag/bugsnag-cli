@@ -123,58 +123,6 @@ steps:
 
   - group: ":react: React Native"
     steps:
-      - label: "RN 0.69 :ios: Integration Tests"
-        skip: "issue with Boost https://github.com/facebook/react-native/issues/42180"
-        depends_on: build
-        agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 13
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_69.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.70 :ios: Integration Tests"
-        depends_on: build
-        agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 13
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_70.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.72 :ios: Integration Tests"
-        depends_on: build
-        agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 14
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_72.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
       - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
         depends_on:
           - "build"
@@ -191,4 +139,4 @@ steps:
           queue: "macos"
         timeout_in_minutes: 5
         commands:
-          - buildkite-agent pipeline upload .buildkite/react-native/iOS.pipeline.yml
+          - buildkite-agent pipeline upload .buildkite/react-native/ios.pipeline.yml
