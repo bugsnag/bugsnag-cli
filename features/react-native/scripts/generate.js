@@ -11,11 +11,6 @@ if (!process.env.RN_VERSION) {
     process.exit(1)
 }
 
-if (!process.env.REGISTRY_URL) {
-    console.error('Please provide a Registry URL')
-    process.exit(1)
-}
-
 if (!process.env.RCT_NEW_ARCH_ENABLED || (process.env.RCT_NEW_ARCH_ENABLED !== '1' && process.env.RCT_NEW_ARCH_ENABLED !== '0')) {
     console.error('RCT_NEW_ARCH_ENABLED must be set to 1 or 0')
     process.exit(1)
@@ -57,9 +52,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
     iosUtils.configureIOSProject(fixtureDir)
 
-    console.log("i got here")
-
-    execSync(`npm install --registry ${process.env.REGISTRY_URL} --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
+    execSync(`npm install --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 // Build the android fixture
