@@ -182,7 +182,7 @@ steps:
           queue: "macos"
         timeout_in_minutes: 5
         commands:
-          - buildkite-agent pipeline upload .buildkite/react-native-android.pipeline.yml
+          - buildkite-agent pipeline upload .buildkite/react-native/android.pipeline.yml
 
       - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE iOS STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
         depends_on:
@@ -191,4 +191,4 @@ steps:
           queue: "macos"
         timeout_in_minutes: 5
         commands:
-          - buildkite-agent pipeline upload .buildkite/react-native-iOS.pipeline.yml
+          - buildkite-agent pipeline upload .buildkite/react-native/iOS.pipeline.yml
