@@ -245,3 +245,12 @@ Before('@BuildRNAndroid') do
     @setup_android = true
   end
 end
+
+Before('@BuildRNiOS') do
+  unless defined?(@setup_ios) && @setup_ios
+    puts "Setting up React Native iOS app and sourcemap..."
+    @output = `node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    @setup_ios = true
+  end
+end

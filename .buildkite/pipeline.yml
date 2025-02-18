@@ -184,19 +184,11 @@ steps:
         commands:
           - buildkite-agent pipeline upload .buildkite/react-native-android.pipeline.yml
 
-      - label: RN 0.72 Integration Tests
-        depends_on: build
+      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE iOS STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
+        depends_on:
+          - "build"
         agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 14
+          queue: "macos"
+        timeout_in_minutes: 5
         commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
+          - buildkite-agent pipeline upload .buildkite/react-native-iOS.pipeline.yml
