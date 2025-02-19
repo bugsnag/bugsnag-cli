@@ -140,4 +140,3 @@ steps:
         timeout_in_minutes: 5
         commands:
           - buildkite-agent pipeline upload .buildkite/react-native/ios.pipeline.yml
-        skip: "Waiting on PLAT-13621"
