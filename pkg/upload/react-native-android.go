@@ -2,11 +2,9 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
-
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -116,7 +114,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 				androidOptions.Android.AppManifest = appManifestPathExpected
 				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
 			} else {
-				appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", strings.Title(androidOptions.Android.Variant), "process"+androidOptions.Android.Variant+"Manifest", "AndroidManifest.xml")
+				appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", cases.Title(language.English).String(androidOptions.Android.Variant), "process"+androidOptions.Android.Variant+"Manifest", "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					androidOptions.Android.AppManifest = appManifestPathExpected
 					logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
