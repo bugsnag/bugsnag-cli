@@ -135,7 +135,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 	// Check that the source map file exists and error out if it doesn't
 	if iosOptions.ReactNative.SourceMap != "" {
 		if !utils.FileExists(iosOptions.ReactNative.SourceMap) {
-			return fmt.Errorf("unable to find specified source map: %s", iosOptions.ReactNative.SourceMap)
+			return fmt.Errorf("Unable to find specified source map: %s", iosOptions.ReactNative.SourceMap)
 		}
 	} else {
 		// Use SOURCEMAP_FILE environment variable, if defined, or use the build directory
