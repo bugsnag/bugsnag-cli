@@ -211,3 +211,28 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	return uploadOptions, nil
 }
+
+// BuildMinidumpKUploadOptions - Builds the upload options for processing Minidump symbol files
+func BuildMinidumpUploadOptions(apiKey string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if sharedObjectName != "" {
+		uploadOptions["sharedObjectName"] = sharedObjectName
+	}
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	return uploadOptions, nil
+}

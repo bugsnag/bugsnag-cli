@@ -2,11 +2,11 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/minidump"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"path/filepath"
 )
 
 func ProcessMinidump(globalOptions options.CLI, endpoint string, logger log.Logger) error {
@@ -37,7 +37,12 @@ func ProcessMinidump(globalOptions options.CLI, endpoint string, logger log.Logg
 	}
 
 	logger.Info(fmt.Sprintf("Uploading %d minidump .sym files to Bugsnag", len(symFileList)))
-
+	logger.Info(fmt.Sprintf("Using endpoint: %s", endpoint))
+	logger.Info(fmt.Sprintf("Using API key: %s", globalOptions.ApiKey))
+	err := minidump.UploadMinidumps(symFileList, globalOptions.ApiKey, minidumpOptions.ProjectRoot, endpoint, globalOptions, logger)
+	if err != nil {
+		return err
+	}
 	logger.Info("Minidump symbol upload complete")
 	return nil
 }
