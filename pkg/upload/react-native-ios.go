@@ -15,9 +15,8 @@ import (
 func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logger) error {
 	iosOptions := options.Upload.ReactNativeIos
 	var (
-		rootDirPath string
-		plistData   *ios.PlistData
-		//buildSettings    *ios.XcodeBuildSettings
+		rootDirPath      string
+		plistData        *ios.PlistData
 		err              error
 		xcodeArchivePath string
 		buildDirPath     string
@@ -72,19 +71,23 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 					}
 				}
 			} else {
-				return fmt.Errorf("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
+				return fmt.Errorf("could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
 
 			logger.Debug(fmt.Sprintf("Found Xcode scheme: %s", iosOptions.Ios.Scheme))
 
-			xcodeArchivePath, err = ios.GetLatestXcodeArchiveForScheme(iosOptions.Ios.Scheme)
+			if iosOptions.Ios.XcarchivePath != "" {
+				xcodeArchivePath = string(iosOptions.Ios.XcarchivePath)
+			} else {
+				xcodeArchivePath, err = ios.GetLatestXcodeArchiveForScheme(iosOptions.Ios.Scheme)
 
-			if err != nil {
-				return fmt.Errorf("Error locating latest xcarchive: %w", err)
+				if err != nil {
+					return fmt.Errorf("error locating latest xcarchive from Xcode project (scheme: %s), please specify the archive path directly using --archive-path: %w", iosOptions.Ios.Scheme, err)
+				}
 			}
 
 		} else {
-			return fmt.Errorf("No xcarchive found in specified paths")
+			return fmt.Errorf("path should be an .xcarchive or the directory of your React Native project: %s", path)
 		}
 
 		logger.Debug(fmt.Sprintf("Found Xcode Archive Path: %s", xcodeArchivePath))
