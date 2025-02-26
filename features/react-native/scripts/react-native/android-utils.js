@@ -6,7 +6,23 @@ module.exports = {
     // set android:usesCleartextTraffic="true" in AndroidManifest.xml
     const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
     let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
-    androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true"')
+
+// Ensure `android:usesCleartextTraffic="true"` is added to the <application> tag
+    if (!androidManifestContents.includes('android:usesCleartextTraffic="true"')) {
+      androidManifestContents = androidManifestContents.replace(
+          '<application',
+          '<application android:usesCleartextTraffic="true"'
+      )
+    }
+
+// Check if the Bugsnag <meta-data> tag already exists
+    if (!androidManifestContents.includes('com.bugsnag.android.API_KEY')) {
+      androidManifestContents = androidManifestContents.replace(
+          /<application[^>]*>/,
+          match => `${match}\n    <meta-data android:name="com.bugsnag.android.API_KEY" android:value="1234567890ABCDEF1234567890ABCDEF"/>`
+      )
+    }
+
     fs.writeFileSync(androidManifestPath, androidManifestContents)
 
     // enable/disable the new architecture in gradle.properties

@@ -190,7 +190,6 @@ Then(/^I should only see the fatal log level messages$/) do
 end
 
 Before('@installation') do
-  @base_dir = Dir.pwd
   @output = `npm pack`
   @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
 end
@@ -238,19 +237,19 @@ end
 
 # React Native
 Before('@BuildRNAndroid') do
-  unless defined?(@setup_android) && @setup_android
+  unless defined?($setup_android) && $setup_android
     puts "Setting up React Native Android app and sourcemap..."
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
-    @setup_android = true
+    $setup_android = true
   end
 end
 
 Before('@BuildRNiOS') do
-  unless defined?(@setup_ios) && @setup_ios
+  unless defined?($setup_ios) && $setup_ios
     puts "Setting up React Native iOS app and sourcemap..."
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
-    @setup_ios = true
+    $setup_ios = true
   end
 end
