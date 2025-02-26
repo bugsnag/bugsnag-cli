@@ -109,7 +109,7 @@ steps:
   - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
-      UNITY_VERSION: 6000.0.25f1
+      UNITY_VERSION: 6000.0.36f1
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
@@ -140,4 +140,3 @@ steps:
         timeout_in_minutes: 5
         commands:
           - buildkite-agent pipeline upload .buildkite/react-native/ios.pipeline.yml
-        skip: "Waiting on PLAT-13621"
