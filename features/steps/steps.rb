@@ -235,3 +235,22 @@ Given(/^I set the NDK path to the Unity bundled version$/) do
 #  Set the environment variable to the path of the NDK bundled with Unity
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end
+
+# React Native
+Before('@BuildRNAndroid') do
+  unless defined?(@setup_android) && @setup_android
+    puts "Setting up React Native Android app and sourcemap..."
+    @output = `node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
+    @setup_android = true
+  end
+end
+
+Before('@BuildRNiOS') do
+  unless defined?(@setup_ios) && @setup_ios
+    puts "Setting up React Native iOS app and sourcemap..."
+    @output = `node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    @setup_ios = true
+  end
+end

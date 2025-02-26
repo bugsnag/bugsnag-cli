@@ -2,10 +2,9 @@ package upload
 
 import (
 	"fmt"
-	"path/filepath"
-
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -22,6 +21,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 	var variantDirName string
 	var bundleDirPath string
 	var variantFileFormat string
+	var appManifestPathExpected string
 
 	for _, path := range androidOptions.Path {
 
@@ -109,12 +109,18 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 		}
 
 		if androidOptions.Android.AppManifest == "" {
-			appManifestPathExpected := filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "AndroidManifest.xml")
+			appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				androidOptions.Android.AppManifest = appManifestPathExpected
 				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
 			} else {
-				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+				appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "process"+cases.Title(language.English).String(androidOptions.Android.Variant)+"Manifest", "AndroidManifest.xml")
+				if utils.FileExists(appManifestPathExpected) {
+					androidOptions.Android.AppManifest = appManifestPathExpected
+					logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
+				} else {
+					logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+				}
 			}
 		}
 

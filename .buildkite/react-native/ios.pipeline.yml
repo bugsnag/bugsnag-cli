@@ -1,0 +1,31 @@
+agents:
+  queue: macos-14
+
+steps:
+  - label: ':ios: Build RN {{matrix}} CLI test fixture'
+    key: "build-react-native-cli-ios-fixture"
+    timeout_in_minutes: 15
+    env:
+      JAVA_VERSION: "17"
+      NODE_VERSION: "18"
+      RN_VERSION: "{{matrix}}"
+      RCT_NEW_ARCH_ENABLED: "0"
+      BUILD_IOS: "true"
+    commands:
+      - "chmod +x bin/arm64-macos-bugsnag-cli"
+      - "bundle install"
+      - "bundle exec maze-runner features/react-native/ios.feature"
+    matrix:
+      - "0.70"
+      - "0.73"
+      - "0.75"
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+    retry:
+      automatic:
+        - exit_status: "*"
+          limit: 1
