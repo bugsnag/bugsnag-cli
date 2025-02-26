@@ -148,6 +148,17 @@ type UnityAndroid struct {
 	VersionCode   string      `help:"The version code of this build of the application"`
 	VersionName   string      `help:"The version of the application"`
 }
+type Minidump struct {
+	SymFilePath     utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
+	ProjectRoot     string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	VersionCode     string      `help:"The version code of this build of the application"`
+	VersionName     string      `help:"The version of the application"`
+	OsName          string      `help:"The name of the operating system that generated the minidump file"`
+	CpuInfo         string      `help:"The CPU architecture of the system that generated the minidump file"`
+	DebugFile       string      `help:"The path to the code file that the minidump file relates to" type:"path"`
+	DebugIdentifier string      `help:"The debug identifier of the code file that the minidump file relates to"`
+	Product         string      `help:"The product of the code file that the minidump file relates to"`
+}
 
 // Unique CLI options
 type CLI struct {
@@ -176,6 +187,7 @@ type CLI struct {
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		Minidump           Minidump               `cmd:"" help:"Upload minidump files"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }
 
