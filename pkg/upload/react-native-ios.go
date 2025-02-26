@@ -75,7 +75,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				return fmt.Errorf("Could not find an Xcode project file, please specify the path by using --xcode-proj-path")
 			}
 
-			logger.Debug(fmt.Sprintf("Found Xcode Scheme: %s", iosOptions.Ios.Scheme))
+			logger.Debug(fmt.Sprintf("Found Xcode scheme: %s", iosOptions.Ios.Scheme))
 
 			xcodeArchivePath, err = ios.GetLatestXcodeArchiveForScheme(iosOptions.Ios.Scheme)
 
