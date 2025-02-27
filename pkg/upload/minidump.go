@@ -37,8 +37,7 @@ func ProcessMinidump(globalOptions options.CLI, endpoint string, logger log.Logg
 	}
 
 	logger.Info(fmt.Sprintf("Uploading %d minidump .sym files to Bugsnag", len(symFileList)))
-	logger.Info(fmt.Sprintf("Using endpoint: %s", endpoint))
-	logger.Info(fmt.Sprintf("Using API key: %s", globalOptions.ApiKey))
+
 	err := minidump.UploadMinidumps(symFileList, globalOptions.ApiKey, minidumpOptions.ProjectRoot, endpoint, globalOptions, logger)
 	if err != nil {
 		return err
