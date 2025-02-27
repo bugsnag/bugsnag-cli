@@ -217,7 +217,7 @@ func BuildMinidumpUploadOptions(apiKey string, projectRoot string, sharedObjectN
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
+		uploadOptions["api_key"] = apiKey
 	} else {
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}

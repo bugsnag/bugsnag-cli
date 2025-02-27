@@ -31,9 +31,9 @@ func UploadMinidumps(
 			return err
 		}
 
-		fileFieldData["symFile"] = server.LocalFile(file)
-
-		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol", uploadOptions, fileFieldData, file, options, logger)
+		fileFieldData["symbol_file"] = server.LocalFile(file)
+		apiKey := uploadOptions["api_key"]
+		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol"+"?api_key="+apiKey, uploadOptions, fileFieldData, file, options, logger)
 
 		if err != nil {
 			return err
