@@ -121,7 +121,7 @@ steps:
         upload:
           - maze_output/**/*
   
-  - label: Minidump Integration Tests"
+  - label: "Minidump Integration Tests"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
