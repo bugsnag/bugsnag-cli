@@ -122,6 +122,13 @@ The unity-android command uploads the IL2CPP symbols from the .symbols.zip file 
 
     $ bugsnag-cli upload unity-android /path/to/build/directory
 
+### Breakpad symbol Files (.sym only)
+
+to upload symbol files for Breakpad, you can use the following command:
+
+    $ bugsnag-cli upload breakpad-symbols /path/to/symbol(s)
+
+See our [breakpad documentation](https://docs.bugsnag.com/api/breakpad-symbol-upload/#generating-symbol-files) for more information on how to generate symbol files.
 
 ## BugSnag On-Premise
 

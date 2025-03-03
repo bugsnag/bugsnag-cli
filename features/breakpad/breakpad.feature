@@ -1,7 +1,7 @@
-Feature: Minidump Integration Tests
+Feature: Breakpad Integration Tests
 
-    Scenario: Upload a single Minidump sym using all CLI flags
-        When I run bugsnag-cli with upload minidump --upload-api-root-url=http://localhost:9339 --version-code=2 --version-name=2.0 --os-name="Linux" --cpu-info="x86_64" --product="test-product" --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/minidump/fixtures/breakpad-symbols.sym
+    Scenario: Upload a single breakpad .sym using all CLI flags
+        When I run bugsnag-cli with upload breakpad-symbols --upload-api-root-url=http://localhost:9339 --version-code=2 --version-name=2.0 --os-name="Linux" --cpu-info="x86_64" --product="test-product" --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/breakpad/fixtures/breakpad-symbols.sym
         And I wait to receive 1 sourcemaps
         Then the sourcemap is valid for the breakpad upload API
         Then the sourcemaps Content-Type header is valid multipart form-data

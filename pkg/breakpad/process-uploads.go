@@ -1,4 +1,4 @@
-package minidump
+package breakpad
 
 import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func UploadMinidumps(
+func UploadBreakpadSymbols(
 	fileList []string,
 	apiKey string,
 	projectRoot string,
@@ -20,12 +20,12 @@ func UploadMinidumps(
 
 	numberOfFiles := len(fileList)
 	if numberOfFiles < 1 {
-		logger.Info("No minidump .sym files found to process")
+		logger.Info("No breakpad .sym files found to process")
 		return nil
 	}
 
 	for _, file := range fileList {
-		uploadOptions, err := utils.BuildMinidumpUploadOptions(apiKey, projectRoot, filepath.Base(file), options.Upload.Overwrite)
+		uploadOptions, err := utils.BuildBreakpadUploadOptions(apiKey, projectRoot, filepath.Base(file), options.Upload.Overwrite)
 
 		if err != nil {
 			return err
