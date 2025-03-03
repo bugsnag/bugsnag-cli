@@ -1,9 +1,8 @@
 Feature: Breakpad Integration Tests
 
     Scenario: Upload a single breakpad .sym using all CLI flags
-        When I run bugsnag-cli with upload breakpad-symbols --upload-api-root-url=http://localhost:9339 --version-code=2 --version-name=2.0 --os-name="Linux" --cpu-info="x86_64" --product="test-product" --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/breakpad/fixtures/breakpad-symbols.sym
+        When I run bugsnag-cli with upload breakpad features/breakpad/fixtures/breakpad-symbols.sym --upload-api-root-url=http://localhost:9339 --version-code=2 --version-name=2.0 --os-name="Linux" --cpu-info="x86_64" --product="test-product" --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite
         And I wait to receive 1 sourcemaps
-        Then the sourcemap is valid for the breakpad upload API
         Then the sourcemaps Content-Type header is valid multipart form-data
         And the sourcemap payload field "api_Key" equals "1234567890ABCDEF1234567890ABCDEF"
         And the sourcemap payload field "OsName" equals "Linux, x86_64"

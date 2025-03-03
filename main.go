@@ -173,7 +173,7 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-	case "upload breakpad-symbols", "upload breakpad-symbols <path>":
+	case "upload breakpad", "upload breakpad <path>":
 		if commands.ApiKey == "" {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
