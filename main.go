@@ -178,7 +178,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.ProcessMinidump(commands, endpoint, logger)
+		err := upload.ProcessBreakpad(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
