@@ -212,8 +212,8 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 	return uploadOptions, nil
 }
 
-// BuildMinidumpKUploadOptions - Builds the upload options for processing Minidump symbol files
-func BuildMinidumpUploadOptions(apiKey string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+// BuildBreakpadUploadOptions - Builds the upload options for processing breakpad symbol files
+func BuildBreakpadUploadOptions(apiKey string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if apiKey != "" {
