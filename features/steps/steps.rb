@@ -251,6 +251,10 @@ Before('@BuildRNAndroid') do
       ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/react/release/index.android.bundle"
     end
 
+    if ENV['RN_VERSION'].to_f == 0.71
+      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    end
+
     if ENV['RN_VERSION'].to_f == 0.75
       ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
     end
