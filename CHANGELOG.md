@@ -100,7 +100,7 @@
 
 ## [2.1.1] - 2023-03-22
 
-### ### Fixed
+### Fixed
 - Ensure that the `--retries` flag is correctly passed to the Unity Android upload API. [#91](https://github.com/bugsnag/bugsnag-cli/pull/91)
 
 ## [2.1.0] - 2023-03-18
