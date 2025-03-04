@@ -275,9 +275,7 @@ end
 Before('@BuildExportRNiOS') do
   unless defined?($export_ios) && $export_ios
     puts "Setting up React Native iOS app and sourcemap and exporting the archive..."
-    ENV['EXPORT_ARCHIVE'] == "true"
-    ENV['SKIP_GENERATE_FIXTURE'] == "true"
-    @output = `node features/react-native/scripts/generate.js`
+    @output = `EXPORT_ARCHIVE=true node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
     $export_ios = true
   end
