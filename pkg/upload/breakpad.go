@@ -36,7 +36,7 @@ func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logg
 		return nil
 	}
 
-	logger.Info(fmt.Sprintf("Uploading %d Breakpad .sym files to Bugsnag", len(symFileList)))
+	logger.Debug(fmt.Sprintf("Uploading %d .sym files", len(symFileList)))
 
 	err := breakpad.UploadBreakpadSymbols(symFileList, globalOptions.ApiKey, breakpadOptions.ProjectRoot, endpoint, globalOptions, logger)
 	if err != nil {
