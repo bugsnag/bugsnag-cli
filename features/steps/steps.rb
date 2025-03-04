@@ -16,6 +16,8 @@ when os.downcase.include?('darwin')
   binary = 'bugsnag-cli'
 end
 
+base_dir = Dir.pwd
+
 When('I run bugsnag-cli') do
   @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
@@ -191,11 +193,11 @@ end
 
 Before('@installation') do
   @output = `npm pack`
-  @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
+  @bugsnag_cli_package_path = "#{base_dir}/#{@output}"
 end
 
 When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
-  @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+  @fixture_dir = "#{base_dir}/features/cli/fixtures/#{package_manager}"
   Dir.mkdir(@fixture_dir)
   Dir.chdir(@fixture_dir)
 
@@ -211,7 +213,7 @@ When('I install the bugsnag-cli via {string} in a new directory') do |package_ma
     @install_output = `pnpm add #{@bugsnag_cli_package_path}`
   end
 
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 Then('the {string} directory should contain {string}') do |directory, package|
@@ -219,11 +221,10 @@ Then('the {string} directory should contain {string}') do |directory, package|
 end
 
 Given('I build the Unity Android example project') do
-  @base_dir = Dir.pwd
-  @fixture_dir = "#{@base_dir}/platforms-examples/Unity"
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
   Dir.chdir(@fixture_dir)
   @output = `./build_android.sh aab`
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 And('I wait for the Unity symbols to generate') do
