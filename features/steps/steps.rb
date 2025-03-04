@@ -243,19 +243,18 @@ Before('@BuildRNAndroid') do
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
 
+    ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
+    ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
+    ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
+
     if ENV['RN_VERSION'].to_f == 0.70
-      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
       ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/react/release/index.android.bundle"
-      ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
-    elsif ENV['RN_VERSION'].to_f == 0.73
-      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
-      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
-      ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
-    elsif ENV['RN_VERSION'].to_f == 0.75
-      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
-      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
-      ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
     end
+
+    if ENV['RN_VERSION'].to_f == 0.75
+      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
+    end
+
     $setup_android = true
   end
 end

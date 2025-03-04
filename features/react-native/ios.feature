@@ -31,13 +31,3 @@ Feature: React Native iOS Integration Tests
     And the sourcemap payload field "appBundleVersion" equals "1"
     And the sourcemap payload field "platform" equals "ios"
     And the sourcemap payload field "overwrite" equals "true"
-#  --bundle=STRING            The path to the bundled JavaScript file to upload
-#  --code-bundle-id=STRING    A unique identifier for the JavaScript bundle
-#  --dev                      Indicates whether this is a debug or release build
-#  --source-map=STRING        The path to the source map file to upload
-#  --version-name=STRING      The version of the application
-#  --bundle-version=STRING    The bundle version of this build of the application (Apple platforms only)
-#  --plist=STRING             The path to a .plist file from which to obtain build information
-#  --scheme=STRING            The name of the Xcode options.Ios.Scheme used to build the application
-#  --xcode-project=STRING     The path to an Xcode project, workspace or containing directory from which to obtain build information
-#  --xcarchive-path=PATH      The path to the .xcarchive to process if it has been exported
