@@ -17,11 +17,11 @@ when os.downcase.include?('darwin')
 end
 
 When('I run bugsnag-cli') do
-  @output = `bin/#{arch}-#{os}-#{binary} --verbose 2>&1`
+  @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
 
 When(/^I run bugsnag-cli with (.*)$/) do |flags|
-  @output = `bin/#{arch}-#{os}-#{binary} --verbose #{flags} 2>&1`
+  @output = `bin/#{arch}-#{os}-#{binary} #{flags} 2>&1`
   puts @output
 end
 
@@ -265,5 +265,16 @@ Before('@BuildRNiOS') do
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
     $setup_ios = true
+  end
+end
+
+Before('@BuildExportRNiOS') do
+  unless defined?($export_ios) && $export_ios
+    puts "Setting up React Native iOS app and sourcemap and exporting the archive..."
+    ENV['EXPORT_ARCHIVE'] == "true"
+    ENV['SKIP_GENERATE_FIXTURE'] == "true"
+    @output = `node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    $export_ios = true
   end
 end
