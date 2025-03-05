@@ -1,17 +1,26 @@
 Feature: Upload Xcode Archives
   Scenario: Uploading an .xcarchive containing commas and special characters
-    When I run bugsnag-cli with upload xcode-archive --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF "features/xcode/fixtures/bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive"
+    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF "features/xcode/fixtures/bugsnag-example 14-05-2021,,, 11.27éøœåñü#.xcarchive"
     And I wait to receive 2 sourcemaps
     Then the sourcemap is valid for the dSYM Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
 
   Scenario: Archive and upload an .xcarchive
-    When I make the "features/base-fixtures/dsym/archive"
+    When I make the "features/base-fixtures/dsym"
     Then I wait for the build to succeed
 
+    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF features/base-fixtures/dsym/
+    And I wait to receive 1 sourcemaps
+    Then the sourcemap is valid for the dSYM Build API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
 
-    When I run bugsnag-cli with upload xcode-archive --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF features/base-fixtures/dsym/
+  Scenario: Export an .xcarchive and upload using the escape hatches
+    When I make the "features/base-fixtures/dsym/export"
+    Then I wait for the build to succeed
+
+    When I run bugsnag-cli with upload dsym --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --plist=features/base-fixtures/dsym/output/dSYM-Example.app/Contents/Info.plist features/base-fixtures/dsym/dSYM-Example.xcarchive
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the dSYM Build API
     Then the sourcemaps Content-Type header is valid multipart form-data

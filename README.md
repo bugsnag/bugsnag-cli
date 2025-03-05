@@ -104,17 +104,11 @@ If you are stripping debug symbols from your Dart code when building your Flutte
 
     $ bugsnag-cli upload dart --api-key=YOUR_API_KEY app-debug-info/
 
-### dSYM files from an Xcode build (iOS, macOS, tvOS)
-
-Upload dSYM files generated from a Build in Xcode to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
-
-    $ bugsnag-cli upload xcode-build
-
 ### dSYM files from an Xcode Archive (iOS, macOS, tvOS)
 
 Upload dSYM files generated from an Archive in Xcode to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
 
-    $ bugsnag-cli upload xcode-archive
+    $ bugsnag-cli upload dsym
 
 ### Unity Symbol Files (Android only) 
 

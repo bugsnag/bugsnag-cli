@@ -27,8 +27,8 @@ When(/^I run bugsnag-cli with (.*)$/) do |flags|
   puts @output
 end
 
-Then('I should see a log level of {string} when no dSYM files could be found') do |log_level|
-  message = log_level + ' No dSYM files found'
+Then('I should see a log level of {string} when no xcarchive files could be found') do |log_level|
+  message = log_level + ' No xcarchive found'
   Maze.check.include(run_output, message)
 end
 

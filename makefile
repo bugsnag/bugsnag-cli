@@ -82,14 +82,14 @@ features/base-fixtures/dart:
 features/base-fixtures/dsym:
 	bundle install
 	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
-	cd $@ && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -configuration Release -quiet build GCC_TREAT_WARNINGS_AS_ERRORS=YES
+	cd $@ && xcrun xcodebuild -scheme dSYM-Example -configuration Release -allowProvisioningUpdates archive
 
-.PHONY: features/base-fixtures/dsym/archive
-features/base-fixtures/dsym/archive:
+.PHONY: features/base-fixtures/dsym/export
+features/base-fixtures/dsym/export:
 	bundle install
-	cd features/base-fixtures/dsym && bundle install
 	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
-	cd features/base-fixtures/dsym && xcrun xcodebuild -scheme dSYM-Example -configuration Release -allowProvisioningUpdates archive
+	cd features/base-fixtures/dsym && xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F -scheme dSYM-Example -configuration Release -allowProvisioningUpdates -archivePath dSYM-Example.xcarchive archive
+	cd features/base-fixtures/dsym && xcrun xcodebuild -exportArchive -archivePath dSYM-Example.xcarchive -exportPath output/ -exportOptionsPlist exportOptions.plist
 
 .PHONY: features/base-fixtures/js-webpack4
 features/base-fixtures/js-webpack4:
