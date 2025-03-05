@@ -2,11 +2,11 @@ package upload
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // ProcessReactNative handles the upload process for React Native projects.
@@ -55,22 +55,6 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		return fmt.Errorf("failed to upload Android Proguard mappings: %w", err)
 	}
 
-	// Process iOS dSYMs
-	logger.Info("Uploading iOS dSYMs")
-	globalOptions.Upload.XcodeBuild = options.XcodeBuild{
-		Path:        iosPath,
-		VersionName: reactNativeOptions.Shared.VersionName,
-		Shared: options.XcodeShared{
-			ProjectRoot: reactNativeOptions.ProjectRoot,
-			Scheme:      reactNativeOptions.IosSpecific.Scheme,
-		},
-		Plist:        utils.Path(reactNativeOptions.IosSpecific.Plist),
-		XcodeProject: utils.Path(reactNativeOptions.IosSpecific.XcodeProject),
-	}
-	if err := ProcessXcodeBuild(globalOptions, endpoint, logger); err != nil {
-		return fmt.Errorf("failed to upload iOS dSYMs: %w", err)
-	}
-
 	// Process Android NDK symbols
 	logger.Info("Uploading Android NDK symbols")
 	globalOptions.Upload.AndroidNdk = options.AndroidNdkMapping{
@@ -83,6 +67,19 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 	}
 	if err := ProcessAndroidNDK(globalOptions, endpoint, logger); err != nil {
 		return fmt.Errorf("failed to upload Android NDK symbols: %w", err)
+	}
+
+	// Process iOS dSYMs
+	logger.Info("Uploading iOS dSYMs")
+	globalOptions.Upload.Dsym = options.Dsym{
+		Path:        iosPath,
+		ProjectRoot: reactNativeOptions.ProjectRoot,
+		Scheme:      reactNativeOptions.IosSpecific.Scheme,
+		Plist:       utils.Path(reactNativeOptions.IosSpecific.Plist),
+	}
+
+	if err := ProcessDsym(globalOptions, endpoint, logger); err != nil {
+		return fmt.Errorf("failed to upload iOS dSYMs: %w", err)
 	}
 
 	logger.Info("Successfully uploaded all React Native assets")

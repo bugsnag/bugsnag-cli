@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-// ProcessXcodeArchive processes an xcarchive, locating its dSYM files and uploading them
+// ProcessDsym processes an xcarchive, locating its dSYM files and uploading them
 // to a Bugsnag server.
 //
 // Parameters:
@@ -20,11 +20,10 @@ import (
 //
 // Returns:
 // - An error if any part of the process fails, otherwise nil.
-func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger) error {
-	xcarchiveOptions := options.Upload.XcodeArchive
+func ProcessDsym(options options.CLI, endpoint string, logger log.Logger) error {
+	xcarchiveOptions := options.Upload.Dsym
 	var (
 		xcarchivePath string
-		plistPath     string
 		dwarfInfo     []*ios.DwarfInfo
 		tempDirs      []string
 		tempDir       string
@@ -45,17 +44,17 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		} else if utils.IsDir(path) {
 			logger.Info(fmt.Sprintf("Searching for xcarchives in %s", path))
 			if ios.IsPathAnXcodeProjectOrWorkspace(path) {
-				xcarchiveOptions.Shared.ProjectRoot = ios.GetDefaultProjectRoot(path, xcarchiveOptions.Shared.ProjectRoot)
-				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcarchiveOptions.Shared.ProjectRoot))
+				xcarchiveOptions.ProjectRoot = ios.GetDefaultProjectRoot(path, xcarchiveOptions.ProjectRoot)
+				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcarchiveOptions.ProjectRoot))
 
-				if xcarchiveOptions.Shared.Scheme == "" {
-					xcarchiveOptions.Shared.Scheme, err = ios.GetDefaultScheme(path)
+				if xcarchiveOptions.Scheme == "" {
+					xcarchiveOptions.Scheme, err = ios.GetDefaultScheme(path)
 					if err != nil {
 						return fmt.Errorf("Error determining default scheme: %w", err)
 					}
 				}
 
-				xcarchivePath, err = ios.GetLatestXcodeArchiveForScheme(xcarchiveOptions.Shared.Scheme)
+				xcarchivePath, err = ios.GetLatestXcodeArchiveForScheme(xcarchiveOptions.Scheme)
 				if err != nil {
 					return fmt.Errorf("Error locating latest xcarchive: %w", err)
 				}
@@ -73,8 +72,8 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		// Locate and process dSYM files in the xcarchive
 		dwarfInfo, tempDir, err = ios.FindDsymsInPath(
 			xcarchivePath,
-			xcarchiveOptions.Shared.IgnoreEmptyDsym,
-			xcarchiveOptions.Shared.IgnoreMissingDwarf,
+			xcarchiveOptions.IgnoreEmptyDsym,
+			xcarchiveOptions.IgnoreMissingDwarf,
 			logger,
 		)
 		tempDirs = append(tempDirs, tempDir)
@@ -86,9 +85,12 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 		}
 		logger.Info(fmt.Sprintf("Found %d dSYM files in %s", len(dwarfInfo), xcarchivePath))
 
-		// Extract API key from Info.plist if available
-		plistPath = filepath.Join(xcarchivePath, "Info.plist")
-		err = ios.ProcessDsymUpload(plistPath, endpoint, xcarchiveOptions.Shared.ProjectRoot, options, dwarfInfo, logger)
+		// Ensure that the Info.plist file is available
+		if xcarchiveOptions.Plist == "" {
+			xcarchiveOptions.Plist = utils.Path(filepath.Join(xcarchivePath, "Info.plist"))
+		}
+
+		err = ios.ProcessDsymUpload(string(xcarchiveOptions.Plist), endpoint, xcarchiveOptions.ProjectRoot, options, dwarfInfo, logger)
 		if err != nil {
 			return fmt.Errorf("Error uploading dSYM files: %w", err)
 		}
