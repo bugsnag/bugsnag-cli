@@ -16,6 +16,8 @@ when os.downcase.include?('darwin')
   binary = 'bugsnag-cli'
 end
 
+base_dir = Dir.pwd
+
 When('I run bugsnag-cli') do
   @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
@@ -190,13 +192,12 @@ Then(/^I should only see the fatal log level messages$/) do
 end
 
 Before('@installation') do
-  @base_dir = Dir.pwd
   @output = `npm pack`
-  @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
+  @bugsnag_cli_package_path = "#{base_dir}/#{@output}"
 end
 
 When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
-  @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+  @fixture_dir = "#{base_dir}/features/cli/fixtures/#{package_manager}"
   Dir.mkdir(@fixture_dir)
   Dir.chdir(@fixture_dir)
 
@@ -212,7 +213,7 @@ When('I install the bugsnag-cli via {string} in a new directory') do |package_ma
     @install_output = `pnpm add #{@bugsnag_cli_package_path}`
   end
 
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 Then('the {string} directory should contain {string}') do |directory, package|
@@ -220,11 +221,10 @@ Then('the {string} directory should contain {string}') do |directory, package|
 end
 
 Given('I build the Unity Android example project') do
-  @base_dir = Dir.pwd
-  @fixture_dir = "#{@base_dir}/platforms-examples/Unity"
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
   Dir.chdir(@fixture_dir)
   @output = `./build_android.sh aab`
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 And('I wait for the Unity symbols to generate') do
@@ -238,19 +238,45 @@ end
 
 # React Native
 Before('@BuildRNAndroid') do
-  unless defined?(@setup_android) && @setup_android
+  unless defined?($setup_android) && $setup_android
     puts "Setting up React Native Android app and sourcemap..."
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
-    @setup_android = true
+
+    ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
+    ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
+    ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
+
+    if ENV['RN_VERSION'].to_f == 0.70
+      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/react/release/index.android.bundle"
+    end
+
+    if ENV['RN_VERSION'].to_f == 0.71
+      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    end
+
+    if ENV['RN_VERSION'].to_f == 0.75
+      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
+    end
+
+    $setup_android = true
   end
 end
 
 Before('@BuildRNiOS') do
-  unless defined?(@setup_ios) && @setup_ios
+  unless defined?($setup_ios) && $setup_ios
     puts "Setting up React Native iOS app and sourcemap..."
     @output = `node features/react-native/scripts/generate.js`
     Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
-    @setup_ios = true
+    $setup_ios = true
+  end
+end
+
+Before('@BuildExportRNiOS') do
+  unless defined?($export_ios) && $export_ios
+    puts "Setting up React Native iOS app and sourcemap and exporting the archive..."
+    @output = `EXPORT_ARCHIVE=true node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    $export_ios = true
   end
 end

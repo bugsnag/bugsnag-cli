@@ -42,14 +42,14 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 
 		if androidOptions.ReactNative.Bundle == "" {
 			if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets", "react")) {
-				// RN version < 0.70 - generated/assets/react/<options.Variant>/index.android.bundle
+				// RN version < 0.70 - generated/assets/react/<androidOptions.Android.Variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets", "react")
 			} else if utils.IsDir(filepath.Join(buildDirPath, "ASSETS")) {
-				// RN versions < 0.72 - ASSETS/createBundle<options.Variant>JsAndAssets/index.android.bundle
+				// RN versions < 0.72 - ASSETS/createBundle<androidOptions.Android.Variant>JsAndAssets/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "ASSETS")
 				variantFileFormat = "createBundle%sJsAndAssets"
 			} else if utils.IsDir(filepath.Join(buildDirPath, "generated", "assets")) {
-				// RN versions >= 0.72 - generated/assets/<options.Variant>/index.android.bundle
+				// RN versions >= 0.72 - generated/assets/<androidOptions.Android.Variant>/index.android.bundle
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets")
 				variantFileFormat = "createBundle%sJsAndAssets"
 			} else {
@@ -92,7 +92,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 			androidOptions.ReactNative.SourceMap = filepath.Join(sourceMapDirPath, androidOptions.Android.Variant, "index.android.bundle.map")
 		} else {
 			if androidOptions.Android.Variant == "" {
-				// Set options.Variant based off the source map file location
+				// Set androidOptions.Android.Variant based off the source map file location
 				sourceMapDirPath := filepath.Join(androidOptions.ReactNative.SourceMap, "..", "..")
 
 				if filepath.Base(sourceMapDirPath) == "react" {
@@ -109,11 +109,13 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 		}
 
 		if androidOptions.Android.AppManifest == "" {
+			// RN versions <= 0.74 intermediates/merged_manifests/<androidOptions.Android.Variant>/AndroidManifest.xml"
 			appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "AndroidManifest.xml")
 			if utils.FileExists(appManifestPathExpected) {
 				androidOptions.Android.AppManifest = appManifestPathExpected
 				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
 			} else {
+				// RN versions > 0.74 "intermediates/merged_manifests/androidOptions.Android.Variant, <androidOptions.Android.Variant>/AndroidManifest.xml"
 				appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "process"+cases.Title(language.English).String(androidOptions.Android.Variant)+"Manifest", "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					androidOptions.Android.AppManifest = appManifestPathExpected

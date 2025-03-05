@@ -63,7 +63,9 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 
 // Build the iOS fixture
 if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
-    if (process.env.EXPORT_ARCHIVE !== 'true' || process.env.EXPORT_ARCHIVE !== '1') {
+    if (process.env.EXPORT_ARCHIVE === 'true' || process.env.EXPORT_ARCHIVE === '1') {
+        exportArchive = true
+    } else {
         exportArchive = false
     }
     iosUtils.buildIPA(fixtureDir, exportArchive)
