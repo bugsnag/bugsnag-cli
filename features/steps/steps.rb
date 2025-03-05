@@ -237,6 +237,16 @@ Given(/^I set the NDK path to the Unity bundled version$/) do
 end
 
 # React Native
+Before('@BuildRN') do
+  unless defined?($setup_rn) && $setup_rn
+    puts "Setting up React Native app and sourcemap..."
+    @output = `node features/react-native/scripts/generate.js`
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
+    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    $setup_rn = true
+  end
+end
+
 Before('@BuildRNAndroid') do
   unless defined?($setup_android) && $setup_android
     puts "Setting up React Native Android app and sourcemap..."
@@ -258,7 +268,6 @@ Before('@BuildRNAndroid') do
     if ENV['RN_VERSION'].to_f == 0.75
       ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
     end
-
     $setup_android = true
   end
 end

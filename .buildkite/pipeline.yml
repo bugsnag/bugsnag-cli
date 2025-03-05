@@ -121,22 +121,10 @@ steps:
         upload:
           - maze_output/**/*
 
-  - group: ":react: React Native"
-    steps:
-      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
-        depends_on:
-          - "build"
-        agents:
-          queue: "macos"
-        timeout_in_minutes: 5
-        commands:
-          - buildkite-agent pipeline upload .buildkite/react-native/android.pipeline.yml
-
-      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE iOS STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
-        depends_on:
-          - "build"
-        agents:
-          queue: "macos"
-        timeout_in_minutes: 5
-        commands:
-          - buildkite-agent pipeline upload .buildkite/react-native/ios.pipeline.yml
+  - label: ':large_blue_circle: :large_blue_circle: :large_blue_circle: Append React Native Pipeline :large_blue_circle: :large_blue_circle: :large_blue_circle:'
+    depends_on: build
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    commands:
+      - buildkite-agent pipeline upload .buildkite/react-native.pipeline.yml

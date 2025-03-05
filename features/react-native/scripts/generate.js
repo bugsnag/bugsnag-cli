@@ -58,7 +58,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 // Build the android fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
     // build the android app
-    androidUtils.buildAPK(fixtureDir)
+    androidUtils.buildAAB(fixtureDir)
 }
 
 // Build the iOS fixture

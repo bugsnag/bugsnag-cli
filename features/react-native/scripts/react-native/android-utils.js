@@ -30,50 +30,13 @@ module.exports = {
     let gradlePropertiesContents = fs.readFileSync(gradlePropertiesPath, 'utf8')
     gradlePropertiesContents = gradlePropertiesContents.replace(/newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${newArchEnabled}`)
     fs.writeFileSync(gradlePropertiesPath, gradlePropertiesContents)
-  },
-  configureReactNavigationAndroid: function configureReactNavigationAndroid (fixtureDir, reactNativeVersion) {
-    const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
-    let mainActivityPattern, mainActivityReplacement
-    if (fileExtension === 'java') {
-      mainActivityPattern = 'public class MainActivity extends ReactActivity {'
-      mainActivityReplacement = `
-  import android.os.Bundle;
-  
-  public class MainActivity extends ReactActivity {
-  
-    /**
-     * Required for react-navigation/native implementation
-     * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
-     */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(null);
-    }
-  `
-    } else if (fileExtension === 'kt') {
-      mainActivityPattern = 'class MainActivity : ReactActivity() {'
-      mainActivityReplacement = `
-  import android.os.Bundle
-  
-  class MainActivity : ReactActivity() {
-  
-    /**
-     * Required for react-navigation/native implementation
-     * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
-     */
-    override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(null)
-    }
-  `
-    }
 
-    const mainActivityPath = `${fixtureDir}/android/app/src/main/java/com/reactnative/MainActivity.${fileExtension}`
-    let mainActivityContents = fs.readFileSync(mainActivityPath, 'utf8')
-    mainActivityContents = mainActivityContents.replace(mainActivityPattern, mainActivityReplacement)
-    fs.writeFileSync(mainActivityPath, mainActivityContents)
+    const buildGradlePath = `${fixtureDir}/android/app/build.gradle`
+    let buildGradleContents = fs.readFileSync(buildGradlePath, 'utf8')
+    buildGradleContents = buildGradleContents.replace(/def\s*enableProguardInReleaseBuilds\s*=\s*false/, 'def enableProguardInReleaseBuilds = true')
+    fs.writeFileSync(buildGradlePath, buildGradleContents)
   },
-  buildAPK: function buildAPK (fixtureDir) {
-    execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
-    fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
+  buildAAB: function buildAAB (fixtureDir) {
+    execFileSync('./gradlew', ['bundleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   }
 }
