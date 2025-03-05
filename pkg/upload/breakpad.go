@@ -2,46 +2,80 @@ package upload
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/breakpad"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
+	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
+	"strings"
 )
 
 func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logger) error {
 	breakpadOptions := globalOptions.Upload.Breakpad
-	var symFileList []string
+	apiKey := globalOptions.ApiKey
+	projectRoot := globalOptions.Upload.Breakpad.ProjectRoot
 
-	for _, path := range breakpadOptions.SymFilePath {
-		if utils.IsDir(path) {
-			files, err := utils.BuildFileList([]string{path})
-			if err != nil {
-				return err
-			}
-			for _, file := range files {
-				if filepath.Ext(file) == ".sym" {
-					symFileList = append(symFileList, file)
-				}
-			}
-		} else if filepath.Ext(path) == ".sym" {
-			symFileList = append(symFileList, path)
-		} else {
-			logger.Warn(fmt.Sprintf("Skipping %s (not a .sym file or directory)", path))
-		}
+	symFileList, err := utils.BuildFileList(breakpadOptions.Path)
+	if err != nil {
+		return err
 	}
 
 	if len(symFileList) == 0 {
-		logger.Info("No Breakpad .sym files found, skipping upload")
+		logger.Error("No .sym files found")
 		return nil
 	}
 
 	logger.Debug(fmt.Sprintf("Uploading %d .sym files", len(symFileList)))
 
-	err := breakpad.UploadBreakpadSymbols(symFileList, globalOptions.ApiKey, breakpadOptions.ProjectRoot, endpoint, globalOptions, logger)
-	if err != nil {
-		return err
+	return UploadBreakpadSymbols(symFileList, apiKey, projectRoot, endpoint, globalOptions, logger)
+}
+
+func UploadBreakpadSymbols(
+	fileList []string,
+	apiKey string,
+	projectRoot string,
+	endpoint string,
+	options options.CLI,
+	logger log.Logger,
+) error {
+	if apiKey == "" {
+		return fmt.Errorf("missing api key, please specify using --api-key")
 	}
-	logger.Info("Breakpad symbol upload complete")
+
+	breakpadOptions := options.Upload.Breakpad
+
+	for _, file := range fileList {
+		formFields, err := utils.BuildBreakpadUploadOptions(
+			breakpadOptions.CpuArch,
+			breakpadOptions.CodeFile,
+			breakpadOptions.DebugFile,
+			breakpadOptions.DebugIdentifier,
+			breakpadOptions.ProductName,
+			breakpadOptions.OsName,
+			breakpadOptions.VersionName,
+		)
+		if err != nil {
+			return err
+		}
+
+		// Add the query params to the form fields
+		formFields["api_key"] = apiKey
+		formFields["overwrite"] = fmt.Sprintf("%t", options.Upload.Overwrite)
+		formFields["project_root"] = projectRoot
+
+		fileFieldData := map[string]server.FileField{
+			"symbol_file": server.LocalFile(file),
+		}
+
+		queryParams := fmt.Sprintf("?api_key=%s&overwrite=%t&project_root=%s",
+			strings.ReplaceAll(apiKey, " ", "%20"),
+			options.Upload.Overwrite,
+			strings.ReplaceAll(projectRoot, " ", "%20"),
+		)
+
+		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol"+queryParams, formFields, fileFieldData, file, options, logger)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

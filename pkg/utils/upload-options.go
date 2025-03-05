@@ -213,25 +213,35 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 }
 
 // BuildBreakpadUploadOptions - Builds the upload options for processing breakpad symbol files
-func BuildBreakpadUploadOptions(apiKey string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile string, DebugIdentifier string, ProductName string, OsName string, VersionName string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	if apiKey != "" {
-		uploadOptions["api_key"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	if CpuArch != "" {
+		uploadOptions["cpu"] = CpuArch
 	}
 
-	if projectRoot != "" {
-		uploadOptions["projectRoot"] = projectRoot
+	if CodeFile != "" {
+		uploadOptions["code_file"] = CodeFile
 	}
 
-	if sharedObjectName != "" {
-		uploadOptions["sharedObjectName"] = sharedObjectName
+	if DebugFile != "" {
+		uploadOptions["debug_file"] = DebugFile
 	}
 
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
+	if DebugIdentifier != "" {
+		uploadOptions["debug_identifier"] = DebugIdentifier
+	}
+
+	if ProductName != "" {
+		uploadOptions["product"] = ProductName
+	}
+
+	if OsName != "" {
+		uploadOptions["os"] = OsName
+	}
+
+	if VersionName != "" {
+		uploadOptions["version"] = VersionName
 	}
 
 	return uploadOptions, nil
