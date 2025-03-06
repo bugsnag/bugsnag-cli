@@ -57,11 +57,6 @@ func UploadBreakpadSymbols(
 			return err
 		}
 
-		// Add the query params to the form fields
-		formFields["api_key"] = apiKey
-		formFields["overwrite"] = fmt.Sprintf("%t", options.Upload.Overwrite)
-		formFields["project_root"] = projectRoot
-
 		fileFieldData := map[string]server.FileField{
 			"symbol_file": server.LocalFile(file),
 		}

@@ -5,9 +5,9 @@ Feature: Breakpad Integration Tests
         And I wait to receive 1 sourcemaps
         Then the sourcemap is valid for the Breakpad Build API
         Then the sourcemaps Content-Type header is valid multipart form-data
-        And the sourcemap payload field "api_key" equals "1234567890ABCDEF1234567890ABCDEF"
-        And the sourcemap payload field "project_root" equals "/features/breakpad/fixtures/breakpad-symbols.sym"
-        And the sourcemap payload field "overwrite" equals "true"
+        And the sourcemap "api_key" query parameter equals "1234567890ABCDEF1234567890ABCDEF"
+        And the sourcemap "project_root" query parameter equals "/features/breakpad/fixtures/breakpad-symbols.sym"
+        And the sourcemap "overwrite" query parameter equals "true"
         And the sourcemap payload field "version" equals "2"
         And the sourcemap payload field "os" equals "Linux"
         And the sourcemap payload field "cpu" equals "x86_64"

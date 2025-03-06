@@ -93,8 +93,8 @@ end
 
 Then('the sourcemap is valid for the Breakpad Build API') do
   steps %(
-    And the sourcemap payload field "api_key" equals "#{$api_key}"
-    And the sourcemap payload field "project_root" is not null
+    And the sourcemap "api_key" query parameter equals "#{$api_key}"
+    And the sourcemap "project_root" query parameter is not null
   )
 end
 
