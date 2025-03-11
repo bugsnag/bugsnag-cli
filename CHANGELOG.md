@@ -4,6 +4,7 @@
 
 ### Added
 - Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
+- Ensure that the Dsym command works with Xcode archives by default [#181](https://github.com/bugsnag/bugsnag-cli/pull/176)
 
 ### Fixed
 - Update the path for AndroidManifest.xml in newer versions of RN [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
