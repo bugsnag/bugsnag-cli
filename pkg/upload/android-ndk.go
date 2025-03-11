@@ -2,6 +2,8 @@ package upload
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -46,12 +48,22 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 			}
 
 			if ndkOptions.AppManifest == "" {
-				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", ndkOptions.Variant, "AndroidManifest.xml")
+				logger.Info("No app manifest provided, attempting to find one")
+				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", ndkOptions.Variant, "AndroidManifest.xml")
+				logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
 				if utils.FileExists(appManifestPathExpected) {
 					ndkOptions.AppManifest = appManifestPathExpected
 					logger.Debug(fmt.Sprintf("Found app manifest at: %s", ndkOptions.AppManifest))
+				} else {
+					appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", ndkOptions.Variant, "process"+cases.Title(language.English).String(ndkOptions.Variant)+"Manifest", "AndroidManifest.xml")
+					logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
+					if utils.FileExists(appManifestPathExpected) {
+						ndkOptions.AppManifest = appManifestPathExpected
+						logger.Info(fmt.Sprintf("Found app manifest at: %s", ndkOptions.AppManifest))
+					} else {
+						logger.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+					}
 				}
-
 			}
 
 			if ndkOptions.ProjectRoot == "" {

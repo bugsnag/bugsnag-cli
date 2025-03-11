@@ -2,6 +2,8 @@ package upload
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"path/filepath"
 	"strings"
 
@@ -43,9 +45,18 @@ func ProcessAndroidProguard(options options.CLI, endpoint string, logger log.Log
 
 			if proguardOptions.AppManifest == "" {
 				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", proguardOptions.Variant, "AndroidManifest.xml")
+				logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
 				if utils.FileExists(appManifestPathExpected) {
 					proguardOptions.AppManifest = appManifestPathExpected
-					logger.Info(fmt.Sprintf("Found app manifest at: %s", proguardOptions.AppManifest))
+					logger.Debug(fmt.Sprintf("Found app manifest at: %s", proguardOptions.AppManifest))
+				} else {
+					appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", proguardOptions.Variant, "process"+cases.Title(language.English).String(proguardOptions.Variant)+"Manifest", "AndroidManifest.xml")
+					if utils.FileExists(appManifestPathExpected) {
+						proguardOptions.AppManifest = appManifestPathExpected
+						logger.Info(fmt.Sprintf("Found app manifest at: %s", proguardOptions.AppManifest))
+					} else {
+						logger.Info(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
+					}
 				}
 			}
 
