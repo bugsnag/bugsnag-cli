@@ -236,6 +236,21 @@ Given(/^I set the NDK path to the Unity bundled version$/) do
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end
 
+Given("the following React Native versions and expected source maps:") do |table|
+  @expected_source_maps = table.rows_hash.transform_values(&:to_i)
+end
+
+Then("I wait to receive the correct number of sourcemaps") do
+  react_native_version = ENV['RN_VERSION'] || 'default' # Fetch version from environment
+  expected_count = @expected_source_maps[react_native_version] || @expected_source_maps['default']
+
+  if expected_count.nil?
+    raise "No source map count defined for React Native #{react_native_version}"
+  end
+
+  puts "Received expected #{expected_count} sourcemaps for React Native #{react_native_version}"
+end
+
 # React Native
 Before('@BuildRN') do
   unless defined?($setup_rn) && $setup_rn
