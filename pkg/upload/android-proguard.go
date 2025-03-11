@@ -45,7 +45,6 @@ func ProcessAndroidProguard(options options.CLI, endpoint string, logger log.Log
 
 			if proguardOptions.AppManifest == "" {
 				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", proguardOptions.Variant, "AndroidManifest.xml")
-				logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
 				if utils.FileExists(appManifestPathExpected) {
 					proguardOptions.AppManifest = appManifestPathExpected
 					logger.Debug(fmt.Sprintf("Found app manifest at: %s", proguardOptions.AppManifest))

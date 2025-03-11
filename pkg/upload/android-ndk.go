@@ -48,15 +48,12 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 			}
 
 			if ndkOptions.AppManifest == "" {
-				logger.Info("No app manifest provided, attempting to find one")
-				appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", ndkOptions.Variant, "AndroidManifest.xml")
-				logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
+				appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", ndkOptions.Variant, "AndroidManifest.xml")
 				if utils.FileExists(appManifestPathExpected) {
 					ndkOptions.AppManifest = appManifestPathExpected
 					logger.Debug(fmt.Sprintf("Found app manifest at: %s", ndkOptions.AppManifest))
 				} else {
-					appManifestPathExpected = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", ndkOptions.Variant, "process"+cases.Title(language.English).String(ndkOptions.Variant)+"Manifest", "AndroidManifest.xml")
-					logger.Info(fmt.Sprintf("Looking for app manifest at: %s", appManifestPathExpected))
+					appManifestPathExpected = filepath.Join(mergeNativeLibPath, "..", "merged_manifests", ndkOptions.Variant, "process"+cases.Title(language.English).String(ndkOptions.Variant)+"Manifest", "AndroidManifest.xml")
 					if utils.FileExists(appManifestPathExpected) {
 						ndkOptions.AppManifest = appManifestPathExpected
 						logger.Info(fmt.Sprintf("Found app manifest at: %s", ndkOptions.AppManifest))
