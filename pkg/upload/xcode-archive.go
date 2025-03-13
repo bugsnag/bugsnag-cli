@@ -57,10 +57,8 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 
 				xcarchivePath, err = ios.GetLatestXcodeArchiveForScheme(xcarchiveOptions.Shared.Scheme)
 				if err != nil {
-					return fmt.Errorf("Error locating latest xcarchive: %w", err)
+					logger.Debug(fmt.Sprintf("Error locating latest xcarchive: %s", err))
 				}
-			} else {
-				return fmt.Errorf("No xcarchive found in %s", path)
 			}
 		}
 

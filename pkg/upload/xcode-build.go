@@ -20,7 +20,7 @@ import (
 // Returns:
 // - An error if any part of the process fails, otherwise nil.
 func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) error {
-	dsymOptions := options.Upload.XcodeBuild
+	xcodeBuildOptions := options.Upload.XcodeBuild
 	var (
 		buildSettings *ios.XcodeBuildSettings
 		dwarfInfo     []*ios.DwarfInfo
@@ -29,8 +29,8 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 		tempDir       string
 		err           error
 	)
-	xcodeProjPath := string(dsymOptions.XcodeProject)
-	plistPath := string(dsymOptions.Plist)
+	xcodeProjPath := string(xcodeBuildOptions.Shared.XcodeProject)
+	plistPath := string(xcodeBuildOptions.Shared.Plist)
 
 	// Cleanup temporary directories on exit
 	defer func() {
@@ -40,7 +40,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 	}()
 
 	// Process paths provided in the CLI options
-	for _, path := range dsymOptions.Path {
+	for _, path := range xcodeBuildOptions.Path {
 		if filepath.Ext(path) == ".xcarchive" {
 			logger.Warn(fmt.Sprintf("The specified path %s is an xcarchive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
 		}
@@ -57,27 +57,27 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 
 		if xcodeProjPath != "" {
 			// Determine project root if not provided
-			if dsymOptions.Shared.ProjectRoot == "" {
-				dsymOptions.Shared.ProjectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, dsymOptions.Shared.ProjectRoot)
-				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", dsymOptions.Shared.ProjectRoot))
+			if xcodeBuildOptions.Shared.ProjectRoot == "" {
+				xcodeBuildOptions.Shared.ProjectRoot = ios.GetDefaultProjectRoot(xcodeProjPath, xcodeBuildOptions.Shared.ProjectRoot)
+				logger.Info(fmt.Sprintf("Setting `--project-root` from Xcode project settings: %s", xcodeBuildOptions.Shared.ProjectRoot))
 			}
 
 			// Determine or validate the scheme
-			if dsymOptions.Shared.Scheme == "" {
-				dsymOptions.Shared.Scheme, err = ios.GetDefaultScheme(xcodeProjPath)
+			if xcodeBuildOptions.Shared.Scheme == "" {
+				xcodeBuildOptions.Shared.Scheme, err = ios.GetDefaultScheme(xcodeProjPath)
 				if err != nil {
 					logger.Warn(fmt.Sprintf("Error determining default scheme: %s", err))
 				}
 			} else {
-				_, err = ios.IsSchemeInPath(xcodeProjPath, dsymOptions.Shared.Scheme)
+				_, err = ios.IsSchemeInPath(xcodeProjPath, xcodeBuildOptions.Shared.Scheme)
 				if err != nil {
 					logger.Warn(fmt.Sprintf("Scheme validation error: %s", err))
 				}
 			}
 
 			// Retrieve build settings for the scheme and configuration
-			if dsymOptions.Shared.Scheme != "" {
-				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, dsymOptions.Shared.Scheme, dsymOptions.Configuration)
+			if xcodeBuildOptions.Shared.Scheme != "" {
+				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, xcodeBuildOptions.Shared.Scheme, xcodeBuildOptions.Shared.Scheme)
 				if err != nil {
 					logger.Warn(fmt.Sprintf("Error retrieving build settings: %s", err))
 				}
@@ -94,9 +94,9 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 		}
 
 		// Default project root to current directory if not set
-		if dsymOptions.Shared.ProjectRoot == "" {
-			dsymOptions.Shared.ProjectRoot, _ = os.Getwd()
-			logger.Info(fmt.Sprintf("Setting `--project-root` to current working directory: %s", dsymOptions.Shared.ProjectRoot))
+		if xcodeBuildOptions.Shared.ProjectRoot == "" {
+			xcodeBuildOptions.Shared.ProjectRoot, _ = os.Getwd()
+			logger.Info(fmt.Sprintf("Setting `--project-root` to current working directory: %s", xcodeBuildOptions.Shared.ProjectRoot))
 		}
 
 		// Validate dSYM path
@@ -105,7 +105,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 		}
 
 		// Locate and process dSYM files
-		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, dsymOptions.Shared.IgnoreEmptyDsym, dsymOptions.Shared.IgnoreMissingDwarf, logger)
+		dwarfInfo, tempDir, err = ios.FindDsymsInPath(dsymPath, xcodeBuildOptions.Shared.IgnoreEmptyDsym, xcodeBuildOptions.Shared.IgnoreMissingDwarf, logger)
 		tempDirs = append(tempDirs, tempDir)
 		if err != nil {
 			return fmt.Errorf("Error locating dSYM files: %w", err)
@@ -120,7 +120,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 		}
 
 		// Upload dSYM files
-		err = ios.ProcessDsymUpload(plistPath, endpoint, dsymOptions.Shared.ProjectRoot, options, dwarfInfo, logger)
+		err = ios.ProcessDsymUpload(plistPath, endpoint, xcodeBuildOptions.Shared.ProjectRoot, options, dwarfInfo, logger)
 		if err != nil {
 			return fmt.Errorf("Error uploading dSYM files: %w", err)
 		}

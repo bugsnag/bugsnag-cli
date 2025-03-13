@@ -61,25 +61,29 @@ type DartSymbol struct {
 	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
 }
 
+type Dsym struct {
+	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Shared DsymShared  `embed:""`
+}
+
 type XcodeBuild struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	Plist         utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	VersionName   string      `help:"The version of the application"`
-	XcodeProject  utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
-	Configuration string      `help:"The configuration used to build the application"`
-	Shared        XcodeShared `embed:""`
+	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Shared DsymShared  `embed:""`
 }
 
 type XcodeArchive struct {
 	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	Shared XcodeShared `embed:""`
+	Shared DsymShared  `embed:""`
 }
 
-type XcodeShared struct {
-	IgnoreEmptyDsym    bool   `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
-	IgnoreMissingDwarf bool   `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
-	Scheme             string `help:"The name of the Xcode options.Scheme used to build the application"`
-	ProjectRoot        string `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+type DsymShared struct {
+	IgnoreEmptyDsym    bool       `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
+	IgnoreMissingDwarf bool       `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	Configuration      string     `help:"The configuration used to build the application"`
+	Scheme             string     `help:"The name of the Xcode options.Scheme used to build the application"`
+	ProjectRoot        string     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Plist              utils.Path `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	XcodeProject       utils.Path `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 }
 
 type Js struct {
@@ -170,7 +174,7 @@ type CLI struct {
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-		Dsym               XcodeBuild             `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
+		Dsym               Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
 		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcarchive"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`

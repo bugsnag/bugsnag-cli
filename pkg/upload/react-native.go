@@ -58,14 +58,13 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 	// Process iOS dSYMs
 	logger.Info("Uploading iOS dSYMs")
 	globalOptions.Upload.XcodeBuild = options.XcodeBuild{
-		Path:        iosPath,
-		VersionName: reactNativeOptions.Shared.VersionName,
-		Shared: options.XcodeShared{
-			ProjectRoot: reactNativeOptions.ProjectRoot,
-			Scheme:      reactNativeOptions.IosSpecific.Scheme,
+		Path: iosPath,
+		Shared: options.DsymShared{
+			ProjectRoot:  reactNativeOptions.ProjectRoot,
+			Scheme:       reactNativeOptions.IosSpecific.Scheme,
+			Plist:        utils.Path(reactNativeOptions.IosSpecific.Plist),
+			XcodeProject: utils.Path(reactNativeOptions.IosSpecific.XcodeProject),
 		},
-		Plist:        utils.Path(reactNativeOptions.IosSpecific.Plist),
-		XcodeProject: utils.Path(reactNativeOptions.IosSpecific.XcodeProject),
 	}
 	if err := ProcessXcodeBuild(globalOptions, endpoint, logger); err != nil {
 		return fmt.Errorf("failed to upload iOS dSYMs: %w", err)
