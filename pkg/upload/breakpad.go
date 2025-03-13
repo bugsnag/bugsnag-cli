@@ -14,6 +14,10 @@ func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logg
 	apiKey := globalOptions.ApiKey
 	projectRoot := globalOptions.Upload.Breakpad.ProjectRoot
 
+	if apiKey == "" {
+		return fmt.Errorf("missing api key, please specify using --api-key")
+	}
+
 	symFileList, err := utils.BuildFileList(breakpadOptions.Path)
 	if err != nil {
 		return err
@@ -26,24 +30,7 @@ func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logg
 
 	logger.Debug(fmt.Sprintf("Uploading %d .sym files", len(symFileList)))
 
-	return UploadBreakpadSymbols(symFileList, apiKey, projectRoot, endpoint, globalOptions, logger)
-}
-
-func UploadBreakpadSymbols(
-	fileList []string,
-	apiKey string,
-	projectRoot string,
-	endpoint string,
-	options options.CLI,
-	logger log.Logger,
-) error {
-	if apiKey == "" {
-		return fmt.Errorf("missing api key, please specify using --api-key")
-	}
-
-	breakpadOptions := options.Upload.Breakpad
-
-	for _, file := range fileList {
+	for _, file := range symFileList {
 		formFields, err := utils.BuildBreakpadUploadOptions(
 			breakpadOptions.CpuArch,
 			breakpadOptions.CodeFile,
@@ -63,14 +50,15 @@ func UploadBreakpadSymbols(
 
 		queryParams := fmt.Sprintf("?api_key=%s&overwrite=%t&project_root=%s",
 			strings.ReplaceAll(apiKey, " ", "%20"),
-			options.Upload.Overwrite,
+			globalOptions.Upload.Overwrite,
 			strings.ReplaceAll(projectRoot, " ", "%20"),
 		)
 
-		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol"+queryParams, formFields, fileFieldData, file, options, logger)
+		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol"+queryParams, formFields, fileFieldData, file, globalOptions, logger)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
