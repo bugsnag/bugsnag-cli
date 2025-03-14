@@ -120,6 +120,19 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
+  
+  - label: "Breakpad Integration Tests"
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/breakpad
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
 
   - group: ":react: React Native"
     steps:
@@ -230,3 +243,4 @@ steps:
               - bin/arm64-macos-bugsnag-cli
             upload:
               - maze_output/**/*
+

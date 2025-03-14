@@ -1,5 +1,10 @@
 # Changelog
 
+## TBD
+
+### Enhancements
+- Adds support for uploading breakpad .sym files [178](https://github.com/bugsnag/bugsnag-cli/pull/178)
+
 ## 2.9.2 (2025-02-11)
 
 ### Fixes

@@ -91,6 +91,13 @@ Then('the sourcemap is valid for the Dart Build API') do
   )
 end
 
+Then('the sourcemap is valid for the Breakpad Build API') do
+  steps %(
+    And the sourcemap "api_key" query parameter equals "#{$api_key}"
+    And the sourcemap "project_root" query parameter is not null
+  )
+end
+
 Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
