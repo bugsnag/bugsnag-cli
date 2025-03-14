@@ -187,7 +187,7 @@ type CLI struct {
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad files"`
+		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }
 
