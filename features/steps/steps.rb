@@ -237,20 +237,18 @@ Given(/^I set the NDK path to the Unity bundled version$/) do
 end
 
 # dSYM
-Before('@CleanAndBuildDsym') do
-  scheme = 'dSYM-Example'
-  project_path = 'features/base-fixtures/dsym'
-
+def clean_and_build(scheme, project_path, build_target)
   puts "🚀 Starting dSYM cleaning and build process..."
 
   # Find the Xcode archive path dynamically
   custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
   archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
-  today = Date.today.strftime('%Y-%m-%d')
+  today = Date.today.strftime('%d-%m-%Y')
+  archives_path = File.join(archives_path, Date.today.strftime('%Y-%m-%d'))
 
   # Delete archives for the given scheme created today
   archives_deleted = false
-  Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
+  Dir.glob(File.join(archives_path, "#{scheme} #{today}*")) do |archive|
     if archive.include?(scheme)
       puts "🗑️ Removing archive: #{archive}"
       FileUtils.rm_rf(archive)
@@ -274,7 +272,7 @@ Before('@CleanAndBuildDsym') do
 
   # Build the project
   puts "🏗️ Building project: #{project_path}"
-  output = `make #{project_path}`
+  output = `make #{build_target}`
 
   if $?.success?
     puts "✅ Build completed successfully."
@@ -282,54 +280,23 @@ Before('@CleanAndBuildDsym') do
     puts "❌ Build failed. Output:\n#{output}"
     raise "Build process failed."
   end
+end
+
+Before('@CleanAndBuildDsym') do
+  scheme = 'dSYM-Example'
+  project_path = 'features/base-fixtures/dsym'
+  build_target = project_path
+
+  clean_and_build(scheme, project_path, build_target)
 end
 
 Before('@CleanAndArchiveDsym') do
   scheme = 'dSYM-Example'
   project_path = 'features/base-fixtures/dsym'
+  build_target = "#{project_path}/archive"
 
-  puts "🚀 Starting dSYM cleaning and archiving process..."
-
-  # Find the Xcode archive path dynamically
-  custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
-  archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
-  today = Date.today.strftime('%Y-%m-%d')
-
-  # Delete archives for the given scheme created today
-  archives_deleted = false
-  Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
-    if archive.include?(scheme)
-      puts "🗑️ Removing archive: #{archive}"
-      FileUtils.rm_rf(archive)
-      archives_deleted = true
-    end
-  end
-  puts archives_deleted ? "✅ Archives deleted successfully." : "ℹ️ No matching archives found."
-
-  # Clear Xcode build directories matching wildcard pattern
-  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/#{scheme}-*"))
-
-  if build_paths.any?
-    build_paths.each do |path|
-      puts "🧹 Clearing Xcode build directory: #{path}"
-      FileUtils.rm_rf(path)
-    end
-    puts "✅ Xcode build directories cleared."
-  else
-    puts "ℹ️ No matching build directories found."
-  end
-
-  # Build the project
-  puts "🏗️ Building project: #{project_path}"
-  output = `make #{project_path}/archive`
-
-  if $?.success?
-    puts "✅ Build completed successfully."
-  else
-    puts "❌ Build failed. Output:\n#{output}"
-    raise "Build process failed."
-  end
-end
+  clean_and_build(scheme, project_path, build_target)
+end 
 
 # React Native
 Before('@BuildRNAndroid') do
@@ -420,4 +387,8 @@ Before('@BuildExportRNiOS') do
     puts "📍 Sourcemap verified successfully."
     $export_ios = true
   end
+end
+
+Then('I should see the {string} in the output') do |log_message|
+  Maze.check.include(run_output, log_message)
 end
