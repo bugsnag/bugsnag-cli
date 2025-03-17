@@ -347,7 +347,7 @@ Before('@BuildRNAndroid') do
     end
 
     base_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build"
-    sourcemap_path = "#{base_path}/generated/sourcemaps/react/release/index.android.bundle.map"
+    sourcemap_path = "#{base_path}/generated/sourcemaps/react/release"
 
     unless Maze.check.include(`ls #{sourcemap_path}`, 'index.android.bundle.map')
       raise "❌ Sourcemap not found at: #{sourcemap_path}"
