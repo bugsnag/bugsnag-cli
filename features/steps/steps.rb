@@ -349,7 +349,7 @@ Before('@BuildRNAndroid') do
     base_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build"
     sourcemap_path = "#{base_path}/generated/sourcemaps/react/release/index.android.bundle.map"
 
-    unless Maze.check.include?(`ls #{sourcemap_path}`, 'index.android.bundle.map')
+    unless Maze.check.include(`ls #{sourcemap_path}`, 'index.android.bundle.map')
       raise "❌ Sourcemap not found at: #{sourcemap_path}"
     end
 
@@ -394,7 +394,7 @@ Before('@BuildRNiOS') do
 
     sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
 
-    unless Maze.check.include?(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+    unless Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
       raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
     end
 
@@ -419,7 +419,7 @@ Before('@BuildExportRNiOS') do
 
     sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
 
-    unless Maze.check.include?(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+    unless Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
       raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
     end
 
