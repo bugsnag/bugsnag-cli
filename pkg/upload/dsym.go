@@ -10,10 +10,8 @@ func ProcessDsym(globalOptions options.CLI, endpoint string, logger log.Logger) 
 
 	logger.Info("Searching for dSYM files to upload")
 
-	globalOptions.Upload.XcodeArchive = options.XcodeArchive{
-		Path:   dsymOptions.Path,
-		Shared: dsymOptions.Shared,
-	}
+	// Convert dsymOptions to XcodeArchive directly
+	globalOptions.Upload.XcodeArchive = options.XcodeArchive(dsymOptions)
 
 	// Attempt to process dSYMs from the Xcode archive
 	if err := ProcessXcodeArchive(globalOptions, endpoint, logger); err != nil {
@@ -27,11 +25,8 @@ func ProcessDsym(globalOptions options.CLI, endpoint string, logger log.Logger) 
 		return nil
 	}
 
-	// Attempt to process dSYMs from the Xcode build directory
-	globalOptions.Upload.XcodeBuild = options.XcodeBuild{
-		Path:   dsymOptions.Path,
-		Shared: dsymOptions.Shared,
-	}
+	// Convert dsymOptions to XcodeBuild directly
+	globalOptions.Upload.XcodeBuild = options.XcodeBuild(dsymOptions)
 
 	if err := ProcessXcodeBuild(globalOptions, endpoint, logger); err != nil {
 		return err
