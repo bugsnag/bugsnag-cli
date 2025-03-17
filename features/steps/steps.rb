@@ -349,16 +349,14 @@ Before('@BuildRNAndroid') do
     base_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build"
     sourcemap_path = "#{base_path}/generated/sourcemaps/react/release"
 
-    unless Maze.check.include(`ls #{sourcemap_path}`, 'index.android.bundle.map')
-      raise "❌ Sourcemap not found at: #{sourcemap_path}"
-    end
+    Maze.check.include(`ls #{sourcemap_path}`, 'index.android.bundle.map')
 
     puts "📍 Sourcemap verified successfully."
 
     # Set environment variables
     ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/AndroidManifest.xml"
     ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
-    ENV['SOURCE_MAP_PATH'] = sourcemap_path
+    ENV['SOURCE_MAP_PATH'] = "#{sourcemap_path}/index.android.bundle.map"
 
     case ENV['RN_VERSION'].to_f
     when 0.70
@@ -394,9 +392,7 @@ Before('@BuildRNiOS') do
 
     sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
 
-    unless Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
-      raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
-    end
+    Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
 
     puts "📍 Sourcemap verified successfully."
     $setup_ios = true
@@ -419,9 +415,7 @@ Before('@BuildExportRNiOS') do
 
     sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
 
-    unless Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
-      raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
-    end
+    Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
 
     puts "📍 Sourcemap verified successfully."
     $export_ios = true
