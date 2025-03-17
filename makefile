@@ -91,6 +91,14 @@ features/base-fixtures/dsym/archive:
 	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
 	cd features/base-fixtures/dsym && xcrun xcodebuild -scheme dSYM-Example -configuration Release -allowProvisioningUpdates archive
 
+.PHONY: features/base-fixtures/dsym/archive/export
+features/base-fixtures/dsym/archive/export:
+	bundle install
+	cd features/base-fixtures/dsym && bundle install
+	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
+	cd features/base-fixtures/dsym && xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F -scheme dSYM-Example -configuration Release -archivePath dsym.xcarchive -allowProvisioningUpdates archive
+	cd features/base-fixtures/dsym && xcrun xcodebuild -exportArchive -archivePath dsym.xcarchive -exportPath output/ -exportOptionsPlist ../../react-native/fixtures/app/dynamic/ios/exportOptions.plist
+
 .PHONY: features/base-fixtures/js-webpack4
 features/base-fixtures/js-webpack4:
 	cd $@ && npm i && npm run build

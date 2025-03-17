@@ -1,4 +1,4 @@
-Feature: dSYM Upload Integration Tests
+Feature: Xcode Build Integration Tests
 
   Scenario: Upload a single dSYM sourcemap using path containing one dSYM
     When I run bugsnag-cli with upload xcode-build --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --project-root=/my/project/root/ features/xcode/fixtures/single-dsym

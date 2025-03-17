@@ -236,6 +236,75 @@ Given(/^I set the NDK path to the Unity bundled version$/) do
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end
 
+# dSYM
+Before('@CleanAndBuildDsym') do
+  scheme = 'dSYM-Example'
+  project_path = 'features/base-fixtures/dsym'
+
+  # Find the Xcode archive path dynamically
+  custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
+  archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
+  today = Date.today.strftime('%Y-%m-%d')
+
+  # Delete archives for the given scheme created today
+  Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
+    if archive.include?(scheme)
+      puts "Removing archive: #{archive}"
+      FileUtils.rm_rf(archive)
+    end
+  end
+
+  # Clear Xcode build directories matching wildcard pattern
+  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/dSYM-Example-*"))
+
+  if build_paths.any?
+    build_paths.each do |path|
+      puts "Clearing Xcode build directory: #{path}"
+      FileUtils.rm_rf(path)
+    end
+  else
+    puts "No matching build directories found."
+  end
+
+  # Build the project
+  puts "Building project: #{project_path}"
+  @output = `make features/base-fixtures/dsym`
+end
+
+Before('@CleanAndArchiveDsym') do
+  scheme = 'dSYM-Example'
+  project_path = 'features/base-fixtures/dsym'
+
+  # Find the Xcode archive path dynamically
+  custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
+  archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
+  today = Date.today.strftime('%Y-%m-%d')
+
+  # Delete archives for the given scheme created today
+  Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
+    if archive.include?(scheme)
+      puts "Removing archive: #{archive}"
+      FileUtils.rm_rf(archive)
+    end
+  end
+
+  # Clear Xcode build directories matching wildcard pattern
+  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/dSYM-Example-*"))
+
+  if build_paths.any?
+    build_paths.each do |path|
+      puts "Clearing Xcode build directory: #{path}"
+      FileUtils.rm_rf(path)
+    end
+  else
+    puts "No matching build directories found."
+  end
+
+  # Build the project
+  puts "Building project: #{project_path}"
+  @output = `make features/base-fixtures/dsym/archive`
+end
+
 # React Native
 Before('@BuildRNAndroid') do
   unless defined?($setup_android) && $setup_android
