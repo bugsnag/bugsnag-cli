@@ -241,92 +241,138 @@ Before('@CleanAndBuildDsym') do
   scheme = 'dSYM-Example'
   project_path = 'features/base-fixtures/dsym'
 
+  puts "🚀 Starting dSYM cleaning and build process..."
+
   # Find the Xcode archive path dynamically
   custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
   archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
   today = Date.today.strftime('%Y-%m-%d')
 
   # Delete archives for the given scheme created today
+  archives_deleted = false
   Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
     if archive.include?(scheme)
-      puts "Removing archive: #{archive}"
+      puts "🗑️ Removing archive: #{archive}"
       FileUtils.rm_rf(archive)
+      archives_deleted = true
     end
   end
+  puts archives_deleted ? "✅ Archives deleted successfully." : "ℹ️ No matching archives found."
 
   # Clear Xcode build directories matching wildcard pattern
-  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/dSYM-Example-*"))
+  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/#{scheme}-*"))
 
   if build_paths.any?
     build_paths.each do |path|
-      puts "Clearing Xcode build directory: #{path}"
+      puts "🧹 Clearing Xcode build directory: #{path}"
       FileUtils.rm_rf(path)
     end
+    puts "✅ Xcode build directories cleared."
   else
-    puts "No matching build directories found."
+    puts "ℹ️ No matching build directories found."
   end
 
   # Build the project
-  puts "Building project: #{project_path}"
-  @output = `make features/base-fixtures/dsym`
+  puts "🏗️ Building project: #{project_path}"
+  output = `make #{project_path}`
+
+  if $?.success?
+    puts "✅ Build completed successfully."
+  else
+    puts "❌ Build failed. Output:\n#{output}"
+    raise "Build process failed."
+  end
 end
 
 Before('@CleanAndArchiveDsym') do
   scheme = 'dSYM-Example'
   project_path = 'features/base-fixtures/dsym'
 
+  puts "🚀 Starting dSYM cleaning and archiving process..."
+
   # Find the Xcode archive path dynamically
   custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
   archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
   today = Date.today.strftime('%Y-%m-%d')
 
   # Delete archives for the given scheme created today
+  archives_deleted = false
   Dir.glob(File.join(archives_path, "#{today}*")) do |archive|
     if archive.include?(scheme)
-      puts "Removing archive: #{archive}"
+      puts "🗑️ Removing archive: #{archive}"
       FileUtils.rm_rf(archive)
+      archives_deleted = true
     end
   end
+  puts archives_deleted ? "✅ Archives deleted successfully." : "ℹ️ No matching archives found."
 
   # Clear Xcode build directories matching wildcard pattern
-  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/dSYM-Example-*"))
+  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/#{scheme}-*"))
 
   if build_paths.any?
     build_paths.each do |path|
-      puts "Clearing Xcode build directory: #{path}"
+      puts "🧹 Clearing Xcode build directory: #{path}"
       FileUtils.rm_rf(path)
     end
+    puts "✅ Xcode build directories cleared."
   else
-    puts "No matching build directories found."
+    puts "ℹ️ No matching build directories found."
   end
 
   # Build the project
-  puts "Building project: #{project_path}"
-  @output = `make features/base-fixtures/dsym/archive`
+  puts "🏗️ Building project: #{project_path}"
+  output = `make #{project_path}/archive`
+
+  if $?.success?
+    puts "✅ Build completed successfully."
+  else
+    puts "❌ Build failed. Output:\n#{output}"
+    raise "Build process failed."
+  end
 end
 
 # React Native
 Before('@BuildRNAndroid') do
   unless defined?($setup_android) && $setup_android
-    puts "Setting up React Native Android app and sourcemap..."
-    @output = `node features/react-native/scripts/generate.js`
-    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release`, 'index.android.bundle.map')
+    puts "🚀 Setting up React Native Android app and generating sourcemap..."
 
-    ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/AndroidManifest.xml"
-    ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
-    ENV['SOURCE_MAP_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map"
+    generate_command = 'node features/react-native/scripts/generate.js'
+    output = `#{generate_command}`
 
-    if ENV['RN_VERSION'].to_f == 0.70
-      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/generated/assets/react/release/index.android.bundle"
+    if $?.success?
+      puts "✅ Android setup completed successfully."
+    else
+      puts "❌ Android setup failed. Output:\n#{output}"
+      raise "Failed to set up React Native Android."
     end
 
-    if ENV['RN_VERSION'].to_f == 0.71
-      ENV['BUNDLE_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    base_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build"
+    sourcemap_path = "#{base_path}/generated/sourcemaps/react/release/index.android.bundle.map"
+
+    unless Maze.check.include?(`ls #{sourcemap_path}`, 'index.android.bundle.map')
+      raise "❌ Sourcemap not found at: #{sourcemap_path}"
     end
 
-    if ENV['RN_VERSION'].to_f == 0.75
-      ENV['APP_MANIFEST_PATH'] = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
+    puts "📍 Sourcemap verified successfully."
+
+    # Set environment variables
+    ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/AndroidManifest.xml"
+    ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
+    ENV['SOURCE_MAP_PATH'] = sourcemap_path
+
+    case ENV['RN_VERSION'].to_f
+    when 0.70
+      ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/react/release/index.android.bundle"
+    when 0.71
+      ENV['BUNDLE_PATH'] = "#{base_path}/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    when 0.75
+      ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
     end
+
+    puts "🔧 Environment variables set:"
+    puts "  - APP_MANIFEST_PATH: #{ENV['APP_MANIFEST_PATH']}"
+    puts "  - BUNDLE_PATH: #{ENV['BUNDLE_PATH']}"
+    puts "  - SOURCE_MAP_PATH: #{ENV['SOURCE_MAP_PATH']}"
 
     $setup_android = true
   end
@@ -334,18 +380,50 @@ end
 
 Before('@BuildRNiOS') do
   unless defined?($setup_ios) && $setup_ios
-    puts "Setting up React Native iOS app and sourcemap..."
-    @output = `node features/react-native/scripts/generate.js`
-    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    puts "🚀 Setting up React Native iOS app and generating sourcemap..."
+
+    generate_command = 'node features/react-native/scripts/generate.js'
+    output = `#{generate_command}`
+
+    if $?.success?
+      puts "✅ React Native iOS setup completed successfully."
+    else
+      puts "❌ Setup failed. Output:\n#{output}"
+      raise "Failed to set up React Native iOS."
+    end
+
+    sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
+
+    unless Maze.check.include?(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+      raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
+    end
+
+    puts "📍 Sourcemap verified successfully."
     $setup_ios = true
   end
 end
 
 Before('@BuildExportRNiOS') do
   unless defined?($export_ios) && $export_ios
-    puts "Setting up React Native iOS app and sourcemap and exporting the archive..."
-    @output = `EXPORT_ARCHIVE=true node features/react-native/scripts/generate.js`
-    Maze.check.include(`ls features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps`, 'main.jsbundle.map')
+    puts "🚀 Setting up React Native iOS app, generating sourcemaps, and exporting the archive..."
+
+    export_command = 'EXPORT_ARCHIVE=true node features/react-native/scripts/generate.js'
+    output = `#{export_command}`
+
+    if $?.success?
+      puts "✅ Archive export completed successfully."
+    else
+      puts "❌ Archive export failed. Output:\n#{output}"
+      raise "Failed to export archive."
+    end
+
+    sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
+
+    unless Maze.check.include?(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+      raise "❌ Sourcemap not found at: #{sourcemap_path}/main.jsbundle.map"
+    end
+
+    puts "📍 Sourcemap verified successfully."
     $export_ios = true
   end
 end
