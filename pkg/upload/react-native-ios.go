@@ -82,15 +82,15 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				xcodeArchivePath, err = ios.GetLatestXcodeArchiveForScheme(iosOptions.Ios.Scheme)
 
 				if err != nil {
-					return fmt.Errorf("error locating latest xcarchive from Xcode project (scheme: %s), please specify the archive path directly using --archive-path: %w", iosOptions.Ios.Scheme, err)
+					return fmt.Errorf("error locating latest Xcode archive from Xcode project (scheme: %s), please specify the xcarchive path directly using --xcarchive-path: %w", iosOptions.Ios.Scheme, err)
 				}
 			}
 
 		} else {
-			return fmt.Errorf("path should be an .xcarchive or the directory of your React Native project: %s", path)
+			return fmt.Errorf("path should be an Xcode archive or the directory of your React Native project: %s", path)
 		}
 
-		logger.Debug(fmt.Sprintf("Found Xcode Archive Path: %s", xcodeArchivePath))
+		logger.Debug(fmt.Sprintf("Found Xcode archive Path: %s", xcodeArchivePath))
 
 		// Attempt to parse information from the .xcworkspace file if values aren't provided on the command line
 		if iosOptions.ReactNative.Bundle == "" || (iosOptions.Ios.Plist == "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "")) {

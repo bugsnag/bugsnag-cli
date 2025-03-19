@@ -42,7 +42,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 	// Process paths provided in the CLI options
 	for _, path := range xcodeBuildOptions.Path {
 		if filepath.Ext(path) == ".xcarchive" {
-			logger.Warn(fmt.Sprintf("The specified path %s is an xcarchive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
+			logger.Warn(fmt.Sprintf("The specified path %s is an Xcode archive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
 		}
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {

@@ -132,7 +132,7 @@ type ReactNativeIosSpecific struct {
 	Plist         string     `help:"The path to a .plist file from which to obtain build information" type:"path"`
 	Scheme        string     `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
 	XcodeProject  string     `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
-	XcarchivePath utils.Path `help:"The path to the .xcarchive to process if it has been exported" type:"path"`
+	XcarchivePath utils.Path `help:"The path to the Xcode archive to process if it has been exported" type:"path"`
 }
 
 type ReactNativeIos struct {
@@ -175,7 +175,7 @@ type CLI struct {
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
 		Dsym               Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcarchive"`
+		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
