@@ -31,10 +31,7 @@ func ProcessDsym(globalOptions options.CLI, endpoint string, logger log.Logger) 
 	globalOptions.Upload.XcodeArchive = options.XcodeArchive(dsymOptions)
 
 	// Locate the Xcode archive (.xcarchive) path based on the provided options
-	xcarchivePath, err = ios.FindXcarchivePath(globalOptions, logger)
-	if err != nil {
-		return err // Return error if the archive path cannot be determined
-	}
+	xcarchivePath, _ = ios.FindXcarchivePath(globalOptions, logger)
 
 	// If no Xcode archive is found, return an error
 	if xcarchivePath != "" {
