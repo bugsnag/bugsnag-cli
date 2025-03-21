@@ -261,7 +261,8 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 
 	url := jsOptions.BundleUrl
 	if jsOptions.BaseUrl != "" {
-		_, fileName := filepath.Split(jsOptions.Bundle)
+		// Remote the jsOptions.ProjectRoot and the dist/ prefix from the jsOptions.Bundle
+		fileName := strings.TrimPrefix(strings.TrimPrefix(strings.TrimPrefix(jsOptions.Bundle, jsOptions.ProjectRoot), "/"), "dist/")
 		url = jsOptions.BaseUrl + fileName
 		logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", url, jsOptions.BaseUrl))
 	}
