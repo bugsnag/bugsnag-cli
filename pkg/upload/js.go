@@ -75,7 +75,7 @@ func resolveProjectRoot(projectRoot, path string) string {
 	}
 
 	for i := 0; i < segments; i++ {
-		if HasProjectRootFile(checkPath) {
+		if hasProjectRootFile(checkPath) {
 			return checkPath
 		}
 		parent := filepath.Dir(checkPath)
@@ -101,7 +101,7 @@ func resolveProjectRoot(projectRoot, path string) string {
 //
 // Returns:
 // - bool: Returns true if any of the project root files are found in the directory; otherwise, false.
-func HasProjectRootFile(dir string) bool {
+func hasProjectRootFile(dir string) bool {
 	projectFiles := []string{"package.json", "yarn.lock", "lerna.json"}
 	for _, file := range projectFiles {
 		if utils.FileExists(filepath.Join(dir, file)) {
