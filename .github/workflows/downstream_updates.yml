@@ -1,0 +1,37 @@
+name: downstream-updates
+permissions: read-all
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Version of the CLI to update downstream repos to'
+        required: true
+        type: string
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.target_version || github.event.release.tag_name }}
+    strategy:
+      matrix:
+        downstream_repo: ['bugsnag/bugsnag-unity']
+    steps:
+      - name: Install libcurl4-openssl-dev and net-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install libcurl4-openssl-dev net-tools
+
+      - run: >
+          curl -X POST https://api.github.com/repos/bugsnag/bugsnag-unity/dispatches
+          -H 'Content-Type: application/json'
+          -H "Authorization: Bearer ${{ secrets.DEP_UPDATER_BEARER_TOKEN }}"
+          -d '{
+            "event_type": "update-cli",
+            "client_payload": {
+              "cli_version": "${{ env.RELEASE_VERSION }}"
+            }
+          }'

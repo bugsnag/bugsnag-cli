@@ -91,6 +91,13 @@ Then('the sourcemap is valid for the Dart Build API') do
   )
 end
 
+Then('the sourcemap is valid for the Breakpad Build API') do
+  steps %(
+    And the sourcemap "api_key" query parameter equals "#{$api_key}"
+    And the sourcemap "project_root" query parameter is not null
+  )
+end
+
 Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
@@ -229,4 +236,9 @@ end
 
 And('I wait for the Unity symbols to generate') do
   Maze.check.include(`ls #{@fixture_dir}`, 'UnityExample-1.0-v1-IL2CPP.symbols.zip')
+end
+
+Given(/^I set the NDK path to the Unity bundled version$/) do
+#  Set the environment variable to the path of the NDK bundled with Unity
+  ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end

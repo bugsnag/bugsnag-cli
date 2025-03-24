@@ -148,6 +148,17 @@ type UnityAndroid struct {
 	VersionCode   string      `help:"The version code of this build of the application"`
 	VersionName   string      `help:"The version of the application"`
 }
+type Breakpad struct {
+	Path            utils.Paths `arg:"" name:"path" help:"The path to the symbol files (.sym) to upload (or directory containing them)" type:"path"`
+	CpuArch         string      `help:"The CPU architecture that the module was built for"`
+	CodeFile        string      `help:"The basename of the module"`
+	DebugFile       string      `help:"The basename of the debug file"`
+	DebugIdentifier string      `help:"The debug file's identifier"`
+	ProductName     string      `help:"The product name"`
+	ProjectRoot     string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	OsName          string      `help:"The name of the operating system that the module was built for"`
+	VersionName     string      `help:"The version of the application"`
+}
 
 // Unique CLI options
 type CLI struct {
@@ -176,6 +187,7 @@ type CLI struct {
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }
 
