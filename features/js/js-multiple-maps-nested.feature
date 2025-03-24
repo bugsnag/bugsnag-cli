@@ -1,12 +1,12 @@
-Feature: Js integration tests multiple source maps
+Feature: Js integration tests multiple nested source maps
 
   Scenario: Searches in the dist folder automatically
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --verbose --project-root=features/js/fixtures/js-multiple-maps-nested features/js/fixtures/js-multiple-maps-nested/
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/js/fixtures/js-multiple-maps-nested/
     And I wait to receive 4 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "3.0.0"
+    And the sourcemap payload field "appVersion" equals "1.2.3"
     And the sourcemap payload field "minifiedUrl" equals "example.com/dir1/file1.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
@@ -18,7 +18,7 @@ Feature: Js integration tests multiple source maps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "3.0.0"
+    And the sourcemap payload field "appVersion" equals "1.2.3"
     And the sourcemap payload field "minifiedUrl" equals "example.com/dir2/dir22/file3.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
@@ -30,7 +30,7 @@ Feature: Js integration tests multiple source maps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "3.0.0"
+    And the sourcemap payload field "appVersion" equals "1.2.3"
     And the sourcemap payload field "minifiedUrl" equals "example.com/dir2/file2.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
@@ -42,7 +42,7 @@ Feature: Js integration tests multiple source maps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "3.0.0"
+    And the sourcemap payload field "appVersion" equals "1.2.3"
     And the sourcemap payload field "minifiedUrl" equals "example.com/index.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty

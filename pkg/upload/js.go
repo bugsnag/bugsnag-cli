@@ -46,7 +46,7 @@ func CleanPath(path string) string {
 
 // resolveProjectRoot determines the project root directory.
 // If a project root is provided, it returns that value.
-// Otherwise, it defaults to the current working directory.
+// Otherwise, it defaults to searching up the directory tree.
 //
 // Parameters:
 // - projectRoot: A user-specified project root directory (can be empty).
@@ -54,15 +54,61 @@ func CleanPath(path string) string {
 //
 // Returns:
 // - The resolved project root directory.
-func resolveProjectRoot(projectRoot string, path string) string {
+func resolveProjectRoot(projectRoot, path string) string {
 	if projectRoot != "" {
 		return projectRoot
 	}
-	workingDirectory, err := os.Getwd()
+
+	// Get absolute path
+	checkPath, err := filepath.Abs(path)
 	if err != nil {
 		return path
 	}
-	return workingDirectory
+
+	// Workout how many segments to go up
+	segments := 0
+	for _, segment := range strings.Split(checkPath, string(filepath.Separator)) {
+		if segment == "node_modules" {
+			break
+		}
+		segments++
+	}
+
+	for i := 0; i < segments; i++ {
+		if HasProjectRootFile(checkPath) {
+			return checkPath
+		}
+		parent := filepath.Dir(checkPath)
+		if parent == checkPath { // Stop if we reach the root directory
+			break
+		}
+		checkPath = parent
+	}
+
+	return checkPath
+}
+
+// HasProjectRootFile determines whether the specified directory contains
+// any of the common project root files, indicating it is likely the root of a project.
+//
+// The function checks for the existence of the following files:
+// - "package.json"
+// - "yarn.lock"
+// - "lerna.json"
+//
+// Parameters:
+// - dir: The directory path to check.
+//
+// Returns:
+// - bool: Returns true if any of the project root files are found in the directory; otherwise, false.
+func HasProjectRootFile(dir string) bool {
+	projectFiles := []string{"package.json", "yarn.lock", "lerna.json"}
+	for _, file := range projectFiles {
+		if utils.FileExists(filepath.Join(dir, file)) {
+			return true
+		}
+	}
+	return false
 }
 
 // resolveVersion attempts to determine the application version by reading the package.json file

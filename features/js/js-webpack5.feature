@@ -53,7 +53,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uses the working directory as project root
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/js/fixtures/js-webpack5/
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/cli/../js/fixtures/js-webpack5/dist/
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -62,7 +62,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "minifiedUrl" equals "example.com/main.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
-    And the sourcemap payload field "projectRoot" ends with "bugsnag-cli"
+    And the sourcemap payload field "projectRoot" ends with "js-webpack5"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Base URL correctly appends the path
