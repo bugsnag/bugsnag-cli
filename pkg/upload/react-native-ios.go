@@ -70,7 +70,12 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 				}
 
 				if iosOptions.Ios.Scheme != "" {
-					buildSettings, err = ios.GetXcodeBuildSettings(iosOptions.Ios.XcodeProject, iosOptions.Ios.Scheme, "")
+					buildType := "Release"
+					if iosOptions.ReactNative.Dev {
+						buildType = "Debug"
+					}
+					
+					buildSettings, err = ios.GetXcodeBuildSettings(iosOptions.Ios.XcodeProject, iosOptions.Ios.Scheme, buildType)
 					if err != nil {
 						logger.Warn(err.Error())
 					}
