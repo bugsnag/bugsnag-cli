@@ -174,8 +174,20 @@ class BugsnagCLI {
          * @param {?string} bundleVersion - The bundle version of the build. Optional.
          * @returns {Promise<string>} - Resolves with the command's output or rejects with an error message.
          */
-        BugsnagCLI.run('create-build', options, target)
+        return new Promise((resolve, reject) => {
+            try {
+                const output = BugsnagCLI.run('create-build', options, target)
+                if (output instanceof Promise) {
+                    output.then(resolve).catch(reject)
+                } else {
+                    resolve(output)
+                }
+            } catch (error) {
+                reject(error)
+            }
+        })
     }
+
 }
 
 module.exports = BugsnagCLI
