@@ -129,7 +129,7 @@ class BugsnagCLI {
                  * @param {?string} options.variant - The variant of the project (e.g., production, staging). Optional.
                  * @param {?string} options.versionCode - The version code for the project. Optional.
                  * @param {?string} target - The path to the file or directory to upload (e.g., a bundle file or folder). Optional.
-                 * @returns {Promise<string>}
+                 * @returns {Promise<string>} - Resolves with the command's output or rejects with an error message.
                  */
                 Android: (options = {}, target = '') =>
                     BugsnagCLI.run('upload react-native-android', options, target),
@@ -172,7 +172,7 @@ class BugsnagCLI {
          * @param {?string} appManifest - The path to an Android manifest file. Optional.
          * @param {?string} versionCode - The version code of the build. Optional.
          * @param {?string} bundleVersion - The bundle version of the build. Optional.
-         *
+         * @returns {Promise<string>} - Resolves with the command's output or rejects with an error message.
          */
         BugsnagCLI.run('create-build', options, target)
     }

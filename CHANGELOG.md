@@ -4,6 +4,7 @@
 
 ### Added
 - Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
+- Create build wrapper for the @bugsnag/cli node package []()
 
 ### Fixed
 - Update the path for AndroidManifest.xml in newer versions of RN [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
