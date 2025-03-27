@@ -211,3 +211,38 @@ func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionNa
 
 	return uploadOptions, nil
 }
+
+// BuildBreakpadUploadOptions - Builds the upload options for processing breakpad symbol files
+func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile string, DebugIdentifier string, ProductName string, OsName string, VersionName string) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if CpuArch != "" {
+		uploadOptions["cpu"] = CpuArch
+	}
+
+	if CodeFile != "" {
+		uploadOptions["code_file"] = CodeFile
+	}
+
+	if DebugFile != "" {
+		uploadOptions["debug_file"] = DebugFile
+	}
+
+	if DebugIdentifier != "" {
+		uploadOptions["debug_identifier"] = DebugIdentifier
+	}
+
+	if ProductName != "" {
+		uploadOptions["product"] = ProductName
+	}
+
+	if OsName != "" {
+		uploadOptions["os"] = OsName
+	}
+
+	if VersionName != "" {
+		uploadOptions["version"] = VersionName
+	}
+
+	return uploadOptions, nil
+}
