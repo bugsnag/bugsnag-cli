@@ -38,13 +38,7 @@ func resolveProjectRoot(projectRoot, path string) string {
 	}
 
 	// Workout how many segments to go up
-	segments := 0
-	for _, segment := range strings.Split(checkPath, string(filepath.Separator)) {
-		if segment == "node_modules" {
-			break
-		}
-		segments++
-	}
+	segments := len(strings.Split(checkPath, string(filepath.Separator)))
 
 	for i := 0; i < segments; i++ {
 		if hasProjectRootFile(checkPath) {
