@@ -10,6 +10,7 @@
 ### Fixed
 - Update the path for AndroidManifest.xml in newer versions of RN [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
 - Update how the `--project-root` is worked out for the `upload js` command [#187](https://github.com/bugsnag/bugsnag-cli/pull/187)
+- Ensure we resolve the source path relative to the source map path for the JS command [#188](https://github.com/bugsnag/bugsnag-cli/pull/188)
 
 ## [2.9.2] - 2025-02-11
 

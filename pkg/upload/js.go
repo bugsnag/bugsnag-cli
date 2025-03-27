@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -222,8 +221,9 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, pro
 				sourcePath = sourcePath[:questionMark-1]
 			}
 		}
-		if !path.IsAbs(sourcePath) {
-			sourcePath = path.Join(projectRoot, sourcePath)
+		if !filepath.IsAbs(sourcePath) {
+			// Resolve the path relative to the source map
+			sourcePath, _ = filepath.Abs(filepath.Join(filepath.Dir(sourceMapPath), sourcePath))
 		}
 		logger.Debug(fmt.Sprintf("Attempting to read the source %s.", sourcePath))
 		content, err := os.ReadFile(sourcePath)
