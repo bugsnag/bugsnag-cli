@@ -62,7 +62,7 @@ Feature: Webpack 5 js Integration Tests
     And the sourcemap payload field "minifiedUrl" equals "example.com/main.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
-    And the sourcemap payload field "projectRoot" ends with "bugsnag-cli"
+    And the sourcemap payload field "projectRoot" ends with "js-webpack5"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Base URL correctly appends the path
