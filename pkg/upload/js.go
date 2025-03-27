@@ -170,7 +170,7 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 }
 
 // Based on the source map specification https://bit.ly/sourcemap. Returns if the source map was modified.
-func addSourcesContent(section map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func addSourcesContent(section map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
 		logger.Warn(fmt.Sprintf("Cannot find the required sources field in the source map at %s", sourceMapPath))
@@ -247,13 +247,13 @@ func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, 
 		if sources, ok := sections.([]map[string]interface{}); ok {
 			anyModified := false
 			for _, section := range sources {
-				modified := addSourcesContent(section, sourceMapPath, projectRoot, logger)
+				modified := addSourcesContent(section, sourceMapPath, logger)
 				anyModified = modified || anyModified
 			}
 			return anyModified
 		}
 	} else {
-		return addSourcesContent(sourceMapContents, sourceMapPath, projectRoot, logger)
+		return addSourcesContent(sourceMapContents, sourceMapPath, logger)
 	}
 	return false
 }
