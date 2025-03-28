@@ -241,7 +241,7 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, log
 }
 
 // If the source map doesn't have sourcesContent then attempt to add it. Returns true if a modifcation was performed.
-func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
 		if sources, ok := sections.([]map[string]interface{}); ok {
@@ -289,7 +289,7 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 
 	var sourceMapFile server.FileField
 
-	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, jsOptions.ProjectRoot, logger)
+	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, logger)
 	if sourceMapModified {
 		logger.Info(fmt.Sprintf("Added sources content to source map from %s", jsOptions.SourceMap))
 		encodedSourceMap, err := json.Marshal(sourceMapContents)
