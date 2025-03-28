@@ -312,7 +312,6 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 	if jsOptions.BaseUrl != "" {
 		//Remove the project root from the bundle path and the first / if it exists
 		bundlePath := strings.TrimPrefix(strings.TrimPrefix(jsOptions.Bundle, jsOptions.ProjectRoot), "/")
-		logger.Info(fmt.Sprintf("Using Bundle %s", bundlePath))
 
 		// Check for common build folders and remove them from the bundle path
 		buildFolders := []string{"dist", "build", "public", "out"}
