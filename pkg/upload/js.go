@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -171,7 +170,7 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 }
 
 // Based on the source map specification https://bit.ly/sourcemap. Returns if the source map was modified.
-func addSourcesContent(section map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func addSourcesContent(section map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
 		logger.Warn(fmt.Sprintf("Cannot find the required sources field in the source map at %s", sourceMapPath))
@@ -222,8 +221,9 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, pro
 				sourcePath = sourcePath[:questionMark-1]
 			}
 		}
-		if !path.IsAbs(sourcePath) {
-			sourcePath = path.Join(projectRoot, sourcePath)
+		if !filepath.IsAbs(sourcePath) {
+			// Resolve the path relative to the source map
+			sourcePath, _ = filepath.Abs(filepath.Join(filepath.Dir(sourceMapPath), sourcePath))
 		}
 		logger.Debug(fmt.Sprintf("Attempting to read the source %s.", sourcePath))
 		content, err := os.ReadFile(sourcePath)
@@ -241,19 +241,19 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, pro
 }
 
 // If the source map doesn't have sourcesContent then attempt to add it. Returns true if a modifcation was performed.
-func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
 		if sources, ok := sections.([]map[string]interface{}); ok {
 			anyModified := false
 			for _, section := range sources {
-				modified := addSourcesContent(section, sourceMapPath, projectRoot, logger)
+				modified := addSourcesContent(section, sourceMapPath, logger)
 				anyModified = modified || anyModified
 			}
 			return anyModified
 		}
 	} else {
-		return addSourcesContent(sourceMapContents, sourceMapPath, projectRoot, logger)
+		return addSourcesContent(sourceMapContents, sourceMapPath, logger)
 	}
 	return false
 }
@@ -289,7 +289,7 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 
 	var sourceMapFile server.FileField
 
-	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, jsOptions.ProjectRoot, logger)
+	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, logger)
 	if sourceMapModified {
 		logger.Info(fmt.Sprintf("Added sources content to source map from %s", jsOptions.SourceMap))
 		encodedSourceMap, err := json.Marshal(sourceMapContents)
