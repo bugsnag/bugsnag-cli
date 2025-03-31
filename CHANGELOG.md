@@ -4,6 +4,7 @@
 
 ### Added
 - Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
+- Create build wrapper for the @bugsnag/cli node package [#186](https://github.com/bugsnag/bugsnag-cli/pull/186)
 - dSYM Super command to handle both Xcode Archives and Builds [#182](https://github.com/bugsnag/bugsnag-cli/pull/182)
 - Adds support for uploading breakpad .sym files [178](https://github.com/bugsnag/bugsnag-cli/pull/178)
 
