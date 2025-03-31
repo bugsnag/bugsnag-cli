@@ -281,7 +281,7 @@ func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logge
 }
 
 // Upload a single source map
-func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint string, logger log.Logger) error {
+func uploadSingleSourceMap(path string, options options.CLI, jsOptions options.Js, endpoint string, logger log.Logger) error {
 	sourceMapContents, err := ReadSourceMap(jsOptions.SourceMap, logger)
 	if err != nil {
 		return err
@@ -311,8 +311,7 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 	url := jsOptions.BundleUrl
 	if jsOptions.BaseUrl != "" {
 		//Remove the project root from the bundle path and the first / if it exists
-		bundlePath := strings.TrimPrefix(strings.TrimPrefix(jsOptions.Bundle, jsOptions.ProjectRoot), "/")
-
+		bundlePath := strings.TrimPrefix(strings.TrimPrefix(jsOptions.Bundle, path), "/")
 		// Check for common build folders and remove them from the bundle path
 		buildFolders := []string{"dist", "build", "public", "out"}
 		for _, folder := range buildFolders {
@@ -392,7 +391,7 @@ func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
 
 		for _, sourceMapPath := range sourceMapPaths {
 			jsOptions.SourceMap = sourceMapPath
-			err := uploadSingleSourceMap(options, jsOptions, endpoint, logger)
+			err := uploadSingleSourceMap(path, options, jsOptions, endpoint, logger)
 			if err != nil {
 				return err
 			}
