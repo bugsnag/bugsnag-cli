@@ -311,9 +311,7 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 
 	fileFieldData := make(map[string]server.FileField)
 	fileFieldData["sourceMap"] = sourceMapFile
-	if bundlePath != "" { // Todo: can this be empty?
-		fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
-	}
+	fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 
 	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
 
