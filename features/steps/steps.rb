@@ -399,3 +399,42 @@ end
 Then('I should see the {string} in the output') do |log_message|
   Maze.check.include(run_output, log_message)
 end
+
+Before('@BuildNestedJS') do
+  unless defined?($nested_js) && $nested_js
+    puts "🚀 Building Nested JS fixture and generating sourcemaps..."
+
+    @fixture_dir= "#{base_dir}/features/base-fixtures/js"
+
+    # Change to the Nested JS fixture directory
+    Dir.chdir(@fixture_dir)
+
+    # Run NPM install
+    npm_install = `npm install`
+    if $?.success?
+      puts "✅ NPM install completed successfully."
+    else
+      puts "❌ NPM install failed. Output:\n#{npm_install}"
+      raise "Failed to install NPM dependencies."
+    end
+
+    # Run the build script
+    build_command = 'npm run build'
+    output = `#{build_command}`
+
+    if $?.success?
+      puts "✅ Build completed successfully."
+    else
+      puts "❌ Build failed. Output:\n#{output}"
+      raise "Failed to build Nested JS."
+    end
+
+    Maze.check.include(`ls #{@fixture_dir}`, 'out')
+
+    puts "📍 Sourcemap verified successfully."
+
+    # Change back to the base directory
+    Dir.chdir(base_dir)
+    $nested_js = true
+  end
+end

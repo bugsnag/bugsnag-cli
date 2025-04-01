@@ -18,7 +18,7 @@ func TestPopulateSourceMap(t *testing.T) {
 		t.Error(err)
 	}
 
-	modified := upload.AddSources(results, sourceMapPath, "../testdata/js-nosources", logger)
+	modified := upload.AddSources(results, sourceMapPath, logger)
 	if !modified {
 		t.Error("Source map should have been modified")
 	}

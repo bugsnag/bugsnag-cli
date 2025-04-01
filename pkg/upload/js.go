@@ -281,41 +281,29 @@ func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logge
 }
 
 // Upload a single source map
-func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint string, logger log.Logger) error {
-	sourceMapContents, err := ReadSourceMap(jsOptions.SourceMap, logger)
+func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl string, versionName string, codeBundleId string, projectRoot string, options options.CLI, endpoint string, logger log.Logger) error {
+	sourceMapContents, err := ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
 		return err
 	}
 
 	var sourceMapFile server.FileField
 
-	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, logger)
+	sourceMapModified := AddSources(sourceMapContents, sourceMapPath, logger)
 	if sourceMapModified {
-		logger.Info(fmt.Sprintf("Added sources content to source map from %s", jsOptions.SourceMap))
+		logger.Info(fmt.Sprintf("Added sources content to source map from %s", sourceMapPath))
 		encodedSourceMap, err := json.Marshal(sourceMapContents)
 		if err != nil {
 			return fmt.Errorf("failed generate valid source map JSON with original sources added: %s", err.Error())
 		}
-		sourceMapFile = server.InMemoryFile{Path: jsOptions.SourceMap, Data: encodedSourceMap}
+		sourceMapFile = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
 	} else {
 		// Directly use the local file if the source map wasn't modified.
-		logger.Info(fmt.Sprintf("Uploading unmodified source map from %s", jsOptions.SourceMap))
-		sourceMapFile = server.LocalFile(jsOptions.SourceMap)
+		logger.Info(fmt.Sprintf("Uploading unmodified source map from %s", sourceMapPath))
+		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
-	jsOptions.Bundle, err = resolveBundlePath(jsOptions.Bundle, jsOptions.SourceMap, logger)
-	if err != nil {
-		return err
-	}
-
-	url := jsOptions.BundleUrl
-	if jsOptions.BaseUrl != "" {
-		_, fileName := filepath.Split(jsOptions.Bundle)
-		url = jsOptions.BaseUrl + fileName
-		logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", url, jsOptions.BaseUrl))
-	}
-
-	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, jsOptions.VersionName, jsOptions.CodeBundleId, url, jsOptions.ProjectRoot, options.Upload.Overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Overwrite)
 
 	if err != nil {
 		return fmt.Errorf("failed to build upload options: %s", err.Error())
@@ -323,11 +311,9 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 
 	fileFieldData := make(map[string]server.FileField)
 	fileFieldData["sourceMap"] = sourceMapFile
-	if jsOptions.Bundle != "" {
-		fileFieldData["minifiedFile"] = server.LocalFile(jsOptions.Bundle)
-	}
+	fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 
-	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, jsOptions.SourceMap, options, logger)
+	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
 
 	if err != nil {
 		return fmt.Errorf("encountered error when uploading js sourcemap: %s", err.Error())
@@ -381,8 +367,22 @@ func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			jsOptions.SourceMap = sourceMapPath
-			err := uploadSingleSourceMap(options, jsOptions, endpoint, logger)
+
+			bundlePath, err := resolveBundlePath(jsOptions.Bundle, sourceMapPath, logger)
+			if err != nil {
+				return err
+			}
+
+			var bundleUrl string
+			if jsOptions.BundleUrl != "" {
+				bundleUrl = jsOptions.BundleUrl
+			} else {
+				// For directory uploads, add the relative path of the bundle to the base URL
+				bundleUrl = jsOptions.BaseUrl + strings.TrimPrefix(strings.TrimPrefix(bundlePath, path), "/")
+				logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", bundleUrl, jsOptions.BaseUrl))
+			}
+
+			err = uploadSingleSourceMap(sourceMapPath, bundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, endpoint, logger)
 			if err != nil {
 				return err
 			}
