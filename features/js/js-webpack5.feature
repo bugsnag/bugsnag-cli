@@ -46,14 +46,14 @@ Feature: Webpack 5 js Integration Tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
-    And the sourcemap payload field "minifiedUrl" equals "example.com/main.js"
+    And the sourcemap payload field "minifiedUrl" equals "example.com/dist/main.js"
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack5"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uses the working directory as project root
-    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/js/fixtures/js-webpack5/
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/js/fixtures/js-webpack5/dist
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the JS Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
