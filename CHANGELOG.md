@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.0] - 2025-04-03
 
 ### Added
 - Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
