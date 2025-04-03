@@ -6,13 +6,12 @@ import (
 
 // Global CLI options
 type Globals struct {
-	ApiKey            string            `help:"The BugSnag API key for the application"`
-	DryRun            bool              `help:"Performs a dry-run of the command without sending any information to BugSnag"`
-	FailOnUploadError bool              `help:"Stops the upload when a file fails to upload successfully" default:"false"`
-	LogLevel          string            `help:"Sets the level of logging to debug, info, warn or fatal" default:"info"`
-	Port              int               `help:"The port number for the BugSnag upload server" default:"443"`
-	Verbose           bool              `name:"verbose" help:"Sets the level of the logging to its highest."`
-	Version           utils.VersionFlag `name:"version" help:"Prints the version information for this CLI"`
+	ApiKey   string            `help:"The BugSnag API key for the application"`
+	DryRun   bool              `help:"Performs a dry-run of the command without sending any information to BugSnag"`
+	LogLevel string            `help:"Sets the level of logging to debug, info, warn or fatal" default:"info"`
+	Port     int               `help:"The port number for the BugSnag upload server" default:"443"`
+	Verbose  bool              `name:"verbose" help:"Sets the level of the logging to its highest."`
+	Version  utils.VersionFlag `name:"version" help:"Prints the version information for this CLI"`
 }
 
 type DiscoverAndUploadAny struct {

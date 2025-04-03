@@ -49,10 +49,6 @@ func main() {
 		logger.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
-	if commands.FailOnUploadError {
-		logger.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release. All commands now fail if the upload is unsuccessful.")
-	}
-
 	switch kongCtx.Command() {
 
 	case "upload all <path>":
