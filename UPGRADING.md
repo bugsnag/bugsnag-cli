@@ -1,5 +1,14 @@
 # Upgrading Guide
 
+## v2.x to v3.x
+
+The following options have been removed from the CLI:
+
+| Command                       | Removed                  | Replacement        |
+|-------------------------------|--------------------------| ------------------ |
+| `upload`                       | `--fail-on-upload-error` |   | 
+
+
 ## v1.x to v2.x
 
 ### Deprecated options
