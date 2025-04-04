@@ -74,6 +74,18 @@ If you distribute your app as an [Android App Bundle](https://developer.android.
 
 See the [`upload android-aab`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/) command reference for full usage information.
 
+### React Native Symbols
+
+This command is a convenience wrapper for the following commands, which upload the different file types separately with more specific options available to customize the upload:
+- `upload react-native-android`
+- `upload react-native-ios`
+- `upload android-ndk`
+- `upload android-proguard`
+- `upload dsym`
+
+
+    $ bugsnag-cli upload react-native
+
 ### React Native JavaScript source maps (Android only)
 
 To get unminified stack traces for JavaScript code in your React Native app built for Android, source maps must be generated and can be uploaded to BugSnag using the following command from the root of your project:
@@ -103,6 +115,12 @@ See the [`upload js`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/up
 If you are stripping debug symbols from your Dart code when building your Flutter apps, you will need to upload symbol files in order to see full stacktraces using the following command:
 
     $ bugsnag-cli upload dart --api-key=YOUR_API_KEY app-debug-info/
+
+### dSYM files (iOS, macOS, tvOS)
+
+Upload dSYM files from an Xcode project - either by locating an Xcode archive (.xcarchive) or from the project build – to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
+
+    $ bugsnag-cli upload dsym
 
 ### dSYM files from an Xcode build (iOS, macOS, tvOS)
 

@@ -2,6 +2,12 @@
 
 ## v2.x to v3.x
 
+### Breaking changes
+
+We now prioritize Xcode archives over Xcode builds when uploading dSYMs. This means that if you have both an archive and a build, the CLI will upload the dSYMs from the archive when using the `upload dsym` and `upload react-native` commands.
+
+### Deprecated options
+
 The following options have been removed from the CLI:
 
 | Command                       | Removed                  | Replacement        |
