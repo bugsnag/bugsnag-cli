@@ -118,7 +118,7 @@ If you are stripping debug symbols from your Dart code when building your Flutte
 
 ### dSYM files (iOS, macOS, tvOS)
 
-Upload dSYM files from an Xcode project - either by locating an Xcode archive (.xcarchive) or from the project build – to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
+Upload dSYM files from an Xcode project - either by locating the latest Xcode archive (.xcarchive) for that day or from the project build – to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
 
     $ bugsnag-cli upload dsym
 
