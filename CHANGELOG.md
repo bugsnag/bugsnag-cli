@@ -2,6 +2,8 @@
 
 ## [3.0.0] - 2025-08-03
 
+This major release includes some breaking changes – please see our [Upgrading Guide](./UPGRADING.md) for full details.
+
 ### Added
 - Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
 - Create build wrapper for the @bugsnag/cli node package [#186](https://github.com/bugsnag/bugsnag-cli/pull/186)
