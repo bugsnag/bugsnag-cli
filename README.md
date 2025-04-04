@@ -33,13 +33,15 @@ The script downloads the appropriate binary and attempts to install it to `~/.lo
 
 ### NPM
 
-To install or upgrade the BugSnag CLI via `npm`, you can run the following command:
+If your project uses `npm` or `yarn`, the CLI can be installed by adding the [`@bugsnag/cli`](https://www.npmjs.com/package/@bugsnag/cli) package:
 
-`npm install @bugsnag/cli`
+```sh
+npm install @bugsnag/cli`
+```
+
+It can then be executed from your project scripts at `/node_modules/.bin/bugsnag-cli` or using `npx @bugsnag/cli`.
 
 ## Supported commands
-
-This tool is currently being developed. It currently supports the following commands:
 
 ### Create builds
 
@@ -49,104 +51,18 @@ Allows you to create a build within BugSnag to enrich releases shown in the BugS
 
 See the [`create-build`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/create-build/) command reference for full usage information.
 
-### Android NDK mapping files
+### Symbol &amp; mapping file uploads
 
-For apps that use the [NDK](https://developer.android.com/ndk/), this command extracts symbols from `.so` files and uploads them along with version information.
+Simplifies the upload of the various symbol and mapping files required to make your stacktraces readable in the BugSnag dashboard. Where possible files the files to upload are located automatically and the parameters, such as API key, located in project files. However all options can be overridden to allow you to customize the command for your build system.
 
-    $ bugsnag-cli upload android-ndk \
-        app/build/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libMyApp.so
+Supported uploads with links to online docs for the file type:
 
-See the [`upload android-ndk`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/) command reference for full usage information.
-
-### Android Proguard mapping flies
-
-If you are using [ProGuard](https://developer.android.com/studio/build/shrink-code.html), [DexGuard](https://www.guardsquare.com/en/dexguard), or [R8](https://r8.googlesource.com/r8#d8-dexer-and-r8-shrinker) to minify and optimize your app, this command uploads the mapping file along with version information from your project directory:
-
-    $ bugsnag-cli upload android-proguard app/build/outputs/proguard/release/mapping.txt
-
-See the [`upload android-proguard`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-proguard/) command reference for full usage information.
-
-### Android App Bundle (AAB) files
-
-If you distribute your app as an [Android App Bundle](https://developer.android.com/guide/app-bundle) (AAB), they contain all required files and so can be uploaded in a single command:
-
-    $ bugsnag-cli upload android-aab app/build/outputs/bundle/release/app-release.aab
-
-See the [`upload android-aab`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/) command reference for full usage information.
-
-### React Native Symbols
-
-This command is a convenience wrapper for the following commands, which upload the different file types separately with more specific options available to customize the upload:
-- `upload react-native-android`
-- `upload react-native-ios`
-- `upload android-ndk`
-- `upload android-proguard`
-- `upload dsym`
-
-
-    $ bugsnag-cli upload react-native
-
-### React Native JavaScript source maps (Android only)
-
-To get unminified stack traces for JavaScript code in your React Native app built for Android, source maps must be generated and can be uploaded to BugSnag using the following command from the root of your project:
-
-    $ bugsnag-cli upload react-native-android
-
-See the [`upload react-native-android`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-android/) command reference for full usage information.
-
-### React Native JavaScript source maps (iOS only)
-
-To get unminified stack traces for JavaScript code in your React Native app built for iOS, source maps must be generated and uploaded to BugSnag.
-
-    $ bugsnag-cli upload react-native-ios
-
-See the [`upload react-native-ios`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/) command reference for full usage information.
-
-### JavaScript source maps
-
-To get unminified stack traces for JavaScript code on the web, source maps must be generated and uploaded to BugSnag.
-
-    $ bugsnag-cli upload js
-
-See the [`upload js`](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-js/) command reference for full usage information.
-
-### Dart symbols for Flutter
-
-If you are stripping debug symbols from your Dart code when building your Flutter apps, you will need to upload symbol files in order to see full stacktraces using the following command:
-
-    $ bugsnag-cli upload dart --api-key=YOUR_API_KEY app-debug-info/
-
-### dSYM files (iOS, macOS, tvOS)
-
-Upload dSYM files from an Xcode project - either by locating the latest Xcode archive (.xcarchive) for that day or from the project build – to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
-
-    $ bugsnag-cli upload dsym
-
-### dSYM files from an Xcode build (iOS, macOS, tvOS)
-
-Upload dSYM files generated from a Build in Xcode to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
-
-    $ bugsnag-cli upload xcode-build
-
-### dSYM files from an Xcode Archive (iOS, macOS, tvOS)
-
-Upload dSYM files generated from an Archive in Xcode to allow BugSnag to show human-friendly function names, file paths, and line numbers in your iOS, macOS, and tvOS stacktraces.
-
-    $ bugsnag-cli upload xcode-archive
-
-### Unity Symbol Files (Android only) 
-
-The unity-android command uploads the IL2CPP symbols from the .symbols.zip file produced by the Unity build (see [Unity documentation](https://docs.unity3d.com/Manual/android-symbols.html) for more information) to the [NDK symbol API](https://d1upynpnqddd6j.cloudfront.net/api/ndk-symbol-mapping-upload/).
-
-    $ bugsnag-cli upload unity-android /path/to/build/directory
-
-### Breakpad symbol files
-
-Upload [Breakpad](https://chromium.googlesource.com/breakpad/breakpad/) `.sym` files, generated by the `dump_syms` tool.
-
-    $ bugsnag-cli upload breakpad /path/to/mylib.sym
-
-See our [Breakpad documentation](https://docs.bugsnag.com/api/breakpad-symbol-upload/#generating-symbol-files) for more information on how to generate symbol files.
+* Android (obfuscation [mapping]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-proguard/)) and [native symbol]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/)) files, from builds or [AAB]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-aab/)) files)
+* iOS (`.dSYM` from [builds]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-xcode-build/)) or [archives](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-xcode-archive/))
+* JavaScript source maps – for [web](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-js/) and [React Native]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn/))
+* Unity ([Android symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-unity-android/))
+* Dart ([stripped symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dart/))
+* Breakpad ([generated symbol files](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-breakpad/))
 
 ## BugSnag On-Premise
 
