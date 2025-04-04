@@ -4,7 +4,9 @@
 
 ### Breaking changes
 
-We now prioritize Xcode archives over Xcode builds when uploading dSYMs. This means that if you have both an archive and a build, the CLI will search the default archive location set in Xcode for the latest archive for that day and upload the dSYMs from the archive when using the `upload dsym` and `upload react-native` commands.
+When using the `upload dsym` and `upload react-native` commands, Xcode archives are now prioritized over dSYMs found inside the project from a build. This means that if you have both an archive and a build, the CLI will search the default archive location set in Xcode for the latest archive for that day and upload the dSYMs from the archive.
+
+The `upload xcode-build` commands can be used if you want to always pick dSYM files from a project build instead.
 
 ### Deprecated options
 
