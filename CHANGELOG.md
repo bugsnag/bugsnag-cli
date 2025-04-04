@@ -14,6 +14,9 @@
 - Ensure we resolve the source path relative to the source map path for the JS command [#188](https://github.com/bugsnag/bugsnag-cli/pull/188)
 - Preserve folder structure or the bundle URL during upload for the JS command [#189](https://github.com/bugsnag/bugsnag-cli/pull/189)
 
+### Removed
+- Remove the deprecated option `--fail-on-upload-error` [#191](https://github.com/bugsnag/bugsnag-cli/pull/191)
+
 ## [2.9.2] - 2025-02-11
 
 ### Fixed
