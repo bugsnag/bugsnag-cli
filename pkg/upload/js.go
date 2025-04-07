@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -16,16 +15,65 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// Resolve the project if it isn't specified using the current working directory
-func resolveProjectRoot(projectRoot string, path string) string {
+// resolveProjectRoot determines the project root directory.
+// If a project root is provided, it returns that value.
+// Otherwise, it defaults to searching up the directory tree.
+//
+// Parameters:
+// - projectRoot: A user-specified project root directory (can be empty).
+// - path: A fallback path in case retrieving the working directory fails.
+//
+// Returns:
+// - The resolved project root directory.
+func resolveProjectRoot(projectRoot, path string) string {
 	if projectRoot != "" {
 		return projectRoot
 	}
-	workingDirectory, err := os.Getwd()
+
+	// Get absolute path
+	checkPath, err := filepath.Abs(path)
 	if err != nil {
 		return path
 	}
-	return workingDirectory
+
+	// Workout how many segments to go up
+	segments := len(strings.Split(checkPath, string(filepath.Separator)))
+
+	for i := 0; i < segments; i++ {
+		if hasProjectRootFile(checkPath) {
+			return checkPath
+		}
+		parent := filepath.Dir(checkPath)
+		if parent == checkPath { // Stop if we reach the root directory
+			break
+		}
+		checkPath = parent
+	}
+
+	return checkPath
+}
+
+// HasProjectRootFile determines whether the specified directory contains
+// any of the common project root files, indicating it is likely the root of a project.
+//
+// The function checks for the existence of the following files:
+// - "package.json"
+// - "yarn.lock"
+// - "lerna.json"
+//
+// Parameters:
+// - dir: The directory path to check.
+//
+// Returns:
+// - bool: Returns true if any of the project root files are found in the directory; otherwise, false.
+func hasProjectRootFile(dir string) bool {
+	projectFiles := []string{"package.json", "yarn.lock", "lerna.json"}
+	for _, file := range projectFiles {
+		if utils.FileExists(filepath.Join(dir, file)) {
+			return true
+		}
+	}
+	return false
 }
 
 // Attempt to parse information from the package.json file if values aren't provided on the command line
@@ -122,7 +170,7 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 }
 
 // Based on the source map specification https://bit.ly/sourcemap. Returns if the source map was modified.
-func addSourcesContent(section map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func addSourcesContent(section map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
 		logger.Warn(fmt.Sprintf("Cannot find the required sources field in the source map at %s", sourceMapPath))
@@ -173,8 +221,9 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, pro
 				sourcePath = sourcePath[:questionMark-1]
 			}
 		}
-		if !path.IsAbs(sourcePath) {
-			sourcePath = path.Join(projectRoot, sourcePath)
+		if !filepath.IsAbs(sourcePath) {
+			// Resolve the path relative to the source map
+			sourcePath, _ = filepath.Abs(filepath.Join(filepath.Dir(sourceMapPath), sourcePath))
 		}
 		logger.Debug(fmt.Sprintf("Attempting to read the source %s.", sourcePath))
 		content, err := os.ReadFile(sourcePath)
@@ -192,19 +241,19 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, pro
 }
 
 // If the source map doesn't have sourcesContent then attempt to add it. Returns true if a modifcation was performed.
-func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, projectRoot string, logger log.Logger) bool {
+func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
 		if sources, ok := sections.([]map[string]interface{}); ok {
 			anyModified := false
 			for _, section := range sources {
-				modified := addSourcesContent(section, sourceMapPath, projectRoot, logger)
+				modified := addSourcesContent(section, sourceMapPath, logger)
 				anyModified = modified || anyModified
 			}
 			return anyModified
 		}
 	} else {
-		return addSourcesContent(sourceMapContents, sourceMapPath, projectRoot, logger)
+		return addSourcesContent(sourceMapContents, sourceMapPath, logger)
 	}
 	return false
 }
@@ -232,41 +281,29 @@ func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logge
 }
 
 // Upload a single source map
-func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint string, logger log.Logger) error {
-	sourceMapContents, err := ReadSourceMap(jsOptions.SourceMap, logger)
+func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl string, versionName string, codeBundleId string, projectRoot string, options options.CLI, endpoint string, logger log.Logger) error {
+	sourceMapContents, err := ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
 		return err
 	}
 
 	var sourceMapFile server.FileField
 
-	sourceMapModified := AddSources(sourceMapContents, jsOptions.SourceMap, jsOptions.ProjectRoot, logger)
+	sourceMapModified := AddSources(sourceMapContents, sourceMapPath, logger)
 	if sourceMapModified {
-		logger.Info(fmt.Sprintf("Added sources content to source map from %s", jsOptions.SourceMap))
+		logger.Info(fmt.Sprintf("Added sources content to source map from %s", sourceMapPath))
 		encodedSourceMap, err := json.Marshal(sourceMapContents)
 		if err != nil {
 			return fmt.Errorf("failed generate valid source map JSON with original sources added: %s", err.Error())
 		}
-		sourceMapFile = server.InMemoryFile{Path: jsOptions.SourceMap, Data: encodedSourceMap}
+		sourceMapFile = server.InMemoryFile{Path: sourceMapPath, Data: encodedSourceMap}
 	} else {
 		// Directly use the local file if the source map wasn't modified.
-		logger.Info(fmt.Sprintf("Uploading unmodified source map from %s", jsOptions.SourceMap))
-		sourceMapFile = server.LocalFile(jsOptions.SourceMap)
+		logger.Info(fmt.Sprintf("Uploading unmodified source map from %s", sourceMapPath))
+		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
-	jsOptions.Bundle, err = resolveBundlePath(jsOptions.Bundle, jsOptions.SourceMap, logger)
-	if err != nil {
-		return err
-	}
-
-	url := jsOptions.BundleUrl
-	if jsOptions.BaseUrl != "" {
-		_, fileName := filepath.Split(jsOptions.Bundle)
-		url = jsOptions.BaseUrl + fileName
-		logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", url, jsOptions.BaseUrl))
-	}
-
-	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, jsOptions.VersionName, jsOptions.CodeBundleId, url, jsOptions.ProjectRoot, options.Upload.Overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Overwrite)
 
 	if err != nil {
 		return fmt.Errorf("failed to build upload options: %s", err.Error())
@@ -274,11 +311,9 @@ func uploadSingleSourceMap(options options.CLI, jsOptions options.Js, endpoint s
 
 	fileFieldData := make(map[string]server.FileField)
 	fileFieldData["sourceMap"] = sourceMapFile
-	if jsOptions.Bundle != "" {
-		fileFieldData["minifiedFile"] = server.LocalFile(jsOptions.Bundle)
-	}
+	fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 
-	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, jsOptions.SourceMap, options, logger)
+	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
 
 	if err != nil {
 		return fmt.Errorf("encountered error when uploading js sourcemap: %s", err.Error())
@@ -332,8 +367,22 @@ func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
 		}
 
 		for _, sourceMapPath := range sourceMapPaths {
-			jsOptions.SourceMap = sourceMapPath
-			err := uploadSingleSourceMap(options, jsOptions, endpoint, logger)
+
+			bundlePath, err := resolveBundlePath(jsOptions.Bundle, sourceMapPath, logger)
+			if err != nil {
+				return err
+			}
+
+			var bundleUrl string
+			if jsOptions.BundleUrl != "" {
+				bundleUrl = jsOptions.BundleUrl
+			} else {
+				// For directory uploads, add the relative path of the bundle to the base URL
+				bundleUrl = jsOptions.BaseUrl + strings.TrimPrefix(strings.TrimPrefix(bundlePath, path), "/")
+				logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", bundleUrl, jsOptions.BaseUrl))
+			}
+
+			err = uploadSingleSourceMap(sourceMapPath, bundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, endpoint, logger)
 			if err != nil {
 				return err
 			}

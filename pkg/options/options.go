@@ -6,13 +6,12 @@ import (
 
 // Global CLI options
 type Globals struct {
-	ApiKey            string            `help:"The BugSnag API key for the application"`
-	DryRun            bool              `help:"Performs a dry-run of the command without sending any information to BugSnag"`
-	FailOnUploadError bool              `help:"Stops the upload when a file fails to upload successfully" default:"false"`
-	LogLevel          string            `help:"Sets the level of logging to debug, info, warn or fatal" default:"info"`
-	Port              int               `help:"The port number for the BugSnag upload server" default:"443"`
-	Verbose           bool              `name:"verbose" help:"Sets the level of the logging to its highest."`
-	Version           utils.VersionFlag `name:"version" help:"Prints the version information for this CLI"`
+	ApiKey   string            `help:"The BugSnag API key for the application"`
+	DryRun   bool              `help:"Performs a dry-run of the command without sending any information to BugSnag"`
+	LogLevel string            `help:"Sets the level of logging to debug, info, warn or fatal" default:"info"`
+	Port     int               `help:"The port number for the BugSnag upload server" default:"443"`
+	Verbose  bool              `name:"verbose" help:"Sets the level of the logging to its highest."`
+	Version  utils.VersionFlag `name:"version" help:"Prints the version information for this CLI"`
 }
 
 type DiscoverAndUploadAny struct {
@@ -61,25 +60,29 @@ type DartSymbol struct {
 	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
 }
 
+type Dsym struct {
+	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Shared DsymShared  `embed:""`
+}
+
 type XcodeBuild struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	Plist         utils.Path  `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	VersionName   string      `help:"The version of the application"`
-	XcodeProject  utils.Path  `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
-	Configuration string      `help:"The configuration used to build the application"`
-	Shared        XcodeShared `embed:""`
+	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
+	Shared DsymShared  `embed:""`
 }
 
 type XcodeArchive struct {
 	Path   utils.Paths `arg:"" name:"path" help:"The path to the directory or file to upload" type:"path" default:"."`
-	Shared XcodeShared `embed:""`
+	Shared DsymShared  `embed:""`
 }
 
-type XcodeShared struct {
-	IgnoreEmptyDsym    bool   `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
-	IgnoreMissingDwarf bool   `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
-	Scheme             string `help:"The name of the Xcode options.Scheme used to build the application"`
-	ProjectRoot        string `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+type DsymShared struct {
+	IgnoreEmptyDsym    bool       `help:"Throw warnings instead of errors when a dSYM file is found, rather than the expected dSYM directory"`
+	IgnoreMissingDwarf bool       `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
+	Configuration      string     `help:"The configuration used to build the application"`
+	Scheme             string     `help:"The name of the Xcode options.Scheme used to build the application"`
+	ProjectRoot        string     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	Plist              utils.Path `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	XcodeProject       utils.Path `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 }
 
 type Js struct {
@@ -124,10 +127,11 @@ type ReactNativeShared struct {
 }
 
 type ReactNativeIosSpecific struct {
-	BundleVersion string `help:"The bundle version of this build of the application (Apple platforms only)"`
-	Plist         string `help:"The path to a .plist file from which to obtain build information" type:"path"`
-	Scheme        string `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
-	XcodeProject  string `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	BundleVersion string     `help:"The bundle version of this build of the application (Apple platforms only)"`
+	Plist         string     `help:"The path to a .plist file from which to obtain build information" type:"path"`
+	Scheme        string     `help:"The name of the Xcode options.Ios.Scheme used to build the application"`
+	XcodeProject  string     `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
+	XcarchivePath utils.Path `help:"The path to the Xcode archive to process if it has been exported" type:"path"`
 }
 
 type ReactNativeIos struct {
@@ -180,8 +184,8 @@ type CLI struct {
 		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
 		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
 		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-		Dsym               XcodeBuild             `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcarchive"`
+		Dsym               Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
+		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
 		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
 		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`

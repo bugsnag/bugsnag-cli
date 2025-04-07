@@ -1,20 +1,17 @@
-const { exec } = require('child_process');
+const { exec } = require('child_process')
 
 /**
  *
- * @typedef {Object} BugsnagUploadOptions
+ * @typedef {Object} BugsnagOptions
  * @property {?string} apiKey - The API key for authentication. Optional.
  * @property {?boolean} dryRun - Whether to perform a dry run without actually uploading. Defaults to `false`. Optional.
- * @property {?boolean} failOnUploadError - Whether to fail the process on upload error. Defaults to `false`. Optional.
  * @property {?string} logLevel - The log level for output. Optional.
  * @property {?number} port - The port for the connection. Defaults to `443`. Optional.
+ * @property {?boolean} failOnUploadError - Whether to fail the process on upload error. Defaults to `false`. Optional.
  * @property {?boolean} verbose - Whether to enable verbose logging. Defaults to `false`. Optional.
  * @property {?boolean} overwrite - Whether to overwrite existing files. Defaults to `false`. Optional.
  * @property {?number} retries - The number of retries for failed requests. Defaults to `0`. Optional.
  * @property {?number} timeout - The timeout value in seconds for requests. Defaults to `300`. Optional.
- * @property {?string} uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`. Optional.
- * @property {?string} projectRoot - The root directory for the project. Optional.
- * @property {?boolean} dev - Whether this is a development environment. Defaults to `false`. Optional.
  *
  */
 
@@ -28,7 +25,7 @@ class BugsnagCLI {
      * @returns {string} - The string in kebab-case format.
      */
     static camelToKebab(str) {
-        return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+        return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
     }
 
     /**
@@ -43,32 +40,32 @@ class BugsnagCLI {
             // Convert the options keys from camelCase to kebab-case
             const kebabCaseOptions = Object.entries(options)
                 .map(([key, value]) => {
-                    const kebabKey = BugsnagCLI.camelToKebab(key);
+                    const kebabKey = BugsnagCLI.camelToKebab(key)
                     if (typeof value === 'boolean' && value === true) {
-                        return `--${kebabKey}`;
+                        return `--${kebabKey}`
                     } else if (typeof value !== 'boolean') {
-                        return `--${kebabKey}=${value}`;
+                        return `--${kebabKey}=${value}`
                     }
-                    return '';
+                    return ''
                 })
                 .filter(Boolean)
-                .join(' ');
+                .join(' ')
 
-            const positionalArg = target ? `"${target}"` : '';
-            const cliCommand = `npx bugsnag-cli ${command} ${kebabCaseOptions} ${positionalArg}`.trim();
+            const positionalArg = target ? `"${target}"` : ''
+            const cliCommand = `npx bugsnag-cli ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
 
             // Execute the command
             exec(cliCommand, (error, stdout, stderr) => {
                 if (error) {
                     const errorMessage = `Command failed: ${cliCommand}\n` +
                         `Error: ${error.message}\n` +
-                        `${stdout.trim()}`;
-                    reject(errorMessage);
+                        `${stdout.trim()}`
+                    reject(errorMessage)
                 } else {
-                    resolve(stdout.trim());
+                    resolve(stdout.trim())
                 }
-            });
-        });
+            })
+        })
     }
 
     /**
@@ -76,6 +73,14 @@ class BugsnagCLI {
      * Provides nested methods for specific upload types.
      */
     static Upload = {
+        /**
+         *
+         * @typedef {Object} BugsnagUploadOptions
+         * @param {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
+         * @param {?string} uploadApiRootUrl - The root URL for the upload API. Defaults to `'https://upload.bugsnag.com'`. Optional.
+         * @param {?string} projectRoot - The root directory for the project. Optional.
+         * @param {?boolean} dev - Whether this is a development environment. Defaults to `false`. Optional.
+         */
         ReactNative: Object.assign(
             /**
              *
@@ -124,7 +129,7 @@ class BugsnagCLI {
                  * @param {?string} options.variant - The variant of the project (e.g., production, staging). Optional.
                  * @param {?string} options.versionCode - The version code for the project. Optional.
                  * @param {?string} target - The path to the file or directory to upload (e.g., a bundle file or folder). Optional.
-                 * @returns {Promise<string>}
+                 * @returns {Promise<string>} - Resolves with the command's output or rejects with an error message.
                  */
                 Android: (options = {}, target = '') =>
                     BugsnagCLI.run('upload react-native-android', options, target),
@@ -145,7 +150,44 @@ class BugsnagCLI {
          */
         Js: (options = {}, target = '') =>
             BugsnagCLI.run('upload js', options, target),
-    };
+    }
+
+    /**
+     * Send build information to Bugsnag
+     */
+    static CreateBuild(options = {}, target = '') {
+        /**
+         * @typedef {Object} BugsnagBuildOptions
+         * @property {BugsnagOptions} options - Common Key-value pairs of options for the CLI.
+         * @param {?boolean} autoAssignRelease - Whether to automatically associate this build with new error events and sessions. Optional.
+         * @param {?string} buildApiRootUrl - The build server hostname. Optional.
+         * @param {?string} builderName - The name of the person or entity who built the app. Optional.
+         * @param {?string} metadata - Custom build information to associate with the release. Optional.
+         * @param {?string} provider - The source control provider for the build. Optional.
+         * @param {?string} releaseStage - The release stage (e.g., production, staging). Optional.
+         * @param {?string} repository - The URL of the repository containing the source code. Optional.
+         * @param {?string} revision - The source control SHA-1 hash for the code that has been built. Optional.
+         * @param {?string} versionName - The version of the application. Optional.
+         * @param {?string} androidAab - The path to an Android AAB file. Optional.
+         * @param {?string} appManifest - The path to an Android manifest file. Optional.
+         * @param {?string} versionCode - The version code of the build. Optional.
+         * @param {?string} bundleVersion - The bundle version of the build. Optional.
+         * @returns {Promise<string>} - Resolves with the command's output or rejects with an error message.
+         */
+        return new Promise((resolve, reject) => {
+            try {
+                const output = BugsnagCLI.run('create-build', options, target)
+                if (output instanceof Promise) {
+                    output.then(resolve).catch(reject)
+                } else {
+                    resolve(output)
+                }
+            } catch (error) {
+                reject(error)
+            }
+        })
+    }
+
 }
 
-module.exports = BugsnagCLI;
+module.exports = BugsnagCLI

@@ -91,71 +91,13 @@ features/base-fixtures/dsym/archive:
 	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
 	cd features/base-fixtures/dsym && xcrun xcodebuild -scheme dSYM-Example -configuration Release -allowProvisioningUpdates archive
 
-.PHONY: features/base-fixtures/rn0_69
-features/base-fixtures/rn0_69: features/base-fixtures/rn0_69/android features/base-fixtures/rn0_69/ios
-
-.PHONY: features/base-fixtures/rn0_70
-features/base-fixtures/rn0_70: features/base-fixtures/rn0_70/android features/base-fixtures/rn0_70/ios
-
-.PHONY: features/base-fixtures/rn0_72
-features/base-fixtures/rn0_72: features/base-fixtures/rn0_72/android features/base-fixtures/rn0_72/ios
-
-.PHONY: features/base-fixtures/rn0_69/android
-features/base-fixtures/rn0_69/android:
-	cd $@/../ && npm i
-	cd $@ && ./gradlew bundleRelease
-
-.PHONY: features/base-fixtures/rn0_69/ios
-features/base-fixtures/rn0_69/ios:
-	cd $@/../ && npm i
-	cd $@ && bundle install
-	cd $@ && bundle exec pod install --repo-update
-	cd $@ && xcodebuild -workspace rn0_69.xcworkspace -scheme rn0_69 -configuration Release -sdk iphoneos build
-
-.PHONY: features/base-fixtures/rn0_69/ios/archive
-features/base-fixtures/rn0_69/ios/archive:
-	cd features/base-fixtures/rn0_69/ && npm i
-	cd features/base-fixtures/rn0_69/ios/ && bundle install
-	cd features/base-fixtures/rn0_69/ios/ && bundle exec pod install --repo-update
-	cd features/base-fixtures/rn0_69/ios/ && xcrun xcodebuild -scheme rn0_69 -workspace rn0_69.xcworkspace -configuration Release -archivePath "../rn0_69.xcarchive" -allowProvisioningUpdates archive
-
-.PHONY: features/base-fixtures/rn0_70/android
-features/base-fixtures/rn0_70/android:
-	cd $@/../ && npm i
-	cd $@ && ./gradlew bundleRelease
-
-.PHONY: features/base-fixtures/rn0_70/ios
-features/base-fixtures/rn0_70/ios:
-	cd $@/../ && npm i
-	cd $@ && bundle install
-	cd $@ && bundle exec pod install --repo-update
-	cd $@ && xcodebuild -workspace rn0_70.xcworkspace -scheme rn0_70 -configuration Release -sdk iphoneos build
-
-.PHONY: features/base-fixtures/rn0_70/ios/archive
-features/base-fixtures/rn0_70/ios/archive:
-	cd features/base-fixtures/rn0_70/ && npm i
-	cd features/base-fixtures/rn0_70/ios/ && bundle install
-	cd features/base-fixtures/rn0_70/ios/ && bundle exec pod install --repo-update
-	cd features/base-fixtures/rn0_70/ios/ && xcrun xcodebuild -scheme rn0_70 -workspace rn0_70.xcworkspace -configuration Release -archivePath "../rn0_70.xcarchive" -allowProvisioningUpdates archive
-
-.PHONY: features/base-fixtures/rn0_72/android
-features/base-fixtures/rn0_72/android:
-	cd $@/../ && npm i
-	cd $@ && ./gradlew bundleRelease
-
-.PHONY: features/base-fixtures/rn0_72/ios
-features/base-fixtures/rn0_72/ios:
-	cd $@/../ && npm i
-	cd $@ && bundle install
-	cd $@ && bundle exec pod install --repo-update
-	cd $@ && xcodebuild -workspace rn0_72.xcworkspace -scheme rn0_72 -configuration Release -sdk iphoneos build
-
-.PHONY: features/base-fixtures/rn0_72/ios/archive
-features/base-fixtures/rn0_72/ios/archive:
-	cd features/base-fixtures/rn0_72/ && npm i
-	cd features/base-fixtures/rn0_72/ios && bundle install
-	cd features/base-fixtures/rn0_72/ios/ && bundle exec pod install --repo-update
-	cd features/base-fixtures/rn0_72/ios/ && xcrun xcodebuild -scheme rn0_72 -workspace rn0_72.xcworkspace -configuration Release -archivePath "../rn0_72.xcarchive" -allowProvisioningUpdates archive
+.PHONY: features/base-fixtures/dsym/archive/export
+features/base-fixtures/dsym/archive/export:
+	bundle install
+	cd features/base-fixtures/dsym && bundle install
+	cd features/base-fixtures/dsym && xcrun xcodebuild -allowProvisioningUpdates -scheme dSYM-Example -resolvePackageDependencies
+	cd features/base-fixtures/dsym && xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F -scheme dSYM-Example -configuration Release -archivePath dsym.xcarchive -allowProvisioningUpdates archive
+	cd features/base-fixtures/dsym && xcrun xcodebuild -exportArchive -archivePath dsym.xcarchive -exportPath output/ -exportOptionsPlist ../../react-native/fixtures/app/dynamic/ios/exportOptions.plist
 
 .PHONY: features/base-fixtures/js-webpack4
 features/base-fixtures/js-webpack4:
