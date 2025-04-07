@@ -3,6 +3,8 @@ package ios
 import (
 	"bytes"
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"os/exec"
@@ -62,7 +64,7 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 	}()
 
 	if err != nil {
-		return "", fmt.Errorf("failed to determine xcarchive location: %w", err)
+		return "", fmt.Errorf("failed to determine Xcode archive location: %w", err)
 	}
 
 	// Search for the latest xcarchive matching the scheme
@@ -87,13 +89,57 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("error walking the archive directory: %w", err)
+		return "", fmt.Errorf("error walking the Xcode archive directory: %w", err)
 	}
 
 	// If no matching xcarchive file was found, return an error
 	if latestFile == "" {
-		return "", fmt.Errorf("no xcarchive files found for scheme: %s", scheme)
+		return "", fmt.Errorf("no Xcode archive files found for scheme: %s", scheme)
 	}
 
 	return latestFile, nil
+}
+
+// FindXcarchivePath searches for an Xcode archive (.xcarchive) within the provided paths.
+// If a directory is given, it attempts to locate the latest archive associated with a scheme.
+//
+// Parameters:
+// - options: CLI options containing upload paths and shared settings.
+// - logger: Logger instance for logging messages during processing.
+//
+// Returns:
+// - The path to the found Xcode archive (.xcarchive), or an empty string if none are found.
+// - An error if any issue occurs during the process.
+func FindXcarchivePath(options options.CLI, logger log.Logger) (string, error) {
+	var (
+		xcarchivePath string
+		err           error
+	)
+
+	// Iterate through the list of provided paths
+	for _, path := range options.Upload.XcodeArchive.Path {
+		if filepath.Ext(path) == ".xcarchive" {
+			// If the path is already an Xcode archive, assign it
+			xcarchivePath = path
+		} else if utils.IsDir(path) {
+			// If the path is a directory, search for an Xcode archive inside it
+			logger.Info(fmt.Sprintf("Searching for an Xcode archive in %s", path))
+
+			// Check if the directory contains an Xcode project or workspace
+			if IsPathAnXcodeProjectOrWorkspace(path) {
+				// Determine the scheme if it is not set
+				if options.Upload.XcodeArchive.Shared.Scheme == "" {
+					options.Upload.XcodeArchive.Shared.Scheme, err = GetDefaultScheme(path)
+					if err != nil {
+						return "", fmt.Errorf("error determining default scheme: %w", err)
+					}
+				}
+
+				// Retrieve the latest Xcode archive for the determined scheme
+				xcarchivePath, _ = GetLatestXcodeArchiveForScheme(options.Upload.XcodeArchive.Shared.Scheme)
+			}
+		}
+	}
+
+	return xcarchivePath, nil
 }

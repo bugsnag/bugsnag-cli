@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "2.9.2"
+var package_version = "3.0.0"
 
 func main() {
 	commands := options.CLI{}
@@ -47,10 +47,6 @@ func main() {
 
 	if commands.DryRun {
 		logger.Info("Performing dry run - no data will be sent to BugSnag")
-	}
-
-	if commands.FailOnUploadError {
-		logger.Warn("The `--fail-on-upload-error` flag is deprecated and will be removed in a future release. All commands now fail if the upload is unsuccessful.")
 	}
 
 	switch kongCtx.Command() {
@@ -153,9 +149,7 @@ func main() {
 
 	case "upload dsym", "upload dsym <path>":
 
-		logger.Warn("The `upload dsym` command is deprecated and will be removed in a future release. Please use `upload xcode-build` instead.")
-
-		err := upload.ProcessXcodeBuild(commands, endpoint, logger)
+		err := upload.ProcessDsym(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -168,6 +162,17 @@ func main() {
 		}
 
 		err := upload.ProcessUnityAndroid(commands, endpoint, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "upload breakpad <path>":
+		if commands.ApiKey == "" {
+			logger.Fatal("missing api key, please specify using `--api-key`")
+		}
+
+		err := upload.ProcessBreakpad(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

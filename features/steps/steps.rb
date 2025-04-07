@@ -16,6 +16,8 @@ when os.downcase.include?('darwin')
   binary = 'bugsnag-cli'
 end
 
+base_dir = Dir.pwd
+
 When('I run bugsnag-cli') do
   @output = `bin/#{arch}-#{os}-#{binary} 2>&1`
 end
@@ -88,6 +90,13 @@ Then('the sourcemap is valid for the Dart Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "buildId" is not null
+  )
+end
+
+Then('the sourcemap is valid for the Breakpad Build API') do
+  steps %(
+    And the sourcemap "api_key" query parameter equals "#{$api_key}"
+    And the sourcemap "project_root" query parameter is not null
   )
 end
 
@@ -190,13 +199,12 @@ Then(/^I should only see the fatal log level messages$/) do
 end
 
 Before('@installation') do
-  @base_dir = Dir.pwd
   @output = `npm pack`
-  @bugsnag_cli_package_path = "#{@base_dir}/#{@output}"
+  @bugsnag_cli_package_path = "#{base_dir}/#{@output}"
 end
 
 When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|
-  @fixture_dir = "#{@base_dir}/features/cli/fixtures/#{package_manager}"
+  @fixture_dir = "#{base_dir}/features/cli/fixtures/#{package_manager}"
   Dir.mkdir(@fixture_dir)
   Dir.chdir(@fixture_dir)
 
@@ -212,7 +220,7 @@ When('I install the bugsnag-cli via {string} in a new directory') do |package_ma
     @install_output = `pnpm add #{@bugsnag_cli_package_path}`
   end
 
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 Then('the {string} directory should contain {string}') do |directory, package|
@@ -220,11 +228,10 @@ Then('the {string} directory should contain {string}') do |directory, package|
 end
 
 Given('I build the Unity Android example project') do
-  @base_dir = Dir.pwd
-  @fixture_dir = "#{@base_dir}/platforms-examples/Unity"
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
   Dir.chdir(@fixture_dir)
   @output = `./build_android.sh aab`
-  Dir.chdir(@base_dir)
+  Dir.chdir(base_dir)
 end
 
 And('I wait for the Unity symbols to generate') do
@@ -234,4 +241,200 @@ end
 Given(/^I set the NDK path to the Unity bundled version$/) do
 #  Set the environment variable to the path of the NDK bundled with Unity
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
+end
+
+# dSYM
+def clean_and_build(scheme, project_path, build_target)
+  puts "🚀 Starting dSYM cleaning and build process..."
+
+  # Find the Xcode archive path dynamically
+  custom_archives_path = `defaults read com.apple.dt.Xcode IDECustomDistributionArchivesLocation`.strip
+  archives_path = custom_archives_path.empty? ? File.expand_path("~/Library/Developer/Xcode/Archives/") : custom_archives_path
+  today = Date.today.strftime('%d-%m-%Y')
+  archives_path = File.join(archives_path, Date.today.strftime('%Y-%m-%d'))
+
+  # Delete archives for the given scheme created today
+  archives_deleted = false
+  Dir.glob(File.join(archives_path, "#{scheme} #{today}*")) do |archive|
+    if archive.include?(scheme)
+      puts "🗑️ Removing archive: #{archive}"
+      FileUtils.rm_rf(archive)
+      archives_deleted = true
+    end
+  end
+  puts archives_deleted ? "✅ Archives deleted successfully." : "ℹ️ No matching archives found."
+
+  # Clear Xcode build directories matching wildcard pattern
+  build_paths = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/#{scheme}-*"))
+
+  if build_paths.any?
+    build_paths.each do |path|
+      puts "🧹 Clearing Xcode build directory: #{path}"
+      FileUtils.rm_rf(path)
+    end
+    puts "✅ Xcode build directories cleared."
+  else
+    puts "ℹ️ No matching build directories found."
+  end
+
+  # Build the project
+  puts "🏗️ Building project: #{project_path}"
+  output = `make #{build_target}`
+
+  if $?.success?
+    puts "✅ Build completed successfully."
+  else
+    puts "❌ Build failed. Output:\n#{output}"
+    raise "Build process failed."
+  end
+end
+
+Before('@CleanAndBuildDsym') do
+  scheme = 'dSYM-Example'
+  project_path = 'features/base-fixtures/dsym'
+  build_target = project_path
+
+  clean_and_build(scheme, project_path, build_target)
+end
+
+Before('@CleanAndArchiveDsym') do
+  scheme = 'dSYM-Example'
+  project_path = 'features/base-fixtures/dsym'
+  build_target = "#{project_path}/archive"
+
+  clean_and_build(scheme, project_path, build_target)
+end 
+
+# React Native
+Before('@BuildRNAndroid') do
+  unless defined?($setup_android) && $setup_android
+    puts "🚀 Setting up React Native Android app and generating sourcemap..."
+
+    generate_command = 'node features/react-native/scripts/generate.js'
+    output = `#{generate_command}`
+
+    if $?.success?
+      puts "✅ Android setup completed successfully."
+    else
+      puts "❌ Android setup failed. Output:\n#{output}"
+      raise "Failed to set up React Native Android."
+    end
+
+    base_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/android/app/build"
+    sourcemap_path = "#{base_path}/generated/sourcemaps/react/release"
+
+    Maze.check.include(`ls #{sourcemap_path}`, 'index.android.bundle.map')
+
+    puts "📍 Sourcemap verified successfully."
+
+    # Set environment variables
+    ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/AndroidManifest.xml"
+    ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
+    ENV['SOURCE_MAP_PATH'] = "#{sourcemap_path}/index.android.bundle.map"
+
+    case ENV['RN_VERSION'].to_f
+    when 0.70
+      ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/react/release/index.android.bundle"
+    when 0.71
+      ENV['BUNDLE_PATH'] = "#{base_path}/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    when 0.75
+      ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
+    end
+
+    puts "🔧 Environment variables set:"
+    puts "  - APP_MANIFEST_PATH: #{ENV['APP_MANIFEST_PATH']}"
+    puts "  - BUNDLE_PATH: #{ENV['BUNDLE_PATH']}"
+    puts "  - SOURCE_MAP_PATH: #{ENV['SOURCE_MAP_PATH']}"
+
+    $setup_android = true
+  end
+end
+
+Before('@BuildRNiOS') do
+  unless defined?($setup_ios) && $setup_ios
+    puts "🚀 Setting up React Native iOS app and generating sourcemap..."
+
+    generate_command = 'node features/react-native/scripts/generate.js'
+    output = `#{generate_command}`
+
+    if $?.success?
+      puts "✅ React Native iOS setup completed successfully."
+    else
+      puts "❌ Setup failed. Output:\n#{output}"
+      raise "Failed to set up React Native iOS."
+    end
+
+    sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
+
+    Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+
+    puts "📍 Sourcemap verified successfully."
+    $setup_ios = true
+  end
+end
+
+Before('@BuildExportRNiOS') do
+  unless defined?($export_ios) && $export_ios
+    puts "🚀 Setting up React Native iOS app, generating sourcemaps, and exporting the archive..."
+
+    export_command = 'EXPORT_ARCHIVE=true node features/react-native/scripts/generate.js'
+    output = `#{export_command}`
+
+    if $?.success?
+      puts "✅ Archive export completed successfully."
+    else
+      puts "❌ Archive export failed. Output:\n#{output}"
+      raise "Failed to export archive."
+    end
+
+    sourcemap_path = "features/react-native/fixtures/generated/old-arch/#{ENV['RN_VERSION']}/ios/build/sourcemaps"
+
+    Maze.check.include(`ls #{sourcemap_path}`, 'main.jsbundle.map')
+
+    puts "📍 Sourcemap verified successfully."
+    $export_ios = true
+  end
+end
+
+Then('I should see the {string} in the output') do |log_message|
+  Maze.check.include(run_output, log_message)
+end
+
+Before('@BuildNestedJS') do
+  unless defined?($nested_js) && $nested_js
+    puts "🚀 Building Nested JS fixture and generating sourcemaps..."
+
+    @fixture_dir= "#{base_dir}/features/base-fixtures/js"
+
+    # Change to the Nested JS fixture directory
+    Dir.chdir(@fixture_dir)
+
+    # Run NPM install
+    npm_install = `npm install`
+    if $?.success?
+      puts "✅ NPM install completed successfully."
+    else
+      puts "❌ NPM install failed. Output:\n#{npm_install}"
+      raise "Failed to install NPM dependencies."
+    end
+
+    # Run the build script
+    build_command = 'npm run build'
+    output = `#{build_command}`
+
+    if $?.success?
+      puts "✅ Build completed successfully."
+    else
+      puts "❌ Build failed. Output:\n#{output}"
+      raise "Failed to build Nested JS."
+    end
+
+    Maze.check.include(`ls #{@fixture_dir}`, 'out')
+
+    puts "📍 Sourcemap verified successfully."
+
+    # Change back to the base directory
+    Dir.chdir(base_dir)
+    $nested_js = true
+  end
 end

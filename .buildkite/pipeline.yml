@@ -109,7 +109,7 @@ steps:
   - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
-      UNITY_VERSION: 6000.0.25f1
+      UNITY_VERSION: 6000.0.36f1
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
@@ -120,113 +120,36 @@ steps:
           - bin/arm64-macos-bugsnag-cli
         upload:
           - maze_output/**/*
+  
+  - label: "Breakpad Integration Tests"
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner features/breakpad
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
 
   - group: ":react: React Native"
     steps:
-      - label: "RN 0.69 :ios: Integration Tests"
-        skip: "issue with Boost https://github.com/facebook/react-native/issues/42180"
-        depends_on: build
+      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
+        depends_on:
+          - "build"
         agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 13
+          queue: "macos"
+        timeout_in_minutes: 5
         commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_69.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
+          - buildkite-agent pipeline upload .buildkite/react-native/android.pipeline.yml
 
-      - label: "RN 0.70 :ios: Integration Tests"
-        depends_on: build
+      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE iOS STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
+        depends_on:
+          - "build"
         agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 13
+          queue: "macos"
+        timeout_in_minutes: 5
         commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_70.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.72 :ios: Integration Tests"
-        depends_on: build
-        agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 14
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-ios/rn0_72.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.69 :android: Integration Tests"
-        depends_on: build
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-android/rn0_69.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.70 :android: Integration Tests"
-        depends_on: build
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-android/rn0_70.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: "RN 0.72 :android: Integration Tests"
-        depends_on: build
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native-android/rn0_72.feature
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
-
-      - label: RN 0.72 Integration Tests
-        depends_on: build
-        agents:
-          queue: macos-12-arm
-        env:
-          XCODE_VERSION: 14
-        commands:
-          - chmod +x bin/arm64-macos-bugsnag-cli
-          - bundle install
-          - bundle exec maze-runner features/react-native
-        plugins:
-          artifacts#v1.5.0:
-            download:
-              - bin/arm64-macos-bugsnag-cli
-            upload:
-              - maze_output/**/*
+          - buildkite-agent pipeline upload .buildkite/react-native/ios.pipeline.yml

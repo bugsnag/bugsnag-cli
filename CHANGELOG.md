@@ -1,190 +1,180 @@
 # Changelog
 
-## 2.9.2 (2025-02-11)
+## [3.0.0] - 2025-04-07
 
-### Fixes
-- Get NDK version from the `source.properties` file when uploading NDK symbol files [172](https://github.com/bugsnag/bugsnag-cli/pull/172)
+This major release includes some breaking changes – please see our [Upgrading Guide](./UPGRADING.md) for full details.
 
-## 2.9.1 - (2025-01-23)
+### Added
+- Ensure that the React Native iOS command works with Xcode archives by default [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
+- Create build wrapper for the @bugsnag/cli node package [#186](https://github.com/bugsnag/bugsnag-cli/pull/186)
+- dSYM Super command to handle both Xcode Archives and Builds [#182](https://github.com/bugsnag/bugsnag-cli/pull/182)
+- Adds support for uploading breakpad .sym files [178](https://github.com/bugsnag/bugsnag-cli/pull/178)
 
-### Fixes
+### Fixed
+- Update the path for AndroidManifest.xml in newer versions of RN [#176](https://github.com/bugsnag/bugsnag-cli/pull/176)
+- Update how the `--project-root` is worked out for the `upload js` command [#187](https://github.com/bugsnag/bugsnag-cli/pull/187)
+- Ensure we resolve the source path relative to the source map path for the JS command [#188](https://github.com/bugsnag/bugsnag-cli/pull/188)
+- Preserve folder structure or the bundle URL during upload for the JS command [#189](https://github.com/bugsnag/bugsnag-cli/pull/189)
 
-- Switch `js-yaml` to `yaml` for the NodeJS package [168](https://github.com/bugsnag/bugsnag-cli/pull/168) 
+### Removed
+- Remove the deprecated option `--fail-on-upload-error` [#191](https://github.com/bugsnag/bugsnag-cli/pull/191)
 
-## 2.9.0 (2025-01-20)
+## [2.9.2] - 2025-02-11
 
-### Enhancements
+### Fixed
+- Get NDK version from the `source.properties` file when uploading NDK symbol files [#172](https://github.com/bugsnag/bugsnag-cli/pull/172)
 
-- Add a wrapper for the `npm` package to interact with the BugSnag CLI [161](https://github.com/bugsnag/bugsnag-cli/pull/161)
-- Add the support for .so.* files when processing ndk symbol files [163](https://github.com/bugsnag/bugsnag-cli/pull/163)
-- Add additional logging to the Android AAB upload command [165](https://github.com/bugsnag/bugsnag-cli/pull/165)
+## [2.9.1] - 2025-01-23
 
-## 2.8.0 (2025-01-06)
+### Fixed
+- Switch `js-yaml` to `yaml` for the NodeJS package [#168](https://github.com/bugsnag/bugsnag-cli/pull/168)
 
-### Enhancements
+## [2.9.0] - 2025-01-20
 
-- Add the Xcode Archive Command to support the uploading of xcarchive files [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
-- Rename the `dsym` upload command to `xcode-build` to better reflect the command's purpose. `dsym` will be removed in the next major release [156](https://github.com/bugsnag/bugsnag-cli/pull/156)
+### Added
+- Add a wrapper for the `npm` package to interact with the BugSnag CLI [#161](https://github.com/bugsnag/bugsnag-cli/pull/161)
+- Add support for `.so.*` files when processing NDK symbol files [#163](https://github.com/bugsnag/bugsnag-cli/pull/163)
+- Add additional logging to the Android AAB upload command [#165](https://github.com/bugsnag/bugsnag-cli/pull/165)
 
-## 2.7.0 (2024-11-26)
+## [2.8.0] - 2025-01-06
 
-### Enhancements
+### Added
+- Add the Xcode Archive Command to support the uploading of `xcarchive` files [#156](https://github.com/bugsnag/bugsnag-cli/pull/156)
+- Rename the `dsym` upload command to `xcode-build` to better reflect its purpose. `dsym` will be removed in the next major release [#156](https://github.com/bugsnag/bugsnag-cli/pull/156)
 
-- Add the `--configuration` option to the `upload dsym` command. [154](https://github.com/bugsnag/bugsnag-cli/pull/154)
+## [2.7.0] - 2024-11-26
 
-## 2.6.3 (2024-11-26)
+### Added
+- Add the `--configuration` option to the `upload dsym` command [#154](https://github.com/bugsnag/bugsnag-cli/pull/154)
 
-### Enhancements
+## [2.6.3] - 2024-11-26
 
-- Default the `--project-root` to the current working directory for the `upload dsym` command. [148](https://github.com/bugsnag/bugsnag-cli/pull/148)
+### Added
+- Default the `--project-root` to the current working directory for the `upload dsym` command [#148](https://github.com/bugsnag/bugsnag-cli/pull/148)
 
-### Fixes
+### Fixed
+- Add the `--code-bundle-id` option to the `upload js` command [#150](https://github.com/bugsnag/bugsnag-cli/pull/150)
 
-- Add the `--code-bundle-id` option to the `upload js` command. [150](https//github.com/bugsnag/bugsnag-cli/pull/150)
+## [2.6.2] - 2024-10-17
 
-## 2.6.2 (2024-10-17)
+### Fixed
+- Ensure that the Node package is configured correctly so that `npx @bugsnag/cli` and `yarn bugsnag-cli` work as expected [#144](https://github.com/bugsnag/bugsnag-cli/pull/144)
+- Replace the axios dependency with fetch to reduce package size [#145](https://github.com/bugsnag/bugsnag-cli/pull/145)
 
-### Fixes
+## [2.6.1] - 2024-09-18
 
-- Ensure that the node package is configured correctly so that you can run `npx @bugsnag/cli` and `yarn bugsnag-cli`. [144](https://github.com/bugsnag/bugsnag-cli/pull/144)
-- Replace the axios dependency with fetch to reduce the size of the package. [145](https://github.com/bugsnag/bugsnag-cli/pull/144)
+### Fixed
+- Ensure that only either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` is passed to the upload API [#140](https://github.com/bugsnag/bugsnag-cli/pull/140)
 
-## 2.6.1 (2024-09-18)
+## [2.6.0] - 2024-09-09
 
-### Fixes
+### Added
+- Add React Native super command [#127](https://github.com/bugsnag/bugsnag-cli/pull/127)
 
-- Ensure that we only pass either `--code-bundle-id` or `--version-code`/`--version-name`/`--bundle-version` to the upload API. [140](https://github.com/bugsnag/bugsnag-cli/pull/140)
+### Fixed
+- Allow spaces when processing and uploading dSYM files [#135](https://github.com/bugsnag/bugsnag-cli/pull/135)
 
-## 2.6.0 (2024-09-09)
+## [2.5.0] - 2024-07-31
 
-### Enhancements
+### Added
+- Add support for JavaScript source maps [#121](https://github.com/bugsnag/bugsnag-cli/pull/121)
 
-- Add React Native super command [127](https://github.com/bugsnag/bugsnag-cli/pull/127)
+## [2.4.1] - 2024-07-17
 
-### Fixes
+### Fixed
+- Ensure that extracted `.aab` files can be processed by the Android AAB upload function [#114](https://github.com/bugsnag/bugsnag-cli/pull/114)
+- Hide `--upload-api-root-url` and `--build-api-root-url` flags in the general help output [#115](https://github.com/bugsnag/bugsnag-cli/pull/115)
 
-- Allow spaces when processing and uploading dSYM files [135](https://github.com/bugsnag/bugsnag-cli/pull/135)
+## [2.4.0] - 2024-07-08
 
-## 2.5.0 (2024-07-31)
+### Added
+- Restrict input for the `--provider` option for `create-build` [#102](https://github.com/bugsnag/bugsnag-cli/pull/102)
 
-### Enhancements
+### Fixed
+- Ensure binary installation works correctly via PNPM and Yarn [#109](https://github.com/bugsnag/bugsnag-cli/pull/109)
 
-- Add support for JavaScript source maps [121](https://github.com/bugsnag/bugsnag-cli/pull/121)
+## [2.3.0] - 2024-06-04
 
-## 2.4.1 (2024-07-17)
+### Added
+- Add the ability to set the log level via the `--log-level` flag [#103](https://github.com/bugsnag/bugsnag-cli/pull/103)
+- Allow more flexible path searching when uploading NDK symbol files [#98](https://github.com/bugsnag/bugsnag-cli/pull/98)
 
-### Fixes
+### Fixed
+- Fix the error message when `--version-name` is missing [#103](https://github.com/bugsnag/bugsnag-cli/pull/103)
 
-- Ensure that extracted `.aab` files can be processed by the Android AAB upload function [114](https://github.com/bugsnag/bugsnag-cli/pull/114)
-- Dont show `--upload-api-root-url` and `--build-api-root-url` flags in the general help output [115](https://github.com/bugsnag/bugsnag-cli/pull/115)
+## [2.2.0] - 2024-04-17
 
-## 2.4.0 (2024-07-08)
+### Added
+- `upload android-proguard` will now attempt to automatically locate the `classes.dex` files if no build-uuid or dex-files are found or specified [#92](https://github.com/bugsnag/bugsnag-cli/pull/92)
+- Added the `--no-build-uuid` option to the `upload android-*` options [#92](https://github.com/bugsnag/bugsnag-cli/pull/92)
+- Added `Windows_NT` to `supported-platforms.yml` [#95](https://github.com/bugsnag/bugsnag-cli/pull/95)
 
-### Enhancements
+## [2.1.1] - 2023-03-22
 
-- Restrict input for the `--provider` option for `create-build` [102](https://github.com/bugsnag/bugsnag-cli/pull/102)
+### Fixed
+- Ensure that the `--retries` flag is correctly passed to the Unity Android upload API. [#91](https://github.com/bugsnag/bugsnag-cli/pull/91)
 
-### Fixes
+## [2.1.0] - 2023-03-18
 
-- Ensure that the binary is correctly installed when installing via PNPM and Yarn [109](https://github.com/bugsnag/bugsnag-cli/pull/109)
+### Removed
+- The `--fail-on-upload-error` option now has no affect: upload commands will now all return a non-zero exit code if the upload is unsuccessful. All 4xx and 5xx status codes from the upload API are treated as errors apart from duplicate files (409), which the command will not treat as an error case to allow re-run commands to succeed. [#95](https://github.com/bugsnag/bugsnag-cli/pull/90)
 
-## 2.3.0 (2024-06-04)
-
-### Enhancements
-
-- Add the ability to set the log leveL via the `--log-level` flag [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
-- Allow more flexible path searching when uploading NDK symbol files [98](https://github.com/bugsnag/bugsnag-cli/pull/98)
-
-### Fixes
-
-- Fix the error message when `--version-name` is missing [103](https://github.com/bugsnag/bugsnag-cli/pull/103)
-
-## 2.2.0 (2024-04-17)
-
-### Enhancements
-
-- `upload android-proguard` will now attempt to automatically locate the `classes.dex` files if no build-uuid or dex-files are found or specified [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
-- Added the `--no-build-uuid` option to the `upload android-*` options [92](https://github.com/bugsnag/bugsnag-cli/pull/92)
-- Added `Windows_NT` to `supported-platforms.yml` [95](https://github.com/bugsnag/bugsnag-cli/pull/95)
-
-## 2.1.1 (2023-03-22)
-
-### Fixes
-
-- Ensure that the `--retries` flag is correctly passed to the Unity Android upload API. [91](https://github.com/bugsnag/bugsnag-cli/pull/91)
-
-## 2.1.0 (2023-03-18)
-
-### Deprecations
-- The `--fail-on-upload-error` option now has no affect: upload commands will now all return a non-zero exit code if the upload is unsuccessful. All 4xx and 5xx status codes from the upload API are treated as errors apart from duplicate files (409), which the command will not treat as an error case to allow re-run commands to succeed. [95](https://github.com/bugsnag/bugsnag-cli/pull/90)
-
-### Enhancements
+### Added
 
 - Add support for React Native source maps for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-ios/)
 - Add support for dSYM uploads for iOS [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dsym/)
-- Allow `create build` to extract relevant information from a given Android manifest or AAB file.[65](https://github.com/bugsnag/bugsnag-cli/pull/65)
+- Allow `create build` to extract relevant information from a given Android manifest or AAB file. [#65](https://github.com/bugsnag/bugsnag-cli/pull/65)
 
-### Fixes
+### Fixed
 
-- Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [67](https://github.com/bugsnag/bugsnag-cli/pull/67)
-- Ensure that uploads are retried when passing the `--retries=x` argument to the CLI. [70](https://github.com/bugsnag/bugsnag-cli/pull/70)
+- Ensure that `--ios-app-path` exists when passed as an option via the `upload dart` CLI. [#67](https://github.com/bugsnag/bugsnag-cli/pull/67)
+- Ensure that uploads are retried when passing the `--retries=x` argument to the CLI. [#70](https://github.com/bugsnag/bugsnag-cli/pull/70)
 
-## 2.0.0 (2023-10-17)
+## [2.0.0] - 2023-10-17
 
-### Breaking Changes
-
-- Remove deprecated (renamed) CLI options - `--version`, `--app-version`, `--app-version-code` and `--app-bundle-version`. [52](https://github.com/bugsnag/bugsnag-cli/pull/52)
+### Removed
+- Remove deprecated (renamed) CLI options - `--version`, `--app-version`, `--app-version-code` and `--app-bundle-version`. [#52](https://github.com/bugsnag/bugsnag-cli/pull/52)
 
 See [Upgrading Guide](./UPGRADING.md) for full details.
 
-### Enhancements
+### Added
 
-- Add support for Unity Android symbol files. [56](https://github.com/bugsnag/bugsnag-cli/pull/56)
-- Add `--version` flag to the command to retrieve the version of the installed CLI. [51](https://github.com/bugsnag/bugsnag-cli/pull/51)
-- Add `--dry-run` flag to all upload commands to validate but not upload source maps. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
-- Automatically generate a unique value for the `buildUUID` parameter from `.aab` files when not specified in the `AndroidManifest` or `--build-uuid` option. [54](https://github.com/bugsnag/bugsnag-cli/pull/54)
-- Add `--dex-files` flag to `upload android-proguard` to generate a unique value for the `buildUUID` from `classes.dex` files when uploading a `mapping.txt` [61](https://github.com/bugsnag/bugsnag-cli/pull/61)
+- Add support for Unity Android symbol files. [#56](https://github.com/bugsnag/bugsnag-cli/pull/56)
+- Add `--version` flag to the command to retrieve the version of the installed CLI. [#51](https://github.com/bugsnag/bugsnag-cli/pull/51)
+- Add `--dry-run` flag to all upload commands to validate but not upload source maps. [#54](https://github.com/bugsnag/bugsnag-cli/pull/54)
+- Automatically generate a unique value for the `buildUUID` parameter from `.aab` files when not specified in the `AndroidManifest` or `--build-uuid` option. [#54](https://github.com/bugsnag/bugsnag-cli/pull/54)
+- Add `--dex-files` flag to `upload android-proguard` to generate a unique value for the `buildUUID` from `classes.dex` files when uploading a `mapping.txt` [#61](https://github.com/bugsnag/bugsnag-cli/pull/61)
 
-## 1.2.2 (2023-07-11)
+## [1.2.2] - 2023-07-11
 
-### Enhancements
+### Added
+- Do not modify the projects package.json when installing the CLI via NPM. [#50](https://github.com/bugsnag/bugsnag-cli/pull/50)
+- Adjust `index.android.bundle` path checking for React Native Android to ensure that paths are tested correctly. [#49](https://github.com/bugsnag/bugsnag-cli/pull/49)
 
-- Do not modify the projects package.json when installing the CLI via NPM. [50](https://github.com/bugsnag/bugsnag-cli/pull/50)
+## [1.2.1] - 2023-07-03
 
-- Adjust `index.android.bundle` path checking for React Native Android to ensure that paths are tested correctly. [49](https://github.com/bugsnag/bugsnag-cli/pull/49)
+### Added
+- Allow non-standard variants when not providing the bundle path as a flag to the CLI. [#44](https://github.com/bugsnag/bugsnag-cli/pull/44)
+- Add bundle path support for React Native 0.72. [#46](https://github.com/bugsnag/bugsnag-cli/pull/46)
 
-## 1.2.1 (2023-07-03)
+## [1.2.0] - 2023-06-29
 
-### Enhancements
+### Added
+- Add support for installing the CLI via NPM - [#39](https://github.com/bugsnag/bugsnag-cli/pull/39)
+- Move global `appVersion`, `appVersionCode` and `appBundleVersion` flags to sub commands for `dart` and `create-build` - [#41](https://github.com/bugsnag/bugsnag-cli/pull/41)
+- Get values from Android AAB manifest via resource ID - [#41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
-- Allow non-standard variants when not providing the bundle path as a flag to the CLI. [44](https://github.com/bugsnag/bugsnag-cli/pull/44)
+### Fixed
+- Correct `buildUUID` name in server requests for Android Proguard - [#41](https://github.com/bugsnag/bugsnag-cli/pull/41)
 
-- Add bundle path support for React Native 0.72. [46](https://github.com/bugsnag/bugsnag-cli/pull/46)
+## [1.1.1] -v2023-05-25
 
-## 1.2.0 (2023-06-29)
+### Fixed
+- Fix how we check for the AndroidManifest.xml file for Android AAB - [#37](https://github.com/bugsnag/bugsnag-cli/pull/37)
 
-### Enhancements
+## [1.1.0] - 2023-05-10
 
-- Add support for installing the CLI via NPM - [39](https://github.com/bugsnag/bugsnag-cli/pull/39)
-
-- Move global `appVersion`, `appVersionCode` and `appBundleVersion` flags to sub commands for `dart` and `create-build` - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
-
-- Get values from Android AAB manifest via resource ID - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
-
-### Fixes
-
-- Correct `buildUUID` name in server requests for Android Proguard - [41](https://github.com/bugsnag/bugsnag-cli/pull/41)
-
-## 1.1.1 (2023-05-25)
-
-### Fixes
-
-- Fix how we check for the AndroidManifest.xml file for Android AAB - [37](https://github.com/bugsnag/bugsnag-cli/pull/37)
-
-## 1.1.0 (2023-05-10)
-
-### Enhancements
-
+### Added
 Add support for:
 - React Native source maps for Android - see our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn-android/)
 - Android AAB files - see our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-aab/)
@@ -193,6 +183,5 @@ Add support for:
 
 Add the `create-build` command to provide extra information whenever you build, release, or deploy your application. - see our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/create-build/)
 
-## 1.0.0 (2022-11-29)
-
+## [1.0.0] - 2022-11-29
 - Initial release with support for Dart symbol files – see our [online docs](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dart/).
