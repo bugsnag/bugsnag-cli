@@ -40,7 +40,7 @@ steps:
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner features/cli
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/cli
     plugins:
       artifacts#v1.5.0:
         download:
@@ -53,7 +53,7 @@ steps:
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner features/android
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/android
     env:
       JAVA_VERSION: 17
     plugins:
@@ -68,7 +68,7 @@ steps:
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner features/dart
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/dart
     env:
       FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
     plugins:
@@ -85,7 +85,7 @@ steps:
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner features/xcode
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/xcode
     plugins:
       artifacts#v1.5.0:
         download:
@@ -98,7 +98,7 @@ steps:
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner features/js
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/js
     plugins:
       artifacts#v1.5.0:
         download:
@@ -113,7 +113,7 @@ steps:
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner features/unity-android
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/unity-android
     plugins:
       artifacts#v1.5.0:
         download:
@@ -126,7 +126,7 @@ steps:
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
-      - bundle exec maze-runner features/breakpad
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/breakpad
     plugins:
       artifacts#v1.5.0:
         download:
