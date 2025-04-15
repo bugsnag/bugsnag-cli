@@ -29,7 +29,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "3.0"
-    And the sourcemap payload field "sharedObjectName" ends with ".so"
+    And the sourcemap payload field "sharedObjectName" ends with ".so.sym"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uploading Android AAB file with Dexguard with --verbose
@@ -41,7 +41,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "3.0"
-    And the sourcemap payload field "sharedObjectName" ends with ".so"
+    And the sourcemap payload field "sharedObjectName" ends with ".so.sym"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Build and Upload Android AAB file
@@ -55,7 +55,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "sharedObjectName" ends with ".so"
+    And the sourcemap payload field "sharedObjectName" ends with ".so.sym"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Build and Upload Android AAB file with --verbose
@@ -70,7 +70,7 @@ Feature: Android AAB Integration Test
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "sharedObjectName" ends with ".so"
+    And the sourcemap payload field "sharedObjectName" ends with ".so.sym"
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uploading Android AAB file when command is run from project root
