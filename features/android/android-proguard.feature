@@ -1,7 +1,7 @@
 Feature: Android Proguard Integration Test
 
   Scenario: Upload an Android Proguard mapping file using all CLI flags
-    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --application-id="com.exampleApp.android" --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --build-uuid=1234567890abcdefghijklmnopqrstuvwxyz --variant=release --version-code=2 --version-name=2.0 features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --application-id="com.exampleApp.android" --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --build-uuid=1234567890abcdefghijklmnopqrstuvwxyz --variant=release --version-code=2 --version-name=2.0 features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Proguard Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -13,7 +13,7 @@ Feature: Android Proguard Integration Test
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Upload an Android Proguard mapping file providing the app-manifest CLI flag
-    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Proguard Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -25,7 +25,7 @@ Feature: Android Proguard Integration Test
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Upload an Android Proguard mapping file providing no flags to the CLI
-    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Proguard Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -40,7 +40,7 @@ Feature: Android Proguard Integration Test
     When I make the "features/base-fixtures/android"
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:9339 --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/android
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/base-fixtures/android
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the Proguard Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
