@@ -6,7 +6,7 @@
 @BuildRNAndroid
 Feature: React Native Android Integration Tests
   Scenario: Upload a single React Native Android sourcemap using all escape hatches
-    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --bundle=$BUNDLE_PATH --source-map=$SOURCE_MAP_PATH --app-manifest=$APP_MANIFEST_PATH --version-name=2.0 --variant=release --version-code=2 --overwrite
+    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --bundle=$BUNDLE_PATH --source-map=$SOURCE_MAP_PATH --app-manifest=$APP_MANIFEST_PATH --version-name=2.0 --variant=release --version-code=2 --overwrite
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -17,7 +17,7 @@ Feature: React Native Android Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Upload a single React Native Android sourcemap, only passing bundle, sourcemap and manifest options
-    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --bundle=$BUNDLE_PATH --source-map=$SOURCE_MAP_PATH --app-manifest=$APP_MANIFEST_PATH --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
+    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --bundle=$BUNDLE_PATH --source-map=$SOURCE_MAP_PATH --app-manifest=$APP_MANIFEST_PATH --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -28,7 +28,7 @@ Feature: React Native Android Integration Tests
     And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Upload a single React Native Android sourcemap
-    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:9339 --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
+    When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
     And I wait to receive 1 sourcemaps
     Then the sourcemap is valid for the React Native Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
