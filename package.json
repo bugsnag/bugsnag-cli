@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "BugSnag CLI",
   "main": "bugsnag-cli-wrapper.js",
   "bin": {

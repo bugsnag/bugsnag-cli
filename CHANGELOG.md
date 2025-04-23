@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.1] - 2025-04-23
+
+### Fixed
+- Update the command referenced in the missing bundle error message [#178]()
+
 ## [3.0.0] - 2025-04-07
 
 This major release includes some breaking changes – please see our [Upgrading Guide](./UPGRADING.md) for full details.
