@@ -3,7 +3,7 @@
 ## [3.0.1] - 2025-04-23
 
 ### Fixed
-- Update the command referenced in the missing bundle error message [#178]()
+- Update the command referenced in the missing bundle error message [#195](https://github.com/bugsnag/bugsnag-cli/pull/195)
 
 ## [3.0.0] - 2025-04-07
 
