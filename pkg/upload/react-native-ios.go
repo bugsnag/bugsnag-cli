@@ -132,7 +132,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 
 	// Check that we now have a bundle path
 	if iosOptions.ReactNative.Bundle == "" {
-		return fmt.Errorf("Could not find a bundle file, please specify the path by using --bundle-path")
+		return fmt.Errorf("Could not find a bundle file, please specify the path by using --bundle")
 	}
 
 	// Check that the source map file exists and error out if it doesn't
