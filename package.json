@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "BugSnag CLI",
   "main": "bugsnag-cli-wrapper.js",
+  "types": "bugsnag-cli-wrapper.d.ts",
   "bin": {
     "bugsnag-cli": "bin/bugsnag-cli"
   },
