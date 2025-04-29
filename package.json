@@ -1,8 +1,9 @@
 {
   "name": "@bugsnag/cli",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "BugSnag CLI",
   "main": "bugsnag-cli-wrapper.js",
+  "types": "bugsnag-cli-wrapper.d.ts",
   "bin": {
     "bugsnag-cli": "bin/bugsnag-cli"
   },
@@ -26,7 +27,8 @@
     "bugsnag-cli-install.js",
     "bugsnag-cli-wrapper.js",
     "bin/bugsnag-cli",
-    "supported-platforms.yml"
+    "supported-platforms.yml",
+    "bugsnag-cli-wrapper.d.ts"
   ],
   "scripts": {
     "postinstall": "node bugsnag-cli-install.js"

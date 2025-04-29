@@ -14,7 +14,7 @@ steps:
     commands:
       - "chmod +x bin/arm64-macos-bugsnag-cli"
       - "bundle install"
-      - "bundle exec maze-runner features/react-native/android.feature"
+      - "bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/react-native/android.feature"
     matrix:
       - "0.70"
       - "0.73"

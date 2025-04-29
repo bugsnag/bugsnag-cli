@@ -53,7 +53,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 				bundleDirPath = filepath.Join(buildDirPath, "generated", "assets")
 				variantFileFormat = "createBundle%sJsAndAssets"
 			} else {
-				return fmt.Errorf("unable to find index.android.bundle in your project, please specify the path using --bundle-path")
+				return fmt.Errorf("unable to find index.android.bundle in your project, please specify the path using --bundle")
 			}
 
 			if bundleDirPath != "" {
