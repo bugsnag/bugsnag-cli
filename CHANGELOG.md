@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.1] - 2025-04-23
+## [3.0.1] - 2025-04-29
 
 ### Added
 - Add TypeScript definitions to cli wrapper [#196](https://github.com/bugsnag/bugsnag-cli/pull/196)
