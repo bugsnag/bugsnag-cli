@@ -1,9 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [3.0.1] - 2025-04-29
 
 ### Added
 - Add TypeScript definitions to cli wrapper [#196](https://github.com/bugsnag/bugsnag-cli/pull/196)
+
+### Fixed
+- Update the command referenced in the missing bundle error message [#195](https://github.com/bugsnag/bugsnag-cli/pull/195)
 
 ## [3.0.0] - 2025-04-07
 

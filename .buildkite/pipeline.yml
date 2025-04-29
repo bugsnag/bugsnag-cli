@@ -109,7 +109,7 @@ steps:
   - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
-      UNITY_VERSION: 6000.0.36f1
+      UNITY_VERSION: 6000.0.47f1
     agents:
       queue: macos-14-isolated
     commands:
