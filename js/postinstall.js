@@ -1,45 +1,31 @@
-import fs from 'fs'
-import { Readable } from 'stream'
-import { ReadableStream } from 'stream/web'
-import { createWriteStream } from 'fs'
-import path from 'path'
-import os from 'os'
-import YAML from 'yaml'
-import packageJson from './package.json'
+const fs = require('fs')
+const { Readable } = require('stream')
+const { createWriteStream } = require('fs')
+const path = require('path')
+const os = require('os')
+const YAML = require('yaml')
+const packageJson = require('./package.json')
 
-interface SupportedPlatform {
-    TYPE: string
-    ARCHITECTURE: string
-    ARTIFACT_NAME: string
-    BINARY_NAME: string
-}
-
-interface PackageJson {
-    name: string
-    repository: { url: string }
-    version: string
-}
-
-const supportedPlatformsConfig: string = fs.readFileSync(
+const supportedPlatformsConfig = fs.readFileSync(
     path.join(__dirname, 'supported-platforms.yml'),
     'utf8'
 )
 
-const supportedPlatforms: SupportedPlatform[] = YAML.parse(supportedPlatformsConfig)
-const { name, repository, version }: PackageJson = packageJson as PackageJson
+const supportedPlatforms = YAML.parse(supportedPlatformsConfig)
+const { name, repository, version } = packageJson
 
-const handleError = (msg: string) => {
+const handleError = (msg) => {
     console.error(msg)
     process.exit(1)
 }
 
-const removeGitPrefixAndSuffix = (input: string): string => {
+const removeGitPrefixAndSuffix = (input) => {
     let result = input.replace(/^git\+/, '')
     result = result.replace(/\.git$/, '')
     return result
 }
 
-const getPlatformMetadata = (): SupportedPlatform | undefined => {
+const getPlatformMetadata = () => {
     const type = os.type()
     const architecture = os.arch()
 
@@ -64,7 +50,7 @@ const getPlatformMetadata = (): SupportedPlatform | undefined => {
     )
 }
 
-const downloadBinaryFromGitHub = async (downloadUrl: string, outputPath: string): Promise<void> => {
+const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
     try {
         const binDir = path.resolve(process.cwd(), 'bin')
         if (!fs.existsSync(binDir)) {
@@ -75,21 +61,21 @@ const downloadBinaryFromGitHub = async (downloadUrl: string, outputPath: string)
 
         if (resp.ok && resp.body) {
             const writer = createWriteStream(outputPath)
-            Readable.fromWeb(resp.body as ReadableStream).pipe(writer)
+            Readable.fromWeb(resp.body).pipe(writer)
         } else {
             throw new Error(`Failed to download. Status: ${resp.status}`)
         }
 
         fs.chmodSync(outputPath, 0o755)
         console.log('Binary downloaded successfully!')
-    } catch (err: any) {
+    } catch (err) {
         console.error('Error downloading binary:', err.message)
     }
 }
 
 const platformMetadata = getPlatformMetadata()
 const repoUrl = removeGitPrefixAndSuffix(repository.url)
-const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata?.ARTIFACT_NAME}`
-const binaryOutputPath = path.join(process.cwd(), 'bin', platformMetadata?.BINARY_NAME || '')
+const binaryUrl = `${repoUrl}/releases/download/v${version}/${platformMetadata.ARTIFACT_NAME}`
+const binaryOutputPath = path.join(process.cwd(), 'bin', platformMetadata.BINARY_NAME)
 
 downloadBinaryFromGitHub(binaryUrl, binaryOutputPath)
