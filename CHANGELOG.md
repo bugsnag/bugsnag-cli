@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Changed
+
+- Convert the NPM package to TypeScript [#199](https://github.com/bugsnag/bugsnag-cli/pull/199)
+
 ## [3.0.1] - 2025-04-29
 
 ### Added
