@@ -5,7 +5,7 @@
   "main": "dist/bugsnag-cli-wrapper.js",
   "types": "dist/bugsnag-cli-wrapper.d.ts",
   "bin": {
-    "bugsnag-cli": "bin/bugsnag-cli"
+    "bugsnag-cli": "dist/bin/bugsnag-cli"
   },
   "repository": {
     "type": "git",
@@ -24,14 +24,12 @@
     "yaml": "^2.7.0"
   },
   "files": [
-    "dist",
-    "bugsnag-cli-install.js",
-    "bin/bugsnag-cli",
-    "supported-platforms.yml"
+    "dist/*"
   ],
   "scripts": {
-    "postinstall": "node bugsnag-cli-install.js",
-    "build": "tsc"
+    "postinstall": "node dist/bugsnag-cli-install.js",
+    "build": "tsc",
+    "postbuild": "cp supported-platforms.yml dist/ && mkdir dist/bin && cp bin/bugsnag-cli dist/bin/"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
