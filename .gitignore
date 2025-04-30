@@ -1,9 +1,7 @@
-bugsnag-cli
 Gemfile.lock
 bin/*
 bin/**/**
 .DS_Store
-dist
 
 # NodeJS
 node_modules/
