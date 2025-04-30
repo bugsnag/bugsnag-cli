@@ -31,6 +31,11 @@
     "bugsnag-cli-wrapper.d.ts"
   ],
   "scripts": {
-    "postinstall": "node bugsnag-cli-install.js"
+    "postinstall": "node bugsnag-cli-install.js",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.8.3"
   }
 }
