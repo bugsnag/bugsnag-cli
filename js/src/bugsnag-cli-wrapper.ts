@@ -82,7 +82,7 @@ class BugsnagCLI {
     /**
      * Execute a Bugsnag CLI command
      */
-    static run(command: string, options = {}, target = '') {
+    static run(command: string, options = {}, target = ''): Promise<string> {
         return new Promise((resolve, reject) => {
             // Convert the options keys from camelCase to kebab-case
             const kebabCaseOptions = Object.entries(options)
@@ -122,24 +122,24 @@ class BugsnagCLI {
     static Upload = {
 
         ReactNative: Object.assign(
-            (options: BugsnagUploadReactNativeOptions = {}, target = '') =>
+            (options: BugsnagUploadReactNativeOptions = {}, target = ''): Promise<string> =>
                 BugsnagCLI.run('upload react-native', options, target), // Default ReactNative command
             {
-                iOS: (options: BugsnagUploadiOSOptions = {}, target = '') =>
+                iOS: (options: BugsnagUploadiOSOptions = {}, target = ''): Promise<string> =>
                     BugsnagCLI.run('upload react-native-ios', options, target),
             
-                Android: (options: BugsnagUploadAndroidOptions = {}, target = '') =>
+                Android: (options: BugsnagUploadAndroidOptions = {}, target = ''): Promise<string> =>
                     BugsnagCLI.run('upload react-native-android', options, target),
             }
         ),
-        Js: (options: BugsnagUploadJsOptions = {}, target = '') =>
+        Js: (options: BugsnagUploadJsOptions = {}, target = ''): Promise<string> =>
             BugsnagCLI.run('upload js', options, target),
     }
 
     /**
      * Send build information to Bugsnag
      */
-    static CreateBuild(options: BugsnagCreateBuildOptions = {}, target = '') {
+    static CreateBuild(options: BugsnagCreateBuildOptions = {}, target = ''): Promise<string> {
         return new Promise((resolve, reject) => {
             try {
                 const output = BugsnagCLI.run('create-build', options, target)
