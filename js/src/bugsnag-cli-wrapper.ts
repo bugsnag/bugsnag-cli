@@ -26,13 +26,19 @@ export interface BugsnagCreateBuildOptions extends BaseOptions {
     appManifest?: string
     versionCode?: string
     bundleVersion?: string
-} 
+}
 
-export interface BugsnagUploadReactNativeOptions extends BaseOptions {
+interface UploadOptions extends BaseOptions {
+    uploadApiRootUrl?: string
+    projectRoot?: string
+    dev?: boolean
     bundle?: string
-    codeBundleId?: string
-    sourceMap?: string
     versionName?: string
+    sourceMap?: string
+    codeBundleId?: string
+}
+
+export interface BugsnagUploadReactNativeOptions extends UploadOptions {
     androidAppManifest?: string
     androidVariant?: string
     androidVersionCode?: string
@@ -42,35 +48,24 @@ export interface BugsnagUploadReactNativeOptions extends BaseOptions {
     iosXcodeProject?: string
 }
 
-export interface BugsnagUploadiOSOptions extends BaseOptions {
-    bundle?: string
-    codeBundleId?: string
+export interface BugsnagUploadiOSOptions extends UploadOptions {
     sourceMap?: string
-    versionName?: string
     bundleVersion?: string
     plist?: string
     scheme?: string
     xcodeProject?: string
 }
 
-export interface BugsnagUploadAndroidOptions extends BaseOptions {
-    bundle?: string
-    codeBundleId?: string
-    sourceMap?: string
-    versionName?: string
+export interface BugsnagUploadAndroidOptions extends UploadOptions {
     appManifest?: string
     variant?: string
     versionCode?: string
 }
 
-export interface BugsnagUploadJsOptions extends BaseOptions {
+export interface BugsnagUploadJsOptions extends UploadOptions {
     baseUrl?: string
-    bundle?: string
     bundleUrl?: string
     projectRoot?: string
-    sourceMap?: string
-    versionName?: string
-    codeBundleId?: string
 }
 
 /**
