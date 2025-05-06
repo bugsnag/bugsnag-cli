@@ -50,7 +50,7 @@ unit-test:
 
 .PHONY: npm-lint
 npm-lint:
-	npm i && npm install -g npm-check && npm-check
+	cd js && npm i && npm install -g npm-check && npm-check
 
 .PHONY: go-lint
 go-lint:
