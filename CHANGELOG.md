@@ -2,6 +2,10 @@
 
 ## [unreleased]
 
+### Added
+
+- Add support for Linux ARM platforms []()
+
 ### Changed
 
 - Convert the NPM package to TypeScript [#199](https://github.com/bugsnag/bugsnag-cli/pull/199)
