@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Call the CLI directly rather than using NPX in the JS CLI wrapper []()
+- Call the CLI directly rather than using NPX in the JS CLI wrapper [#201](https://github.com/bugsnag/bugsnag-cli/pull/201)
 
 ### Changed
 
