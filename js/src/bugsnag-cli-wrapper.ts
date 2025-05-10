@@ -1,4 +1,5 @@
 import { exec } from 'child_process'
+import * as path from "path";
 
 interface BaseOptions {
     apiKey?: string
@@ -99,7 +100,8 @@ class BugsnagCLI {
                 .join(' ')
 
             const positionalArg = target ? `"${target}"` : ''
-            const cliCommand = `npx bugsnag-cli ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
+            const binPath = path.resolve(__dirname, 'bin/bugsnag-cli')
+            const cliCommand = `${binPath} ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
 
             // Execute the command
             exec(cliCommand, (error, stdout, stderr) => {
