@@ -4,7 +4,7 @@
 
 ### Added
 
-- Add support for Linux ARM platforms []()
+- Add support for Linux ARM platforms [#202](https://github.com/bugsnag/bugsnag-cli/pull/202)
 
 ### Changed
 
