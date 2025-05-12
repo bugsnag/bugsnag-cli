@@ -1,72 +1,6 @@
-import { exec } from 'child_process'
-
-interface BaseOptions {
-    apiKey?: string
-    dryRun?: boolean
-    logLevel?: string
-    port?: number
-    failOnUploadError?: boolean
-    verbose?: boolean
-    overwrite?: boolean
-    retries?: number
-    timeout?: number
-}
-
-export interface BugsnagCreateBuildOptions extends BaseOptions {
-    autoAssignRelease?: boolean
-    buildApiRootUrl?: string
-    builderName?: string
-    metadata?: object
-    provider?: string
-    releaseStage?: string
-    repository?: string
-    revision?: string
-    versionName?: string
-    androidAab?: string
-    appManifest?: string
-    versionCode?: string
-    bundleVersion?: string
-}
-
-interface UploadOptions extends BaseOptions {
-    uploadApiRootUrl?: string
-    projectRoot?: string
-    dev?: boolean
-    bundle?: string
-    versionName?: string
-    sourceMap?: string
-    codeBundleId?: string
-}
-
-export interface BugsnagUploadReactNativeOptions extends UploadOptions {
-    androidAppManifest?: string
-    androidVariant?: string
-    androidVersionCode?: string
-    iosBundleVersion?: string
-    iosPlist?: string
-    iosScheme?: string
-    iosXcodeProject?: string
-}
-
-export interface BugsnagUploadiOSOptions extends UploadOptions {
-    sourceMap?: string
-    bundleVersion?: string
-    plist?: string
-    scheme?: string
-    xcodeProject?: string
-}
-
-export interface BugsnagUploadAndroidOptions extends UploadOptions {
-    appManifest?: string
-    variant?: string
-    versionCode?: string
-}
-
-export interface BugsnagUploadJsOptions extends UploadOptions {
-    baseUrl?: string
-    bundleUrl?: string
-    projectRoot?: string
-}
+import { execFile } from 'child_process'
+import { BugsnagCreateBuildOptions, BugsnagUploadiOSOptions, BugsnagUploadJsOptions, BugsnagUploadAndroidOptions, BugsnagUploadReactNativeOptions } from './types'
+import * as path from "path"
 
 /**
  * Wrapper for Bugsnag CLI
@@ -98,13 +32,13 @@ class BugsnagCLI {
                 .filter(Boolean)
                 .join(' ')
 
-            const positionalArg = target ? `"${target}"` : ''
-            const cliCommand = `npx bugsnag-cli ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
-
+            const binPath = path.resolve(__dirname, path.join('..','bin','bugsnag-cli'))
+            // Split CLI options to pass to execFile
+            const args = [...command.split(" "), ...kebabCaseOptions.split(" "), target.trim()]
             // Execute the command
-            exec(cliCommand, (error, stdout, stderr) => {
+            execFile(binPath, args, (error, stdout, stderr) => {
                 if (error) {
-                    const errorMessage = `Command failed: ${cliCommand}\n` +
+                    const errorMessage = `Command failed: ${binPath}\n` +
                         `Error: ${error.message}\n` +
                         `${stdout.trim()}`
                     reject(errorMessage)
@@ -156,4 +90,4 @@ class BugsnagCLI {
 
 }
 
-export default BugsnagCLI
+export = BugsnagCLI

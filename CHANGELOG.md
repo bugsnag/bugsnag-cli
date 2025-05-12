@@ -1,6 +1,14 @@
 # Changelog
 
-## [unreleased]
+## [3.1.0] - 2025-05-12
+
+### Added
+
+- Add support for Linux ARM platforms [#202](https://github.com/bugsnag/bugsnag-cli/pull/202)
+
+### Fixed
+
+- Call the CLI directly rather than using NPX in the JS CLI wrapper [#201](https://github.com/bugsnag/bugsnag-cli/pull/201)
 
 ### Changed
 
