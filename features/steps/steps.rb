@@ -202,7 +202,7 @@ Before('@installation') do
   # Change directory to the js directory
   @js_dir = "#{base_dir}/js"
   Dir.chdir(@js_dir)
-  @output = `npm pack`
+  @output = `npm i && npm pack`
   @bugsnag_cli_package_path = "#{@js_dir}/#{@output}"
   Dir.chdir(base_dir)
 end
