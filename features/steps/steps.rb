@@ -199,8 +199,12 @@ Then(/^I should only see the fatal log level messages$/) do
 end
 
 Before('@installation') do
-  @output = `npm pack`
-  @bugsnag_cli_package_path = "#{base_dir}/#{@output}"
+  # Change directory to the js directory
+  @js_dir = "#{base_dir}/js"
+  Dir.chdir(@js_dir)
+  @output = `npm i && npm pack`
+  @bugsnag_cli_package_path = "#{@js_dir}/#{@output}"
+  Dir.chdir(base_dir)
 end
 
 When('I install the bugsnag-cli via {string} in a new directory') do |package_manager|

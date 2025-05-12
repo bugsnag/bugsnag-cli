@@ -30,6 +30,7 @@ build-windows:
 .PHONY: build-linux
 build-linux:
 	[ -d bin ] || mkdir -p bin
+	GOOS=linux GOARCH=arm64 go build -ldflags '-s' -o bin/arm64-linux-bugsnag-cli main.go
 	GOOS=linux GOARCH=amd64 go build -ldflags '-s' -o bin/x86_64-linux-bugsnag-cli main.go
 	GOOS=linux GOARCH=386 go build -ldflags '-s' -o bin/i386-linux-bugsnag-cli main.go
 
@@ -50,7 +51,7 @@ unit-test:
 
 .PHONY: npm-lint
 npm-lint:
-	npm i && npm install -g npm-check && npm-check
+	cd js && npm i && npm install -g npm-check && npm-check
 
 .PHONY: go-lint
 go-lint:

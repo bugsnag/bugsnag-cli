@@ -1,27 +1,29 @@
 const fs = require('fs')
+const { Readable } = require('stream')
+const { createWriteStream } = require('fs')
 const path = require('path')
 const os = require('os')
 const YAML = require('yaml')
-const createWriteStream = require('fs').createWriteStream
-const Readable = require('stream').Readable
+const packageJson = require('./package.json')
 
-const supportedPlatformsConfig = fs.readFileSync(path.join(__dirname, 'supported-platforms.yml'), 'utf8')
-const { name, repository, version } = require('./package.json')
+const supportedPlatformsConfig = fs.readFileSync(
+    path.join(__dirname, 'supported-platforms.yml'),
+    'utf8'
+)
+
+const supportedPlatforms = YAML.parse(supportedPlatformsConfig)
+const { name, repository, version } = packageJson
 
 const handleError = (msg) => {
     console.error(msg)
     process.exit(1)
 }
 
-// Remove the git prefix and suffix from the repository URL
 const removeGitPrefixAndSuffix = (input) => {
     let result = input.replace(/^git\+/, '')
     result = result.replace(/\.git$/, '')
     return result
 }
-
-// Parse supported-platforms.yml into an iterable array
-const supportedPlatforms = YAML.parse(supportedPlatformsConfig)
 
 const getPlatformMetadata = () => {
     const type = os.type()
@@ -33,13 +35,11 @@ const getPlatformMetadata = () => {
         }
     }
 
-    const supportedPlatformsTable = supportedPlatforms.map((platform) => {
-        return {
-            Type: platform.TYPE,
-            Architecture: platform.ARCHITECTURE,
-            Artifact: platform.ARTIFACT_NAME
-        }
-    })
+    const supportedPlatformsTable = supportedPlatforms.map((platform) => ({
+        Type: platform.TYPE,
+        Architecture: platform.ARCHITECTURE,
+        Artifact: platform.ARTIFACT_NAME
+    }))
 
     handleError(
         `Platform with type "${type}" and architecture "${architecture}" is not supported by ${name}.\nYour system must be one of the following:\n\n${JSON.stringify(
@@ -57,15 +57,16 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
             fs.mkdirSync(binDir, { recursive: true })
         }
 
-        const fileName = downloadUrl.split("/").pop()
         const resp = await fetch(downloadUrl)
 
         if (resp.ok && resp.body) {
-            let writer = createWriteStream(outputPath)
+            const writer = createWriteStream(outputPath)
             Readable.fromWeb(resp.body).pipe(writer)
+        } else {
+            throw new Error(`Failed to download. Status: ${resp.status}`)
         }
 
-        fs.chmodSync(outputPath, '755')
+        fs.chmodSync(outputPath, 0o755)
         console.log('Binary downloaded successfully!')
     } catch (err) {
         console.error('Error downloading binary:', err.message)

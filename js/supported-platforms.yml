@@ -24,6 +24,11 @@
   BINARY_NAME: 'bugsnag-cli'
 
 - TYPE: 'Linux'
+  ARCHITECTURE: 'arm64'
+  ARTIFACT_NAME: 'arm64-linux-bugsnag-cli'
+  BINARY_NAME: 'bugsnag-cli'
+
+- TYPE: 'Linux'
   ARCHITECTURE: 'i386'
   ARTIFACT_NAME: 'i386-linux-bugsnag-cli'
   BINARY_NAME: 'bugsnag-cli'
