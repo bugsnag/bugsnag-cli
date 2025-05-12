@@ -1,73 +1,6 @@
 import { exec } from 'child_process'
-import * as path from "path";
-
-interface BaseOptions {
-    apiKey?: string
-    dryRun?: boolean
-    logLevel?: string
-    port?: number
-    failOnUploadError?: boolean
-    verbose?: boolean
-    overwrite?: boolean
-    retries?: number
-    timeout?: number
-}
-
-export interface BugsnagCreateBuildOptions extends BaseOptions {
-    autoAssignRelease?: boolean
-    buildApiRootUrl?: string
-    builderName?: string
-    metadata?: object
-    provider?: string
-    releaseStage?: string
-    repository?: string
-    revision?: string
-    versionName?: string
-    androidAab?: string
-    appManifest?: string
-    versionCode?: string
-    bundleVersion?: string
-}
-
-interface UploadOptions extends BaseOptions {
-    uploadApiRootUrl?: string
-    projectRoot?: string
-    dev?: boolean
-    bundle?: string
-    versionName?: string
-    sourceMap?: string
-    codeBundleId?: string
-}
-
-export interface BugsnagUploadReactNativeOptions extends UploadOptions {
-    androidAppManifest?: string
-    androidVariant?: string
-    androidVersionCode?: string
-    iosBundleVersion?: string
-    iosPlist?: string
-    iosScheme?: string
-    iosXcodeProject?: string
-}
-
-export interface BugsnagUploadiOSOptions extends UploadOptions {
-    sourceMap?: string
-    bundleVersion?: string
-    plist?: string
-    scheme?: string
-    xcodeProject?: string
-}
-
-export interface BugsnagUploadAndroidOptions extends UploadOptions {
-    appManifest?: string
-    variant?: string
-    versionCode?: string
-}
-
-export interface BugsnagUploadJsOptions extends UploadOptions {
-    baseUrl?: string
-    bundleUrl?: string
-    projectRoot?: string
-}
+import { BugsnagCreateBuildOptions, BugsnagUploadiOSOptions, BugsnagUploadJsOptions, BugsnagUploadAndroidOptions, BugsnagUploadReactNativeOptions } from './types'
+import * as path from "path"
 
 /**
  * Wrapper for Bugsnag CLI
@@ -100,7 +33,7 @@ class BugsnagCLI {
                 .join(' ')
 
             const positionalArg = target ? `"${target}"` : ''
-            const binPath = path.resolve(__dirname, 'bin/bugsnag-cli')
+            const binPath = path.resolve(__dirname, path.join('..','bin','bugsnag-cli'))
             const cliCommand = `${binPath} ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
 
             // Execute the command
@@ -158,4 +91,4 @@ class BugsnagCLI {
 
 }
 
-export default BugsnagCLI
+export = BugsnagCLI

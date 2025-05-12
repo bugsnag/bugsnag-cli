@@ -33,7 +33,7 @@
     "build": "tsc",
     "postinstall": "node postinstall.js",
     "prepack": "npm run prepublish",
-    "prepublish": "cp bin/bugsnag-cli-placeholder bin/bugsnag-cli"
+    "prepublish": "npm run build && cp bin/bugsnag-cli-placeholder bin/bugsnag-cli"
   },
   "devDependencies": {
     "@types/node": "^22.15.3",
