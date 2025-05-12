@@ -1,4 +1,4 @@
-import { exec } from 'child_process'
+import { execFile } from 'child_process'
 import { BugsnagCreateBuildOptions, BugsnagUploadiOSOptions, BugsnagUploadJsOptions, BugsnagUploadAndroidOptions, BugsnagUploadReactNativeOptions } from './types'
 import * as path from "path"
 
@@ -32,14 +32,13 @@ class BugsnagCLI {
                 .filter(Boolean)
                 .join(' ')
 
-            const positionalArg = target ? `"${target}"` : ''
             const binPath = path.resolve(__dirname, path.join('..','bin','bugsnag-cli'))
-            const cliCommand = `${binPath} ${command} ${kebabCaseOptions} ${positionalArg}`.trim()
-
+            // Split CLI options to pass to execFile
+            const args = [...command.split(" "), ...kebabCaseOptions.split(" "), target.trim()]
             // Execute the command
-            exec(cliCommand, (error, stdout, stderr) => {
+            execFile(binPath, args, (error, stdout, stderr) => {
                 if (error) {
-                    const errorMessage = `Command failed: ${cliCommand}\n` +
+                    const errorMessage = `Command failed: ${binPath}\n` +
                         `Error: ${error.message}\n` +
                         `${stdout.trim()}`
                     reject(errorMessage)
