@@ -13,7 +13,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-var package_version = "3.0.1"
+var package_version = "3.1.0"
 
 func main() {
 	commands := options.CLI{}
