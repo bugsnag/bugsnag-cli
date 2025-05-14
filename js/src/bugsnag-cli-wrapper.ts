@@ -40,9 +40,6 @@ class BugsnagCLI {
                 ...(target.trim() ? [target.trim()] : [])
             ]
 
-            // Debug log
-            console.log(args)
-
             // Execute the command
             execFile(binPath, args, (error, stdout, stderr) => {
                 if (error) {
