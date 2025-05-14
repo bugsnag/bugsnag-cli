@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.1] - 2025-05-14
+
+### Fixed
+
+- Ensure that the CLI wrapper handles CLI flags with spaces in them [#205](https://github.com/bugsnag/bugsnag-cli/pull/205)
+
 ## [3.1.0] - 2025-05-12
 
 ### Added

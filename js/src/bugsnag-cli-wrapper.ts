@@ -19,22 +19,27 @@ class BugsnagCLI {
     static run(command: string, options = {}, target = ''): Promise<string> {
         return new Promise((resolve, reject) => {
             // Convert the options keys from camelCase to kebab-case
-            const kebabCaseOptions = Object.entries(options)
+            const kebabCaseOptions: string[] = Object.entries(options)
                 .map(([key, value]) => {
                     const kebabKey = BugsnagCLI.camelToKebab(key)
                     if (typeof value === 'boolean' && value === true) {
-                        return `--${kebabKey}`
+                        return [`--${kebabKey}`]
                     } else if (typeof value !== 'boolean') {
-                        return `--${kebabKey}=${value}`
+                        return [`--${kebabKey}`, String(value)]
                     }
-                    return ''
+                    return []
                 })
-                .filter(Boolean)
-                .join(' ')
+                .flat()
 
-            const binPath = path.resolve(__dirname, path.join('..','bin','bugsnag-cli'))
-            // Split CLI options to pass to execFile
-            const args = [...command.split(" "), ...kebabCaseOptions.split(" "), target.trim()]
+            const binPath = path.resolve(__dirname, path.join('..', 'bin', 'bugsnag-cli'))
+
+            // Prepare CLI arguments
+            const args = [
+                ...command.split(' ').filter(Boolean),
+                ...kebabCaseOptions,
+                ...(target.trim() ? [target.trim()] : [])
+            ]
+
             // Execute the command
             execFile(binPath, args, (error, stdout, stderr) => {
                 if (error) {
@@ -61,7 +66,7 @@ class BugsnagCLI {
             {
                 iOS: (options: BugsnagUploadiOSOptions = {}, target = ''): Promise<string> =>
                     BugsnagCLI.run('upload react-native-ios', options, target),
-            
+
                 Android: (options: BugsnagUploadAndroidOptions = {}, target = ''): Promise<string> =>
                     BugsnagCLI.run('upload react-native-android', options, target),
             }
@@ -87,7 +92,6 @@ class BugsnagCLI {
             }
         })
     }
-
 }
 
 export = BugsnagCLI
