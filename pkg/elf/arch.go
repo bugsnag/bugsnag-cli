@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// GerArch returns the architecture string from the given ELF binary.
+// GetArch returns the architecture string from the given ELF binary.
 //
 // This function opens the ELF file and reads its machine architecture field,
 // which indicates the target CPU architecture (e.g., "EM_AARCH64", "EM_386").
@@ -18,7 +18,7 @@ import (
 //
 //	arch  - the string representation of the ELF machine architecture.
 //	error - non-nil if the file could not be opened or parsed.
-func GerArch(filepath string) (string, error) {
+func GetArch(filepath string) (string, error) {
 	var arch string
 	file, err := elf.Open(filepath)
 	if err != nil {

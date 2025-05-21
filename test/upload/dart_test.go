@@ -21,7 +21,7 @@ func TestReadElfBuildId(t *testing.T) {
 func TestGetArchFromElfFile(t *testing.T) {
 	t.Log("Testing getting arch from symbol file")
 
-	results, err := elf.GerArch("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
+	results, err := elf.GetArch("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
 
 	t.Log(results)
 	if err != nil {

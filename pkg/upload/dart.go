@@ -73,7 +73,7 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 			}
 
 			var arch string
-			arch, err = elf.GerArch(file)
+			arch, err = elf.GetArch(file)
 			if err != nil {
 				return err
 			}
