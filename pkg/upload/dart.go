@@ -1,7 +1,6 @@
 package upload
 
 import (
-	"debug/elf"
 	"errors"
 	"fmt"
 	"os"
@@ -10,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
@@ -38,7 +38,7 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 			logger.Info(fmt.Sprintf("Processing android symbol file: %s", file))
 
 			var buildId string
-			buildId, err = GetBuildIdFromElfFile(file)
+			buildId, err = elf.GetBuildId(file)
 			if err != nil {
 				return err
 			}
@@ -73,7 +73,7 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 			}
 
 			var arch string
-			arch, err = GetArchFromElfFile(file)
+			arch, err = elf.GerArch(file)
 			if err != nil {
 				return err
 			}
@@ -107,74 +107,6 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 	}
 
 	return nil
-}
-
-// ReadElfFile - Gets all data from the symbol file
-func ReadElfFile(symbolFile string) (*elf.File, error) {
-	file, err := os.OpenFile(symbolFile, os.O_RDONLY, 0)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to open file: %w", err)
-	}
-
-	_elf, err := elf.NewFile(file)
-
-	if err != nil {
-		return nil, fmt.Errorf("error reading symbol file: %w", err)
-	}
-
-	return _elf, nil
-}
-
-// GetBuildIdFromElfFile - Gets the build ID from the symbol file
-func GetBuildIdFromElfFile(symbolFile string) (string, error) {
-	elfData, err := ReadElfFile(symbolFile)
-
-	if err != nil {
-		return "", err
-	}
-
-	if sect := elfData.Section(".note.gnu.build-id"); sect != nil {
-		var data []byte
-		data, err = sect.Data()
-		if err != nil {
-			return "", fmt.Errorf("error reading symbol file")
-		}
-
-		buildId := fmt.Sprintf("%x", data[16:])
-
-		return buildId, nil
-	}
-
-	return "", fmt.Errorf("unable to find buildId")
-}
-
-// GetArchFromElfFile - Gets the Arch from the symbol file to help with getting the UUID from the built iOS app
-func GetArchFromElfFile(symbolFile string) (string, error) {
-	elfData, err := ReadElfFile(symbolFile)
-
-	if err != nil {
-		return "", err
-	}
-
-	var arch string
-
-	switch elfData.Machine {
-	case elf.EM_AARCH64:
-		arch = "arm64"
-	case elf.EM_386:
-		arch = "x86"
-	case elf.EM_X86_64:
-		arch = "x86_64"
-	case elf.EM_ARM:
-		arch = "armv7"
-	}
-
-	if arch == "" {
-		return "", fmt.Errorf("unable to find arch type")
-	}
-
-	return arch, nil
 }
 
 // GetIosAppPath - Gets the path to the built iOS app relative to the symbol files

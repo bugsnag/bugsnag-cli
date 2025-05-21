@@ -1,16 +1,16 @@
 package upload_testing
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestReadElfBuildId(t *testing.T) {
 	t.Log("Testing getting a build ID from an ELF file")
-	results, err := upload.GetBuildIdFromElfFile("../../features/dart/fixtures//app-debug-info/app.android-arm64.symbols")
+	results, err := elf.GetBuildId("../../features/dart/fixtures//app-debug-info/app.android-arm64.symbols")
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,7 +21,7 @@ func TestReadElfBuildId(t *testing.T) {
 func TestGetArchFromElfFile(t *testing.T) {
 	t.Log("Testing getting arch from symbol file")
 
-	results, err := upload.GetArchFromElfFile("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
+	results, err := elf.GerArch("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
 
 	t.Log(results)
 	if err != nil {
@@ -29,19 +29,6 @@ func TestGetArchFromElfFile(t *testing.T) {
 	}
 
 	assert.Equal(t, results, "arm64", "Arch should match")
-}
-
-func TestReadElfFile(t *testing.T) {
-	t.Log("Testing reading an elf file")
-	results, err := upload.ReadElfFile("../../features/dart/fixtures//app-debug-info/app.ios-arm64.symbols")
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	resultTypeOf := reflect.TypeOf(results)
-
-	assert.Equal(t, resultTypeOf.String(), "*elf.File", "Data should be of type *elf.File")
 }
 
 func TestDwarfDumpUuid(t *testing.T) {
