@@ -143,15 +143,22 @@ type ReactNativeIos struct {
 }
 
 type UnityAndroid struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
-	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
-	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
-	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
-	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
-	VersionCode   string      `help:"The version code of this build of the application"`
-	VersionName   string      `help:"The version of the application"`
+	Path             utils.Paths      `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path" default:"."`
+	AabPath          utils.Path       `help:"The path to an AAB file to upload alongside the Unity symbols"`
+	ApplicationId    string           `help:"A unique application ID, usually the package name, of the application"`
+	BuildUuid        string           `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
+	NoBuildUuid      bool             `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
+	ProjectRoot      string           `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	VersionCode      string           `help:"The version code of this build of the application"`
+	VersionName      string           `help:"The version of the application"`
+	UnityLineMapping UnityLineMapping `embed:""`
 }
+
+type UnityLineMapping struct {
+	NoUploadIl2cppMappingFile bool       `help:"Do not upload the il2cpp mapping file"`
+	UploadIl2cppMappingFile   utils.Path `help:"The path to the il2cpp mapping file to upload"`
+}
+
 type Breakpad struct {
 	Path            utils.Paths `arg:"" name:"path" help:"The path to the symbol files (.sym) to upload (or directory containing them)" type:"path"`
 	CpuArch         string      `help:"The CPU architecture that the module was built for"`

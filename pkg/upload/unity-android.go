@@ -2,6 +2,7 @@ package upload
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 	"os"
 	"path/filepath"
 	"strings"
@@ -96,6 +97,16 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 
 		if err != nil {
 			return err
+		}
+
+		if unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
+			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else {
+			lineMappingFile, err := unity.GetAndroidLineMapping(string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile), unityOptions.ProjectRoot)
+			if err != nil {
+				return err
+			}
+			logger.Info(fmt.Sprintf("Uploading %s", lineMappingFile))
 		}
 
 		for _, arch := range archList {
