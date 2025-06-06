@@ -246,3 +246,39 @@ func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile strin
 
 	return uploadOptions, nil
 }
+
+func BuildUnityAndroidLineMappingUploadOptions(apiKey string, soBuildId string, applicationId string, versionName string, versionCode string, projectRoot string, overwrite bool) (map[string]string, error) {
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if soBuildId != "" {
+		uploadOptions["soBuildId"] = soBuildId
+	}
+
+	if applicationId != "" {
+		uploadOptions["appId"] = applicationId
+	}
+
+	if versionCode != "" {
+		uploadOptions["appVersionCode"] = versionCode
+	}
+
+	if versionName != "" {
+		uploadOptions["appVersion"] = versionName
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
+	}
+
+	return uploadOptions, nil
+}

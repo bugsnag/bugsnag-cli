@@ -2,6 +2,8 @@ package upload
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
+	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +20,8 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	var archList []string
 	var symbolFileList []string
 	var manifestData map[string]string
+	var lineMappingFile string
+
 	var aabPath = string(unityOptions.AabPath)
 
 	for _, path := range unityOptions.Path {
@@ -98,6 +102,16 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			return err
 		}
 
+		if unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
+			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else {
+			lineMappingFile, err = unity.GetAndroidLineMapping(string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile), unityOptions.ProjectRoot)
+			if err != nil {
+				return err
+			}
+			logger.Debug(fmt.Sprintf("Found line mapping file: %s", lineMappingFile))
+		}
+
 		for _, arch := range archList {
 			soPath := filepath.Join(unityDir, arch)
 			fileList, err := utils.BuildFileList([]string{soPath})
@@ -108,6 +122,32 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
+
+				// If we're uploading a libil2cpp.so file, we want to extract the build ID so that we can upload the linemapping file
+				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
+					buildId, err := elf.GetBuildId(file)
+					if err != nil {
+						return fmt.Errorf("failed to get build ID from %s: %w", file, err)
+					}
+					logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
+					err = unity.UploadAndroidLineMappings(
+						lineMappingFile,
+						manifestData["apiKey"],
+						buildId,
+						manifestData["applicationId"],
+						manifestData["versionName"],
+						manifestData["versionCode"],
+						unityOptions.ProjectRoot,
+						endpoint,
+						globalOptions,
+						logger,
+					)
+
+					if err != nil {
+						return err
+					}
+				}
+
 				symbolFileList = append(symbolFileList, file)
 			}
 		}
