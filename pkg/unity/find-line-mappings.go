@@ -28,19 +28,18 @@ import (
 //
 //	mappingPath - the resolved path to LineNumberMappings.json, or an empty string if not found.
 //	error       - non-nil if there was an error during backup folder resolution.
-func GetAndroidLineMapping(path string, projectRoot string) (string, error) {
+func GetAndroidLineMapping(path string, buildDir string) (string, error) {
 	if path != "" {
 		return path, nil
 	}
 
 	// Check default artifacts path
-	defaultPath := filepath.Join("Library", "Bee", "artifacts", "Android", "il2cppOutput", "cpp", "Symbols", "LineNumberMappings.json")
+	defaultPath := filepath.Join(buildDir, "Library", "Bee", "artifacts", "Android", "il2cppOutput", "cpp", "Symbols", "LineNumberMappings.json")
 	if utils.FileExists(defaultPath) {
 		return defaultPath, nil
 	}
 
-	// Try fallback: backup directory
-	backupDir, err := utils.FindFolderWithSuffix(projectRoot, "BackUpThisFolder_ButDontShipItWithYourGame")
+	backupDir, err := utils.FindFolderWithSuffix(buildDir, "BackUpThisFolder_ButDontShipItWithYourGame")
 	if err != nil {
 		return "", fmt.Errorf("unable to find backup folder: %s", err.Error())
 	}
@@ -50,7 +49,7 @@ func GetAndroidLineMapping(path string, projectRoot string) (string, error) {
 		return backupPath, nil
 	}
 
-	return "", fmt.Errorf("Unable to fine line mapping file in your project: %s ", projectRoot)
+	return "", fmt.Errorf("Unable to fine line mapping file in your project: %s ", buildDir)
 }
 
 // GetiOSLineMapping locates the LineNumberMappings.json file for iOS builds.

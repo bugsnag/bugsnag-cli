@@ -21,11 +21,13 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	var symbolFileList []string
 	var manifestData map[string]string
 	var lineMappingFile string
+	var buildDirectory string
 
 	var aabPath = string(unityOptions.AabPath)
 
 	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
+			buildDirectory = path
 			zipPath, _ = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
 			if aabPath == "" {
@@ -33,10 +35,8 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			}
 		} else if strings.HasSuffix(path, ".symbols.zip") {
 			zipPath = path
-
 			if aabPath == "" {
-				buildDirectory := filepath.Dir(path)
-
+				buildDirectory = filepath.Dir(path)
 				aabPath, _ = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
 			}
 		} else {
@@ -105,7 +105,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 		if unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
 		} else {
-			lineMappingFile, err = unity.GetAndroidLineMapping(string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile), unityOptions.ProjectRoot)
+			lineMappingFile, err = unity.GetAndroidLineMapping(string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile), buildDirectory)
 			if err != nil {
 				return err
 			}
