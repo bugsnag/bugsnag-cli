@@ -121,6 +121,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			unityOptions.ProjectRoot,
 			endpoint,
 			globalOptions,
+			unityOptions.Overwrite,
 			logger,
 		)
 

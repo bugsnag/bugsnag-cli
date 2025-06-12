@@ -18,6 +18,7 @@ func UploadAndroidNdk(
 	projectRoot string,
 	endpoint string,
 	options options.CLI,
+	overwrite bool,
 	logger log.Logger,
 ) error {
 	fileFieldData := make(map[string]server.FileField)
@@ -30,7 +31,7 @@ func UploadAndroidNdk(
 	}
 
 	for _, file := range fileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), options.Upload.Overwrite)
+		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
 		if err != nil {
 			return err

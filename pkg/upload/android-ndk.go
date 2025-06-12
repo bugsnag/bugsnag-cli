@@ -177,6 +177,7 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 		ndkOptions.ProjectRoot,
 		endpoint,
 		options,
+		ndkOptions.Overwrite,
 		logger,
 	)
 
