@@ -73,6 +73,7 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 				ProjectRoot:   aabOptions.ProjectRoot,
 				VersionCode:   manifestData["versionCode"],
 				VersionName:   manifestData["versionName"],
+				Overwrite:     aabOptions.Overwrite,
 			}
 			globalOptions.ApiKey = manifestData["apiKey"]
 			err = ProcessAndroidNDK(globalOptions, endpoint, logger)
@@ -99,6 +100,7 @@ func ProcessAndroidAab(globalOptions options.CLI, endpoint string, logger log.Lo
 			Path:          []string{mappingFilePath},
 			VersionCode:   manifestData["versionCode"],
 			VersionName:   manifestData["versionName"],
+			Overwrite:     aabOptions.Overwrite,
 		}
 		globalOptions.ApiKey = manifestData["apiKey"]
 		err = ProcessAndroidProguard(globalOptions, endpoint, logger)
