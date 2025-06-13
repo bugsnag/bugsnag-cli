@@ -21,7 +21,7 @@ func All(options options.CLI, endpoint string, logger log.Logger,
 
 	uploadOptions["apiKey"] = options.ApiKey
 
-	if options.Upload.Overwrite {
+	if allOptions.Overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 
