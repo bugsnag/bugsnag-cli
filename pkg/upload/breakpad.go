@@ -50,7 +50,7 @@ func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logg
 
 		queryParams := fmt.Sprintf("?api_key=%s&overwrite=%t&project_root=%s",
 			strings.ReplaceAll(apiKey, " ", "%20"),
-			globalOptions.Upload.Overwrite,
+			breakpadOptions.Overwrite,
 			strings.ReplaceAll(projectRoot, " ", "%20"),
 		)
 

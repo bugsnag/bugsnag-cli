@@ -162,7 +162,7 @@ func ProcessAndroidProguard(options options.CLI, endpoint string, logger log.Log
 			return err
 		}
 
-		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(options.ApiKey, proguardOptions.ApplicationId, proguardOptions.VersionName, proguardOptions.VersionCode, proguardOptions.BuildUuid, options.Upload.Overwrite)
+		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(options.ApiKey, proguardOptions.ApplicationId, proguardOptions.VersionName, proguardOptions.VersionCode, proguardOptions.BuildUuid, proguardOptions.Overwrite)
 
 		if err != nil {
 			return err
