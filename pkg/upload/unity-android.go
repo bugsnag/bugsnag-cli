@@ -132,12 +132,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 					logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
 					err = unity.UploadAndroidLineMappings(
 						lineMappingFile,
-						manifestData["apiKey"],
 						buildId,
-						manifestData["applicationId"],
-						manifestData["versionName"],
-						manifestData["versionCode"],
-						unityOptions.ProjectRoot,
 						endpoint,
 						globalOptions,
 						logger,

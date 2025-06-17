@@ -9,17 +9,6 @@ import (
 
 // UnityLineMappingOptions holds shared upload metadata for Unity line mapping uploads.
 // Includes platform-specific fields for Android and iOS.
-type UnityLineMappingOptions struct {
-	APIKey           string
-	AppID            string
-	AppVersion       string
-	AppVersionCode   string // Android only
-	AppBundleVersion string // iOS only
-	SOBuildID        string // Android only
-	DSYMUUUID        string // iOS only
-	ProjectRoot      string
-	Overwrite        bool
-}
 
 // UploadAndroidLineMappings uploads an Android Unity line mapping file to the Bugsnag server.
 // It builds the upload options and submits the file using the provided endpoint and logger.
@@ -30,7 +19,7 @@ func UploadAndroidLineMappings(
 	options options.CLI,
 	logger log.Logger,
 ) error {
-	opts := UnityLineMappingOptions{
+	opts := utils.UnityLineMappingOptions{
 		APIKey:         options.ApiKey,
 		AppID:          options.Upload.UnityAndroid.ApplicationId,
 		AppVersion:     options.Upload.UnityAndroid.VersionName,
@@ -68,7 +57,7 @@ func UploadIosLineMappings(
 	options options.CLI,
 	logger log.Logger,
 ) error {
-	opts := UnityLineMappingOptions{
+	opts := utils.UnityLineMappingOptions{
 		APIKey:           options.ApiKey,
 		AppID:            options.Upload.UnityIos.ApplicationId,
 		AppVersion:       options.Upload.UnityIos.VersionName,

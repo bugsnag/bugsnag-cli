@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 )
 
 // BuildDartUploadOptions - Builds the upload options for processing dart files
@@ -248,7 +247,19 @@ func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile strin
 	return uploadOptions, nil
 }
 
-func BuildUnityLineMappingUploadOptions(opts unity.UnityLineMappingOptions) (map[string]string, error) {
+type UnityLineMappingOptions struct {
+	APIKey           string
+	AppID            string
+	AppVersion       string
+	AppVersionCode   string // Android only
+	AppBundleVersion string // iOS only
+	SOBuildID        string // Android only
+	DSYMUUUID        string // iOS only
+	ProjectRoot      string
+	Overwrite        bool
+}
+
+func BuildUnityLineMappingUploadOptions(opts UnityLineMappingOptions) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	if opts.APIKey != "" {

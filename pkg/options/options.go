@@ -164,6 +164,16 @@ type UnityAndroid struct {
 	Overwrite        bool             `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
+type UnityIos struct {
+	Path             utils.Paths      `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
+	ApplicationId    string           `help:"A unique application ID, usually the package name, of the application"`
+	BundleVersion    string           `help:"The bundle version of this build of the application (Apple platforms only)"`
+	VersionName      string           `help:"The version of the application"`
+	UnityLineMapping UnityLineMapping `embed:""`
+	Shared           DsymShared       `embed:""`
+	Overwrite        bool             `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
+}
+
 type UnityLineMapping struct {
 	NoUploadIl2cppMappingFile bool       `help:"Do not upload the il2cpp mapping file"`
 	UploadIl2cppMappingFile   utils.Path `help:"The path to the il2cpp mapping file to upload"`
@@ -208,6 +218,7 @@ type CLI struct {
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		UnityIos           UnityIos               `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }
