@@ -21,7 +21,7 @@ func UploadAndroidLineMappings(
 ) error {
 	fileFieldData := make(map[string]server.FileField)
 
-	uploadOptions, err := utils.BuildUnityAndroidLineMappingUploadOptions(apiKey, soBuildId, applicationId, versionName, versionCode, projectRoot, options.Upload.Overwrite)
+	uploadOptions, err := utils.BuildUnityAndroidLineMappingUploadOptions(apiKey, soBuildId, applicationId, versionName, versionCode, projectRoot, options.Upload.UnityAndroid.Overwrite)
 
 	if err != nil {
 		return err
