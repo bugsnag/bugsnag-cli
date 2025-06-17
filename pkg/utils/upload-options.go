@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 )
 
 // BuildDartUploadOptions - Builds the upload options for processing dart files
@@ -247,36 +248,44 @@ func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile strin
 	return uploadOptions, nil
 }
 
-func BuildUnityAndroidLineMappingUploadOptions(apiKey string, soBuildId string, applicationId string, versionName string, versionCode string, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildUnityLineMappingUploadOptions(opts unity.UnityLineMappingOptions) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
+	if opts.APIKey != "" {
+		uploadOptions["apiKey"] = opts.APIKey
 	} else {
 		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	if soBuildId != "" {
-		uploadOptions["soBuildId"] = soBuildId
+	if opts.SOBuildID != "" {
+		uploadOptions["soBuildId"] = opts.SOBuildID
 	}
 
-	if applicationId != "" {
-		uploadOptions["appId"] = applicationId
+	if opts.DSYMUUUID != "" {
+		uploadOptions["dsymUUID"] = opts.DSYMUUUID
 	}
 
-	if versionCode != "" {
-		uploadOptions["appVersionCode"] = versionCode
+	if opts.AppID != "" {
+		uploadOptions["appId"] = opts.AppID
 	}
 
-	if versionName != "" {
-		uploadOptions["appVersion"] = versionName
+	if opts.AppVersionCode != "" {
+		uploadOptions["appVersionCode"] = opts.AppVersionCode
 	}
 
-	if projectRoot != "" {
-		uploadOptions["projectRoot"] = projectRoot
+	if opts.AppBundleVersion != "" {
+		uploadOptions["appBundleVersion"] = opts.AppBundleVersion
 	}
 
-	if overwrite {
+	if opts.AppVersion != "" {
+		uploadOptions["appVersion"] = opts.AppVersion
+	}
+
+	if opts.ProjectRoot != "" {
+		uploadOptions["projectRoot"] = opts.ProjectRoot
+	}
+
+	if opts.Overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 
