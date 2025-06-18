@@ -41,6 +41,8 @@ func FindDsymsAndSettings(opts options.CLI, logger log.Logger) ([]*ios.DwarfInfo
 			logger.Warn(fmt.Sprintf("The specified path %s is an Xcode archive. Please use the `xcode-archive` command instead as this functionality will be deprecated in future releases.", path))
 		}
 
+		logger.Info(fmt.Sprintf("Processing path: %s", path))
+
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			if xcodeProjPath == "" {
 				xcodeProjPath = path
@@ -48,6 +50,8 @@ func FindDsymsAndSettings(opts options.CLI, logger log.Logger) ([]*ios.DwarfInfo
 		} else {
 			dsymPath = path
 		}
+
+		logger.Info(fmt.Sprintf("Using Xcode project/workspace path: %s", xcodeProjPath))
 
 		if xcodeProjPath != "" {
 			if xcodeBuildOptions.Shared.ProjectRoot == "" {
@@ -67,12 +71,16 @@ func FindDsymsAndSettings(opts options.CLI, logger log.Logger) ([]*ios.DwarfInfo
 				}
 			}
 
+			logger.Info(fmt.Sprintf("Using Xcode scheme: %s", xcodeBuildOptions.Shared.Scheme))
+
 			if xcodeBuildOptions.Shared.Scheme != "" {
 				buildSettings, err = ios.GetXcodeBuildSettings(xcodeProjPath, xcodeBuildOptions.Shared.Scheme, xcodeBuildOptions.Shared.Scheme)
 				if err != nil {
 					logger.Warn(fmt.Sprintf("Error retrieving build settings: %s", err))
 				}
 			}
+
+			logger.Info(fmt.Sprintf("Using Xcode build settings: %s", xcodeBuildOptions.Shared.Scheme))
 
 			if buildSettings != nil && dsymPath == "" {
 				possibleDsymPath := filepath.Join(buildSettings.ConfigurationBuildDir, buildSettings.DsymName)
@@ -81,6 +89,10 @@ func FindDsymsAndSettings(opts options.CLI, logger log.Logger) ([]*ios.DwarfInfo
 					logger.Debug(fmt.Sprintf("Using dSYM path: %s", dsymPath))
 				}
 			}
+
+			fmt.Println(buildSettings)
+
+			logger.Info(fmt.Sprintf("Using dSYM path: %s", dsymPath))
 		}
 
 		if xcodeBuildOptions.Shared.ProjectRoot == "" {
