@@ -2,69 +2,132 @@ package upload
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/unity"
-	"os"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logger) error {
 	unityOptions := globalOptions.Upload.UnityIos
-	var lineMappingFile string
+	var tempDirs []string
+
+	defer func() {
+		for _, dir := range tempDirs {
+			_ = os.RemoveAll(dir)
+		}
+	}()
 
 	for _, path := range unityOptions.Path {
-		globalOptions.Upload.XcodeBuild = options.XcodeBuild{
-			Path: unityOptions.Path,
-			Shared: options.DsymShared{
-				IgnoreEmptyDsym:    unityOptions.Shared.IgnoreEmptyDsym,
-				IgnoreMissingDwarf: unityOptions.Shared.IgnoreMissingDwarf,
-				Configuration:      unityOptions.Shared.Configuration,
-				Scheme:             unityOptions.Shared.Scheme,
-				ProjectRoot:        unityOptions.Shared.ProjectRoot,
-				Plist:              unityOptions.Shared.Plist,
-				XcodeProject:       unityOptions.Shared.XcodeProject,
-			},
-		}
+		var (
+			err             error
+			pathToCheck     string
+			dsyms           []*ios.DwarfInfo
+			tempDir         string
+			lineMappingFile string
+			plistData       *ios.PlistData
+		)
 
-		dsyms, plistPath, tempDirs, err := FindDsymsAndSettings(globalOptions, logger)
-		defer func() {
-			for _, tempDir := range tempDirs {
-				_ = os.RemoveAll(tempDir)
+		// Handle Xcode project detection
+		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+			globalOptions.Upload.XcodeArchive = options.XcodeArchive{
+				Path:   utils.Paths{path},
+				Shared: unityOptions.Shared,
 			}
-		}()
-		if err != nil {
-			return err
+
+			xcarchivePath, err := ios.FindXcarchivePath(globalOptions, logger)
+			if err != nil {
+				return fmt.Errorf("failed to find Xcode archive path: %w", err)
+			}
+			if xcarchivePath == "" {
+				return fmt.Errorf("no Xcode archive found in specified paths")
+			}
+
+			logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
+			pathToCheck = xcarchivePath
+		} else {
+			pathToCheck = path
 		}
 
+		dsyms, tempDir, err = ios.FindDsymsInPath(
+			pathToCheck,
+			unityOptions.Shared.IgnoreEmptyDsym,
+			unityOptions.Shared.IgnoreMissingDwarf,
+			logger,
+		)
+		tempDirs = append(tempDirs, tempDir)
+
+		if err != nil {
+			return fmt.Errorf("error locating dSYM files: %w", err)
+		}
+		if len(dsyms) == 0 {
+			return fmt.Errorf("no dSYM files found in: %s", pathToCheck)
+		}
+
+		logger.Info(fmt.Sprintf("Found %d dSYM files in: %s", len(dsyms), pathToCheck))
+
+		// Resolve plist path if not explicitly provided
+		plistPath := string(unityOptions.Shared.Plist)
+		if plistPath == "" {
+			plistPath = filepath.Join(dsyms[0].Location, "..", "..", "Info.plist")
+		}
+
+		if !utils.FileExists(plistPath) {
+			return fmt.Errorf("plist file not found at: %s", plistPath)
+		}
+		logger.Info(fmt.Sprintf("Using plist path: %s", plistPath))
+
+		plistData, err = ios.GetPlistData(plistPath)
+		if err != nil {
+			return fmt.Errorf("failed to read plist: %w", err)
+		}
+
+		// Optionally process line mapping file
 		if unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
 		} else {
-			lineMappingFile, err = unity.GetiOSLineMapping(string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile), path)
+			lineMappingFile, err = unity.GetiOSLineMapping(
+				string(unityOptions.UnityLineMapping.UploadIl2cppMappingFile),
+				path,
+			)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to get line mapping file: %w", err)
 			}
-			logger.Debug(fmt.Sprintf("Found line mapping file: %s", lineMappingFile))
+			logger.Info(fmt.Sprintf("Found line mapping file: %s", lineMappingFile))
 		}
 
+		// Log dSYM details
 		for _, dsym := range dsyms {
-			logger.Info(fmt.Sprintf("Processing dSYM: %s (%s)", dsym.Name, dsym.UUID))
-			if dsym.Name == "UnityFramework" && !unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
-				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, dsym.UUID))
-				//err = unity.UploadIosLineMappings(
-				//	lineMappingFile,
-				//	dsym.UUID,
-				//	endpoint,
-				//	globalOptions,
-				//	logger,
-				//)
-				//
-				//if err != nil {
-				//	return err
-				//}
+			if dsym.Name == "UnityFramework" {
+				globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
+				globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
+				globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
+
+				logger.Info(fmt.Sprintf("Uploading %s for dSYM %s, withID %s", lineMappingFile, dsym.Name, dsym.UUID))
+				err = unity.UploadIosLineMappings(
+					lineMappingFile,
+					dsym.UUID,
+					endpoint,
+					globalOptions,
+					logger,
+				)
+
+				if err != nil {
+					return err
+				}
 			}
 		}
 
-		return UploadDsyms(dsyms, plistPath, endpoint, globalOptions, logger)
+		// Upload dSYMs and plist
+		err = UploadDsyms(dsyms, plistPath, endpoint, globalOptions, logger)
+		if err != nil {
+			return fmt.Errorf("failed to upload dSYMs: %w", err)
+		}
 	}
+
 	return nil
 }

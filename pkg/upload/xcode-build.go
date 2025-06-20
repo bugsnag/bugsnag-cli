@@ -90,8 +90,6 @@ func FindDsymsAndSettings(opts options.CLI, logger log.Logger) ([]*ios.DwarfInfo
 				}
 			}
 
-			fmt.Println(buildSettings)
-
 			logger.Info(fmt.Sprintf("Using dSYM path: %s", dsymPath))
 		}
 
