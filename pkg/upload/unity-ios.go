@@ -32,6 +32,11 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			plistData       *ios.PlistData
 		)
 
+		if unityOptions.Shared.Scheme == "" {
+			unityOptions.Shared.Scheme = "Unity-iPhone"
+			logger.Info(fmt.Sprintf("Using scheme: %s", unityOptions.Shared.Scheme))
+		}
+
 		// Handle Xcode project detection
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			globalOptions.Upload.XcodeArchive = options.XcodeArchive{
@@ -102,7 +107,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 
 		// Log dSYM details
 		for _, dsym := range dsyms {
-			if dsym.Name == "UnityFramework" {
+			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
 				globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
 				globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
 				globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier

@@ -83,12 +83,7 @@ func GetiOSLineMapping(path string, projectRoot string) (string, error) {
 	}
 
 	// Try fallback: backup directory
-	backupDir, err := utils.FindFolderWithSuffix(projectRoot, "_xcode")
-	if err != nil {
-		return "", fmt.Errorf("unable to find backup folder: %v", err)
-	}
-
-	backupPath := filepath.Join(backupDir, "Il2CppOutputProject", "Source", "il2cppOutput", "Symbols", "LineNumberMappings.json")
+	backupPath := filepath.Join(projectRoot, "Il2CppOutputProject", "Source", "il2cppOutput", "Symbols", "LineNumberMappings.json")
 	if utils.FileExists(backupPath) {
 		return backupPath, nil
 	}

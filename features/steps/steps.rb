@@ -120,6 +120,13 @@ Then('the sourcemap is valid for the dSYM Build API') do
   )
 end
 
+Then('the sourcemap is valid for the Unity Line Mapping API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "mappingFile" is not null
+  )
+end
+
 Then('the sourcemap is valid for the Android Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
@@ -441,4 +448,11 @@ Before('@BuildNestedJS') do
     Dir.chdir(base_dir)
     $nested_js = true
   end
+end
+
+Given(/^I build the Unity project for iOS$/) do
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
+  Dir.chdir(@fixture_dir)
+  @output = `./build_ios.sh`
+  Dir.chdir(base_dir)
 end
