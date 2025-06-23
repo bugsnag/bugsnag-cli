@@ -67,7 +67,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		tempDirs = append(tempDirs, tempDir)
 
 		if err != nil {
-			return fmt.Errorf("error locating dSYM files: %w", err)
+			return fmt.Errorf("error locating dSYMs in %s: %w", pathToCheck, err)
 		}
 		if len(dsyms) == 0 {
 			return fmt.Errorf("no dSYMs found in %s", pathToCheck)
