@@ -43,3 +43,39 @@ func UploadAndroidLineMappings(
 		logger,
 	)
 }
+
+func UploadIosLineMappings(
+	lineMappingFile string,
+	dsymUuid string,
+	endpoint string,
+	options options.CLI,
+	logger log.Logger,
+) error {
+	opts := utils.UnityLineMappingOptions{
+		APIKey:           options.ApiKey,
+		AppID:            options.Upload.UnityIos.ApplicationId,
+		AppVersion:       options.Upload.UnityIos.VersionName,
+		AppBundleVersion: options.Upload.UnityIos.BundleVersion,
+		DSYMUUUID:        dsymUuid,
+		ProjectRoot:      options.Upload.UnityIos.DsymShared.ProjectRoot,
+		Overwrite:        options.Upload.UnityIos.Overwrite,
+	}
+
+	fileFieldData := map[string]server.FileField{
+		"mappingFile": server.LocalFile(lineMappingFile),
+	}
+
+	uploadOptions, err := utils.BuildUnityLineMappingUploadOptions(opts)
+	if err != nil {
+		return err
+	}
+
+	return server.ProcessFileRequest(
+		endpoint+"/unity-line-mappings",
+		uploadOptions,
+		fileFieldData,
+		lineMappingFile,
+		options,
+		logger,
+	)
+}
