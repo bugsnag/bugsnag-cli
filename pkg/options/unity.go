@@ -20,5 +20,16 @@ type UnityAndroid struct {
 	VersionName   string      `help:"The version of the application"`
 	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 
-	Shared UnityLineMapping `embed:""`
+	UnityShared UnityLineMapping `embed:""`
+}
+
+type UnityIos struct {
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path" default:"."`
+	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
+	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)"`
+	VersionName   string      `help:"The version of the application"`
+	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
+
+	UnityShared UnityLineMapping `embed:""`
+	DsymShared  DsymShared       `embed:""`
 }
