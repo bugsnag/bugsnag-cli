@@ -109,7 +109,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
 		} else {
-			lineMappingFile, err = unity.GetiOSLineMapping(
+			lineMappingFile, err = unity.GetIosLineMapping(
 				string(unityOptions.UnityShared.UploadIl2cppMappingFile),
 				path,
 			)

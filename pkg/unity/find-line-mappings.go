@@ -49,7 +49,7 @@ func GetAndroidLineMapping(path string, buildDir string) (string, error) {
 	return "", fmt.Errorf("Unable to fine line mapping file in your project: %s ", buildDir)
 }
 
-// GetiOSLineMapping locates the LineNumberMappings.json file for iOS builds.
+// GetIosLineMapping locates the LineNumberMappings.json file for iOS builds.
 //
 // This function attempts to resolve the path to the IL2CPP line number mapping file,
 // used for symbolication or debugging in iOS builds. The resolution follows this order:
@@ -68,7 +68,7 @@ func GetAndroidLineMapping(path string, buildDir string) (string, error) {
 //
 //	mappingPath - the resolved path to LineNumberMappings.json.
 //	error       - non-nil if the file cannot be found or the backup folder is missing.
-func GetiOSLineMapping(path string, projectRoot string) (string, error) {
+func GetIosLineMapping(path string, projectRoot string) (string, error) {
 	if path != "" {
 		return path, nil
 	}
