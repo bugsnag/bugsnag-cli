@@ -91,6 +91,20 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			return fmt.Errorf("failed to read plist: %w", err)
 		}
 
+		if plistData != nil {
+			if globalOptions.Upload.UnityIos.VersionName == "" {
+				globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
+			}
+
+			if globalOptions.Upload.UnityIos.BundleVersion == "" {
+				globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
+			}
+
+			if globalOptions.Upload.UnityIos.ApplicationId == "" {
+				globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
+			}
+		}
+
 		// Optionally process line mapping file
 		if unityOptions.UnityLineMapping.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
@@ -108,10 +122,6 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		// Log dSYM details
 		for _, dsym := range dsyms {
 			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
-				globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
-				globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
-				globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
-
 				logger.Info(fmt.Sprintf("Uploading %s for dSYM %s, withID %s", lineMappingFile, dsym.Name, dsym.UUID))
 				err = unity.UploadIosLineMappings(
 					lineMappingFile,

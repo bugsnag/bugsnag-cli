@@ -17,13 +17,14 @@ func UploadAndroidLineMappings(
 	soBuildId string,
 	endpoint string,
 	options options.CLI,
+	manifestData map[string]string,
 	logger log.Logger,
 ) error {
 	opts := utils.UnityLineMappingOptions{
-		APIKey:         options.ApiKey,
-		AppID:          options.Upload.UnityAndroid.ApplicationId,
-		AppVersion:     options.Upload.UnityAndroid.VersionName,
-		AppVersionCode: options.Upload.UnityAndroid.VersionCode,
+		APIKey:         manifestData["apiKey"],
+		AppID:          manifestData["applicationId"],
+		AppVersion:     manifestData["versionName"],
+		AppVersionCode: manifestData["versionCode"],
 		SOBuildID:      soBuildId,
 		ProjectRoot:    options.Upload.UnityAndroid.ProjectRoot,
 		Overwrite:      options.Upload.UnityAndroid.Overwrite,

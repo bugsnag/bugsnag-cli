@@ -135,6 +135,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 						buildId,
 						endpoint,
 						globalOptions,
+						manifestData,
 						logger,
 					)
 
