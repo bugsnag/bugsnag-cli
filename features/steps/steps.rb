@@ -449,3 +449,10 @@ Before('@BuildNestedJS') do
     $nested_js = true
   end
 end
+
+Given(/^I build the Unity project for iOS$/) do
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
+  Dir.chdir(@fixture_dir)
+  @output = `./build_ios.sh`
+  Dir.chdir(base_dir)
+end
