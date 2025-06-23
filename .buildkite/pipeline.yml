@@ -106,22 +106,41 @@ steps:
         upload:
           - maze_output/**/*
 
-  - label: ":video_game: Unity Android Integration Tests"
-    depends_on: build
-    env:
-      UNITY_VERSION: 6000.0.49f1
-    agents:
-      queue: macos-15-isolated
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/unity-android
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
+  - group: ":video_game: Unity"
+    steps:
+      - label: ":video_game: Unity Android Integration Tests"
+        depends_on: build
+        env:
+          UNITY_VERSION: 6000.0.49f1
+        agents:
+          queue: macos-15-isolated
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/unity/android.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
+
+      - label: ":video_game: Unity iOS Integration Tests"
+        depends_on: build
+        env:
+          UNITY_VERSION: 6000.0.49f1
+        agents:
+          queue: macos-15-isolated
+        commands:
+          - chmod +x bin/arm64-macos-bugsnag-cli
+          - bundle install
+          - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/unity/ios.feature
+        plugins:
+          artifacts#v1.5.0:
+            download:
+              - bin/arm64-macos-bugsnag-cli
+            upload:
+              - maze_output/**/*
   
   - label: "Breakpad Integration Tests"
     depends_on: build
