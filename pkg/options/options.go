@@ -152,7 +152,7 @@ type ReactNativeIos struct {
 }
 
 type UnityAndroid struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
+	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path" default:"."`
 	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
 	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
 	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
