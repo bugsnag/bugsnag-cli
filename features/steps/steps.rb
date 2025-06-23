@@ -120,6 +120,13 @@ Then('the sourcemap is valid for the dSYM Build API') do
   )
 end
 
+Then('the sourcemap is valid for the Unity Line Mapping API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "mappingFile" is not null
+  )
+end
+
 Then('the sourcemap is valid for the Android Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
@@ -231,7 +238,7 @@ Then('the {string} directory should contain {string}') do |directory, package|
   Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
 end
 
-Given('I build the Unity Android example project') do
+Given('I build the Unity project for Android') do
   @fixture_dir = "#{base_dir}/platforms-examples/Unity"
   Dir.chdir(@fixture_dir)
   @output = `./build_android.sh aab`
@@ -243,7 +250,7 @@ And('I wait for the Unity symbols to generate') do
 end
 
 Given(/^I set the NDK path to the Unity bundled version$/) do
-#  Set the environment variable to the path of the NDK bundled with Unity
+  #  Set the environment variable to the path of the NDK bundled with Unity
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end
 

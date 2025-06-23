@@ -7,11 +7,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// UnityLineMappingOptions holds shared upload metadata for Unity line mapping uploads.
-// Includes platform-specific fields for Android and iOS.
-
-// UploadAndroidLineMappings uploads an Android Unity line mapping file to the Bugsnag server.
-// It builds the upload options and submits the file using the provided endpoint and logger.
 func UploadAndroidLineMappings(
 	lineMappingFile string,
 	soBuildId string,
