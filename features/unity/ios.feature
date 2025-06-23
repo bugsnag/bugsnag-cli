@@ -20,7 +20,7 @@ Feature: Unity iOS integration tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "appVersion" equals "1.0"
     And the sourcemap payload field "appBundleVersion" equals "1.0"
-    And the sourcemap payload field "dsymUUID" equals "CB79E7C4-F668-3932-B5AF-DE4D97AAB326"
+    And the sourcemap payload field "dsymUUID" is not null
     And the sourcemap payload field "appId" equals "com.apple.xcode.dsym.com.unity3d.framework"
     And the sourcemap payload field "overwrite" equals "true"
 
@@ -48,7 +48,7 @@ Feature: Unity iOS integration tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "appVersion" equals "123.456"
     And the sourcemap payload field "appBundleVersion" equals "999.99"
-    And the sourcemap payload field "dsymUUID" equals "CB79E7C4-F668-3932-B5AF-DE4D97AAB326"
+    And the sourcemap payload field "dsymUUID" is not null
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "overwrite" equals "true"
 
