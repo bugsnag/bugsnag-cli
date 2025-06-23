@@ -70,7 +70,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			return fmt.Errorf("error locating dSYM files: %w", err)
 		}
 		if len(dsyms) == 0 {
-			return fmt.Errorf("no dSYM files found in: %s", pathToCheck)
+			return fmt.Errorf("no dSYMs found in %s", pathToCheck)
 		}
 
 		logger.Info(fmt.Sprintf("Found %d dSYM files in: %s", len(dsyms), pathToCheck))
