@@ -104,8 +104,10 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 
 		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else if unityOptions.UnityShared.UploadIl2cppMappingFile != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMappingFile)
 		} else {
-			lineMappingFile, err = unity.GetAndroidLineMapping(string(unityOptions.UnityShared.UploadIl2cppMappingFile), buildDirectory)
+			lineMappingFile, err = unity.GetAndroidLineMapping(buildDirectory)
 			if err != nil {
 				return err
 			}

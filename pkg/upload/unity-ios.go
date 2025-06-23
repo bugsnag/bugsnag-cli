@@ -105,14 +105,12 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			}
 		}
 
-		// Optionally process line mapping file
 		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else if unityOptions.UnityShared.UploadIl2cppMappingFile != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMappingFile)
 		} else {
-			lineMappingFile, err = unity.GetIosLineMapping(
-				string(unityOptions.UnityShared.UploadIl2cppMappingFile),
-				path,
-			)
+			lineMappingFile, err = unity.GetIosLineMapping(path)
 			if err != nil {
 				return fmt.Errorf("failed to get line mapping file: %w", err)
 			}

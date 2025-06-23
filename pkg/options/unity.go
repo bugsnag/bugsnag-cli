@@ -2,10 +2,10 @@ package options
 
 import "github.com/bugsnag/bugsnag-cli/pkg/utils"
 
-// UnityLineMapping is used to specify options for uploading a Unity il2cpp mapping file.
+// UnityLineMapping is used to specify options for uploading a Unity IL2CPP mapping file.
 type UnityLineMapping struct {
-	NoUploadIl2cppMappingFile bool       `help:"Do not upload the il2cpp mapping file"`
-	UploadIl2cppMappingFile   utils.Path `help:"The path to the il2cpp mapping file to upload"`
+	NoUploadIl2cppMappingFile bool       `help:"Do not upload the IL2CPP mapping file (LineNumberMappings.json)"`
+	UploadIl2cppMappingFile   utils.Path `help:"The path to the IL2CPP mapping file (LineNumberMappings.json) to upload"`
 }
 
 // UnityAndroid is used to specify options for uploading Unity symbols and AAB files.
