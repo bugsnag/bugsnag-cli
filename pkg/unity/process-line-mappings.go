@@ -1,73 +1,71 @@
 package unity
 
 import (
+	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func UploadAndroidLineMappings(
+func UploadUnityLineMappings(
+	apiKey string,
+	platform string,
+	buildId string,
+	applicationId string,
+	appVersion string,
+	platformVersion string,
 	lineMappingFile string,
-	soBuildId string,
-	endpoint string,
-	options options.CLI,
-	manifestData map[string]string,
-	logger log.Logger,
-) error {
-	opts := utils.UnityLineMappingOptions{
-		APIKey:         manifestData["apiKey"],
-		AppID:          manifestData["applicationId"],
-		AppVersion:     manifestData["versionName"],
-		AppVersionCode: manifestData["versionCode"],
-		SOBuildID:      soBuildId,
-		ProjectRoot:    options.Upload.UnityAndroid.ProjectRoot,
-		Overwrite:      options.Upload.UnityAndroid.Overwrite,
-	}
-
-	fileFieldData := map[string]server.FileField{
-		"mappingFile": server.LocalFile(lineMappingFile),
-	}
-
-	uploadOptions, err := utils.BuildUnityLineMappingUploadOptions(opts)
-	if err != nil {
-		return err
-	}
-
-	return server.ProcessFileRequest(
-		endpoint+"/unity-line-mappings",
-		uploadOptions,
-		fileFieldData,
-		lineMappingFile,
-		options,
-		logger,
-	)
-}
-
-func UploadIosLineMappings(
-	lineMappingFile string,
-	dsymUuid string,
+	projectRoot string,
+	overwrite bool,
 	endpoint string,
 	options options.CLI,
 	logger log.Logger,
 ) error {
-	opts := utils.UnityLineMappingOptions{
-		APIKey:           options.ApiKey,
-		AppID:            options.Upload.UnityIos.ApplicationId,
-		AppVersion:       options.Upload.UnityIos.VersionName,
-		AppBundleVersion: options.Upload.UnityIos.BundleVersion,
-		DSYMUUUID:        dsymUuid,
-		ProjectRoot:      options.Upload.UnityIos.DsymShared.ProjectRoot,
-		Overwrite:        options.Upload.UnityIos.Overwrite,
+	uploadOptions := make(map[string]string)
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	if platform == "android" {
+		if buildId != "" {
+			uploadOptions["soBuildId"] = buildId
+		}
+
+		if platformVersion != "" {
+			uploadOptions["appVersionCode"] = platformVersion
+		}
+
+	} else if platform == "ios" {
+		if buildId != "" {
+			uploadOptions["dsymUUID"] = buildId
+		}
+
+		if platformVersion != "" {
+			uploadOptions["appBundleVersion"] = platformVersion
+		}
+	}
+
+	if applicationId != "" {
+		uploadOptions["appId"] = applicationId
+	}
+
+	if appVersion != "" {
+		uploadOptions["appVersion"] = appVersion
+	}
+
+	if projectRoot != "" {
+		uploadOptions["projectRoot"] = projectRoot
+	}
+
+	if overwrite {
+		uploadOptions["overwrite"] = "true"
 	}
 
 	fileFieldData := map[string]server.FileField{
 		"mappingFile": server.LocalFile(lineMappingFile),
-	}
-
-	uploadOptions, err := utils.BuildUnityLineMappingUploadOptions(opts)
-	if err != nil {
-		return err
 	}
 
 	return server.ProcessFileRequest(

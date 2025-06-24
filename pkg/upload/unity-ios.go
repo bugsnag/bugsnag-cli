@@ -13,8 +13,17 @@ import (
 )
 
 func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+	var (
+		err              error
+		possibleDsymPath string
+		dsyms            []*ios.DwarfInfo
+		tempDir          string
+		tempDirs         []string
+		lineMappingFile  string
+		plistData        *ios.PlistData
+	)
+
 	unityOptions := globalOptions.Upload.UnityIos
-	var tempDirs []string
 
 	defer func() {
 		for _, dir := range tempDirs {
@@ -23,21 +32,11 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 	}()
 
 	for _, path := range unityOptions.Path {
-		var (
-			err             error
-			pathToCheck     string
-			dsyms           []*ios.DwarfInfo
-			tempDir         string
-			lineMappingFile string
-			plistData       *ios.PlistData
-		)
-
 		if unityOptions.DsymShared.Scheme == "" {
 			unityOptions.DsymShared.Scheme = "Unity-iPhone"
-			logger.Info(fmt.Sprintf("Using scheme: %s", unityOptions.DsymShared.Scheme))
+			logger.Debug(fmt.Sprintf("Using default Unity scheme: %s", unityOptions.DsymShared.Scheme))
 		}
 
-		// Handle Xcode project detection
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
 			globalOptions.Upload.XcodeArchive = options.XcodeArchive{
 				Path:   utils.Paths{path},
@@ -53,55 +52,52 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			}
 
 			logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
-			pathToCheck = xcarchivePath
+			possibleDsymPath = xcarchivePath
 		} else {
-			pathToCheck = path
+			possibleDsymPath = path
 		}
 
 		dsyms, tempDir, err = ios.FindDsymsInPath(
-			pathToCheck,
+			possibleDsymPath,
 			unityOptions.DsymShared.IgnoreEmptyDsym,
 			unityOptions.DsymShared.IgnoreMissingDwarf,
 			logger,
 		)
+
 		tempDirs = append(tempDirs, tempDir)
 
 		if err != nil {
-			return fmt.Errorf("error locating dSYMs in %s: %w", pathToCheck, err)
+			return fmt.Errorf("error locating dSYMs in %s: %w", possibleDsymPath, err)
 		}
+
 		if len(dsyms) == 0 {
-			return fmt.Errorf("no dSYMs found in %s", pathToCheck)
+			return fmt.Errorf("no dSYMs found in %s", possibleDsymPath)
 		}
 
-		logger.Info(fmt.Sprintf("Found %d dSYM files in: %s", len(dsyms), pathToCheck))
+		logger.Info(fmt.Sprintf("Found %d dSYM files in: %s", len(dsyms), possibleDsymPath))
 
-		// Resolve plist path if not explicitly provided
-		plistPath := string(unityOptions.DsymShared.Plist)
-		if plistPath == "" {
-			plistPath = filepath.Join(dsyms[0].Location, "..", "..", "Info.plist")
-		}
-
-		if !utils.FileExists(plistPath) {
-			return fmt.Errorf("plist file not found at: %s", plistPath)
-		}
-		logger.Info(fmt.Sprintf("Using plist path: %s", plistPath))
-
-		plistData, err = ios.GetPlistData(plistPath)
-		if err != nil {
-			return fmt.Errorf("failed to read plist: %w", err)
-		}
-
-		if plistData != nil {
-			if globalOptions.Upload.UnityIos.VersionName == "" {
-				globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
+		if globalOptions.Upload.UnityIos.VersionName == "" || globalOptions.Upload.UnityIos.BundleVersion == "" || globalOptions.Upload.UnityIos.ApplicationId == "" {
+			plistPath := string(unityOptions.DsymShared.Plist)
+			if plistPath == "" {
+				plistPath = filepath.Join(dsyms[0].Location, "..", "..", "Info.plist")
 			}
 
-			if globalOptions.Upload.UnityIos.BundleVersion == "" {
-				globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
-			}
+			logger.Debug(fmt.Sprintf("Using plist path: %s", plistPath))
 
-			if globalOptions.Upload.UnityIos.ApplicationId == "" {
-				globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
+			plistData, _ = ios.GetPlistData(plistPath)
+
+			if plistData != nil {
+				if globalOptions.Upload.UnityIos.VersionName == "" {
+					globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
+				}
+
+				if globalOptions.Upload.UnityIos.BundleVersion == "" {
+					globalOptions.Upload.UnityIos.BundleVersion = plistData.BundleVersion
+				}
+
+				if globalOptions.Upload.UnityIos.ApplicationId == "" {
+					globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
+				}
 			}
 		}
 
@@ -117,28 +113,42 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 			logger.Info(fmt.Sprintf("Found line mapping file: %s", lineMappingFile))
 		}
 
-		// Log dSYM details
 		for _, dsym := range dsyms {
 			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
-				logger.Info(fmt.Sprintf("Uploading %s for dSYM %s, withID %s", lineMappingFile, dsym.Name, dsym.UUID))
-				err = unity.UploadIosLineMappings(
-					lineMappingFile,
-					dsym.UUID,
-					endpoint,
-					globalOptions,
-					logger,
-				)
-
-				if err != nil {
-					return err
+				if dsym.UUID == "" {
+					return fmt.Errorf("dSYM %s has no UUID, cannot upload line mappings", dsym.Name)
 				}
 			}
 		}
 
 		// Upload dSYMs and plist
-		err = UploadDsyms(dsyms, plistPath, endpoint, globalOptions, logger)
+		err = UploadDsyms(dsyms, possibleDsymPath, endpoint, globalOptions, logger)
 		if err != nil {
 			return fmt.Errorf("failed to upload dSYMs: %w", err)
+		}
+
+		for _, dsym := range dsyms {
+			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
+				logger.Info(fmt.Sprintf("Uploading %s for dSYM %s, withID %s", lineMappingFile, dsym.Name, dsym.UUID))
+
+				err = unity.UploadUnityLineMappings(
+					globalOptions.ApiKey,
+					"ios",
+					dsym.UUID,
+					globalOptions.Upload.UnityIos.ApplicationId,
+					globalOptions.Upload.UnityIos.VersionName,
+					globalOptions.Upload.UnityIos.BundleVersion,
+					lineMappingFile,
+					unityOptions.DsymShared.ProjectRoot,
+					unityOptions.Overwrite,
+					endpoint,
+					globalOptions,
+					logger,
+				)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 
