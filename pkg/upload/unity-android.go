@@ -15,17 +15,22 @@ import (
 )
 
 func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
-	unityOptions := globalOptions.Upload.UnityAndroid
-	var zipPath string
-	var archList []string
-	var symbolFileList []string
-	var manifestData map[string]string
-	var lineMappingFile string
-	var buildDirectory string
+	var (
+		zipPath         string
+		archList        []string
+		symbolFileList  []string
+		manifestData    map[string]string
+		lineMappingFile string
+		buildDirectory  string
+		aabPath         string
+		fileList        []string
+	)
 
-	var aabPath = string(unityOptions.AabPath)
+	unityOptions := globalOptions.Upload.UnityAndroid
 
 	for _, path := range unityOptions.Path {
+		aabPath = string(unityOptions.AabPath)
+
 		if utils.IsDir(path) {
 			buildDirectory = path
 			zipPath, _ = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
@@ -45,7 +50,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	}
 
 	if aabPath != "" {
-
 		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(aabPath)))
 
 		aabDir, err := utils.ExtractFile(aabPath, "aab")
@@ -102,10 +106,12 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			return err
 		}
 
-		if unityOptions.Shared.NoUploadIl2cppMappingFile {
+		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else if unityOptions.UnityShared.UploadIl2cppMappingFile != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMappingFile)
 		} else {
-			lineMappingFile, err = unity.GetAndroidLineMapping(string(unityOptions.Shared.UploadIl2cppMappingFile), buildDirectory)
+			lineMappingFile, err = unity.GetAndroidLineMapping(buildDirectory)
 			if err != nil {
 				return err
 			}
@@ -114,7 +120,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 
 		for _, arch := range archList {
 			soPath := filepath.Join(unityDir, arch)
-			fileList, err := utils.BuildFileList([]string{soPath})
+			fileList, err = utils.BuildFileList([]string{soPath})
 			if err != nil {
 				return err
 			}
@@ -122,28 +128,12 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
-
-				// If we're uploading a libil2cpp.so file, we want to extract the build ID so that we can upload the linemapping file
-				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.Shared.NoUploadIl2cppMappingFile {
-					buildId, err := elf.GetBuildId(file)
+				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+					_, err := elf.GetBuildId(file)
 					if err != nil {
 						return fmt.Errorf("failed to get build ID from %s: %w", file, err)
 					}
-					logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
-					err = unity.UploadAndroidLineMappings(
-						lineMappingFile,
-						buildId,
-						endpoint,
-						globalOptions,
-						manifestData,
-						logger,
-					)
-
-					if err != nil {
-						return err
-					}
 				}
-
 				symbolFileList = append(symbolFileList, file)
 			}
 		}
@@ -164,6 +154,32 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 		if err != nil {
 			return err
 		}
+
+		for _, file := range symbolFileList {
+			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+				buildId, _ := elf.GetBuildId(file)
+				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
+				err = unity.UploadUnityLineMappings(
+					manifestData["apiKey"],
+					"android",
+					buildId,
+					manifestData["applicationId"],
+					manifestData["versionName"],
+					manifestData["versionCode"],
+					lineMappingFile,
+					unityOptions.ProjectRoot,
+					unityOptions.Overwrite,
+					endpoint,
+					globalOptions,
+					logger,
+				)
+
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
+
 	return nil
 }
