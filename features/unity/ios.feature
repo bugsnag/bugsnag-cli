@@ -3,7 +3,7 @@ Feature: Unity iOS integration tests
     Given I build the Unity project for iOS
     And I wait for the build to succeed
 
-    When I run bugsnag-cli with upload unity-ios --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il-2-cpp-mapping-file platforms-examples/Unity/UnityExample/
+    When I run bugsnag-cli with upload unity-ios --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il2cpp-mapping-file platforms-examples/Unity/UnityExample/
     Then I wait to receive 2 sourcemaps
     Then the sourcemap is valid for the dSYM Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
