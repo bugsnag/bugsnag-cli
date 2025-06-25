@@ -111,7 +111,7 @@ steps:
     env:
       UNITY_VERSION: 6000.0.49f1
     agents:
-      queue: macos-14-isolated
+      queue: macos-15-isolated
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install
