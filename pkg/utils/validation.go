@@ -60,19 +60,3 @@ func (l LogLevels) Validate() error {
 		return fmt.Errorf("invalid log level: %s", l)
 	}
 }
-
-func ValidateEndpoint(endpoint string, apiKey string) string {
-	if strings.Contains(endpoint, "https://upload.bugsnag.com") || strings.Contains(endpoint, "https://upload.bugsnag.com/") {
-		if strings.HasPrefix(apiKey, "00000") {
-			endpoint = "https://upload.insighthub.smartbear.com"
-		}
-	}
-
-	if strings.Contains(endpoint, "https://build.bugsnag.com") || strings.Contains(endpoint, "https://build.bugsnag.com/") {
-		if strings.HasPrefix(apiKey, "00000") {
-			endpoint = "https://build.insighthub.smartbear.com"
-		}
-	}
-
-	return endpoint
-}

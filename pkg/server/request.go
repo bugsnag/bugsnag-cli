@@ -119,7 +119,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
 func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
 
-	endpoint = utils.ValidateEndpoint(endpoint, uploadOptions["apiKey"])
+	endpoint = utils.GetDefaultUploadEndpoint(endpoint, uploadOptions["apiKey"])
 
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
@@ -173,7 +173,7 @@ func ProcessBuildRequest(endpoint string, payload []byte, options options.CLI, l
 	}
 
 	apiKey := buildPayload.APIKey
-	endpoint = utils.ValidateEndpoint(endpoint, apiKey)
+	endpoint = utils.GetDefaultBuildEndpoint(endpoint, apiKey)
 
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
