@@ -67,5 +67,12 @@ func ValidateEndpoint(endpoint string, apiKey string) string {
 			endpoint = "https://upload.insighthub.smartbear.com"
 		}
 	}
+
+	if strings.Contains(endpoint, "https://build.bugsnag.com") || strings.Contains(endpoint, "https://build.bugsnag.com/") {
+		if strings.HasPrefix(apiKey, "00000") {
+			endpoint = "https://build.insighthub.smartbear.com"
+		}
+	}
+
 	return endpoint
 }

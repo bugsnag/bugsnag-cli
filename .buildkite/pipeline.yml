@@ -1,5 +1,5 @@
 agents:
-  queue: macos-14
+  queue: macos-15
 
 steps:
   - name: ':copyright: License Audit'
@@ -81,7 +81,7 @@ steps:
   - label: Xcode Integration Tests
     depends_on: build
     env:
-      XCODE_VERSION: 15
+      XCODE_VERSION: 16.3.0
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
@@ -109,9 +109,9 @@ steps:
   - label: ":video_game: Unity Android Integration Tests"
     depends_on: build
     env:
-      UNITY_VERSION: 6000.0.47f1
+      UNITY_VERSION: 6000.0.49f1
     agents:
-      queue: macos-14-isolated
+      queue: macos-15-isolated
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
       - bundle install

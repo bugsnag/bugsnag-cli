@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -160,6 +161,20 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
 func ProcessBuildRequest(endpoint string, payload []byte, options options.CLI, logger log.Logger) error {
+	type BuildPayload struct {
+		APIKey string `json:"apiKey"`
+	}
+
+	var buildPayload BuildPayload
+	err := json.Unmarshal(payload, &buildPayload)
+	if err != nil {
+		logger.Error("Failed to parse payload JSON: " + err.Error())
+		return err
+	}
+
+	apiKey := buildPayload.APIKey
+	endpoint = utils.ValidateEndpoint(endpoint, apiKey)
+
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 

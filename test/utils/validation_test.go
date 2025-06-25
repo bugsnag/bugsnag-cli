@@ -13,34 +13,54 @@ func TestValidateEndpoint(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "Redirects when endpoint is upload.bugsnag.com and apiKey starts with 00000",
+			name:     "Redirect upload.bugsnag.com when apiKey starts with 00000",
 			endpoint: "https://upload.bugsnag.com",
 			apiKey:   "0000012345",
 			expected: "https://upload.insighthub.smartbear.com",
 		},
 		{
-			name:     "Redirects when endpoint ends with slash and apiKey starts with 00000",
+			name:     "Redirect upload.bugsnag.com/ when apiKey starts with 00000",
 			endpoint: "https://upload.bugsnag.com/",
 			apiKey:   "0000099999",
 			expected: "https://upload.insighthub.smartbear.com",
 		},
 		{
-			name:     "Does not redirect when endpoint is different",
-			endpoint: "https://custom.endpoint.com",
-			apiKey:   "0000012345",
-			expected: "https://custom.endpoint.com",
-		},
-		{
-			name:     "Does not redirect when apiKey does not start with 00000",
+			name:     "Do not redirect upload.bugsnag.com when apiKey does not start with 00000",
 			endpoint: "https://upload.bugsnag.com",
-			apiKey:   "1234500000",
+			apiKey:   "1234567890",
 			expected: "https://upload.bugsnag.com",
 		},
+
 		{
-			name:     "Does not redirect when both endpoint and apiKey do not match criteria",
-			endpoint: "https://example.com",
-			apiKey:   "1234567890",
-			expected: "https://example.com",
+			name:     "Redirect build.bugsnag.com when apiKey starts with 00000",
+			endpoint: "https://build.bugsnag.com",
+			apiKey:   "0000054321",
+			expected: "https://build.insighthub.smartbear.com",
+		},
+		{
+			name:     "Redirect build.bugsnag.com/ when apiKey starts with 00000",
+			endpoint: "https://build.bugsnag.com/",
+			apiKey:   "0000088888",
+			expected: "https://build.insighthub.smartbear.com",
+		},
+		{
+			name:     "Do not redirect build.bugsnag.com when apiKey does not start with 00000",
+			endpoint: "https://build.bugsnag.com",
+			apiKey:   "ABCDE12345",
+			expected: "https://build.bugsnag.com",
+		},
+
+		{
+			name:     "Custom endpoint with matching apiKey is unchanged",
+			endpoint: "https://custom.example.com",
+			apiKey:   "0000011111",
+			expected: "https://custom.example.com",
+		},
+		{
+			name:     "Custom endpoint with non-matching apiKey is unchanged",
+			endpoint: "https://custom.example.com",
+			apiKey:   "ZZZZZ",
+			expected: "https://custom.example.com",
 		},
 	}
 
