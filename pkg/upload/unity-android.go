@@ -138,24 +138,24 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			}
 		}
 
-		err = android.UploadAndroidNdk(
-			symbolFileList,
-			manifestData["apiKey"],
-			manifestData["applicationId"],
-			manifestData["versionName"],
-			manifestData["versionCode"],
-			unityOptions.ProjectRoot,
-			endpoint,
-			globalOptions,
-			unityOptions.Overwrite,
-			logger,
-		)
-
-		if err != nil {
-			return err
-		}
-
 		for _, file := range symbolFileList {
+			err = android.UploadAndroidNdk(
+				file,
+				manifestData["apiKey"],
+				manifestData["applicationId"],
+				manifestData["versionName"],
+				manifestData["versionCode"],
+				unityOptions.ProjectRoot,
+				endpoint,
+				globalOptions,
+				unityOptions.Overwrite,
+				logger,
+			)
+
+			if err != nil {
+				return err
+			}
+
 			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
 				buildId, _ := elf.GetBuildId(file)
 				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))

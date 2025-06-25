@@ -168,21 +168,30 @@ func ProcessAndroidNDK(options options.CLI, endpoint string, logger log.Logger) 
 		}
 	}
 
-	err = android.UploadAndroidNdk(
-		symbolFileList,
-		options.ApiKey,
-		ndkOptions.ApplicationId,
-		ndkOptions.VersionName,
-		ndkOptions.VersionCode,
-		ndkOptions.ProjectRoot,
-		endpoint,
-		options,
-		ndkOptions.Overwrite,
-		logger,
-	)
+	numberOfFiles := len(fileList)
 
-	if err != nil {
-		return err
+	if numberOfFiles < 1 {
+		logger.Info("No NDK files found to process")
+		return nil
+	}
+
+	for _, file := range symbolFileList {
+		err = android.UploadAndroidNdk(
+			file,
+			options.ApiKey,
+			ndkOptions.ApplicationId,
+			ndkOptions.VersionName,
+			ndkOptions.VersionCode,
+			ndkOptions.ProjectRoot,
+			endpoint,
+			options,
+			ndkOptions.Overwrite,
+			logger,
+		)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
