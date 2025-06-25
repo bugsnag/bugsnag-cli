@@ -100,7 +100,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 					globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
 				}
 			} else {
-				logger.Debug(fmt.Sprintf("No plist file found"))
+				logger.Debug("No plist file found")
 			}
 		}
 
@@ -117,7 +117,6 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		}
 
 		for _, dsym := range dsyms {
-
 			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
 				if dsym.UUID == "" {
 					return fmt.Errorf("dSYM %s has no UUID, cannot upload line mappings", dsym.Name)
