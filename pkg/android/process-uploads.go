@@ -10,7 +10,7 @@ import (
 )
 
 func UploadAndroidNdk(
-	fileList []string,
+	file string,
 	apiKey string,
 	applicationId string,
 	versionName string,
@@ -23,27 +23,18 @@ func UploadAndroidNdk(
 ) error {
 	fileFieldData := make(map[string]server.FileField)
 
-	numberOfFiles := len(fileList)
+	uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
 
-	if numberOfFiles < 1 {
-		logger.Info("No NDK files found to process")
-		return nil
+	if err != nil {
+		return err
 	}
 
-	for _, file := range fileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), overwrite)
+	fileFieldData["soFile"] = server.LocalFile(file)
 
-		if err != nil {
-			return err
-		}
+	err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
 
-		fileFieldData["soFile"] = server.LocalFile(file)
-
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
-
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
 	}
 
 	return nil

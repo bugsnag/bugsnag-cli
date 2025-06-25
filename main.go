@@ -155,13 +155,25 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-	case "upload unity-android <path>":
+	case "upload unity-android", "upload unity-android <path>":
 
 		if commands.ApiKey == "" {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
 		err := upload.ProcessUnityAndroid(commands, endpoint, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "upload unity-ios", "upload unity-ios <path>":
+
+		if commands.ApiKey == "" {
+			logger.Fatal("missing api key, please specify using `--api-key`")
+		}
+
+		err := upload.ProcessUnityIos(commands, endpoint, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

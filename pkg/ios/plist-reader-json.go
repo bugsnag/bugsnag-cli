@@ -13,6 +13,7 @@ import (
 // PlistData contains the relevant content of a plist file for uploading to Bugsnag.
 // It extracts the app version, bundle version, and Bugsnag-specific project details.
 type PlistData struct {
+	BundleIdentifier      string                `json:"CFBundleIdentifier"`
 	VersionName           string                `json:"CFBundleShortVersionString"`
 	BundleVersion         string                `json:"CFBundleVersion"`
 	BugsnagProjectDetails bugsnagProjectDetails `json:"bugsnag"`

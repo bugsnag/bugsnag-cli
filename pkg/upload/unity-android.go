@@ -2,6 +2,8 @@ package upload
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
+	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,15 +15,24 @@ import (
 )
 
 func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+	var (
+		zipPath         string
+		archList        []string
+		symbolFileList  []string
+		manifestData    map[string]string
+		lineMappingFile string
+		buildDirectory  string
+		aabPath         string
+		fileList        []string
+	)
+
 	unityOptions := globalOptions.Upload.UnityAndroid
-	var zipPath string
-	var archList []string
-	var symbolFileList []string
-	var manifestData map[string]string
-	var aabPath = string(unityOptions.AabPath)
 
 	for _, path := range unityOptions.Path {
+		aabPath = string(unityOptions.AabPath)
+
 		if utils.IsDir(path) {
+			buildDirectory = path
 			zipPath, _ = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
 
 			if aabPath == "" {
@@ -29,10 +40,8 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			}
 		} else if strings.HasSuffix(path, ".symbols.zip") {
 			zipPath = path
-
 			if aabPath == "" {
-				buildDirectory := filepath.Dir(path)
-
+				buildDirectory = filepath.Dir(path)
 				aabPath, _ = utils.FindLatestFileWithSuffix(buildDirectory, ".aab")
 			}
 		} else {
@@ -41,7 +50,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	}
 
 	if aabPath != "" {
-
 		logger.Debug(fmt.Sprintf("Extracting %s into a temporary directory", filepath.Base(aabPath)))
 
 		aabDir, err := utils.ExtractFile(aabPath, "aab")
@@ -98,9 +106,21 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			return err
 		}
 
+		if unityOptions.UnityShared.NoUploadIl2cppMapping {
+			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
+		} else if unityOptions.UnityShared.UploadIl2cppMapping != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMapping)
+		} else {
+			lineMappingFile, err = unity.GetAndroidLineMapping(buildDirectory)
+			if err != nil {
+				return err
+			}
+			logger.Debug(fmt.Sprintf("Found line mapping file: %s", lineMappingFile))
+		}
+
 		for _, arch := range archList {
 			soPath := filepath.Join(unityDir, arch)
-			fileList, err := utils.BuildFileList([]string{soPath})
+			fileList, err = utils.BuildFileList([]string{soPath})
 			if err != nil {
 				return err
 			}
@@ -108,26 +128,58 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
+				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
+					_, err := elf.GetBuildId(file)
+					if err != nil {
+						return fmt.Errorf("failed to get build ID from %s: %w", file, err)
+					}
+				}
 				symbolFileList = append(symbolFileList, file)
 			}
 		}
 
-		err = android.UploadAndroidNdk(
-			symbolFileList,
-			manifestData["apiKey"],
-			manifestData["applicationId"],
-			manifestData["versionName"],
-			manifestData["versionCode"],
-			unityOptions.ProjectRoot,
-			endpoint,
-			globalOptions,
-			unityOptions.Overwrite,
-			logger,
-		)
+		for _, file := range symbolFileList {
+			err = android.UploadAndroidNdk(
+				file,
+				manifestData["apiKey"],
+				manifestData["applicationId"],
+				manifestData["versionName"],
+				manifestData["versionCode"],
+				unityOptions.ProjectRoot,
+				endpoint,
+				globalOptions,
+				unityOptions.Overwrite,
+				logger,
+			)
 
-		if err != nil {
-			return err
+			if err != nil {
+				return err
+			}
+
+			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
+				buildId, _ := elf.GetBuildId(file)
+				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
+				err = unity.UploadUnityLineMappings(
+					manifestData["apiKey"],
+					"android",
+					buildId,
+					manifestData["applicationId"],
+					manifestData["versionName"],
+					manifestData["versionCode"],
+					lineMappingFile,
+					unityOptions.ProjectRoot,
+					unityOptions.Overwrite,
+					endpoint,
+					globalOptions,
+					logger,
+				)
+
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
+
 	return nil
 }
