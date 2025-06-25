@@ -51,10 +51,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
-    And I discard the oldest sourcemaps
-    And I discard the oldest sourcemaps
-    And I discard the oldest sourcemaps
-
 
     Then the sourcemap is valid for the Unity Line Mapping API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -89,9 +85,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "versionName" equals "123.456"
     And the sourcemap payload field "overwrite" equals "true"
 
-    And I discard the oldest sourcemaps
-    And I discard the oldest sourcemaps
-    And I discard the oldest sourcemaps
     And I discard the oldest sourcemaps
 
     Then the sourcemap is valid for the Unity Line Mapping API
