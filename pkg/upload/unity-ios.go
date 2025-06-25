@@ -117,21 +117,19 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		}
 
 		for _, dsym := range dsyms {
+
 			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
 				if dsym.UUID == "" {
 					return fmt.Errorf("dSYM %s has no UUID, cannot upload line mappings", dsym.Name)
 				}
 			}
-		}
 
-		// Upload dSYMs and plist
-		err := ios.ProcessDsymUpload(plistPath, endpoint, unityOptions.DsymShared.ProjectRoot, globalOptions, dsyms, logger)
+			err := ios.ProcessDsymUpload(plistPath, endpoint, unityOptions.DsymShared.ProjectRoot, globalOptions, []*ios.DwarfInfo{dsym}, logger)
 
-		if err != nil {
-			return fmt.Errorf("Error uploading dSYM files: %w", err)
-		}
+			if err != nil {
+				return fmt.Errorf("Error uploading dSYM files: %w", err)
+			}
 
-		for _, dsym := range dsyms {
 			if dsym.Name == "UnityFramework" && lineMappingFile != "" {
 				logger.Info(fmt.Sprintf("Uploading %s for dSYM %s, withID %s", lineMappingFile, dsym.Name, dsym.UUID))
 
