@@ -20,6 +20,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		tempDir          string
 		tempDirs         []string
 		lineMappingFile  string
+		plistPath        string
 		plistData        *ios.PlistData
 	)
 
@@ -82,11 +83,11 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 				plistPath = filepath.Join(dsyms[0].Location, "..", "..", "Info.plist")
 			}
 
-			logger.Debug(fmt.Sprintf("Using plist path: %s", plistPath))
-
 			plistData, _ = ios.GetPlistData(plistPath)
 
 			if plistData != nil {
+				logger.Debug(fmt.Sprintf("Reading plist data from: %s", plistPath))
+
 				if globalOptions.Upload.UnityIos.VersionName == "" {
 					globalOptions.Upload.UnityIos.VersionName = plistData.VersionName
 				}
@@ -98,13 +99,15 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 				if globalOptions.Upload.UnityIos.ApplicationId == "" {
 					globalOptions.Upload.UnityIos.ApplicationId = plistData.BundleIdentifier
 				}
+			} else {
+				logger.Debug(fmt.Sprintf("No plist file found"))
 			}
 		}
 
-		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+		if unityOptions.UnityShared.NoUploadIl2cppMapping {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
-		} else if unityOptions.UnityShared.UploadIl2cppMappingFile != "" {
-			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMappingFile)
+		} else if unityOptions.UnityShared.UploadIl2cppMapping != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMapping)
 		} else {
 			lineMappingFile, err = unity.GetIosLineMapping(path)
 			if err != nil {
@@ -122,9 +125,10 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 		}
 
 		// Upload dSYMs and plist
-		err = UploadDsyms(dsyms, possibleDsymPath, endpoint, globalOptions, logger)
+		err := ios.ProcessDsymUpload(plistPath, endpoint, unityOptions.DsymShared.ProjectRoot, globalOptions, dsyms, logger)
+
 		if err != nil {
-			return fmt.Errorf("failed to upload dSYMs: %w", err)
+			return fmt.Errorf("Error uploading dSYM files: %w", err)
 		}
 
 		for _, dsym := range dsyms {

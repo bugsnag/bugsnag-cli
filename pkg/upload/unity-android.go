@@ -106,10 +106,10 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			return err
 		}
 
-		if unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+		if unityOptions.UnityShared.NoUploadIl2cppMapping {
 			logger.Debug("Skipping the upload of the LineNumberMappings.json file")
-		} else if unityOptions.UnityShared.UploadIl2cppMappingFile != "" {
-			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMappingFile)
+		} else if unityOptions.UnityShared.UploadIl2cppMapping != "" {
+			lineMappingFile = string(unityOptions.UnityShared.UploadIl2cppMapping)
 		} else {
 			lineMappingFile, err = unity.GetAndroidLineMapping(buildDirectory)
 			if err != nil {
@@ -128,7 +128,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
-				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
 					_, err := elf.GetBuildId(file)
 					if err != nil {
 						return fmt.Errorf("failed to get build ID from %s: %w", file, err)
@@ -156,7 +156,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 		}
 
 		for _, file := range symbolFileList {
-			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMappingFile {
+			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
 				buildId, _ := elf.GetBuildId(file)
 				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
 				err = unity.UploadUnityLineMappings(

@@ -3,7 +3,7 @@ Feature: Unity Android integration tests
     Given I build the Unity project for Android
     And I wait for the Unity symbols to generate
 
-    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il2cpp-mapping-file platforms-examples/Unity/
+    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il2cpp-mapping platforms-examples/Unity/
     Then I wait to receive 5 sourcemaps
     Then the sourcemap is valid for the Android Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
@@ -17,7 +17,7 @@ Feature: Unity Android integration tests
     Given I build the Unity project for Android
     And I wait for the Unity symbols to generate
 
-    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il2cpp-mapping-file --aab-path platforms-examples/Unity/UnityExample.aab platforms-examples/Unity/
+    When I run bugsnag-cli with upload unity-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --no-upload-il2cpp-mapping --aab-path platforms-examples/Unity/UnityExample.aab platforms-examples/Unity/
     Then I wait to receive 5 sourcemaps
     Then the sourcemap is valid for the Android Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
