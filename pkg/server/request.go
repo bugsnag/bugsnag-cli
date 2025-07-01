@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -125,7 +126,7 @@ func ProcessFileRequest(apiKey string, endpoint string, uploadOptions map[string
 		return fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
-	endpoint = utils.GetDefaultUploadEndpoint(endpoint, apiKey)
+	endpoint = endpoints.GetDefaultUploadEndpoint(endpoint, apiKey)
 
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
@@ -179,7 +180,7 @@ func ProcessBuildRequest(endpoint string, payload []byte, options options.CLI, l
 	}
 
 	apiKey := buildPayload.APIKey
-	endpoint = utils.GetDefaultBuildEndpoint(endpoint, apiKey)
+	endpoint = endpoints.GetDefaultBuildEndpoint(endpoint, apiKey)
 
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")

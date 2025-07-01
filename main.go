@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -39,7 +40,7 @@ func main() {
 	logger := log.NewLoggerWrapper(commands.LogLevel)
 
 	// Build connection URI
-	endpoint, err := utils.BuildEndpointURL(commands.Upload.UploadAPIRootUrl, commands.Port)
+	endpoint, err := endpoints.BuildEndpointURL(utils.ThisOrThat(commands.Upload.UploadAPIRootUrl, endpoints.BUGSNAG_UPLOAD).(string), commands.Port)
 
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
@@ -194,7 +195,7 @@ func main() {
 		}
 
 		// Get Endpoint URL
-		endpoint, err = utils.BuildEndpointURL(commands.CreateBuild.BuildApiRootUrl, commands.Port)
+		endpoint, err = endpoints.BuildEndpointURL(utils.ThisOrThat(commands.CreateBuild.BuildApiRootUrl, endpoints.BUGSNAG_BUILD).(string), commands.Port)
 
 		if err != nil {
 			logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))

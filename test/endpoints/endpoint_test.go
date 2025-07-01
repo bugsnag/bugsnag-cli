@@ -1,7 +1,7 @@
-package utils_testing
+package endpoints_testing
 
 import (
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"testing"
 )
 
@@ -45,7 +45,7 @@ func TestBuildEndpointUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := utils.BuildEndpointURL(tt.uri, tt.port)
+			result, err := endpoints.BuildEndpointURL(tt.uri, tt.port)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BuildEndpointUrl() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -85,7 +85,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := utils.GetDefaultUploadEndpoint(tt.endpoint, tt.apiKey)
+			result := endpoints.GetDefaultUploadEndpoint(tt.endpoint, tt.apiKey)
 			if result != tt.expected {
 				t.Errorf("GetDefaultUploadEndpoint() = %v, want %v", result, tt.expected)
 			}
@@ -122,7 +122,7 @@ func TestGetDefaultBuildEndpoint(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := utils.GetDefaultBuildEndpoint(tt.endpoint, tt.apiKey)
+			result := endpoints.GetDefaultBuildEndpoint(tt.endpoint, tt.apiKey)
 			if result != tt.expected {
 				t.Errorf("GetDefaultBuildEndpoint() = %v, want %v", result, tt.expected)
 			}

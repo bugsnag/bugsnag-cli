@@ -1,4 +1,4 @@
-package utils
+package endpoints
 
 import (
 	"fmt"
@@ -28,10 +28,6 @@ const (
 //   - A string containing the full URI with port, if applicable.
 //   - An error if the URI cannot be parsed.
 func BuildEndpointURL(uri string, port int) (string, error) {
-	if uri == "" {
-		uri = BUGSNAG_UPLOAD
-	}
-
 	baseURL, err := url.Parse(uri)
 	if err != nil {
 		return "", err
