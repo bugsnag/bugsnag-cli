@@ -190,7 +190,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 
 	}
 
-	uploadOptions, err := utils.BuildReactNativeUploadOptions(options.ApiKey, iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, options.Upload.Overwrite, "ios")
+	uploadOptions, err := utils.BuildReactNativeUploadOptions(iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, options.Upload.Overwrite, "ios")
 
 	if err != nil {
 		return err
@@ -200,7 +200,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 	fileFieldData["sourceMap"] = server.LocalFile(iosOptions.ReactNative.SourceMap)
 	fileFieldData["bundle"] = server.LocalFile(iosOptions.ReactNative.Bundle)
 
-	err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, iosOptions.ReactNative.SourceMap, options, logger)
+	err = server.ProcessFileRequest(options.ApiKey, endpoint+"/react-native-source-map", uploadOptions, fileFieldData, iosOptions.ReactNative.SourceMap, options, logger)
 
 	if err != nil {
 

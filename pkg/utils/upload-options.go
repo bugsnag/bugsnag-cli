@@ -5,10 +5,8 @@ import (
 )
 
 // BuildDartUploadOptions - Builds the upload options for processing dart files
-func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
+func BuildDartUploadOptions(uuid string, platform string, overwrite bool, appVersion string, appExtraVersion string) map[string]string {
 	uploadOptions := make(map[string]string)
-
-	uploadOptions["apiKey"] = apiKey
 
 	uploadOptions["buildId"] = uuid
 
@@ -42,14 +40,8 @@ func BuildDartUploadOptions(apiKey string, uuid string, platform string, overwri
 }
 
 // BuildAndroidProguardUploadOptions - Builds the upload options for processing Proguard files
-func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, buildUuid string, overwrite bool) (map[string]string, error) {
+func BuildAndroidProguardUploadOptions(applicationId string, versionName string, versionCode string, buildUuid string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
-	}
 
 	if applicationId != "" {
 		uploadOptions["appId"] = applicationId
@@ -78,21 +70,15 @@ func BuildAndroidProguardUploadOptions(apiKey string, applicationId string, vers
 	return uploadOptions, nil
 }
 
-func BuildDsymUploadOptions(apiKey string, projectRoot string) (map[string]string, error) {
+func BuildDsymUploadOptions(projectRoot string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
-	}
 
 	uploadOptions["projectRoot"] = projectRoot
 
 	return uploadOptions, nil
 }
 
-func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
+func BuildReactNativeUploadOptions(appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
 	// Return early if all three of these are empty/undefined
@@ -105,12 +91,6 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 		}
 
 		return nil, fmt.Errorf("you must set at least the version name, %s and code bundle ID to uniquely identify the build", platformSpecificTerminology)
-	}
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
 	}
 
 	// If codeBundleId is set, use that instead of appVersion and versionCode
@@ -141,14 +121,8 @@ func BuildReactNativeUploadOptions(apiKey string, appVersion string, versionCode
 	return uploadOptions, nil
 }
 
-func BuildJsUploadOptions(apiKey string, versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
+func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
-	}
 
 	if versionName != "" {
 		uploadOptions["appVersion"] = versionName
@@ -176,14 +150,8 @@ func BuildJsUploadOptions(apiKey string, versionName string, codeBundleId string
 }
 
 // BuildAndroidNDKUploadOptions - Builds the upload options for processing NDK files
-func BuildAndroidNDKUploadOptions(apiKey string, applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
+func BuildAndroidNDKUploadOptions(applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
-
-	if apiKey != "" {
-		uploadOptions["apiKey"] = apiKey
-	} else {
-		return nil, fmt.Errorf("missing api key, please specify using `--api-key`")
-	}
 
 	if applicationId != "" {
 		uploadOptions["appId"] = applicationId

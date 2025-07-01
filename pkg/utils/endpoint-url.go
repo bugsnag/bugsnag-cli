@@ -15,7 +15,7 @@ const (
 	BUGSNAG_BUILD  = "https://build.bugsnag.com"
 )
 
-// BuildEndpointUrl constructs a complete URL from a base URI and optional port.
+// BuildEndpointURL constructs a complete URL from a base URI and optional port.
 //
 // If the URI already includes a port, it returns the URI as-is.
 // Otherwise, if a non-zero port is provided, it appends the port to the base URI.
@@ -27,21 +27,25 @@ const (
 // Returns:
 //   - A string containing the full URI with port, if applicable.
 //   - An error if the URI cannot be parsed.
-func BuildEndpointUrl(uri string, port int) (string, error) {
-	baseUrl, err := url.Parse(uri)
-	if err != nil {
-		return baseUrl.String(), err
+func BuildEndpointURL(uri string, port int) (string, error) {
+	if uri == "" {
+		uri = BUGSNAG_UPLOAD
 	}
 
-	if baseUrl.Port() != "" {
-		return baseUrl.String(), nil
+	baseURL, err := url.Parse(uri)
+	if err != nil {
+		return "", err
+	}
+
+	if baseURL.Port() != "" {
+		return baseURL.String(), nil
 	}
 
 	if port != 0 {
-		return fmt.Sprintf("%s:%d", baseUrl, port), nil
+		baseURL.Host = fmt.Sprintf("%s:%d", baseURL.Hostname(), port)
 	}
 
-	return baseUrl.String(), nil
+	return baseURL.String(), nil
 }
 
 // GetDefaultUploadEndpoint selects the appropriate upload endpoint based on the API key.

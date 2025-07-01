@@ -39,7 +39,7 @@ func main() {
 	logger := log.NewLoggerWrapper(commands.LogLevel)
 
 	// Build connection URI
-	endpoint, err := utils.BuildEndpointUrl(commands.Upload.UploadAPIRootUrl, commands.Port)
+	endpoint, err := utils.BuildEndpointURL(commands.Upload.UploadAPIRootUrl, commands.Port)
 
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
@@ -194,7 +194,7 @@ func main() {
 		}
 
 		// Get Endpoint URL
-		endpoint, err = utils.BuildEndpointUrl(commands.CreateBuild.BuildApiRootUrl, commands.Port)
+		endpoint, err = utils.BuildEndpointURL(commands.CreateBuild.BuildApiRootUrl, commands.Port)
 
 		if err != nil {
 			logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))

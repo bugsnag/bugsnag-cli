@@ -117,9 +117,15 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
+func ProcessFileRequest(apiKey string, endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
 
-	endpoint = utils.GetDefaultUploadEndpoint(endpoint, uploadOptions["apiKey"])
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	endpoint = utils.GetDefaultUploadEndpoint(endpoint, apiKey)
 
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {

@@ -157,7 +157,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeUploadOptions(options.ApiKey, androidOptions.ReactNative.VersionName, androidOptions.Android.VersionCode, androidOptions.ReactNative.CodeBundleId, androidOptions.ReactNative.Dev, androidOptions.ProjectRoot, options.Upload.Overwrite, "android")
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(androidOptions.ReactNative.VersionName, androidOptions.Android.VersionCode, androidOptions.ReactNative.CodeBundleId, androidOptions.ReactNative.Dev, androidOptions.ProjectRoot, options.Upload.Overwrite, "android")
 
 		if err != nil {
 			return err
@@ -167,7 +167,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 		fileFieldData["sourceMap"] = server.LocalFile(androidOptions.ReactNative.SourceMap)
 		fileFieldData["bundle"] = server.LocalFile(androidOptions.ReactNative.Bundle)
 
-		err = server.ProcessFileRequest(endpoint+"/react-native-source-map", uploadOptions, fileFieldData, androidOptions.ReactNative.SourceMap, options, logger)
+		err = server.ProcessFileRequest(options.ApiKey, endpoint+"/react-native-source-map", uploadOptions, fileFieldData, androidOptions.ReactNative.SourceMap, options, logger)
 
 		if err != nil {
 

@@ -19,8 +19,6 @@ func All(options options.CLI, endpoint string, logger log.Logger,
 	// Build UploadOptions list
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["apiKey"] = options.ApiKey
-
 	if options.Upload.Overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
@@ -40,7 +38,7 @@ func All(options options.CLI, endpoint string, logger log.Logger,
 			fileFieldData["file"] = server.LocalFile(file)
 		}
 
-		err := server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, file, options, logger)
+		err := server.ProcessFileRequest(options.ApiKey, endpoint, uploadOptions, fileFieldData, file, options, logger)
 
 		if err != nil {
 

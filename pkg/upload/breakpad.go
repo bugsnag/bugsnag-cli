@@ -54,7 +54,7 @@ func ProcessBreakpad(globalOptions options.CLI, endpoint string, logger log.Logg
 			strings.ReplaceAll(projectRoot, " ", "%20"),
 		)
 
-		err = server.ProcessFileRequest(endpoint+"/breakpad-symbol"+queryParams, formFields, fileFieldData, file, globalOptions, logger)
+		err = server.ProcessFileRequest(apiKey, endpoint+"/breakpad-symbol"+queryParams, formFields, fileFieldData, file, globalOptions, logger)
 		if err != nil {
 			return err
 		}

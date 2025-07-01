@@ -30,7 +30,7 @@ func UploadAndroidNdk(
 	}
 
 	for _, file := range fileList {
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(apiKey, applicationId, versionName, versionCode, projectRoot, filepath.Base(file), options.Upload.Overwrite)
+		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(applicationId, versionName, versionCode, projectRoot, filepath.Base(file), options.Upload.Overwrite)
 
 		if err != nil {
 			return err
@@ -38,7 +38,7 @@ func UploadAndroidNdk(
 
 		fileFieldData["soFile"] = server.LocalFile(file)
 
-		err = server.ProcessFileRequest(endpoint+"/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
+		err = server.ProcessFileRequest(apiKey, endpoint+"/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
 
 		if err != nil {
 			return err

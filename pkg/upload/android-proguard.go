@@ -162,7 +162,7 @@ func ProcessAndroidProguard(options options.CLI, endpoint string, logger log.Log
 			return err
 		}
 
-		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(options.ApiKey, proguardOptions.ApplicationId, proguardOptions.VersionName, proguardOptions.VersionCode, proguardOptions.BuildUuid, options.Upload.Overwrite)
+		uploadOptions, err := utils.BuildAndroidProguardUploadOptions(proguardOptions.ApplicationId, proguardOptions.VersionName, proguardOptions.VersionCode, proguardOptions.BuildUuid, options.Upload.Overwrite)
 
 		if err != nil {
 			return err
@@ -171,12 +171,12 @@ func ProcessAndroidProguard(options options.CLI, endpoint string, logger log.Log
 		fileFieldData := make(map[string]server.FileField)
 		fileFieldData["proguard"] = server.LocalFile(outputFile)
 
-		err = server.ProcessFileRequest(endpoint+"/proguard", uploadOptions, fileFieldData, outputFile, options, logger)
+		err = server.ProcessFileRequest(options.ApiKey, endpoint+"/proguard", uploadOptions, fileFieldData, outputFile, options, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "404 Not Found") {
 				logger.Info(fmt.Sprintf("Trying %s", endpoint))
-				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, outputFile, options, logger)
+				err = server.ProcessFileRequest(options.ApiKey, endpoint, uploadOptions, fileFieldData, outputFile, options, logger)
 			}
 		}
 
