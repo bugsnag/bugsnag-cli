@@ -45,7 +45,7 @@ func TestBuildEndpointUrl(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := utils.BuildEndpointUrl(tt.uri, tt.port)
+			result, err := utils.BuildEndpointURL(tt.uri, tt.port)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BuildEndpointUrl() error = %v, wantErr %v", err, tt.wantErr)
 			}
