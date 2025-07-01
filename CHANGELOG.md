@@ -4,6 +4,10 @@
 
 - Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
 
+### Fixed
+
+- Ensure that the`--metadata` accepts key=value,key=value 
+
 ## [3.1.1] - 2025-05-14
 
 ### Fixed
