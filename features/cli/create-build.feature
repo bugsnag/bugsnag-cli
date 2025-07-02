@@ -43,3 +43,12 @@ Feature: Bugsnag CLI create-build behavior
     When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:$MAZE_RUNNER_PORT/builds --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml --dry-run --verbose
     Then I should see the build payload
     And I wait to receive 0 builds
+
+  Scenario: Starting bugsnag-cli create-build on mac with app-version and metadata
+    When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:$MAZE_RUNNER_PORT/builds --api-key=1234567890ABCDEF1234567890ABCDEF --version-name=1.2.3 --metadata=foo=bar,baz=qux
+    And I wait to receive 1 builds
+    Then the build is valid for the Builds API
+    And the builds payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the builds payload field "appVersion" equals "1.2.3"
+    And the builds payload field "metadata" hash equals {"baz"=>"qux", "foo"=>"bar"}
+    And the builds payload field "sourceControl.repository" equals "https://github.com/bugsnag/bugsnag-cli.git"

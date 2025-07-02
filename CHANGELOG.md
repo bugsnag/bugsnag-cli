@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.2.0] - 2025-07-02
+
+- Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
+- Add minimum node version to the NPM package [#217](https://github.com/bugsnag/bugsnag-cli/pull/217)
+
+### Fixed
+
+- Ensure that the`--metadata` accepts key=value,key=value [#216](https://github.com/bugsnag/bugsnag-cli/pull/216)
+
 ## [3.1.1] - 2025-05-14
 
 ### Fixed

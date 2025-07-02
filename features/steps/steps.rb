@@ -442,3 +442,10 @@ Before('@BuildNestedJS') do
     $nested_js = true
   end
 end
+
+And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([^"]*)"=>"([^"]*)"\}$/) do |arg1, arg2, arg3, arg4, arg5|
+  builds = Maze::Server.builds.current[:body]
+  expected_hash = { arg2 => arg3, arg4 => arg5 }
+
+  Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
+end

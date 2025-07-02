@@ -10,7 +10,19 @@ import (
 )
 
 // ProcessReactNative handles the upload process for React Native projects.
-func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+//
+// It processes both Android and iOS assets, including JavaScript source maps,
+// Proguard mappings, dSYMs, and NDK symbols.
+// It constructs the necessary paths based on the provided options and uploads
+// the assets.
+//
+// Parameters:
+//   - globalOptions: CLI options containing React Native upload settings.
+//   - logger: Logger instance for logging progress and errors.
+//
+// Returns:
+//   - error: non-nil if any step fails during processing or uploading.
+func ProcessReactNative(globalOptions options.CLI, logger log.Logger) error {
 	reactNativeOptions := globalOptions.Upload.ReactNative
 
 	// Construct Android and iOS paths
@@ -26,7 +38,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		ReactNative: reactNativeOptions.Shared,
 		Android:     reactNativeOptions.AndroidSpecific,
 	}
-	if err := ProcessReactNativeAndroid(globalOptions, endpoint, logger); err != nil {
+	if err := ProcessReactNativeAndroid(globalOptions, logger); err != nil {
 		return fmt.Errorf("failed to upload JavaScript source maps for Android: %w", err)
 	}
 
@@ -38,7 +50,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		ReactNative: reactNativeOptions.Shared,
 		Ios:         reactNativeOptions.IosSpecific,
 	}
-	if err := ProcessReactNativeIos(globalOptions, endpoint, logger); err != nil {
+	if err := ProcessReactNativeIos(globalOptions, logger); err != nil {
 		return fmt.Errorf("failed to upload JavaScript source maps for iOS: %w", err)
 	}
 
@@ -51,7 +63,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		Variant:     reactNativeOptions.AndroidSpecific.Variant,
 		VersionCode: reactNativeOptions.AndroidSpecific.VersionCode,
 	}
-	if err := ProcessAndroidProguard(globalOptions, endpoint, logger); err != nil {
+	if err := ProcessAndroidProguard(globalOptions, logger); err != nil {
 		return fmt.Errorf("failed to upload Android Proguard mappings: %w", err)
 	}
 
@@ -66,7 +78,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 			XcodeProject: utils.Path(reactNativeOptions.IosSpecific.XcodeProject),
 		},
 	}
-	if err := ProcessDsym(globalOptions, endpoint, logger); err != nil {
+	if err := ProcessDsym(globalOptions, logger); err != nil {
 		return fmt.Errorf("failed to upload iOS dSYMs: %w", err)
 	}
 
@@ -80,7 +92,7 @@ func ProcessReactNative(globalOptions options.CLI, endpoint string, logger log.L
 		Variant:     reactNativeOptions.AndroidSpecific.Variant,
 		VersionCode: reactNativeOptions.AndroidSpecific.VersionCode,
 	}
-	if err := ProcessAndroidNDK(globalOptions, endpoint, logger); err != nil {
+	if err := ProcessAndroidNDK(globalOptions, logger); err != nil {
 		return fmt.Errorf("failed to upload Android NDK symbols: %w", err)
 	}
 
