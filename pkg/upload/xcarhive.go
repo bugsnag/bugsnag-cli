@@ -10,7 +10,8 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
 
-// ProcessDsymUpload locates and uploads dSYM files from an Xcode archive to a Bugsnag server.
+// ProcessDsymUpload locates and uploads dSYM files from an Xcode archive.
+// It searches for dSYM files in the specified Xcode archive, processes them and uploads them.
 //
 // Parameters:
 // - xcarchivePath: The path to the Xcode archive (.xcarchive) containing dSYM files.
@@ -21,7 +22,7 @@ import (
 // Returns:
 // - The number of dSYM files found and uploaded.
 // - An error if any part of the process fails, otherwise nil.
-func ProcessDsymUpload(xcarchivePath string, endpoint string, opts options.CLI, logger log.Logger) (int, error) {
+func ProcessDsymUpload(xcarchivePath string, opts options.CLI, logger log.Logger) (int, error) {
 	// Locate dSYM files within the specified Xcode archive
 	dwarfInfo, tempDir, err := ios.FindDsymsInPath(
 		xcarchivePath,
@@ -51,7 +52,6 @@ func ProcessDsymUpload(xcarchivePath string, endpoint string, opts options.CLI, 
 	// Process and upload the located dSYM files
 	err = ios.ProcessDsymUpload(
 		filepath.Join(xcarchivePath, "Info.plist"),
-		endpoint,
 		opts.Upload.XcodeArchive.Shared.ProjectRoot,
 		opts,
 		dwarfInfo,

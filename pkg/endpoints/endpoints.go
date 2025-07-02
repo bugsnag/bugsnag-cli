@@ -2,13 +2,14 @@ package endpoints
 
 import (
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"net/url"
 	"strings"
 )
 
-// Constants defining upload and build endpoints for Bugsnag and InsightHub.
+// Constants defining upload and build endpoint instances.
 const (
-	HUB_PREFIX     = "00000" // API keys starting with this indicate usage of InsightHub instead of Bugsnag.
+	HUB_PREFIX     = "00000" // API keys starting with this indicate usage of the Hub instance.
 	HUB_UPLOAD     = "https://upload.insighthub.smartbear.com"
 	HUB_BUILD      = "https://build.insighthub.smartbear.com"
 	BUGSNAG_UPLOAD = "https://upload.bugsnag.com"
@@ -46,46 +47,65 @@ func BuildEndpointURL(uri string, port int) (string, error) {
 
 // GetDefaultUploadEndpoint selects the appropriate upload endpoint based on the API key.
 //
-// If the endpoint matches the default Bugsnag upload URL and the API key starts with
-// HUB_PREFIX, it switches to the InsightHub upload URL.
+// The server passed in as the endpoint option is used, if provided. Otherwise the API key is used to determine the appropriate instance.
+// If the endpoint URL cannot be built, it returns an error.
 //
 // Parameters:
-//   - endpoint: the current upload endpoint (may be Bugsnag or Hub).
-//   - apiKey: the API key used to determine which backend to target.
+//   - apiKey: the project API key.
+//   - endpointPath: the specific path to append to the base upload endpoint.
+//   - options: CLI options that may contain a custom upload API root URL and port.
 //
 // Returns:
 //   - A string containing the resolved upload endpoint.
-func GetDefaultUploadEndpoint(endpoint string, apiKey string) string {
-	if strings.Contains(endpoint, BUGSNAG_UPLOAD) {
-		if strings.HasPrefix(apiKey, HUB_PREFIX) {
-			endpoint = HUB_UPLOAD
-		} else {
-			endpoint = BUGSNAG_UPLOAD
-		}
+//   - An error if the endpoint URL cannot be built.
+func GetDefaultUploadEndpoint(apiKey string, endpointPath string, options options.CLI) (string, error) {
+	var endpoint string
+
+	if options.Upload.UploadAPIRootUrl != "" {
+		endpoint = options.Upload.UploadAPIRootUrl
+	} else if strings.HasPrefix(apiKey, HUB_PREFIX) {
+		endpoint = HUB_UPLOAD
+	} else {
+		endpoint = BUGSNAG_UPLOAD
 	}
 
-	return endpoint
+	endpoint, err := BuildEndpointURL(endpoint+endpointPath, options.Port)
+
+	if err != nil {
+		return endpoint, fmt.Errorf("error building upload endpoint URL: %w", err)
+	}
+
+	return endpoint, nil
 }
 
 // GetDefaultBuildEndpoint selects the appropriate build endpoint based on the API key.
 //
-// If the endpoint matches the default Bugsnag build URL and the API key starts with
-// HUB_PREFIX, it switches to the InsightHub build URL.
+// The server passed in as the endpoint option is used, if provided. Otherwise the API key is used to determine the appropriate instance.
+// If the endpoint URL cannot be built, it returns an error.
 //
 // Parameters:
-//   - endpoint: the current build endpoint (may be Bugsnag or Hub).
-//   - apiKey: the API key used to determine which backend to target.
+//   - apiKey: the project API key.
+//   - options: CLI options that may contain a custom upload API root URL and port.
 //
 // Returns:
 //   - A string containing the resolved build endpoint.
-func GetDefaultBuildEndpoint(endpoint string, apiKey string) string {
-	if strings.Contains(endpoint, BUGSNAG_BUILD) {
-		if strings.HasPrefix(apiKey, HUB_PREFIX) {
-			endpoint = HUB_BUILD
-		} else {
-			endpoint = BUGSNAG_BUILD
-		}
+//   - An error if the endpoint URL cannot be built.
+func GetDefaultBuildEndpoint(apiKey string, options options.CLI) (string, error) {
+	var endpoint string
+
+	if options.CreateBuild.BuildApiRootUrl != "" {
+		endpoint = options.CreateBuild.BuildApiRootUrl
+	} else if strings.HasPrefix(apiKey, HUB_PREFIX) {
+		endpoint = HUB_BUILD
+	} else {
+		endpoint = BUGSNAG_BUILD
 	}
 
-	return endpoint
+	endpoint, err := BuildEndpointURL(endpoint, options.Port)
+
+	if err != nil {
+		return endpoint, fmt.Errorf("error building upload endpoint URL: %w", err)
+	}
+
+	return endpoint, nil
 }
