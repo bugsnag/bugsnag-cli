@@ -14,7 +14,7 @@ import (
 // It processes both Android and iOS assets, including JavaScript source maps,
 // Proguard mappings, dSYMs, and NDK symbols.
 // It constructs the necessary paths based on the provided options and uploads
-// the assets to the Bugsnag server.
+// the assets.
 //
 // Parameters:
 //   - globalOptions: CLI options containing React Native upload settings.

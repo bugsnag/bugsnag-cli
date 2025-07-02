@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-// Constants defining upload and build endpoints for Bugsnag and InsightHub.
+// Constants defining upload and build endpoint instances.
 const (
-	HUB_PREFIX     = "00000" // API keys starting with this indicate usage of InsightHub instead of Bugsnag.
+	HUB_PREFIX     = "00000" // API keys starting with this indicate usage of the Hub instance.
 	HUB_UPLOAD     = "https://upload.insighthub.smartbear.com"
 	HUB_BUILD      = "https://build.insighthub.smartbear.com"
 	BUGSNAG_UPLOAD = "https://upload.bugsnag.com"
@@ -47,13 +47,11 @@ func BuildEndpointURL(uri string, port int) (string, error) {
 
 // GetDefaultUploadEndpoint selects the appropriate upload endpoint based on the API key.
 //
-// If the API key starts with HUB_PREFIX, it uses the InsightHub upload URL.
-// Otherwise, it defaults to the Bugsnag upload URL. The endpointPath is appended to the base URL.
-// If a custom upload API root URL is provided in the CLI options, it uses that instead.
+// The server passed in as the endpoint option is used, if provided. Otherwise the API key is used to determine the appropriate instance.
 // If the endpoint URL cannot be built, it returns an error.
 //
 // Parameters:
-//   - apiKey: the API key used to determine which backend to target.
+//   - apiKey: the project API key.
 //   - endpointPath: the specific path to append to the base upload endpoint.
 //   - options: CLI options that may contain a custom upload API root URL and port.
 //
@@ -82,13 +80,11 @@ func GetDefaultUploadEndpoint(apiKey string, endpointPath string, options option
 
 // GetDefaultBuildEndpoint selects the appropriate build endpoint based on the API key.
 //
-// If the API key starts with HUB_PREFIX, it uses the InsightHub build URL.
-// Otherwise, it defaults to the Bugsnag build URL. If a custom build API root URL is provided
-// in the CLI options, it uses that instead. The endpoint URL is built with the specified port.
+// The server passed in as the endpoint option is used, if provided. Otherwise the API key is used to determine the appropriate instance.
 // If the endpoint URL cannot be built, it returns an error.
 //
 // Parameters:
-//   - apiKey: the API key used to determine which backend to target.
+//   - apiKey: the project API key.
 //   - options: CLI options that may contain a custom upload API root URL and port.
 //
 // Returns:

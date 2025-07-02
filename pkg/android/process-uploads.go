@@ -9,7 +9,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// UploadAndroidNdk uploads a list of Android NDK symbol files to Bugsnag.
+// UploadAndroidNdk uploads a list of Android NDK symbol files to the NDK symbol upload endpoint.
 //
 // This function processes each .so (shared object) file by preparing the necessary
 // metadata and sending a request to the NDK symbol upload endpoint. If no files
@@ -17,7 +17,7 @@ import (
 //
 // Parameters:
 //   - fileList: List of paths to .so files to upload.
-//   - apiKey: The Bugsnag project API key.
+//   - apiKey: The project API key.
 //   - applicationId: The application ID for the Android app.
 //   - versionName: The version name of the build.
 //   - versionCode: The version code of the build.

@@ -16,7 +16,7 @@ import (
 //
 // This function locates the Proguard mapping file(s) from given paths or directories,
 // extracts metadata from AndroidManifest.xml if needed, compresses the mapping file,
-// and uploads it to the Bugsnag server.
+// and uploads it.
 //
 // Parameters:
 //   - options: CLI options containing upload configuration and metadata.

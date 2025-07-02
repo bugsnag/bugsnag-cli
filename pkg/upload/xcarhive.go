@@ -10,9 +10,8 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
 
-// ProcessDsymUpload locates and uploads dSYM files from an Xcode archive to a Bugsnag server.
-// It searches for dSYM files in the specified Xcode archive, processes them, and uploads them
-// to the server endpoint provided in the CLI options.
+// ProcessDsymUpload locates and uploads dSYM files from an Xcode archive.
+// It searches for dSYM files in the specified Xcode archive, processes them and uploads them.
 //
 // Parameters:
 // - xcarchivePath: The path to the Xcode archive (.xcarchive) containing dSYM files.

@@ -110,7 +110,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 // It handles the API key, constructs the endpoint URL, and manages retries in case of failures.
 //
 // Parameters:
-//   - apiKey: The api key to authenticate the request.
+//   - apiKey: The project API key.
 //   - endpointPath: The path to the upload endpoint, which can be empty for the default endpoint.
 //   - uploadOptions: A map containing options for building the file request.
 //   - fileFieldData: A map containing data associated with the file field.
@@ -166,7 +166,7 @@ func ProcessFileRequest(apiKey string, endpointPath string, uploadOptions map[st
 // It handles the API key, constructs the endpoint URL, and manages retries in case of failures.
 //
 // Parameters:
-//   - apiKey: The API key to authenticate the request.
+//   - apiKey: The project API key.
 //   - payload: The payload to be sent in the request body.
 //   - options: used to determine dry run, timeout, and retries.
 //

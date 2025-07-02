@@ -16,7 +16,7 @@ import (
 // ProcessReactNativeAndroid processes React Native Android bundle and source map uploads.
 //
 // It locates the bundle and source map files, resolves variants and manifests, builds upload options,
-// and sends the files to the Bugsnag server.
+// and uploads the files.
 //
 // Parameters:
 //   - options: CLI options containing upload settings and flags.

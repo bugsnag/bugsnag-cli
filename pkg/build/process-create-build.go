@@ -10,7 +10,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// ProcessCreateBuild marshals build metadata into JSON and sends it to the Bugsnag build endpoint.
+// ProcessCreateBuild marshals build metadata into JSON and sends it to the build endpoint.
 //
 // Parameters:
 //   - buildOptions: A structure containing all metadata for the build (implements CreateBuildInfo).

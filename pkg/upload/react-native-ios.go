@@ -15,7 +15,7 @@ import (
 // ProcessReactNativeIos processes React Native iOS bundle and source map uploads.
 //
 // It locates the bundle and source map files, resolves Xcode projects, schemes, and plist data,
-// builds upload options, and sends the files to the Bugsnag server.
+// builds upload options and sends the files.
 //
 // Parameters:
 //   - options: CLI options containing upload settings and flags.
