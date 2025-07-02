@@ -4,6 +4,9 @@
   "description": "BugSnag CLI",
   "main": "dist/bugsnag-cli-wrapper.js",
   "types": "dist/bugsnag-cli-wrapper.d.ts",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "bin": {
     "bugsnag-cli": "bin/bugsnag-cli"
   },
