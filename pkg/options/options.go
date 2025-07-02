@@ -175,7 +175,7 @@ type CLI struct {
 		Overwrite        bool   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 		Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
 		Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
-		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number" default:"https://upload.bugsnag.com"`
+		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
 
 		// required options
 		All                DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
@@ -212,7 +212,7 @@ type IosBuildOptions struct {
 type CreateBuild struct {
 	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
 	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the release stage"`
-	BuildApiRootUrl   string            `help:"The build server hostname, optionally containing port number" default:"https://build.bugsnag.com"`
+	BuildApiRootUrl   string            `help:"The build server hostname, optionally containing port number"`
 	BuilderName       string            `help:"The name of the person or entity who built the app"`
 	Metadata          map[string]string `help:"Custom build information to be associated with the release on the BugSnag dashboard"`
 	Provider          utils.Provider    `help:"The name of the source control provider that contains the source code for the build"`

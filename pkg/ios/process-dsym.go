@@ -16,7 +16,6 @@ import (
 //
 // Parameters:
 // - plistPath: Path to the Info.plist file.
-// - endpoint: The API endpoint for uploading dSYM files.
 // - projectRoot: Root directory of the project.
 // - options: CLI options containing configuration like API key.
 // - dwarfInfo: List of dSYM information objects to be processed.
@@ -24,7 +23,7 @@ import (
 //
 // Returns:
 // - An error if any part of the process fails; nil otherwise.
-func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.CLI, dwarfInfo []*DwarfInfo, logger log.Logger) error {
+func ProcessDsymUpload(plistPath, projectRoot string, options options.CLI, dwarfInfo []*DwarfInfo, logger log.Logger) error {
 	var (
 		plistData     *PlistData
 		uploadOptions map[string]string
@@ -49,7 +48,7 @@ func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.
 		logger.Debug(fmt.Sprintf("Processing dSYM %s", dsymInfo))
 
 		// Build upload options for the current dSYM file.
-		uploadOptions, err = utils.BuildDsymUploadOptions(options.ApiKey, projectRoot)
+		uploadOptions, err = utils.BuildDsymUploadOptions(projectRoot)
 		if err != nil {
 			return fmt.Errorf("failed to build dSYM upload options: %w", err)
 		}
@@ -59,14 +58,13 @@ func ProcessDsymUpload(plistPath, endpoint, projectRoot string, options options.
 			"dsym": server.LocalFile(filepath.Join(dsym.Location, dsym.Name)),
 		}
 
-		// Attempt to upload the dSYM file to the endpoint.
-		uploadURL := endpoint + "/dsym"
-		err = server.ProcessFileRequest(uploadURL, uploadOptions, fileFieldData, dsym.UUID, options, logger)
+		// Attempt to upload the dSYM file.
+		err = server.ProcessFileRequest(options.ApiKey, "/dsym", uploadOptions, fileFieldData, dsym.UUID, options, logger)
 		if err != nil {
 			// Retry with the base endpoint if a 404 error occurs.
 			if strings.Contains(err.Error(), "404 Not Found") {
 				logger.Debug(fmt.Sprintf("Retrying upload for dSYM %s at base endpoint", dsymInfo))
-				err = server.ProcessFileRequest(endpoint, uploadOptions, fileFieldData, dsym.UUID, options, logger)
+				err = server.ProcessFileRequest(options.ApiKey, "", uploadOptions, fileFieldData, dsym.UUID, options, logger)
 			}
 			if err != nil {
 				return fmt.Errorf("failed to upload dSYM %s: %w", dsymInfo, err)

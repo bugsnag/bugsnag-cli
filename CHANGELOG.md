@@ -1,5 +1,9 @@
 # Changelog
 
+## [unreleased]
+
+- Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
+
 ## [3.1.1] - 2025-05-14
 
 ### Fixed

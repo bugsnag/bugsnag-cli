@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/alecthomas/kong"
@@ -10,7 +9,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 var package_version = "3.1.1"
@@ -38,13 +36,6 @@ func main() {
 
 	logger := log.NewLoggerWrapper(commands.LogLevel)
 
-	// Build connection URI
-	endpoint, err := utils.BuildEndpointUrl(commands.Upload.UploadAPIRootUrl, commands.Port)
-
-	if err != nil {
-		logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
-	}
-
 	if commands.DryRun {
 		logger.Info("Performing dry run - no data will be sent to BugSnag")
 	}
@@ -57,7 +48,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.All(commands, endpoint, logger)
+		err := upload.All(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -65,7 +56,7 @@ func main() {
 
 	case "upload android-aab <path>", "upload android-aab":
 
-		err := upload.ProcessAndroidAab(commands, endpoint, logger)
+		err := upload.ProcessAndroidAab(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -73,7 +64,7 @@ func main() {
 
 	case "upload android-ndk <path>", "upload android-ndk":
 
-		err := upload.ProcessAndroidNDK(commands, endpoint, logger)
+		err := upload.ProcessAndroidNDK(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -81,7 +72,7 @@ func main() {
 
 	case "upload android-proguard <path>", "upload android-proguard":
 
-		err := upload.ProcessAndroidProguard(commands, endpoint, logger)
+		err := upload.ProcessAndroidProguard(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -93,7 +84,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.Dart(commands, endpoint, logger)
+		err := upload.Dart(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -101,7 +92,7 @@ func main() {
 
 	case "upload react-native", "upload react-native <path>":
 
-		err := upload.ProcessReactNative(commands, endpoint, logger)
+		err := upload.ProcessReactNative(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -109,7 +100,7 @@ func main() {
 
 	case "upload react-native-android", "upload react-native-android <path>":
 
-		err := upload.ProcessReactNativeAndroid(commands, endpoint, logger)
+		err := upload.ProcessReactNativeAndroid(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -117,7 +108,7 @@ func main() {
 
 	case "upload react-native-ios", "upload react-native-ios <path>":
 
-		err := upload.ProcessReactNativeIos(commands, endpoint, logger)
+		err := upload.ProcessReactNativeIos(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -125,7 +116,7 @@ func main() {
 
 	case "upload js", "upload js <path>":
 
-		err := upload.ProcessJs(commands, endpoint, logger)
+		err := upload.ProcessJs(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -133,7 +124,7 @@ func main() {
 
 	case "upload xcode-build", "upload xcode-build <path>":
 
-		err := upload.ProcessXcodeBuild(commands, endpoint, logger)
+		err := upload.ProcessXcodeBuild(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -141,7 +132,7 @@ func main() {
 
 	case "upload xcode-archive", "upload xcode-archive <path>":
 
-		err := upload.ProcessXcodeArchive(commands, endpoint, logger)
+		err := upload.ProcessXcodeArchive(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -149,7 +140,7 @@ func main() {
 
 	case "upload dsym", "upload dsym <path>":
 
-		err := upload.ProcessDsym(commands, endpoint, logger)
+		err := upload.ProcessDsym(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -161,7 +152,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.ProcessUnityAndroid(commands, endpoint, logger)
+		err := upload.ProcessUnityAndroid(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -172,7 +163,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.ProcessBreakpad(commands, endpoint, logger)
+		err := upload.ProcessBreakpad(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())
@@ -193,14 +184,7 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
-		// Get Endpoint URL
-		endpoint, err = utils.BuildEndpointUrl(commands.CreateBuild.BuildApiRootUrl, commands.Port)
-
-		if err != nil {
-			logger.Fatal(fmt.Sprintf("Failed to build upload url: %s", err.Error()))
-		}
-
-		err = build.ProcessCreateBuild(CreateBuildOptions, endpoint, commands, logger)
+		err = build.ProcessCreateBuild(CreateBuildOptions, commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

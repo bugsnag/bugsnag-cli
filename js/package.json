@@ -36,7 +36,7 @@
     "prepublish": "npm run build && cp bin/bugsnag-cli-placeholder bin/bugsnag-cli"
   },
   "devDependencies": {
-    "@types/node": "^22.15.3",
+    "@types/node": "^24.0.4",
     "typescript": "^5.8.3"
   }
 }
