@@ -12,7 +12,18 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
 
-func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logger) error {
+// ProcessReactNativeIos processes React Native iOS bundle and source map uploads.
+//
+// It locates the bundle and source map files, resolves Xcode projects, schemes, and plist data,
+// builds upload options, and sends the files to the Bugsnag server.
+//
+// Parameters:
+//   - options: CLI options containing upload settings and flags.
+//   - logger: Logger instance for debug and error output.
+//
+// Returns:
+//   - error: non-nil if an error occurs during processing or uploading.
+func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
 	iosOptions := options.Upload.ReactNativeIos
 	var (
 		rootDirPath      string
@@ -200,7 +211,7 @@ func ProcessReactNativeIos(options options.CLI, endpoint string, logger log.Logg
 	fileFieldData["sourceMap"] = server.LocalFile(iosOptions.ReactNative.SourceMap)
 	fileFieldData["bundle"] = server.LocalFile(iosOptions.ReactNative.Bundle)
 
-	err = server.ProcessFileRequest(options.ApiKey, endpoint+"/react-native-source-map", uploadOptions, fileFieldData, iosOptions.ReactNative.SourceMap, options, logger)
+	err = server.ProcessFileRequest(options.ApiKey, "/react-native-source-map", uploadOptions, fileFieldData, iosOptions.ReactNative.SourceMap, options, logger)
 
 	if err != nil {
 

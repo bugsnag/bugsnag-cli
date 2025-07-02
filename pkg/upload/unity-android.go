@@ -12,7 +12,20 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+// ProcessUnityAndroid processes Unity Android symbols and AAB files.
+//
+// This function searches for Unity Android symbols.zip files and AAB files in the specified paths,
+// extracts the necessary data, and uploads the symbols to the Bugsnag server.
+// It handles both the symbols.zip and AAB files, extracting architecture-specific symbols
+// and merging metadata from the AAB manifest if available.
+//
+// Parameters:
+//   - globalOptions: CLI options containing Unity Android upload settings.
+//   - logger: Logger instance for debug and error output.
+//
+// Returns:
+//   - error: non-nil if an error occurs during processing or uploading.
+func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	unityOptions := globalOptions.Upload.UnityAndroid
 	var zipPath string
 	var archList []string
@@ -68,7 +81,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			VersionCode:   manifestData["versionCode"],
 			VersionName:   manifestData["versionName"],
 		}
-		err = ProcessAndroidAab(globalOptions, endpoint, logger)
+		err = ProcessAndroidAab(globalOptions, logger)
 
 		if err != nil {
 			return err
@@ -119,7 +132,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			manifestData["versionName"],
 			manifestData["versionCode"],
 			unityOptions.ProjectRoot,
-			endpoint,
 			globalOptions,
 			logger,
 		)

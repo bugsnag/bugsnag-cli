@@ -10,42 +10,32 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-type Payload struct {
-	ApiKey           string            `json:"apiKey,omitempty"`
-	BuilderName      string            `json:"builderName,omitempty"`
-	ReleaseStage     string            `json:"releaseStage,omitempty"`
-	SourceControl    SourceControl     `json:"sourceControl,omitempty"`
-	Metadata         map[string]string `json:"metadata,omitempty"`
-	AppVersion       string            `json:"appVersion,omitempty"`
-	AppVersionCode   string            `json:"appVersionCode,omitempty"`
-	AppBundleVersion string            `json:"appBundleVersion,omitempty"`
-}
-
-// ProcessCreateBuild processes a build request by creating a payload from the provided
-// build options, logging the build information, and sending an HTTP request to the specified endpoint.
+// ProcessCreateBuild marshals build metadata into JSON and sends it to the Bugsnag build endpoint.
 //
 // Parameters:
-//   - buildOptions: An instance of CreateBuildInfo containing information for the build.
-//   - endpoint: The target URL for the HTTP request.
-//   - options: CLI options used for this command.
+//   - buildOptions: A structure containing all metadata for the build (implements CreateBuildInfo).
+//   - options: CLI options including endpoint and retry configuration.
+//   - logger: Logger used for debug and error output.
 //
 // Returns:
-//   - error: An error if any step of the build processing fails. Nil if the process is successful.
+//   - error: Non-nil if JSON marshalling fails or the request to the server fails.
 func ProcessCreateBuild(
 	buildOptions CreateBuildInfo,
-	endpoint string,
 	options options.CLI,
 	logger log.Logger,
 ) error {
+	// Marshal the build options into a JSON payload
 	buildPayload, err := json.Marshal(buildOptions)
 	if err != nil {
 		return fmt.Errorf("Failed to create build information payload: %s", err.Error())
 	}
 
+	// Output the build payload in a human-readable format for debugging
 	prettyBuildPayload, _ := utils.PrettyPrintJson(string(buildPayload))
 	logger.Debug(fmt.Sprintf("Build information:\n%s", prettyBuildPayload))
 
-	err = server.ProcessBuildRequest(endpoint, buildPayload, options, logger)
+	// Send the build payload to the configured Bugsnag build endpoint
+	err = server.ProcessBuildRequest(buildOptions.ApiKey, buildPayload, options, logger)
 	if err != nil {
 		return err
 	}

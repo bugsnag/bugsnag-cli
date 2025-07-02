@@ -13,7 +13,18 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.Logger) error {
+// ProcessReactNativeAndroid processes React Native Android bundle and source map uploads.
+//
+// It locates the bundle and source map files, resolves variants and manifests, builds upload options,
+// and sends the files to the Bugsnag server.
+//
+// Parameters:
+//   - options: CLI options containing upload settings and flags.
+//   - logger: Logger instance for debug and error output.
+//
+// Returns:
+//   - error: non-nil if an error occurs during processing or uploading.
+func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
 	androidOptions := options.Upload.ReactNativeAndroid
 	var err error
 	var uploadOptions map[string]string
@@ -167,7 +178,7 @@ func ProcessReactNativeAndroid(options options.CLI, endpoint string, logger log.
 		fileFieldData["sourceMap"] = server.LocalFile(androidOptions.ReactNative.SourceMap)
 		fileFieldData["bundle"] = server.LocalFile(androidOptions.ReactNative.Bundle)
 
-		err = server.ProcessFileRequest(options.ApiKey, endpoint+"/react-native-source-map", uploadOptions, fileFieldData, androidOptions.ReactNative.SourceMap, options, logger)
+		err = server.ProcessFileRequest(options.ApiKey, "/react-native-source-map", uploadOptions, fileFieldData, androidOptions.ReactNative.SourceMap, options, logger)
 
 		if err != nil {
 
