@@ -15,7 +15,7 @@ import (
 // ProcessUnityAndroid processes Unity Android symbols and AAB files.
 //
 // This function searches for Unity Android symbols.zip files and AAB files in the specified paths,
-// extracts the necessary data, and uploads the symbols to the Bugsnag server.
+// extracts the necessary data, and uploads the symbols.
 // It handles both the symbols.zip and AAB files, extracting architecture-specific symbols
 // and merging metadata from the AAB manifest if available.
 //
