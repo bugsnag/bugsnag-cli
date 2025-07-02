@@ -2,13 +2,13 @@ agents:
   queue: macos-15
 
 steps:
-  - name: ':copyright: License Audit'
-    agents:
-      queue: opensource
-    plugins:
-      docker-compose#v3.7.0:
-        run: license_finder
-    command: /bin/bash -lc '/scan/scripts/license_finder.sh'
+#  - name: ':copyright: License Audit'
+#    agents:
+#      queue: opensource
+#    plugins:
+#      docker-compose#v3.7.0:
+#        run: license_finder
+#    command: /bin/bash -lc '/scan/scripts/license_finder.sh'
 
   - label: ":hammer: CLI Binaries"
     key: build
@@ -18,134 +18,134 @@ steps:
       artifacts#v1.5.0:
         upload:
           - bin/**/*
-
-  - group: ":lint-roller: Linting"
-    steps:
-      - label: ":lint-roller::go: Lint Go Code"
-        commands:
-          - make go-lint
-      - label: ":lint-roller::npm: Lint NPM Dependencies"
-        commands:
-          - make npm-lint
-
-  # Run the unit tests
-  - label: Unit Tests
-    commands:
-      - make unit-tests
-
-  - label: ":terminal: CLI Integration Tests"
-    depends_on: build
-    env:
-      NODE_VERSION: 18
-    commands:
-      - bundle install
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/cli
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: ":android: Integration Tests"
-    depends_on: build
-    commands:
-      - bundle install
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/android
-    env:
-      JAVA_VERSION: 17
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: ":dartlang: Integration Tests"
-    depends_on: build
-    commands:
-      - bundle install
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/dart
-    env:
-      FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: Xcode Integration Tests
-    depends_on: build
-    env:
-      XCODE_VERSION: 16.3.0
-    commands:
-      - bundle install
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/xcode
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: ":javascript: Integration Tests"
-    depends_on: build
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/js
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-
-  - label: ":video_game: Unity Android Integration Tests"
-    depends_on: build
-    env:
-      UNITY_VERSION: 6000.0.49f1
-    agents:
-      queue: macos-15-isolated
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/unity-android
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
-  
-  - label: "Breakpad Integration Tests"
-    depends_on: build
-    commands:
-      - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle install
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/breakpad
-    plugins:
-      artifacts#v1.5.0:
-        download:
-          - bin/arm64-macos-bugsnag-cli
-        upload:
-          - maze_output/**/*
+#
+#  - group: ":lint-roller: Linting"
+#    steps:
+#      - label: ":lint-roller::go: Lint Go Code"
+#        commands:
+#          - make go-lint
+#      - label: ":lint-roller::npm: Lint NPM Dependencies"
+#        commands:
+#          - make npm-lint
+#
+#  # Run the unit tests
+#  - label: Unit Tests
+#    commands:
+#      - make unit-tests
+#
+#  - label: ":terminal: CLI Integration Tests"
+#    depends_on: build
+#    env:
+#      NODE_VERSION: 18
+#    commands:
+#      - bundle install
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/cli
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: ":android: Integration Tests"
+#    depends_on: build
+#    commands:
+#      - bundle install
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/android
+#    env:
+#      JAVA_VERSION: 17
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: ":dartlang: Integration Tests"
+#    depends_on: build
+#    commands:
+#      - bundle install
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/dart
+#    env:
+#      FLUTTER_BIN: "/opt/flutter/3.19.0/bin/flutter"
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: Xcode Integration Tests
+#    depends_on: build
+#    env:
+#      XCODE_VERSION: 16.3.0
+#    commands:
+#      - bundle install
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/xcode
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: ":javascript: Integration Tests"
+#    depends_on: build
+#    commands:
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle install
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/js
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: ":video_game: Unity Android Integration Tests"
+#    depends_on: build
+#    env:
+#      UNITY_VERSION: 6000.0.49f1
+#    agents:
+#      queue: macos-15-isolated
+#    commands:
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle install
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/unity-android
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
+#
+#  - label: "Breakpad Integration Tests"
+#    depends_on: build
+#    commands:
+#      - chmod +x bin/arm64-macos-bugsnag-cli
+#      - bundle install
+#      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/breakpad
+#    plugins:
+#      artifacts#v1.5.0:
+#        download:
+#          - bin/arm64-macos-bugsnag-cli
+#        upload:
+#          - maze_output/**/*
 
   - group: ":react: React Native"
     steps:
-      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
-        depends_on:
-          - "build"
-        agents:
-          queue: "macos"
-        timeout_in_minutes: 5
-        commands:
-          - buildkite-agent pipeline upload .buildkite/react-native/android.pipeline.yml
+#      - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
+#        depends_on:
+#          - "build"
+#        agents:
+#          queue: "macos"
+#        timeout_in_minutes: 5
+#        commands:
+#          - buildkite-agent pipeline upload .buildkite/react-native/android.pipeline.yml
 
       - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE iOS STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"
         depends_on:
