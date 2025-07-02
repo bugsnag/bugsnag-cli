@@ -44,7 +44,7 @@ Feature: Bugsnag CLI create-build behavior
     Then I should see the build payload
     And I wait to receive 0 builds
 
-  Scenario: Starting bugsnag-cli create-build on mac with app-version
+  Scenario: Starting bugsnag-cli create-build on mac with app-version and metadata
     When I run bugsnag-cli with create-build --build-api-root-url=http://localhost:$MAZE_RUNNER_PORT/builds --api-key=1234567890ABCDEF1234567890ABCDEF --version-name=1.2.3 --metadata=foo=bar,baz=qux
     And I wait to receive 1 builds
     Then the build is valid for the Builds API
