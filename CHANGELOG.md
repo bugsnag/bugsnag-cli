@@ -6,7 +6,7 @@
 
 ### Fixed
 
-- Ensure that the`--metadata` accepts key=value,key=value 
+- Ensure that the`--metadata` accepts key=value,key=value [#216](https://github.com/bugsnag/bugsnag-cli/pull/216)
 
 ## [3.1.1] - 2025-05-14
 
