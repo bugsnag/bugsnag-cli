@@ -3,6 +3,7 @@
 ## [unreleased]
 
 - Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
+- Add minimum node version to the NPM package [#217](https://github.com/bugsnag/bugsnag-cli/pull/217)
 
 ### Fixed
 
