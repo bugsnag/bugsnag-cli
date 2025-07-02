@@ -25,7 +25,7 @@ class BugsnagCLI {
                     if (typeof value === 'boolean' && value === true) {
                         return [`--${kebabKey}`]
                     } else if (typeof value !== 'boolean') {
-                        return [`--${kebabKey}`, String(value)]
+                        return [`--${kebabKey}=${String(value)}`]
                     }
                     return []
                 })
