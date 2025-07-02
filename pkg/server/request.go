@@ -110,6 +110,7 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 // uploading the specified file to the endpoint, and logging information based on the dryRun flag.
 //
 // Parameters:
+//	 - apiKey: The api key to authenticate the request.
 //   - endpoint: The target URL for the file upload.
 //   - uploadOptions: A map containing options for building the file request.
 //   - fileFieldData: A map containing data associated with the file field.
