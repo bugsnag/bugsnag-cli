@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Fixed
+
+- Ensure that we upload Android NDK .so files for all architectures []()
+
 ## [3.2.0] - 2025-07-02
 
 - Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
