@@ -1,68 +1,105 @@
 package android
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// UploadAndroidNdk uploads a list of Android NDK symbol files to the NDK symbol upload endpoint.
-//
-// This function processes each .so (shared object) file by preparing the necessary
-// metadata and sending a request to the NDK symbol upload endpoint. If no files
-// are provided, the function exits early.
+// buildUploadOptions constructs the form parameters required to upload an NDK symbol file.
 //
 // Parameters:
-//   - fileList: List of paths to .so files to upload.
-//   - apiKey: The project API key.
-//   - applicationId: The application ID for the Android app.
-//   - versionName: The version name of the build.
-//   - versionCode: The version code of the build.
-//   - projectRoot: The root path of the project.
-//   - options: CLI options, including overwrite flag.
-//   - logger: Logger for structured output and progress information.
+//   - appID: Android application ID (e.g., com.example.app)
+//   - versionCode: Numeric build version (e.g., "42")
+//   - versionName: Human-readable version name (e.g., "1.2.3")
+//   - projectRoot: Root path of the project
+//   - fileName: Original .so file name
+//   - opts: CLI options containing upload flags
 //
 // Returns:
-//   - error: Non-nil if any step of the upload fails.
+//   - A map[string]string of form values to be sent in the upload request.
+func buildUploadOptions(
+	appID, versionCode, versionName, projectRoot, fileName string,
+	opts options.CLI,
+) map[string]string {
+	uploadOpts := map[string]string{}
+
+	if appID != "" {
+		uploadOpts["appId"] = appID
+	}
+	if versionCode != "" {
+		uploadOpts["versionCode"] = versionCode
+	}
+	if versionName != "" {
+		uploadOpts["versionName"] = versionName
+	}
+	if projectRoot != "" {
+		uploadOpts["projectRoot"] = projectRoot
+	}
+	if base := filepath.Base(fileName); base != "" {
+		uploadOpts["sharedObjectName"] = base
+	}
+	if opts.Upload.Overwrite {
+		uploadOpts["overwrite"] = "true"
+	}
+
+	return uploadOpts
+}
+
+// UploadAndroidNdk uploads extracted Android NDK symbol files (.so debug symbols)
+// to the Bugsnag /ndk-symbol endpoint.
+//
+// Each file is uploaded with associated metadata including app ID, version code/name,
+// and shared object name. If no symbol files are present, the upload is skipped.
+//
+// Parameters:
+//   - symbolFiles: Map of original file path → generated symbol file path
+//   - apiKey: Bugsnag project API key
+//   - appID: Android app package name
+//   - versionName: App version name (semantic)
+//   - versionCode: App version code (build number)
+//   - projectRoot: Absolute or relative root of the Android project
+//   - opts: CLI options, including `--overwrite`
+//   - logger: Logger instance for debug/info/error output
+//
+// Returns:
+//   - error: Non-nil if any file fails to upload
 func UploadAndroidNdk(
-	fileList []string,
+	symbolFiles map[string]string,
 	apiKey string,
-	applicationId string,
+	appID string,
 	versionName string,
 	versionCode string,
 	projectRoot string,
-	options options.CLI,
+	opts options.CLI,
 	logger log.Logger,
 ) error {
-	fileFieldData := make(map[string]server.FileField)
-	numberOfFiles := len(fileList)
-
-	// No files to upload; exit early
-	if numberOfFiles < 1 {
+	if len(symbolFiles) == 0 {
 		logger.Info("No NDK files found to process")
 		return nil
 	}
 
-	// Iterate over each provided .so file
-	for _, file := range fileList {
-		// Construct upload options using project metadata
-		uploadOptions, err := utils.BuildAndroidNDKUploadOptions(
-			applicationId, versionName, versionCode, projectRoot, filepath.Base(file), options.Upload.Overwrite,
-		)
-		if err != nil {
-			return err
+	for originalFile, symbolPath := range symbolFiles {
+		fileField := map[string]server.FileField{
+			"soFile": server.LocalFile(symbolPath),
 		}
 
-		// Attach file to form field
-		fileFieldData["soFile"] = server.LocalFile(file)
+		params := buildUploadOptions(appID, versionCode, versionName, projectRoot, originalFile, opts)
 
-		// Upload the file to the /ndk-symbol endpoint
-		err = server.ProcessFileRequest(apiKey, "/ndk-symbol", uploadOptions, fileFieldData, file, options, logger)
+		err := server.ProcessFileRequest(
+			apiKey,
+			"/ndk-symbol",
+			params,
+			fileField,
+			filepath.Base(originalFile),
+			opts,
+			logger,
+		)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to upload NDK symbol for %s: %w", originalFile, err)
 		}
 	}
 

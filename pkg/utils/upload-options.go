@@ -149,37 +149,6 @@ func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl str
 	return uploadOptions, nil
 }
 
-// BuildAndroidNDKUploadOptions - Builds the upload options for processing NDK files
-func BuildAndroidNDKUploadOptions(applicationId string, versionName string, versionCode string, projectRoot string, sharedObjectName string, overwrite bool) (map[string]string, error) {
-	uploadOptions := make(map[string]string)
-
-	if applicationId != "" {
-		uploadOptions["appId"] = applicationId
-	}
-
-	if versionCode != "" {
-		uploadOptions["versionCode"] = versionCode
-	}
-
-	if versionName != "" {
-		uploadOptions["versionName"] = versionName
-	}
-
-	if projectRoot != "" {
-		uploadOptions["projectRoot"] = projectRoot
-	}
-
-	if sharedObjectName != "" {
-		uploadOptions["sharedObjectName"] = sharedObjectName
-	}
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
-
-	return uploadOptions, nil
-}
-
 // BuildBreakpadUploadOptions - Builds the upload options for processing breakpad symbol files
 func BuildBreakpadUploadOptions(CpuArch string, CodeFile string, DebugFile string, DebugIdentifier string, ProductName string, OsName string, VersionName string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
