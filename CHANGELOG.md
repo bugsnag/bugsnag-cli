@@ -1,5 +1,11 @@
 # Changelog
 
+## [unreleased]
+
+### Changed
+
+- Adjust how we process Android NDK files to ensure that all files are processed correctly during upload [#220](https://github.com/bugsnag/bugsnag-cli/pull/220)
+
 ## [3.2.0] - 2025-07-02
 
 - Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
