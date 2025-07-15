@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Adjust how we process Android NDK files to ensure that all files are processed correctly during upload [#220](https://github.com/bugsnag/bugsnag-cli/pull/220)
+- Improve (non-AAB) Android NDK file processing to avoid name clashes and ensure that all architectures are uploaded [#220](https://github.com/bugsnag/bugsnag-cli/pull/220)
 
 ## [3.2.0] - 2025-07-02
 
