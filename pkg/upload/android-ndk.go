@@ -217,6 +217,7 @@ func ProcessAndroidNDK(opts options.CLI, logger log.Logger) error {
 			if err != nil {
 				return fmt.Errorf("objcopy failed for %s: %w", file, err)
 			}
+			logger.Debug(fmt.Sprintf("Extracted symbol files to %s", outputFile))
 			symbols[file] = outputFile
 		}
 

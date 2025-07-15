@@ -27,11 +27,7 @@ func Objcopy(objcopyPath, file, outputPath string) (string, error) {
 		return "", fmt.Errorf("objcopy binary not found at path %s: %w", objcopyPath, err)
 	}
 
-	md5sum, err := utils.GetFileMD5(file)
-	if err != nil {
-		return "", fmt.Errorf("failed to calculate MD5 of file %s: %w", file, err)
-	}
-
+	md5sum := utils.GetStringMD5(file)
 	outputFile := filepath.Join(outputPath, md5sum)
 
 	cmd := exec.Command(objcopyLocation, "--compress-debug-sections=zlib", "--only-keep-debug", file, outputFile)
