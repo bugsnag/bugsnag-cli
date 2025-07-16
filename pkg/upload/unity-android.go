@@ -29,9 +29,11 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	unityOptions := globalOptions.Upload.UnityAndroid
 	var zipPath string
 	var archList []string
-	var symbolFileList []string
+	var symbolFileList map[string]string
 	var manifestData map[string]string
 	var aabPath = string(unityOptions.AabPath)
+
+	symbolFileList = make(map[string]string)
 
 	for _, path := range unityOptions.Path {
 		if utils.IsDir(path) {
@@ -121,7 +123,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
-				symbolFileList = append(symbolFileList, file)
+				symbolFileList[file] = file
 			}
 		}
 
