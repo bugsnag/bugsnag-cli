@@ -90,6 +90,7 @@ Then('the sourcemap is valid for the Dart Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "buildId" is not null
+    And the sourcemaps are different
   )
 end
 
@@ -97,6 +98,7 @@ Then('the sourcemap is valid for the Breakpad Build API') do
   steps %(
     And the sourcemap "api_key" query parameter equals "#{$api_key}"
     And the sourcemap "project_root" query parameter is not null
+    And the sourcemaps are different
   )
 end
 
@@ -104,6 +106,7 @@ Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
+    And the sourcemaps are different
   )
 end
 
@@ -111,12 +114,14 @@ Then('the sourcemap is valid for the JS Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
+    And the sourcemaps are different
   )
 end
 
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemaps are different
   )
 end
 
@@ -124,6 +129,7 @@ Then('the sourcemap is valid for the Android Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appId" is not null
+    And the sourcemaps are different
   )
 end
 
@@ -307,7 +313,7 @@ Before('@CleanAndArchiveDsym') do
   build_target = "#{project_path}/archive"
 
   clean_and_build(scheme, project_path, build_target)
-end 
+end
 
 # React Native
 Before('@BuildRNAndroid') do
@@ -448,4 +454,14 @@ And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([
   expected_hash = { arg2 => arg3, arg4 => arg5 }
 
   Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
+end
+
+Then('the sourcemaps are different') do
+  requests = Maze::Server.sourcemaps.remaining
+  lastSourceMap = ""
+  requests.each do |request|
+    body = request[:body]
+    Maze.check.not_equal(lastSourceMap, body)
+    lastSourceMap = body
+  end
 end

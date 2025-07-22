@@ -66,7 +66,6 @@ Feature: Android NDK Integration Test
     And the sourcemap payload field "versionName" equals "1.0"
     And the sourcemap payload field "overwrite" equals "true"
 
-
   Scenario: Build and Upload Android NDK sourcemaps
     When I make the "features/base-fixtures/android"
     And I wait for the build to succeed
