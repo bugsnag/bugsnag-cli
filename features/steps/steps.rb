@@ -1,5 +1,6 @@
 require 'rbconfig'
 require 'etc'
+require 'digest/md5'
 
 os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
@@ -457,10 +458,13 @@ end
 
 Then('the sourcemaps are different') do
   requests = Maze::Server.sourcemaps.remaining
-  lastSourceMap = ""
+  last_md5 = nil
   requests.each do |request|
+    puts "last md5: #{last_md5}"
     body = request[:body]
-    Maze.check.not_equal(lastSourceMap, body)
-    lastSourceMap = body
+    body = body.to_s
+    current_md5 = Digest::MD5.hexdigest(body)
+    Maze.check.not_equal(last_md5, current_md5) unless last_md5.nil?
+    last_md5 = current_md5
   end
 end
