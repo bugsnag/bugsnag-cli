@@ -91,7 +91,7 @@ Then('the sourcemap is valid for the Dart Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "buildId" is not null
-    And the sourcemaps are different
+    And the requests are different
   )
 end
 
@@ -99,7 +99,7 @@ Then('the sourcemap is valid for the Breakpad Build API') do
   steps %(
     And the sourcemap "api_key" query parameter equals "#{$api_key}"
     And the sourcemap "project_root" query parameter is not null
-    And the sourcemaps are different
+    And the requests are different
   )
 end
 
@@ -107,7 +107,7 @@ Then('the sourcemap is valid for the React Native Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
-    And the sourcemaps are different
+    And the requests are different
   )
 end
 
@@ -115,7 +115,7 @@ Then('the sourcemap is valid for the JS Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appVersion" is not null
-    And the sourcemaps are different
+    And the requests are different
   )
 end
 
@@ -129,7 +129,7 @@ Then('the sourcemap is valid for the Android Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
     And the sourcemap payload field "appId" is not null
-    And the sourcemaps are different
+    And the requests are different
   )
 end
 
@@ -456,7 +456,7 @@ And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([
   Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
 end
 
-Then('the sourcemaps are different') do
+Then('the requests are different') do
   requests = Maze::Server.sourcemaps.remaining
   last_md5 = nil
   requests.each do |request|
