@@ -1,6 +1,7 @@
 require 'rbconfig'
 require 'etc'
-require 'digest/md5'
+require 'json'
+require 'digest'
 
 os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
@@ -460,10 +461,12 @@ Then('the requests are different') do
   requests = Maze::Server.sourcemaps.remaining
   last_md5 = nil
   requests.each do |request|
-    puts "last md5: #{last_md5}"
-    body = request[:body]
-    body = body.to_s
-    current_md5 = Digest::MD5.hexdigest(body)
+    body = request[:body].to_s
+    parsed = JSON.parse(body) rescue {}
+
+    content = parsed['soFile'] || parsed['proguard'] || parsed['symbol_file'] || parsed['symbolFile'] || parsed['file'] || parsed['sourceMap'] || body
+
+    current_md5 = Digest::MD5.hexdigest(content.to_s)
     Maze.check.not_equal(last_md5, current_md5) unless last_md5.nil?
     last_md5 = current_md5
   end
