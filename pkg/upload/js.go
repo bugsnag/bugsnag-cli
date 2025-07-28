@@ -352,7 +352,7 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
-	uploadOptions, err := utils.BuildJsUploadOptions(versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Js.Overwrite)
 
 	if err != nil {
 		return fmt.Errorf("failed to build upload options: %s", err.Error())

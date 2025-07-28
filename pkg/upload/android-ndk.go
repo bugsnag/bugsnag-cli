@@ -220,17 +220,30 @@ func ProcessAndroidNDK(opts options.CLI, logger log.Logger) error {
 			logger.Debug(fmt.Sprintf("Extracted symbol files to %s", outputFile))
 			symbols[file] = outputFile
 		}
+	}
 
-		if err := android.UploadAndroidNdk(
-			symbols,
-			opts.ApiKey,
-			ndkOpts.ApplicationId,
-			ndkOpts.VersionName,
-			ndkOpts.VersionCode,
-			ndkOpts.ProjectRoot,
-			opts,
+	numberOfFiles := len(fileList)
+
+	if numberOfFiles < 1 {
+		logger.Info("No NDK files found to process")
+		return nil
+	}
+
+	for _, file := range symbolFileList {
+		err = android.UploadAndroidNdk(
+			file,
+			options.ApiKey,
+			ndkOptions.ApplicationId,
+			ndkOptions.VersionName,
+			ndkOptions.VersionCode,
+			ndkOptions.ProjectRoot,
+			endpoint,
+			options,
+			ndkOptions.Overwrite,
 			logger,
-		); err != nil {
+		)
+
+		if err != nil {
 			return err
 		}
 	}

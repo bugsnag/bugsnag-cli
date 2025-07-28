@@ -167,8 +167,8 @@ func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
 				}
 			}
 		}
-
-		uploadOptions, err = utils.BuildReactNativeUploadOptions(androidOptions.ReactNative.VersionName, androidOptions.Android.VersionCode, androidOptions.ReactNative.CodeBundleId, androidOptions.ReactNative.Dev, androidOptions.ProjectRoot, options.Upload.Overwrite, "android")
+    
+		uploadOptions, err = utils.BuildReactNativeUploadOptions(options.ApiKey, androidOptions.ReactNative.VersionName, androidOptions.Android.VersionCode, androidOptions.ReactNative.CodeBundleId, androidOptions.ReactNative.Dev, androidOptions.ProjectRoot, androidOptions.Overwrite, "android")
 
 		if err != nil {
 			return err

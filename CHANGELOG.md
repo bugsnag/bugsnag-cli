@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+## Fixed
+
+- Remove the `--overwrite` option from the `dSYM` related commands as it is not used [#210](https://github.com/bugsnag/bugsnag-cli/pull/210)
+
 ## [3.2.1] - 2025-07-16
 
 ### Changed

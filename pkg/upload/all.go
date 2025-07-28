@@ -28,7 +28,10 @@ func All(options options.CLI, logger log.Logger) error {
 
 	// Build UploadOptions map from CLI options
 	uploadOptions := make(map[string]string)
-	if options.Upload.Overwrite {
+
+	uploadOptions["apiKey"] = options.ApiKey
+
+	if allOptions.Overwrite {
 		uploadOptions["overwrite"] = "true"
 	}
 	for key, value := range allOptions.UploadOptions {

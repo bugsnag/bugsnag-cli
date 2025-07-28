@@ -75,6 +75,7 @@ func UploadAndroidNdk(
 	versionCode string,
 	projectRoot string,
 	opts options.CLI,
+  overwrite bool,
 	logger log.Logger,
 ) error {
 	if len(symbolFiles) == 0 {
