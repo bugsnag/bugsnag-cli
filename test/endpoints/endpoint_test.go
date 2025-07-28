@@ -101,7 +101,6 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					Port: 9999,
 				},
 				Upload: struct {
-					Overwrite          bool                           `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 					Retries            int                            `help:"The number of retry attempts before failing an upload request" default:"0"`
 					Timeout            int                            `help:"The number of seconds to wait before failing an upload request" default:"300"`
 					UploadAPIRootUrl   string                         `help:"The upload server hostname, optionally containing port number"`
@@ -118,9 +117,9 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeAndroid options.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+					UnityIos           options.UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
 					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 				}(struct {
-					Overwrite          bool
 					Retries            int
 					Timeout            int
 					UploadAPIRootUrl   string
@@ -137,6 +136,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeAndroid options.ReactNativeAndroid
 					ReactNativeIos     options.ReactNativeIos
 					UnityAndroid       options.UnityAndroid
+					UnityIos           options.UnityIos
 					Breakpad           options.Breakpad
 				}{
 					UploadAPIRootUrl: "https://custom.bugsnag.com",
@@ -153,7 +153,6 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					Port: 8080,
 				},
 				Upload: struct {
-					Overwrite          bool                           `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 					Retries            int                            `help:"The number of retry attempts before failing an upload request" default:"0"`
 					Timeout            int                            `help:"The number of seconds to wait before failing an upload request" default:"300"`
 					UploadAPIRootUrl   string                         `help:"The upload server hostname, optionally containing port number"`
@@ -170,9 +169,9 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeAndroid options.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+					UnityIos           options.UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
 					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 				}(struct {
-					Overwrite          bool
 					Retries            int
 					Timeout            int
 					UploadAPIRootUrl   string
@@ -189,6 +188,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeAndroid options.ReactNativeAndroid
 					ReactNativeIos     options.ReactNativeIos
 					UnityAndroid       options.UnityAndroid
+					UnityIos           options.UnityIos
 					Breakpad           options.Breakpad
 				}{
 					UploadAPIRootUrl: "http://%",
