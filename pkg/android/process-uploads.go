@@ -42,7 +42,7 @@ func buildUploadOptions(
 	if base := filepath.Base(fileName); base != "" {
 		uploadOpts["sharedObjectName"] = base
 	}
-	if opts.Upload.Overwrite {
+	if opts.Upload.AndroidNdk.Overwrite {
 		uploadOpts["overwrite"] = "true"
 	}
 
@@ -75,7 +75,7 @@ func UploadAndroidNdk(
 	versionCode string,
 	projectRoot string,
 	opts options.CLI,
-  overwrite bool,
+	overwrite bool,
 	logger log.Logger,
 ) error {
 	if len(symbolFiles) == 0 {

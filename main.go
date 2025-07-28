@@ -164,7 +164,7 @@ func main() {
 			logger.Fatal("missing api key, please specify using `--api-key`")
 		}
 
-		err := upload.ProcessUnityIos(commands, endpoint, logger)
+		err := upload.ProcessUnityIos(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

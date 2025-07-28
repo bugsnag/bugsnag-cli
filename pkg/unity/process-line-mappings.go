@@ -17,7 +17,6 @@ func UploadUnityLineMappings(
 	lineMappingFile string,
 	projectRoot string,
 	overwrite bool,
-	endpoint string,
 	options options.CLI,
 	logger log.Logger,
 ) error {
@@ -69,7 +68,8 @@ func UploadUnityLineMappings(
 	}
 
 	return server.ProcessFileRequest(
-		endpoint+"/unity-line-mappings",
+		apiKey,
+		"/unity-line-mappings",
 		uploadOptions,
 		fileFieldData,
 		lineMappingFile,

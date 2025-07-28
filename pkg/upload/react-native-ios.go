@@ -201,7 +201,7 @@ func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
 
 	}
 
-	uploadOptions, err := utils.BuildReactNativeUploadOptions(options.ApiKey, iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, iosOptions.Overwrite, "ios")
+	uploadOptions, err := utils.BuildReactNativeUploadOptions(iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, iosOptions.Overwrite, "ios")
 
 	if err != nil {
 		return err

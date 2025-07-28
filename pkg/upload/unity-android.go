@@ -31,7 +31,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	var (
 		zipPath         string
 		archList        []string
-		symbolFileList  []string
+		symbolFileList  map[string]string
 		manifestData    map[string]string
 		lineMappingFile string
 		buildDirectory  string
@@ -143,7 +143,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
-        
+
 				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
 					_, err := elf.GetBuildId(file)
 					if err != nil {
@@ -162,7 +162,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 				manifestData["versionName"],
 				manifestData["versionCode"],
 				unityOptions.ProjectRoot,
-				endpoint,
 				globalOptions,
 				unityOptions.Overwrite,
 				logger,
@@ -185,7 +184,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 					lineMappingFile,
 					unityOptions.ProjectRoot,
 					unityOptions.Overwrite,
-					endpoint,
 					globalOptions,
 					logger,
 				)

@@ -12,7 +12,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 	var (
 		err              error
 		possibleDsymPath string
@@ -123,7 +123,7 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 				}
 			}
 
-			err := ios.ProcessDsymUpload(plistPath, endpoint, unityOptions.DsymShared.ProjectRoot, globalOptions, []*ios.DwarfInfo{dsym}, logger)
+			err := ios.ProcessDsymUpload(plistPath, unityOptions.DsymShared.ProjectRoot, globalOptions, []*ios.DwarfInfo{dsym}, logger)
 
 			if err != nil {
 				return fmt.Errorf("Error uploading dSYM files: %w", err)
@@ -142,7 +142,6 @@ func ProcessUnityIos(globalOptions options.CLI, endpoint string, logger log.Logg
 					lineMappingFile,
 					unityOptions.DsymShared.ProjectRoot,
 					unityOptions.Overwrite,
-					endpoint,
 					globalOptions,
 					logger,
 				)

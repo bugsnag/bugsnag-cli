@@ -43,7 +43,7 @@ func Dart(options options.CLI, logger log.Logger) error {
 				return err
 			}
 
-			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "android", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.VersionCode)
+			uploadOptions := utils.BuildDartUploadOptions(buildId, "android", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.VersionCode)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
@@ -83,7 +83,7 @@ func Dart(options options.CLI, logger log.Logger) error {
 				return err
 			}
 
-			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "ios", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.BundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(buildId, "ios", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.BundleVersion)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
