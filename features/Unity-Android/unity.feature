@@ -9,10 +9,10 @@ Feature: Unity Android integration tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     Then the sourcemap payload fields should be:
       | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
-        | appId        | com.bugsnag.example.unity.android     |
-        | versionCode  | 1                                    |
-        | versionName  | 1.0                                  |
-        | overwrite    | true                                 |
+      | appId        | com.bugsnag.example.unity.android    |
+      | versionCode  | 1                                    |
+      | versionName  | 1.0                                  |
+      | overwrite    | true                                 |
 
   Scenario: Unity Android integration tests using the bundled NDK
     Given I build the Unity Android example project
@@ -25,10 +25,10 @@ Feature: Unity Android integration tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     Then the sourcemap payload fields should be:
       | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
-        | appId        | com.bugsnag.example.unity.android     |
-        | versionCode  | 1                                    |
-        | versionName  | 1.0                                  |
-        | overwrite    | true                                 |
+      | appId        | com.bugsnag.example.unity.android    |
+      | versionCode  | 1                                    |
+      | versionName  | 1.0                                  |
+      | overwrite    | true                                 |
 
   Scenario: Unity Android integration tests passing the aab file
     Given I build the Unity Android example project
@@ -40,7 +40,7 @@ Feature: Unity Android integration tests
     Then the sourcemaps Content-Type header is valid multipart form-data
     Then the sourcemap payload fields should be:
       | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
-        | appId        | com.bugsnag.example.unity.android     |
-        | versionCode  | 1                                    |
-        | versionName  | 1.0                                  |
-        | overwrite    | true                                 |
+      | appId        | com.bugsnag.example.unity.android    |
+      | versionCode  | 1                                    |
+      | versionName  | 1.0                                  |
+      | overwrite    | true                                 |
