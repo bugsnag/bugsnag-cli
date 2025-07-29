@@ -9,7 +9,7 @@ Feature: Dart Integration Tests
       | apiKey          | 1234567890ABCDEF1234567890ABCDEF     |
       | appVersion      | 2.0                                  |
       | appVersionCode  | 1.0                                  |
-      | buildId         | 1dacae8b2a346d3dc6271a742f5d5210     |
+      | buildId         | 07cc131ca803c124e93268ce19322737     |
       | overwrite       | true                                 |
 
   Scenario: Upload a single iOS Dart sourcemap using all CLI flags
@@ -30,9 +30,25 @@ Feature: Dart Integration Tests
     And I wait to receive 4 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    Then the sourcemap payload fields should be:
-      | apiKey          | 1234567890ABCDEF1234567890ABCDEF     |
-      | appVersion      | 1.0                                  |
-      | appVersionCode  | 1.0                                  |
-      | buildId         | 1dacae8b2a346d3dc6271a742f5d5210     |
-      | overwrite       | true                                 |
+
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "buildId" equals "1dacae8b2a346d3dc6271a742f5d5210"
+    And the sourcemap payload field "overwrite" equals "true"
+
+    And I discard the oldest sourcemap
+
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "buildId" equals "07cc131ca803c124e93268ce19322737"
+    And the sourcemap payload field "overwrite" equals "true"
+
+    And I discard the oldest sourcemap
+
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "buildId" equals "c6e70c11ee73f14347202175430ab226"
+    And the sourcemap payload field "overwrite" equals "true"
+
+    And I discard the oldest sourcemap
+
+    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+    And the sourcemap payload field "buildId" equals "E30C1BE5-DEB6-373C-98B4-52D827B7FF0D"
+    And the sourcemap payload field "overwrite" equals "true"
