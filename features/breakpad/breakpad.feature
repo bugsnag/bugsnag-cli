@@ -8,10 +8,11 @@ Feature: Breakpad Integration Tests
         And the sourcemap "api_key" query parameter equals "1234567890ABCDEF1234567890ABCDEF"
         And the sourcemap "project_root" query parameter equals "/features/breakpad/fixtures/breakpad-symbols.sym"
         And the sourcemap "overwrite" query parameter equals "true"
-        And the sourcemap payload field "version" equals "2"
-        And the sourcemap payload field "os" equals "Linux"
-        And the sourcemap payload field "cpu" equals "x86_64"
-        And the sourcemap payload field "debug_file" equals "/features/breakpad/fixtures/breakpad-symbols.sym"
-        And the sourcemap payload field "code_file" equals "/features/breakpad/fixtures/breakpad-symbols.sym"
-        And the sourcemap payload field "debug_identifier" equals "1234567890ABCDEF1234567890ABCDEF"
-        And the sourcemap payload field "product" equals "test-product"
+        Then the sourcemap payload fields should be:
+        | version           | 2                                                 |
+        | os                | Linux                                             |
+        | cpu               | x86_64                                            |
+        | debug_file        | /features/breakpad/fixtures/breakpad-symbols.sym  |
+        | code_file         | /features/breakpad/fixtures/breakpad-symbols.sym  |
+        | debug_identifier  | 1234567890ABCDEF1234567890ABCDEF                  |
+        | product           | test-product                                      |

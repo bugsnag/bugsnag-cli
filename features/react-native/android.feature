@@ -10,30 +10,33 @@ Feature: React Native Android Integration Tests
     And I wait to receive 1 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "2.0"
-    And the sourcemap payload field "appVersionCode" equals "2"
-    And the sourcemap payload field "platform" equals "android"
-    And the sourcemap payload field "overwrite" equals "true"
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+      | appVersion   | 2.0                                    |
+      | appVersionCode | 2                                      |
+      | platform     | android                                |
+      | overwrite    | true                                   |
 
   Scenario: Upload a single React Native Android sourcemap, only passing bundle, sourcemap and manifest options
     When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --bundle=$BUNDLE_PATH --source-map=$SOURCE_MAP_PATH --app-manifest=$APP_MANIFEST_PATH --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
     And I wait to receive 1 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "1.0"
-    And the sourcemap payload field "appVersionCode" equals "1"
-    And the sourcemap payload field "platform" equals "android"
-    And the sourcemap payload field "overwrite" equals "true"
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+        | appVersion   | 1.0                                    |
+        | appVersionCode | 1                                      |
+        | platform     | android                                |
+        | overwrite    | true                                   |
 
   Scenario: Upload a single React Native Android sourcemap
     When I run bugsnag-cli with upload react-native-android --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --overwrite features/react-native/fixtures/generated/old-arch/$RN_VERSION
     And I wait to receive 1 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appVersion" equals "1.0"
-    And the sourcemap payload field "appVersionCode" equals "1"
-    And the sourcemap payload field "platform" equals "android"
-    And the sourcemap payload field "overwrite" equals "true"
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+        | appVersion   | 1.0                                    |
+        | appVersionCode | 1                                      |
+        | platform     | android                                |
+        | overwrite    | true                                   |

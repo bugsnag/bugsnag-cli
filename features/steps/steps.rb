@@ -89,16 +89,45 @@ Then('the build is valid for the Builds API') do
   )
 end
 
+Then('the sourcemaps are valid for the API') do
+  requests = Maze::Server.sourcemaps.all
+  last_sourcemap_content = nil
+  requests.each do |request|
+    body = request[:body].to_s
+    Maze.check.not_nil(request[:body]['apiKey'], "Expected 'apiKey' field to be present in the sourcemap payload")
+
+    content = request[:body]['soFile'] || request[:body]['proguard'] || request[:body]['symbol_file'] || request[:body]['symbolFile'] || request[:body]['file'] || request[:body]['sourceMap'] || body
+    Maze.check.not_equal(last_sourcemap_content, content) unless last_sourcemap_content.nil?
+    last_sourcemap_content = content
+  end
+end
+
 Then('the sourcemaps Content-Type header is valid multipart form-data') do
-  expected = /^multipart\/form-data; boundary=([^;]+)/
-  actual = Maze::Server.sourcemaps.current[:request]['content-type']
-  Maze.check.match(expected, actual)
+  requests = Maze::Server.sourcemaps.all
+  requests.each do |request|
+    Maze.check.include(request[:request]['content-type'], 'multipart/form-data',
+      "Expected Content-Type to be multipart/form-data, but got: #{request[:request]['content-type']}")
+  end
 end
 
 Then('the sourcemap payload field "sourceMap" is valid json') do
   require 'json'
   decoded = JSON.parse(Maze::Server.sourcemaps.current[:body]['sourceMap'])
   Maze.check.not_equal(decoded['mappings'].length, 0)
+end
+
+# Table-based sourcemap payload field check
+Then('the sourcemap payload fields should be:') do |table|
+  expected_fields = table.rows_hash
+  requests = Maze::Server.sourcemaps.all
+
+  requests.each_with_index do |request, index|
+    payload = request[:body]
+    expected_fields.each do |field, expected_value|
+      actual_value = payload[field]
+      Maze.check.equal(actual_value.to_s, expected_value, "In request ##{index + 1}, expected sourcemap field '#{field}' to be '#{expected_value}', but got '#{actual_value}'")
+    end
+  end
 end
 
 Then('the sourcemap payload field "minifiedFile" is not empty') do
@@ -403,20 +432,4 @@ And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([
   expected_hash = { arg2 => arg3, arg4 => arg5 }
 
   Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
-end
-
-Then('the sourcemaps are valid for the API') do
-  requests = Maze::Server.sourcemaps.all
-  last_sourcemap_content = nil
-  requests.each do |request|
-    body = request[:body].to_s
-    parsed = JSON.parse(body) rescue {}
-    # Check for common fields in the parsed JSON
-    Maze.check.not_nil(parsed['apiKey'], "Expected 'apiKey' field to be present in the sourcemap payload")
-
-    # Check each sourcemap to ensure it has a unique content
-    content = parsed['soFile'] || parsed['proguard'] || parsed['symbol_file'] || parsed['symbolFile'] || parsed['file'] || parsed['sourceMap'] || body
-    Maze.check.not_equal(last_sourcemap_content, content) unless last_sourcemap_content.nil?
-    last_sourcemap_content = content
-  end
 end

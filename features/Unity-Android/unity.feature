@@ -7,11 +7,12 @@ Feature: Unity Android integration tests
     Then I wait to receive 5 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
-    And the sourcemap payload field "versionCode" equals "1"
-    And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+        | appId        | com.bugsnag.example.unity.android     |
+        | versionCode  | 1                                    |
+        | versionName  | 1.0                                  |
+        | overwrite    | true                                 |
 
   Scenario: Unity Android integration tests using the bundled NDK
     Given I build the Unity Android example project
@@ -22,12 +23,12 @@ Feature: Unity Android integration tests
     Then I wait to receive 5 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
-    And the sourcemap payload field "versionCode" equals "1"
-    And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
-
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+        | appId        | com.bugsnag.example.unity.android     |
+        | versionCode  | 1                                    |
+        | versionName  | 1.0                                  |
+        | overwrite    | true                                 |
 
   Scenario: Unity Android integration tests passing the aab file
     Given I build the Unity Android example project
@@ -37,8 +38,9 @@ Feature: Unity Android integration tests
     Then I wait to receive 5 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
-    And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
-    And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
-    And the sourcemap payload field "versionCode" equals "1"
-    And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+        | appId        | com.bugsnag.example.unity.android     |
+        | versionCode  | 1                                    |
+        | versionName  | 1.0                                  |
+        | overwrite    | true                                 |
