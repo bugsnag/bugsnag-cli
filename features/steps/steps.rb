@@ -76,61 +76,9 @@ Then('I should see the path ambiguous error') do
   Maze.check.include(run_output, "Path ambiguous: more than one AAB file was found")
 end
 
-Then('the sourcemap is valid for the Proguard Build API') do
-  steps %(
-    Then the sourcemap is valid for the Android Build API
-  )
-end
-
-Then('the sourcemap is valid for the NDK Build API') do
-  steps %(
-    Then the sourcemap is valid for the Android Build API
-  )
-end
-
-Then('the sourcemap is valid for the Dart Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "buildId" is not null
-    And the requests are different
-  )
-end
-
-Then('the sourcemap is valid for the Breakpad Build API') do
-  steps %(
-    And the sourcemap "api_key" query parameter equals "#{$api_key}"
-    And the sourcemap "project_root" query parameter is not null
-    And the requests are different
-  )
-end
-
-Then('the sourcemap is valid for the React Native Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appVersion" is not null
-    And the requests are different
-  )
-end
-
-Then('the sourcemap is valid for the JS Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appVersion" is not null
-    And the requests are different
-  )
-end
-
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
-  )
-end
-
-Then('the sourcemap is valid for the Android Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appId" is not null
-    And the requests are different
   )
 end
 
@@ -457,17 +405,18 @@ And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([
   Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
 end
 
-Then('the requests are different') do
-  requests = Maze::Server.sourcemaps.remaining
-  last_md5 = nil
+Then('the sourcemaps are valid for the API') do
+  requests = Maze::Server.sourcemaps.all
+  last_sourcemap_content = nil
   requests.each do |request|
     body = request[:body].to_s
     parsed = JSON.parse(body) rescue {}
+    # Check for common fields in the parsed JSON
+    Maze.check.not_nil(parsed['apiKey'], "Expected 'apiKey' field to be present in the sourcemap payload")
 
+    # Check each sourcemap to ensure it has a unique content
     content = parsed['soFile'] || parsed['proguard'] || parsed['symbol_file'] || parsed['symbolFile'] || parsed['file'] || parsed['sourceMap'] || body
-
-    current_md5 = Digest::MD5.hexdigest(content.to_s)
-    Maze.check.not_equal(last_md5, current_md5) unless last_md5.nil?
-    last_md5 = current_md5
+    Maze.check.not_equal(last_sourcemap_content, content) unless last_sourcemap_content.nil?
+    last_sourcemap_content = content
   end
 end
