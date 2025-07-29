@@ -14,12 +14,11 @@ import (
 //
 // Parameters:
 // - options: CLI options provided by the user, including Xcode build settings.
-// - endpoint: The server endpoint for uploading dSYM files.
 // - logger: Logger instance for logging messages during processing.
 //
 // Returns:
 // - An error if any part of the process fails, otherwise nil.
-func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) error {
+func ProcessXcodeBuild(options options.CLI, logger log.Logger) error {
 	xcodeBuildOptions := options.Upload.XcodeBuild
 	var (
 		buildSettings *ios.XcodeBuildSettings
@@ -120,7 +119,7 @@ func ProcessXcodeBuild(options options.CLI, endpoint string, logger log.Logger) 
 		}
 
 		// Upload dSYM files
-		err = ios.ProcessDsymUpload(plistPath, endpoint, xcodeBuildOptions.Shared.ProjectRoot, options, dwarfInfo, logger)
+		err = ios.ProcessDsymUpload(plistPath, xcodeBuildOptions.Shared.ProjectRoot, options, dwarfInfo, logger)
 		if err != nil {
 			return fmt.Errorf("Error uploading dSYM files: %w", err)
 		}

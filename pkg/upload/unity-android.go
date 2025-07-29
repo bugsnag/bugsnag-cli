@@ -14,11 +14,24 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.Logger) error {
+// ProcessUnityAndroid processes Unity Android symbols and AAB files.
+//
+// This function searches for Unity Android symbols.zip files and AAB files in the specified paths,
+// extracts the necessary data, and uploads the symbols.
+// It handles both the symbols.zip and AAB files, extracting architecture-specific symbols
+// and merging metadata from the AAB manifest if available.
+//
+// Parameters:
+//   - globalOptions: CLI options containing Unity Android upload settings.
+//   - logger: Logger instance for debug and error output.
+//
+// Returns:
+//   - error: non-nil if an error occurs during processing or uploading.
+func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	var (
 		zipPath         string
 		archList        []string
-		symbolFileList  []string
+		symbolFileList  map[string]string
 		manifestData    map[string]string
 		lineMappingFile string
 		buildDirectory  string
@@ -27,6 +40,8 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 	)
 
 	unityOptions := globalOptions.Upload.UnityAndroid
+
+	symbolFileList = make(map[string]string)
 
 	for _, path := range unityOptions.Path {
 		aabPath = string(unityOptions.AabPath)
@@ -76,7 +91,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 			VersionCode:   manifestData["versionCode"],
 			VersionName:   manifestData["versionName"],
 		}
-		err = ProcessAndroidAab(globalOptions, endpoint, logger)
+		err = ProcessAndroidAab(globalOptions, logger)
 
 		if err != nil {
 			return err
@@ -128,25 +143,25 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				if filepath.Base(file) == "libil2cpp.sym.so" && utils.ContainsString(fileList, "libil2cpp.dbg.so") {
 					continue
 				}
+
 				if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
 					_, err := elf.GetBuildId(file)
 					if err != nil {
 						return fmt.Errorf("failed to get build ID from %s: %w", file, err)
 					}
 				}
-				symbolFileList = append(symbolFileList, file)
+				symbolFileList[file] = file
 			}
 		}
 
-		for _, file := range symbolFileList {
+		for originalFile, symbolPath := range symbolFileList {
 			err = android.UploadAndroidNdk(
-				file,
+				map[string]string{originalFile: symbolPath},
 				manifestData["apiKey"],
 				manifestData["applicationId"],
 				manifestData["versionName"],
 				manifestData["versionCode"],
 				unityOptions.ProjectRoot,
-				endpoint,
 				globalOptions,
 				unityOptions.Overwrite,
 				logger,
@@ -156,8 +171,8 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 				return err
 			}
 
-			if filepath.Base(file) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
-				buildId, _ := elf.GetBuildId(file)
+			if filepath.Base(symbolPath) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
+				buildId, _ := elf.GetBuildId(symbolPath)
 				logger.Info(fmt.Sprintf("Uploading %s for build ID %s", lineMappingFile, buildId))
 				err = unity.UploadUnityLineMappings(
 					manifestData["apiKey"],
@@ -169,7 +184,6 @@ func ProcessUnityAndroid(globalOptions options.CLI, endpoint string, logger log.
 					lineMappingFile,
 					unityOptions.ProjectRoot,
 					unityOptions.Overwrite,
-					endpoint,
 					globalOptions,
 					logger,
 				)

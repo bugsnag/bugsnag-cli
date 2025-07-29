@@ -19,7 +19,7 @@ import (
 var androidSymbolFileRegex = regexp.MustCompile("android-([^;]*).symbols")
 var iosSymbolFileRegex = regexp.MustCompile("ios-([^;]*).symbols")
 
-func Dart(options options.CLI, endpoint string, logger log.Logger) error {
+func Dart(options options.CLI, logger log.Logger) error {
 	dartOptions := options.Upload.DartSymbol
 	fileList, err := utils.BuildFileList(dartOptions.Path)
 
@@ -43,13 +43,12 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 				return err
 			}
 
-			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "android", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.VersionCode)
+			uploadOptions := utils.BuildDartUploadOptions(buildId, "android", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.VersionCode)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
 
-			err := server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
+			err := server.ProcessFileRequest(options.ApiKey, "/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
 
 			if err != nil {
 
@@ -84,8 +83,7 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 				return err
 			}
 
-			// Build Upload options
-			uploadOptions := utils.BuildDartUploadOptions(options.ApiKey, buildId, "ios", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.BundleVersion)
+			uploadOptions := utils.BuildDartUploadOptions(buildId, "ios", dartOptions.Overwrite, dartOptions.VersionName, dartOptions.BundleVersion)
 
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
@@ -93,7 +91,7 @@ func Dart(options options.CLI, endpoint string, logger log.Logger) error {
 			if options.DryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(endpoint+"/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
+				err = server.ProcessFileRequest(options.ApiKey, "/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
 			}
 
 			if err != nil {

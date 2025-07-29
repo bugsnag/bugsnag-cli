@@ -174,7 +174,7 @@ type CLI struct {
 		// shared options
 		Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
 		Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
-		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number" default:"https://upload.bugsnag.com"`
+		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
 
 		// required options
 		All                DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
@@ -197,31 +197,4 @@ type CLI struct {
 
 type CreateAndroidBuildId struct {
 	Path utils.Paths `arg:"" name:"path" help:"Path to the project directory" type:"path"`
-}
-
-type AndroidBuildOptions struct {
-	AndroidAab  utils.Path `help:"The path to an Android AAB file from which to obtain build information"`
-	AppManifest utils.Path `help:"The path to an Android manifest file (AndroidManifest.xml) from which to obtain build information"`
-	VersionCode string     `help:"The version code of this build of the application (Android only)." aliases:"app-version-code,version-code" xor:"version-code,bundle-version"`
-}
-
-type IosBuildOptions struct {
-	BundleVersion string `help:"The bundle version of this build of the application (Apple platforms only)" aliases:"app-bundle-version,bundle-version"`
-}
-
-type CreateBuild struct {
-	Path              utils.Paths       `arg:"" name:"path" help:"Path to the project directory" type:"path" default:"."`
-	AutoAssignRelease bool              `help:"Whether to automatically associate this build with any new error events and sessions that are received for the release stage"`
-	BuildApiRootUrl   string            `help:"The build server hostname, optionally containing port number" default:"https://build.bugsnag.com"`
-	BuilderName       string            `help:"The name of the person or entity who built the app"`
-	Metadata          map[string]string `help:"Custom build information to be associated with the release on the BugSnag dashboard"`
-	Provider          utils.Provider    `help:"The name of the source control provider that contains the source code for the build"`
-	ReleaseStage      string            `help:"The release stage (eg, production, staging) of the application build"`
-	Repository        string            `help:"The URL of the repository containing the source code that has been built."`
-	Retries           int               `help:"The number of retry attempts before failing the command" default:"0"`
-	Revision          string            `help:"The source control SHA-1 hash for the code that has been built (short or long hash)"`
-	Timeout           int               `help:"The number of seconds to wait before failing the command" default:"300"`
-	VersionName       string            `help:"The version of the application" aliases:"app-version,version-name"`
-	AndroidBuildOptions
-	IosBuildOptions
 }

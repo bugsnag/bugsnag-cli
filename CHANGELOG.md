@@ -6,6 +6,21 @@
 
 - Remove the `--overwrite` option from the `dSYM` related commands as it is not used [#210](https://github.com/bugsnag/bugsnag-cli/pull/210)
 
+## [3.2.1] - 2025-07-16
+
+### Changed
+
+- Improve (non-AAB) Android NDK file processing to avoid name clashes and ensure that all architectures are uploaded [#220](https://github.com/bugsnag/bugsnag-cli/pull/220)
+
+## [3.2.0] - 2025-07-02
+
+- Set default endpoints based on API key [#214](https://github.com/bugsnag/bugsnag-cli/pull/214)
+- Add minimum node version to the NPM package [#217](https://github.com/bugsnag/bugsnag-cli/pull/217)
+
+### Fixed
+
+- Ensure that the`--metadata` accepts key=value,key=value [#216](https://github.com/bugsnag/bugsnag-cli/pull/216)
+
 ## [3.1.1] - 2025-05-14
 
 ### Fixed

@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -106,9 +107,11 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 
 // ProcessFileRequest processes a file upload request by building an HTTP request,
 // uploading the specified file to the endpoint, and logging information based on the dryRun flag.
+// It handles the API key, constructs the endpoint URL, and manages retries in case of failures.
 //
 // Parameters:
-//   - endpoint: The target URL for the file upload.
+//   - apiKey: The project API key.
+//   - endpointPath: The path to the upload endpoint, which can be empty for the default endpoint.
 //   - uploadOptions: A map containing options for building the file request.
 //   - fileFieldData: A map containing data associated with the file field.
 //   - fileName: The name of the file to be uploaded.
@@ -116,7 +119,19 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //
 // Returns:
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
-func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
+func ProcessFileRequest(apiKey string, endpointPath string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
+
+	if apiKey != "" {
+		uploadOptions["apiKey"] = apiKey
+	} else {
+		return fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	endpoint, err := endpoints.GetDefaultUploadEndpoint(apiKey, endpointPath, options)
+	if err != nil {
+		return fmt.Errorf("error getting upload endpoint: %w", err)
+	}
+
 	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
 	if err != nil {
 		return fmt.Errorf("error building file request: %w", err)
@@ -148,15 +163,25 @@ func ProcessFileRequest(endpoint string, uploadOptions map[string]string, fileFi
 
 // ProcessBuildRequest processes a build request by creating an HTTP request with the provided payload,
 // sending the request to the specified endpoint, and logging information based on the dryRun flag.
+// It handles the API key, constructs the endpoint URL, and manages retries in case of failures.
 //
 // Parameters:
-//   - endpoint: The target URL for the HTTP POST request.
+//   - apiKey: The project API key.
 //   - payload: The payload to be sent in the request body.
 //   - options: used to determine dry run, timeout, and retries.
 //
 // Returns:
 //   - error: An error if any step of the build processing fails. Nil if the process is successful.
-func ProcessBuildRequest(endpoint string, payload []byte, options options.CLI, logger log.Logger) error {
+func ProcessBuildRequest(apiKey string, payload []byte, options options.CLI, logger log.Logger) error {
+	if apiKey == "" {
+		return fmt.Errorf("missing api key, please specify using `--api-key`")
+	}
+
+	endpoint, err := endpoints.GetDefaultBuildEndpoint(apiKey, options)
+	if err != nil {
+		return fmt.Errorf("error getting upload endpoint: %w", err)
+	}
+
 	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
 	req.Header.Add("Content-Type", "application/json")
 

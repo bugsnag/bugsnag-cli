@@ -76,7 +76,15 @@ func hasProjectRootFile(dir string) bool {
 	return false
 }
 
-// Attempt to parse information from the package.json file if values aren't provided on the command line
+// resolveVersion attempts to parse the version from the package.json file
+// if a version is not provided on the command line.
+//
+// Parameters:
+// - versionName: version string from CLI (can be empty).
+// - path: directory path to start searching.
+//
+// Returns:
+// - resolved version string or empty if not found.
 func resolveVersion(versionName string, path string, logger log.Logger) string {
 	if versionName != "" {
 		return versionName
@@ -121,7 +129,15 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 	return ""
 }
 
-// Attempt to find the source maps by walking the build directory if it is not passed in to the command line
+// resolveSourceMapPaths attempts to find the source map(s) by walking the build directory
+// if a source map path is not specified.
+//
+// Parameters:
+// - sourceMapPath: user-specified source map path (can be empty).
+// - outputPath: directory to scan for source maps.
+//
+// Returns:
+// - list of source map file paths, or an error.
 func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.Logger) ([]string, error) {
 	if sourceMapPath != "" {
 		if utils.FileExists(sourceMapPath) {
@@ -154,7 +170,13 @@ func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.L
 	return sourceMapPaths, nil
 }
 
-// Reads a JSON source map into memory. Required in order to check if the sourcesContent exists.
+// ReadSourceMap reads a JSON source map into memory.
+//
+// Parameters:
+// - path: path to the source map file.
+//
+// Returns:
+// - parsed JSON map of the source map contents or error.
 func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, error) {
 	logger.Info(fmt.Sprintf("Reading sourcemap %s", path))
 	data, err := os.ReadFile(path)
@@ -169,7 +191,10 @@ func ReadSourceMap(path string, logger log.Logger) (map[string]interface{}, erro
 	return sourceMapContents, nil
 }
 
-// Based on the source map specification https://bit.ly/sourcemap. Returns if the source map was modified.
+// addSourcesContent adds the sourcesContent to a source map section if missing.
+//
+// Returns:
+// - true if the source map was modified.
 func addSourcesContent(section map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	untypedSources, hasSources := section["sources"]
 	if !hasSources {
@@ -240,7 +265,10 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, log
 	return true
 }
 
-// If the source map doesn't have sourcesContent then attempt to add it. Returns true if a modifcation was performed.
+// AddSources adds sourcesContent to the source map if missing.
+//
+// Returns:
+// - true if the source map was modified.
 func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, logger log.Logger) bool {
 	// Sources may be in several sections. See https://bit.ly/sourcemap.
 	if sections, exists := sourceMapContents["sections"]; exists {
@@ -258,7 +286,15 @@ func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, 
 	return false
 }
 
-// Attempt to find the bundle path by changing the extension of the source map if the bundle path is not passed in to the command line
+// resolveBundlePath attempts to find the bundle path by changing the extension
+// of the source map if bundle path is not specified.
+//
+// Parameters:
+// - bundlePath: user-specified bundle path (can be empty).
+// - sourceMapPath: path to the source map.
+//
+// Returns:
+// - resolved bundle path or error.
 func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logger) (string, error) {
 	if bundlePath != "" {
 		if utils.FileExists(bundlePath) {
@@ -280,8 +316,21 @@ func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logge
 	return "", nil
 }
 
-// Upload a single source map
-func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl string, versionName string, codeBundleId string, projectRoot string, options options.CLI, endpoint string, logger log.Logger) error {
+// uploadSingleSourceMap uploads a single source map.
+//
+// Parameters:
+// - sourceMapPath: path to source map file.
+// - bundlePath: path to bundle file.
+// - bundleUrl: URL for the bundle.
+// - versionName: version string.
+// - codeBundleId: optional code bundle id.
+// - projectRoot: project root directory.
+// - options: CLI options.
+// - logger: logger instance.
+//
+// Returns:
+// - error if upload fails.
+func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl string, versionName string, codeBundleId string, projectRoot string, options options.CLI, logger log.Logger) error {
 	sourceMapContents, err := ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
 		return err
@@ -303,7 +352,7 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 		sourceMapFile = server.LocalFile(sourceMapPath)
 	}
 
-	uploadOptions, err := utils.BuildJsUploadOptions(options.ApiKey, versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Js.Overwrite)
+	uploadOptions, err := utils.BuildJsUploadOptions(versionName, codeBundleId, bundleUrl, projectRoot, options.Upload.Js.Overwrite)
 
 	if err != nil {
 		return fmt.Errorf("failed to build upload options: %s", err.Error())
@@ -313,7 +362,7 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 	fileFieldData["sourceMap"] = sourceMapFile
 	fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 
-	err = server.ProcessFileRequest(endpoint+"/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
+	err = server.ProcessFileRequest(options.ApiKey, "/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
 
 	if err != nil {
 		return fmt.Errorf("encountered error when uploading js sourcemap: %s", err.Error())
@@ -322,7 +371,15 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 	return nil
 }
 
-func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
+// ProcessJs uploads JS source maps based on CLI options.
+//
+// Parameters:
+// - options: CLI options.
+// - logger: logger instance.
+//
+// Returns:
+// - error if processing fails.
+func ProcessJs(options options.CLI, logger log.Logger) error {
 	jsOptions := options.Upload.Js
 	for _, path := range jsOptions.Path {
 
@@ -382,7 +439,7 @@ func ProcessJs(options options.CLI, endpoint string, logger log.Logger) error {
 				logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", bundleUrl, jsOptions.BaseUrl))
 			}
 
-			err = uploadSingleSourceMap(sourceMapPath, bundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, endpoint, logger)
+			err = uploadSingleSourceMap(sourceMapPath, bundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, logger)
 			if err != nil {
 				return err
 			}

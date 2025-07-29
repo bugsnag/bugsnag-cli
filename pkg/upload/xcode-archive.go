@@ -12,12 +12,11 @@ import (
 //
 // Parameters:
 // - options: CLI options provided by the user, including xcarchive settings.
-// - endpoint: The server endpoint for uploading dSYM files.
 // - logger: Logger instance for logging messages during processing.
 //
 // Returns:
 // - An error if any part of the process fails, otherwise nil.
-func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger) error {
+func ProcessXcodeArchive(options options.CLI, logger log.Logger) error {
 	var (
 		xcarchivePath string
 		err           error
@@ -38,7 +37,7 @@ func ProcessXcodeArchive(options options.CLI, endpoint string, logger log.Logger
 	logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
 
 	// Process and upload the dSYM files extracted from the Xcode archive
-	_, err = ProcessDsymUpload(xcarchivePath, endpoint, options, logger)
+	_, err = ProcessDsymUpload(xcarchivePath, options, logger)
 	if err != nil {
 		return err // Return error if the upload fails
 	}
