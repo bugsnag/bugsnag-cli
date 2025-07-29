@@ -3,7 +3,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Upload a single js sourcemap using all CLI flags
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --version-name=2.3.4 --source-map=features/js/fixtures/js-webpack4/dist/main.js.map --bundle=features/js/fixtures/js-webpack4/dist/main.js --project-root=features/js/fixtures/js-webpack4 features/js/fixtures/js-webpack4/dist
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "2.3.4"
@@ -16,7 +16,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Automatically resolves the version number based on the package.json
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --project-root=features/js/fixtures/js-webpack4 features/js/fixtures/js-webpack4/dist
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
@@ -29,7 +29,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Resolves the path specified as the map
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --bundle-url=example.com --project-root=features/js/fixtures/js-webpack4 features/js/fixtures/js-webpack4/dist/main.js.map
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
@@ -42,7 +42,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Searches in the dist folder automatically
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --project-root=features/js/fixtures/js-webpack4 features/js/fixtures/js-webpack4/
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
@@ -55,7 +55,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Uses the working directory as project root
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/js/fixtures/js-webpack4/dist
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
@@ -68,7 +68,7 @@ Feature: Webpack 4 js Integration Tests
   Scenario: Base URL correctly appends the path
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --project-root=features/js/fixtures/js-webpack4 features/js/fixtures/js-webpack4/dist
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"
@@ -84,7 +84,7 @@ Feature: Webpack 4 js Integration Tests
 
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com features/base-fixtures/js-webpack4/dist/
     And I wait to receive 1 sourcemaps
-    Then the sourcemap is valid for the JS Build API
+    Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
     And the sourcemap payload field "appVersion" equals "1.2.3"

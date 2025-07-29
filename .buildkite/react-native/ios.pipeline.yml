@@ -11,6 +11,7 @@ steps:
       RN_VERSION: "{{matrix}}"
       RCT_NEW_ARCH_ENABLED: "0"
       BUILD_IOS: "true"
+      XCODE_VERSION: "16.2.0"
     commands:
       - "chmod +x bin/arm64-macos-bugsnag-cli"
       - "bundle install"

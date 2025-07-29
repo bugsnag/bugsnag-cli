@@ -1,5 +1,7 @@
 require 'rbconfig'
 require 'etc'
+require 'json'
+require 'digest'
 
 os = RbConfig::CONFIG['host_os']
 arch = RbConfig::CONFIG['host_cpu']
@@ -74,56 +76,9 @@ Then('I should see the path ambiguous error') do
   Maze.check.include(run_output, "Path ambiguous: more than one AAB file was found")
 end
 
-Then('the sourcemap is valid for the Proguard Build API') do
-  steps %(
-    Then the sourcemap is valid for the Android Build API
-  )
-end
-
-Then('the sourcemap is valid for the NDK Build API') do
-  steps %(
-    Then the sourcemap is valid for the Android Build API
-  )
-end
-
-Then('the sourcemap is valid for the Dart Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "buildId" is not null
-  )
-end
-
-Then('the sourcemap is valid for the Breakpad Build API') do
-  steps %(
-    And the sourcemap "api_key" query parameter equals "#{$api_key}"
-    And the sourcemap "project_root" query parameter is not null
-  )
-end
-
-Then('the sourcemap is valid for the React Native Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appVersion" is not null
-  )
-end
-
-Then('the sourcemap is valid for the JS Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appVersion" is not null
-  )
-end
-
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
-  )
-end
-
-Then('the sourcemap is valid for the Android Build API') do
-  steps %(
-    And the sourcemap payload field "apiKey" equals "#{$api_key}"
-    And the sourcemap payload field "appId" is not null
   )
 end
 
@@ -134,16 +89,45 @@ Then('the build is valid for the Builds API') do
   )
 end
 
+Then('the sourcemaps are valid for the API') do
+  requests = Maze::Server.sourcemaps.all
+  last_sourcemap_content = nil
+  requests.each do |request|
+    body = request[:body].to_s
+    Maze.check.not_nil(request[:body]['apiKey'], "Expected 'apiKey' field to be present in the sourcemap payload")
+
+    content = request[:body]['soFile'] || request[:body]['proguard'] || request[:body]['symbol_file'] || request[:body]['symbolFile'] || request[:body]['file'] || request[:body]['sourceMap'] || body
+    Maze.check.not_equal(last_sourcemap_content, content) unless last_sourcemap_content.nil?
+    last_sourcemap_content = content
+  end
+end
+
 Then('the sourcemaps Content-Type header is valid multipart form-data') do
-  expected = /^multipart\/form-data; boundary=([^;]+)/
-  actual = Maze::Server.sourcemaps.current[:request]['content-type']
-  Maze.check.match(expected, actual)
+  requests = Maze::Server.sourcemaps.all
+  requests.each do |request|
+    Maze.check.include(request[:request]['content-type'], 'multipart/form-data',
+      "Expected Content-Type to be multipart/form-data, but got: #{request[:request]['content-type']}")
+  end
 end
 
 Then('the sourcemap payload field "sourceMap" is valid json') do
   require 'json'
   decoded = JSON.parse(Maze::Server.sourcemaps.current[:body]['sourceMap'])
   Maze.check.not_equal(decoded['mappings'].length, 0)
+end
+
+# Table-based sourcemap payload field check
+Then('the sourcemap payload fields should be:') do |table|
+  expected_fields = table.rows_hash
+  requests = Maze::Server.sourcemaps.all
+
+  requests.each_with_index do |request, index|
+    payload = request[:body]
+    expected_fields.each do |field, expected_value|
+      actual_value = payload[field]
+      Maze.check.equal(actual_value.to_s, expected_value, "In request ##{index + 1}, expected sourcemap field '#{field}' to be '#{expected_value}', but got '#{actual_value}'")
+    end
+  end
 end
 
 Then('the sourcemap payload field "minifiedFile" is not empty') do
@@ -243,7 +227,7 @@ And('I wait for the Unity symbols to generate') do
 end
 
 Given(/^I set the NDK path to the Unity bundled version$/) do
-#  Set the environment variable to the path of the NDK bundled with Unity
+  #  Set the environment variable to the path of the NDK bundled with Unity
   ENV['ANDROID_NDK_ROOT'] = "/Applications/Unity/Hub/Editor/#{ENV['UNITY_VERSION']}/PlaybackEngines/AndroidPlayer/NDK"
 end
 
@@ -307,7 +291,7 @@ Before('@CleanAndArchiveDsym') do
   build_target = "#{project_path}/archive"
 
   clean_and_build(scheme, project_path, build_target)
-end 
+end
 
 # React Native
 Before('@BuildRNAndroid') do
