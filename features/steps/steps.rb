@@ -82,7 +82,6 @@ Then('the sourcemap is valid for the dSYM Build API') do
   )
 end
 
-<<<<<<< HEAD
 Then('the sourcemap is valid for the Unity Line Mapping API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"
@@ -97,8 +96,6 @@ Then('the sourcemap is valid for the Android Build API') do
   )
 end
 
-=======
->>>>>>> origin/next
 Then('the build is valid for the Builds API') do
   steps %(
     And the build payload field "apiKey" equals "#{$api_key}"
