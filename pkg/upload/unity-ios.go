@@ -43,7 +43,6 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 			possibleXcodeProject = path
 		} else {
 			possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
-			possibleDsymPath = path
 		}
 
 		if possibleXcodeProject == "" {
