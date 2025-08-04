@@ -14,14 +14,15 @@ import (
 
 func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 	var (
-		err              error
-		possibleDsymPath string
-		dsyms            []*ios.DwarfInfo
-		tempDir          string
-		tempDirs         []string
-		lineMappingFile  string
-		plistPath        string
-		plistData        *ios.PlistData
+		err                  error
+		possibleDsymPath     string
+		possibleXcodeProject string
+		dsyms                []*ios.DwarfInfo
+		tempDir              string
+		tempDirs             []string
+		lineMappingFile      string
+		plistPath            string
+		plistData            *ios.PlistData
 	)
 
 	unityOptions := globalOptions.Upload.UnityIos
@@ -39,8 +40,17 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 		}
 
 		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+			possibleXcodeProject = path
+		} else {
+			possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
+			possibleDsymPath = path
+		}
+
+		if possibleXcodeProject == "" {
+			possibleDsymPath = path
+		} else {
 			globalOptions.Upload.XcodeArchive = options.XcodeArchive{
-				Path:   utils.Paths{path},
+				Path:   utils.Paths{possibleXcodeProject},
 				Shared: unityOptions.DsymShared,
 			}
 
@@ -54,9 +64,9 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 
 			logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
 			possibleDsymPath = xcarchivePath
-		} else {
-			possibleDsymPath = path
 		}
+
+		logger.Debug(fmt.Sprintf("Searching for dSYMs in: %s", possibleDsymPath))
 
 		dsyms, tempDir, err = ios.FindDsymsInPath(
 			possibleDsymPath,
