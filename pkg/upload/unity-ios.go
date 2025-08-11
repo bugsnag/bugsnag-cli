@@ -39,10 +39,24 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 			logger.Debug(fmt.Sprintf("Using default Unity scheme: %s", unityOptions.DsymShared.Scheme))
 		}
 
-		if ios.IsPathAnXcodeProjectOrWorkspace(path) {
-			possibleXcodeProject = path
+		if unityOptions.DsymShared.ProjectRoot == "" {
+			if utils.IsDir(path) {
+				unityOptions.DsymShared.ProjectRoot = path
+			} else {
+				unityOptions.DsymShared.ProjectRoot = filepath.Dir(path)
+			}
+		}
+
+		logger.Debug(fmt.Sprintf("Using %s as the project root", unityOptions.DsymShared.ProjectRoot))
+
+		if unityOptions.DsymShared.XcodeProject == "" {
+			if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+				possibleXcodeProject = path
+			} else {
+				possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
+			}
 		} else {
-			possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
+			possibleXcodeProject = string(unityOptions.DsymShared.XcodeProject)
 		}
 
 		if possibleXcodeProject == "" {

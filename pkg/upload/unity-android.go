@@ -46,6 +46,14 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	for _, path := range unityOptions.Path {
 		aabPath = string(unityOptions.AabPath)
 
+		if unityOptions.ProjectRoot == "" {
+			if utils.IsDir(path) {
+				unityOptions.ProjectRoot = path
+			} else {
+				unityOptions.ProjectRoot = filepath.Dir(path)
+			}
+		}
+
 		if utils.IsDir(path) {
 			buildDirectory = path
 			zipPath, _ = utils.FindLatestFileWithSuffix(path, ".symbols.zip")
