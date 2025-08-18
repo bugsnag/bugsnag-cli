@@ -2,6 +2,15 @@
 
 ## unreleased
 
+## Added
+
+- Add support for Unity iOS [#224](https://github.com/bugsnag/bugsnag-cli/pull/224)
+- Add support for Unity Line Mappings [#224](https://github.com/bugsnag/bugsnag-cli/pull/224)
+
+## Changed
+
+- Improved the fetching of build ID's and Arch from elf files [#224](https://github.com/bugsnag/bugsnag-cli/pull/224)
+
 ## Fixed
 
 - Remove the `--overwrite` option from the `dSYM` related commands as it is not used [#210](https://github.com/bugsnag/bugsnag-cli/pull/210)
