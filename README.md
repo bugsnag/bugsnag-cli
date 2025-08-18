@@ -60,7 +60,7 @@ Supported uploads with links to online docs for the file type:
 * Android (obfuscation [mapping]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-proguard/)) and [native symbol]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-ndk/)) files, from builds or [AAB]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-android-aab/)) files)
 * iOS (`.dSYM` from [builds]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-xcode-build/)) or [archives](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-xcode-archive/))
 * JavaScript source maps – for [web](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-js/) and [React Native]((https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-rn/))
-* Unity ([Android symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-unity-android/))
+* Unity ([Android symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-unity-android/) or [iOS symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-unity-ios/))
 * Dart ([stripped symbols](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-dart/))
 * Breakpad ([generated symbol files](https://docs.bugsnag.com/build-integrations/bugsnag-cli/upload-breakpad/))
 
