@@ -2,8 +2,9 @@ package unity
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"path/filepath"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // GetAndroidLineMapping locates the LineNumberMappings.json file for Android builds.
@@ -24,7 +25,7 @@ import (
 //	mappingPath - the resolved path to LineNumberMappings.json, or an empty string if not found.
 //	error       - non-nil if there was an error during backup folder resolution.
 func GetAndroidLineMapping(projectRoot string) (string, error) {
-	// Check default artifacts path
+	// Check the default artifacts path
 	defaultPath := filepath.Join(projectRoot, "Library", "Bee", "artifacts", "Android", "il2cppOutput", "cpp", "Symbols", "LineNumberMappings.json")
 	if utils.FileExists(defaultPath) {
 		return defaultPath, nil
@@ -60,18 +61,28 @@ func GetAndroidLineMapping(projectRoot string) (string, error) {
 //
 //	mappingPath - the resolved path to LineNumberMappings.json.
 //	error       - non-nil if the file cannot be found or the backup folder is missing.
-func GetIosLineMapping(projectRoot string) (string, error) {
-	// Check default artifacts path
-	defaultPath := filepath.Join("Library", "Bee", "artifacts", "iOS", "il2cppOutput", "cpp", "Symbols", "LineNumberMappings.json")
-	if utils.FileExists(defaultPath) {
-		return defaultPath, nil
+func GetIosLineMapping(path string) (string, error) {
+	var mappingPath string
+	// Check the default artifacts path
+	mappingPath = filepath.Join(path, "Library", "Bee", "artifacts", "iOS", "il2cppOutput", "cpp", "Symbols", "LineNumberMappings.json")
+	if utils.FileExists(mappingPath) {
+		return mappingPath, nil
 	}
+	fmt.Println(mappingPath)
 
 	// Try fallback: backup directory
-	backupPath := filepath.Join(projectRoot, "Il2CppOutputProject", "Source", "il2cppOutput", "Symbols", "LineNumberMappings.json")
-	if utils.FileExists(backupPath) {
-		return backupPath, nil
+	mappingPath = filepath.Join(path, "Il2CppOutputProject", "Source", "il2cppOutput", "Symbols", "LineNumberMappings.json")
+	if utils.FileExists(mappingPath) {
+		return mappingPath, nil
 	}
+	fmt.Println(mappingPath)
 
-	return "", fmt.Errorf("unable to find line mapping file in your project: %s", projectRoot)
+	// Try fallback: temp directory
+	mappingPath = filepath.Join(path, "Temp", "il2cppOutput", "il2cppOutput", "Symbols", "LineNumberMappings.json")
+	if utils.FileExists(mappingPath) {
+		return mappingPath, nil
+	}
+	fmt.Println(mappingPath)
+
+	return "", fmt.Errorf("unable to find line mapping file in your project: %s", path)
 }

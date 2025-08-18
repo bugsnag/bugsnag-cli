@@ -49,37 +49,42 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 
 		logger.Debug(fmt.Sprintf("Using %s as the project root", unityOptions.DsymShared.ProjectRoot))
 
-		if unityOptions.DsymShared.XcodeProject == "" {
-			if ios.IsPathAnXcodeProjectOrWorkspace(path) {
-				possibleXcodeProject = path
+		if unityOptions.DsymPath == "" {
+			if unityOptions.DsymShared.XcodeProject == "" {
+				if ios.IsPathAnXcodeProjectOrWorkspace(path) {
+					possibleXcodeProject = path
+				} else {
+					possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
+				}
 			} else {
-				possibleXcodeProject = ios.FindXcodeProjOrWorkspace(path)
+				possibleXcodeProject = ios.FindXcodeProjOrWorkspace(string(unityOptions.DsymShared.XcodeProject))
 			}
+
+			if possibleXcodeProject == "" {
+				possibleDsymPath = path
+			} else {
+				globalOptions.Upload.XcodeArchive = options.XcodeArchive{
+					Path:   utils.Paths{possibleXcodeProject},
+					Shared: unityOptions.DsymShared,
+				}
+
+				xcarchivePath, err := ios.FindXcarchivePath(globalOptions, logger)
+				if err != nil {
+					return fmt.Errorf("failed to find Xcode archive path: %w", err)
+				}
+				if xcarchivePath == "" {
+					return fmt.Errorf("no Xcode archive found in specified paths")
+				}
+
+				logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
+				possibleDsymPath = xcarchivePath
+			}
+
+			logger.Debug(fmt.Sprintf("Searching for dSYMs in: %s", possibleDsymPath))
 		} else {
-			possibleXcodeProject = string(unityOptions.DsymShared.XcodeProject)
+			possibleDsymPath = string(unityOptions.DsymPath)
+			logger.Debug(fmt.Sprintf("Using dSYM path: %s", possibleDsymPath))
 		}
-
-		if possibleXcodeProject == "" {
-			possibleDsymPath = path
-		} else {
-			globalOptions.Upload.XcodeArchive = options.XcodeArchive{
-				Path:   utils.Paths{possibleXcodeProject},
-				Shared: unityOptions.DsymShared,
-			}
-
-			xcarchivePath, err := ios.FindXcarchivePath(globalOptions, logger)
-			if err != nil {
-				return fmt.Errorf("failed to find Xcode archive path: %w", err)
-			}
-			if xcarchivePath == "" {
-				return fmt.Errorf("no Xcode archive found in specified paths")
-			}
-
-			logger.Info(fmt.Sprintf("Found Xcode archive at %s", xcarchivePath))
-			possibleDsymPath = xcarchivePath
-		}
-
-		logger.Debug(fmt.Sprintf("Searching for dSYMs in: %s", possibleDsymPath))
 
 		dsyms, tempDir, err = ios.FindDsymsInPath(
 			possibleDsymPath,

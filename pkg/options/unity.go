@@ -29,6 +29,7 @@ type UnityIos struct {
 	BundleVersion string      `help:"The bundle version of this build of the application (Apple platforms only)"`
 	VersionName   string      `help:"The version of the application"`
 	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
+	DsymPath      utils.Path  `help:"The path to the dSYM file to upload"`
 
 	UnityShared UnityLineMapping `embed:""`
 	DsymShared  DsymShared       `embed:""`
