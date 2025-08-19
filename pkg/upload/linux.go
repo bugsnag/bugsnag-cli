@@ -6,51 +6,31 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/linux"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
-// buildVegaVariantFolders scans a directory and returns a list of folders
-// matching the pattern private/vega/{arch}/{variant}/lib/{arch}/.
-func buildVegaVariantFolders(baseDir, variant string) ([]string, error) {
+// buildArchVariantFolders scans a build directory and returns subfolders that
+// match the naming convention "arch-variant" (e.g. "arm64-debug", "x86-release").
+//
+// Parameters:
+//   - baseDir: The root directory containing arch-variant subfolders.
+//   - variant: The variant string to match (e.g. "debug" or "release").
+//
+// Returns:
+//   - []string: A list of matching directories pointing to their "debug" subfolder.
+//   - error: non-nil if the baseDir cannot be read.
+func buildArchVariantFolders(baseDir, variant string) ([]string, error) {
 	var matches []string
 
-	vegaPath := filepath.Join(baseDir, "private", "vega")
-
-	entries, err := os.ReadDir(vegaPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read vega directory: %w", err)
-	}
-
-	// First level: arch
-	for _, archEntry := range entries {
-		if !archEntry.IsDir() {
-			continue
-		}
-		arch := archEntry.Name()
-		variantPath := filepath.Join(vegaPath, arch, variant, "lib", arch)
-
-		if utils.IsDir(variantPath) {
-			matches = append(matches, variantPath)
-		}
-	}
-
-	return matches, nil
-}
-
-// buildArchVariantFolders scans a directory and returns a list of subfolders
-// that match the format "arch-variant" (e.g. "arm64-debug", "x86-release").
-func buildArchVariantFolders(baseDir string, variant string) ([]string, error) {
-	var matches []string
-
-	// Regex: arch-variant (letters, numbers, underscores, dashes allowed), with specific variant
 	re := regexp.MustCompile(`^[a-zA-Z0-9_]+-` + regexp.QuoteMeta(variant) + `$`)
 
 	entries, err := os.ReadDir(baseDir)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("reading directory %q: %w", baseDir, err)
 	}
 
 	for _, entry := range entries {
@@ -62,116 +42,144 @@ func buildArchVariantFolders(baseDir string, variant string) ([]string, error) {
 	return matches, nil
 }
 
+// uploadSymbolFile uploads a single Linux symbol file to the Bugsnag symbol server.
+//
+// Parameters:
+//   - symbolFile: The path to the symbol file to upload.
+//   - linuxOpts: Linux-specific upload options including appId, versionName, etc.
+//   - opts: Global CLI options including an API key and overwrite behavior.
+//   - logger: Logger for structured output.
+//
+// Returns:
+//   - error: non-nil if the upload fails due to request or file issues.
+func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts options.CLI, logger log.Logger) error {
+	uploadOpts := map[string]string{}
+
+	if linuxOpts.ApplicationId != "" {
+		uploadOpts["appId"] = linuxOpts.ApplicationId
+	}
+	if linuxOpts.VersionName != "" {
+		uploadOpts["versionName"] = linuxOpts.VersionName
+	}
+	if linuxOpts.ProjectRoot != "" {
+		uploadOpts["projectRoot"] = linuxOpts.ProjectRoot
+	}
+	if base := filepath.Base(symbolFile); base != "" {
+		uploadOpts["sharedObjectName"] = base
+	}
+	if opts.Upload.Overwrite {
+		uploadOpts["overwrite"] = "true"
+	}
+
+	fileField := map[string]server.FileField{
+		"soFile": server.LocalFile(symbolFile),
+	}
+
+	if err := server.ProcessFileRequest(
+		opts.ApiKey,
+		"/linux",
+		uploadOpts,
+		fileField,
+		filepath.Base(symbolFile),
+		opts,
+		logger,
+	); err != nil {
+		return fmt.Errorf("uploading Linux symbol file %q: %w", symbolFile, err)
+	}
+	return nil
+}
+
+// ProcessLinux locates, validates, and uploads Linux symbol files.
+//
+// Parameters:
+//   - opts: Global CLI options including upload configuration and API key.
+//   - logger: Logger for structured logging and debug output.
+//
+// Behavior:
+//   - Scans provided paths for build folders or symbol files.
+//   - Resolves arch-variant directories when a build folder is found.
+//   - Reads metadata (appId, versionName) from manifest.toml if missing.
+//   - Uploads all recognized symbol files to the Bugsnag /linux endpoint.
+//
+// Returns:
+//   - error: non-nil if scanning, manifest reading, or upload fails.
 func ProcessLinux(opts options.CLI, logger log.Logger) error {
-	var (
-		err              error
-		symbolFiles      []string
-		symbolFolder     []string
-		vegaSymbolFolder []string
-		vegaSymbolFiles  []string
-	)
+	linuxOpts := opts.Upload.Linux
 
-	linuxOptions := opts.Upload.Linux
+	for _, path := range linuxOpts.Path {
+		var (
+			searchDir   string
+			symbolDirs  []string
+			symbolFiles []string
+		)
 
-	for _, path := range linuxOptions.Path {
-		// Locate the build folder
-		if linuxOptions.BuildFolder == "" {
-			possibleBuildFolder := filepath.Join(path, "build")
-			if utils.IsDir(possibleBuildFolder) {
-				linuxOptions.BuildFolder = utils.Path(possibleBuildFolder)
-			} else {
-				return fmt.Errorf("unable to find the build directory in %s", path)
+		if utils.IsDir(path) {
+			// Determine the correct folder to search
+			switch {
+			case linuxOpts.BuildFolder != "":
+				searchDir = string(linuxOpts.BuildFolder)
+			case utils.IsDir(filepath.Join(path, "build")):
+				searchDir = filepath.Join(path, "build")
+			case filepath.Base(path) == "build":
+				searchDir = path
+			default:
+				// Directly treat as a folder containing symbol files
+				symbolDirs = []string{path}
+			}
+
+			// If a build directory is set, scan arch-variant folders
+			if searchDir != "" {
+				logger.Info(fmt.Sprintf("Scanning %s for symbol files (variant: %s)", searchDir, linuxOpts.Variant))
+				var err error
+				symbolDirs, err = buildArchVariantFolders(searchDir, linuxOpts.Variant)
+				if err != nil {
+					return fmt.Errorf("scanning arch-variant folders in %q: %w", searchDir, err)
+				}
+			}
+
+			var err error
+			symbolFiles, err = utils.BuildFileList(symbolDirs)
+			if err != nil {
+				return fmt.Errorf("building symbol file list from %v: %w", symbolDirs, err)
+			}
+		} else {
+			// Single file provided
+			ok, err := utils.IsSymbolFile(path)
+			if err != nil {
+				return fmt.Errorf("checking if %q is a symbol file: %w", path, err)
+			}
+			if ok {
+				symbolFiles, err = utils.BuildFileList([]string{path})
+				if err != nil {
+					return fmt.Errorf("building symbol file list from single file %q: %w", path, err)
+				}
 			}
 		}
 
-		logger.Info(fmt.Sprintf("Searching for symbol files in %s for variant %s", linuxOptions.BuildFolder, linuxOptions.Variant))
+		logger.Info(fmt.Sprintf("Found %d symbol files to upload", len(symbolFiles)))
 
-		//	Locate symbol files in build folder
-		//	Paths to check
-		//	- build/{arch}-{variant}/debug/*.so.debug
-		//	- build/private/vega/{arch}/{variant}/lib/{arch}/*.so
-
-		//	Build a list of folders for symbolFiles
-		symbolFolder, err = buildArchVariantFolders(string(linuxOptions.BuildFolder), linuxOptions.Variant)
-
-		if err != nil {
-			return err
+		// If metadata missing, attempt to read from manifest.toml
+		if linuxOpts.ApplicationId == "" || linuxOpts.VersionName == "" {
+			manifestPath := filepath.Join(path, "manifest.toml")
+			logger.Debug(fmt.Sprintf("Attempting to read metadata from %s", manifestPath))
+			version, appID, err := linux.ReadManifest(manifestPath)
+			if err != nil {
+				logger.Warn(fmt.Sprintf("Unable to read manifest.toml at %s: %s", manifestPath, err.Error()))
+			} else {
+				linuxOpts.VersionName = version
+				linuxOpts.ApplicationId = appID
+			}
 		}
 
-		symbolFiles, err = utils.BuildFileList(symbolFolder)
-
-		if err != nil {
-			return err
+		if linuxOpts.ProjectRoot != "" {
+			logger.Debug(fmt.Sprintf("Using %s as project root", linuxOpts.ProjectRoot))
 		}
-
-		logger.Info(fmt.Sprintf("Found %d symbol files", len(symbolFiles)))
-
-		logger.Info(fmt.Sprintf("Searching for vega symbol files in %s for variant %s", linuxOptions.BuildFolder, utils.Capitalize(linuxOptions.Variant)))
 
 		for _, file := range symbolFiles {
-			logger.Info(fmt.Sprintf("Uploading %s", file))
+			if err := uploadSymbolFile(file, linuxOpts, opts, logger); err != nil {
+				return err
+			}
 		}
-
-		vegaSymbolFolder, err = buildVegaVariantFolders(string(linuxOptions.BuildFolder), utils.Capitalize(linuxOptions.Variant))
-
-		if err != nil {
-			return err
-		}
-
-		vegaSymbolFiles, err = utils.BuildFileList(vegaSymbolFolder)
-
-		logger.Info(fmt.Sprintf("Found %d vega symbol files", len(vegaSymbolFiles)))
-
-		for _, file := range vegaSymbolFiles {
-			logger.Info(fmt.Sprintf("Uploading %s", file))
-		}
-
-		logger.Info("Building Upload Options")
-
-		for _, symbolFile := range symbolFiles {
-			uploadOpts := map[string]string{}
-
-			// Can be gotten from the manifest.toml file
-			if linuxOptions.ApplicationId != "" {
-				uploadOpts["appId"] = linuxOptions.ApplicationId
-			}
-			// Can be gotten from the manifest.toml file
-			if linuxOptions.VersionCode != "" {
-				uploadOpts["versionCode"] = linuxOptions.VersionCode
-			}
-			// Can be gotten from the manifest.toml file
-			if linuxOptions.VersionName != "" {
-				uploadOpts["versionName"] = linuxOptions.VersionName
-			}
-			if linuxOptions.ProjectRoot != "" {
-				uploadOpts["projectRoot"] = linuxOptions.ProjectRoot
-			}
-			if base := filepath.Base(symbolFile); base != "" {
-				uploadOpts["sharedObjectName"] = base
-			}
-			if opts.Upload.Overwrite {
-				uploadOpts["overwrite"] = "true"
-			}
-
-			fileField := map[string]server.FileField{
-				"soFile": server.LocalFile(symbolFile),
-			}
-
-			err := server.ProcessFileRequest(
-				opts.ApiKey,
-				"/linux",
-				uploadOpts,
-				fileField,
-				filepath.Base(symbolFile),
-				opts,
-				logger,
-			)
-			if err != nil {
-				return fmt.Errorf("failed to upload NDK symbol for %s: %w", symbolFile, err)
-			}
-
-		}
-
 	}
 
 	return nil
