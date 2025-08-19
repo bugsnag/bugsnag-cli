@@ -1,9 +1,10 @@
 package endpoints
 
 import (
-	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"strings"
 	"testing"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
@@ -119,6 +120,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
+					Linux              options.LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
 				}(struct {
 					Overwrite          bool
 					Retries            int
@@ -138,6 +140,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeIos     options.ReactNativeIos
 					UnityAndroid       options.UnityAndroid
 					Breakpad           options.Breakpad
+					Linux              options.LinuxOptions
 				}{
 					UploadAPIRootUrl: "https://custom.bugsnag.com",
 				}),
@@ -171,6 +174,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
 					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
+					Linux              options.LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
 				}(struct {
 					Overwrite          bool
 					Retries            int
@@ -190,6 +194,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					ReactNativeIos     options.ReactNativeIos
 					UnityAndroid       options.UnityAndroid
 					Breakpad           options.Breakpad
+					Linux              options.LinuxOptions
 				}{
 					UploadAPIRootUrl: "http://%",
 				}),
