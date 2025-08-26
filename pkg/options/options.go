@@ -164,36 +164,37 @@ type Breakpad struct {
 	VersionName     string      `help:"The version of the application"`
 }
 
+type Upload struct {
+	// shared options
+	Overwrite        bool   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
+	Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
+	Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
+	UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
+
+	// required options
+	All                DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+	AndroidAab         AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+	AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
+	AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
+	DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+	XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
+	Dsym               Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
+	XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
+	Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
+	ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
+	ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+	ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
+	UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+	Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
+	Linux              LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
+}
+
 // Unique CLI options
 type CLI struct {
 	Globals
-
 	CreateAndroidBuildId CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
 	CreateBuild          CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
-	Upload               struct {
-		// shared options
-		Overwrite        bool   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
-		Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
-		Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
-		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
-
-		// required options
-		All                DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-		AndroidAab         AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-		AndroidNdk         AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
-		AndroidProguard    AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
-		DartSymbol         DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-		XcodeBuild         XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-		Dsym               Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-		XcodeArchive       XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
-		Js                 Js                     `cmd:"" help:"Upload source maps for JavaScript"`
-		ReactNative        ReactNative            `cmd:"" help:"Upload source maps for React Native"`
-		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
-		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
-		Linux              LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
-	} `cmd:"" help:"Upload symbol/mapping files"`
+	Upload               Upload               `cmd:"" help:"Upload symbol/mapping files"`
 }
 
 type CreateAndroidBuildId struct {
