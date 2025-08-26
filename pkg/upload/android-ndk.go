@@ -229,6 +229,7 @@ func ProcessAndroidNDK(opts options.CLI, logger log.Logger) error {
 			ndkOpts.VersionCode,
 			ndkOpts.ProjectRoot,
 			opts,
+			ndkOpts.Overwrite,
 			logger,
 		); err != nil {
 			return err

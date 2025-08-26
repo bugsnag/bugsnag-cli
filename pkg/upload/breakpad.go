@@ -66,7 +66,7 @@ func ProcessBreakpad(globalOptions options.CLI, logger log.Logger) error {
 		// Build query parameters for the request
 		queryParams := fmt.Sprintf("?api_key=%s&overwrite=%t&project_root=%s",
 			strings.ReplaceAll(apiKey, " ", "%20"),
-			globalOptions.Upload.Overwrite,
+			breakpadOptions.Overwrite,
 			strings.ReplaceAll(projectRoot, " ", "%20"),
 		)
 

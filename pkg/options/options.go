@@ -17,6 +17,7 @@ type Globals struct {
 type DiscoverAndUploadAny struct {
 	Path          utils.Paths       `arg:"" name:"path" help:"(required) Path to directory or file to upload" type:"path"`
 	UploadOptions map[string]string `help:"Additional arguments to pass to the upload request" mapsep:","`
+	Overwrite     bool              `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type AndroidAabMapping struct {
@@ -27,6 +28,7 @@ type AndroidAabMapping struct {
 	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 	VersionCode   string      `help:"The version code of this build of the application"`
 	VersionName   string      `help:"The version of the application"`
+	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type AndroidNdkMapping struct {
@@ -38,6 +40,7 @@ type AndroidNdkMapping struct {
 	Variant        string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
 	VersionCode    string      `help:"The version code of this build of the application"`
 	VersionName    string      `help:"The version of the application"`
+	Overwrite      bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type AndroidProguardMapping struct {
@@ -50,6 +53,7 @@ type AndroidProguardMapping struct {
 	Variant       string      `help:"The build type/flavor (e.g. debug, release) used to disambiguate the between built files when searching the project directory"`
 	VersionCode   string      `help:"The version code of this build of the application"`
 	VersionName   string      `help:"The version of the application"`
+	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type DartSymbol struct {
@@ -58,6 +62,7 @@ type DartSymbol struct {
 	IosAppPath    utils.Path  `help:"The path to the iOS application binary, used to determine a unique build ID." type:"path"`
 	VersionName   string      `help:"The version of the application." xor:"app-version,version-name"`
 	VersionCode   string      `help:"The version code of this build of the application (Android only)" xor:"app-version-code,version-code"`
+	Overwrite     bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type Dsym struct {
@@ -94,6 +99,7 @@ type Js struct {
 	SourceMap    string      `help:"Path to the source map file. This usually has the .min.js extension." type:"path"`
 	VersionName  string      `help:"The version of the app that the source map applies to. Defaults to the version in the package.json file (if found)."`
 	CodeBundleId string      `help:"A unique identifier for the JavaScript bundle"`
+	Overwrite    bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type ReactNative struct {
@@ -102,6 +108,7 @@ type ReactNative struct {
 	Shared          ReactNativeShared          `embed:""`
 	AndroidSpecific ReactNativeAndroidSpecific `embed:"" prefix:"android-"`
 	IosSpecific     ReactNativeIosSpecific     `embed:"" prefix:"ios-"`
+	Overwrite       bool                       `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type ReactNativeAndroidSpecific struct {
@@ -116,6 +123,7 @@ type ReactNativeAndroid struct {
 
 	ReactNative ReactNativeShared          `embed:""`
 	Android     ReactNativeAndroidSpecific `embed:""`
+	Overwrite   bool                       `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 type ReactNativeShared struct {
@@ -140,18 +148,9 @@ type ReactNativeIos struct {
 
 	ReactNative ReactNativeShared      `embed:""`
 	Ios         ReactNativeIosSpecific `embed:""`
+	Overwrite   bool                   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
-type UnityAndroid struct {
-	Path          utils.Paths `arg:"" name:"path" help:"The path to the Unity symbols (.zip) file to upload (or directory containing it)" type:"path"`
-	AabPath       utils.Path  `help:"The path to an AAB file to upload alongside the Unity symbols"`
-	ApplicationId string      `help:"A unique application ID, usually the package name, of the application"`
-	BuildUuid     string      `help:"A unique identifier for this build of the application" xor:"no-build-uuid,build-uuid"`
-	NoBuildUuid   bool        `help:"Prevents the automatically generated build UUID being uploaded with the build" xor:"build-uuid,no-build-uuid"`
-	ProjectRoot   string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
-	VersionCode   string      `help:"The version code of this build of the application"`
-	VersionName   string      `help:"The version of the application"`
-}
 type Breakpad struct {
 	Path            utils.Paths `arg:"" name:"path" help:"The path to the symbol files (.sym) to upload (or directory containing them)" type:"path"`
 	CpuArch         string      `help:"The CPU architecture that the module was built for"`
@@ -162,6 +161,7 @@ type Breakpad struct {
 	ProjectRoot     string      `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 	OsName          string      `help:"The name of the operating system that the module was built for"`
 	VersionName     string      `help:"The version of the application"`
+	Overwrite       bool        `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
 // Unique CLI options
@@ -172,7 +172,6 @@ type CLI struct {
 	CreateBuild          CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	Upload               struct {
 		// shared options
-		Overwrite        bool   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 		Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
 		Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
 		UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
@@ -191,6 +190,7 @@ type CLI struct {
 		ReactNativeAndroid ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
 		ReactNativeIos     ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
 		UnityAndroid       UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+		UnityIos           UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
 		Breakpad           Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
 	} `cmd:"" help:"Upload symbol/mapping files"`
 }

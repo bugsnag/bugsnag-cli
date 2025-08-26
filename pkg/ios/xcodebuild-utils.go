@@ -241,13 +241,21 @@ func isXcodebuildInstalled() bool {
 	return utils.LocationOf(utils.XCODEBUILD) != ""
 }
 
-// FindXcodeProjOrWorkspace searches for a .xcodeproj or .xcworkspace file in the specified directory.
+// FindXcodeProjOrWorkspace searches the specified directory and its immediate subdirectories
+// for an Xcode project (.xcodeproj) or workspace (.xcworkspace) directory. If both are found,
+// a workspace is preferred over a project.
+//
+// Search order and behavior:
+// 1. In the specified directory, looks for .xcworkspace or .xcodeproj files.
+// 2. If none are found, searches one level deeper in subdirectories.
+// 3. Returns the path to the directory containing the preferred file.
+// 4. If neither is found, returns an empty string.
 //
 // Parameters:
-// - path (string): The directory to search.
+// - path (string): The root directory to search.
 //
 // Returns:
-// - string: The path to the .xcodeproj or .xcworkspace file, preferring .xcworkspace if both are found.
+// - string: Path to the directory containing a .xcworkspace or .xcodeproj, or an empty string if not found.
 func FindXcodeProjOrWorkspace(path string) string {
 	var xcodeProjPath, xcodeWorkspacePath string
 
@@ -256,7 +264,11 @@ func FindXcodeProjOrWorkspace(path string) string {
 		return ""
 	}
 
+	// First, check in the root directory
 	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
 		if strings.HasSuffix(file.Name(), ".xcodeproj") {
 			xcodeProjPath = filepath.Join(path, file.Name())
 		} else if strings.HasSuffix(file.Name(), ".xcworkspace") {
@@ -265,7 +277,38 @@ func FindXcodeProjOrWorkspace(path string) string {
 	}
 
 	if xcodeWorkspacePath != "" {
-		return xcodeWorkspacePath
+		return path
 	}
+	if xcodeProjPath != "" {
+		return path
+	}
+
+	// Now, search one level down
+	for _, file := range files {
+		if !file.IsDir() {
+			continue
+		}
+
+		subdir := filepath.Join(path, file.Name())
+		subfiles, err := os.ReadDir(subdir)
+		if err != nil {
+			continue
+		}
+
+		foundXcodeProj := false
+
+		for _, subfile := range subfiles {
+			if strings.HasSuffix(subfile.Name(), ".xcworkspace") {
+				return subdir // Prefer .xcworkspace and return its containing folder
+			} else if strings.HasSuffix(subfile.Name(), ".xcodeproj") {
+				foundXcodeProj = true
+			}
+		}
+
+		if foundXcodeProj && xcodeProjPath == "" {
+			xcodeProjPath = subdir // Save this in case no workspace is found
+		}
+	}
+
 	return xcodeProjPath
 }
