@@ -109,7 +109,6 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 				if err != nil {
 					return fmt.Errorf("getting build ID for %s: %w", file, err)
 				}
-				logger.Info(fmt.Sprintf("Found symbol file: %s", file))
 				fileBuildIDMap[file] = buildID
 			} else {
 				logger.Debug(fmt.Sprintf("Skipping non-symbol file: %s", file))
@@ -122,9 +121,11 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 			if seenBuildIDs[buildID] {
 				logger.Debug(fmt.Sprintf("Duplicate build ID %s detected, skipping %s", buildID, file))
 				delete(fileBuildIDMap, file)
+				continue
 			} else {
 				seenBuildIDs[buildID] = true
 			}
+			logger.Info(fmt.Sprintf("Found symbol file: %s", file))
 		}
 
 		if linuxOpts.ProjectRoot != "" {
