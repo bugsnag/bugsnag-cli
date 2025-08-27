@@ -21,10 +21,7 @@ import (
 //
 // Returns:
 //   - A map[string]string of form values to be sent in the upload request.
-func buildUploadOptions(
-	appID, versionCode, versionName, projectRoot, fileName string,
-	opts options.CLI,
-) map[string]string {
+func buildUploadOptions(appID, versionCode, versionName, projectRoot, fileName string, overwrite bool) map[string]string {
 	uploadOpts := map[string]string{}
 
 	if appID != "" {
@@ -42,7 +39,7 @@ func buildUploadOptions(
 	if base := filepath.Base(fileName); base != "" {
 		uploadOpts["sharedObjectName"] = base
 	}
-	if opts.Upload.Overwrite {
+	if overwrite {
 		uploadOpts["overwrite"] = "true"
 	}
 
@@ -75,6 +72,7 @@ func UploadAndroidNdk(
 	versionCode string,
 	projectRoot string,
 	opts options.CLI,
+	overwrite bool,
 	logger log.Logger,
 ) error {
 	if len(symbolFiles) == 0 {
@@ -87,7 +85,7 @@ func UploadAndroidNdk(
 			"soFile": server.LocalFile(symbolPath),
 		}
 
-		params := buildUploadOptions(appID, versionCode, versionName, projectRoot, originalFile, opts)
+		params := buildUploadOptions(appID, versionCode, versionName, projectRoot, originalFile, overwrite)
 
 		err := server.ProcessFileRequest(
 			apiKey,

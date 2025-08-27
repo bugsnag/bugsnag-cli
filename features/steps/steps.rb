@@ -82,6 +82,20 @@ Then('the sourcemap is valid for the dSYM Build API') do
   )
 end
 
+Then('the sourcemap is valid for the Unity Line Mapping API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "mappingFile" is not null
+  )
+end
+
+Then('the sourcemap is valid for the Android Build API') do
+  steps %(
+    And the sourcemap payload field "apiKey" equals "#{$api_key}"
+    And the sourcemap payload field "appId" is not null
+  )
+end
+
 Then('the build is valid for the Builds API') do
   steps %(
     And the build payload field "apiKey" equals "#{$api_key}"
@@ -215,7 +229,7 @@ Then('the {string} directory should contain {string}') do |directory, package|
   Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
 end
 
-Given('I build the Unity Android example project') do
+Given('I build the Unity project for Android') do
   @fixture_dir = "#{base_dir}/platforms-examples/Unity"
   Dir.chdir(@fixture_dir)
   @output = `./build_android.sh aab`
@@ -432,4 +446,11 @@ And(/^the builds payload field "([^"]*)" hash equals \{"([^"]*)"=>"([^"]*)", "([
   expected_hash = { arg2 => arg3, arg4 => arg5 }
 
   Maze.check.equal(builds[arg1], expected_hash, "Expected builds payload field '#{arg1}' to equal #{expected_hash}, but got #{builds[arg1]}")
+end
+
+Given(/^I build the Unity project for iOS$/) do
+  @fixture_dir = "#{base_dir}/platforms-examples/Unity"
+  Dir.chdir(@fixture_dir)
+  @output = `./build_ios.sh`
+  Dir.chdir(base_dir)
 end
