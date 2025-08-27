@@ -22,40 +22,31 @@ import (
 // Returns:
 //   - error: non-nil if the upload fails due to request or file issues.
 func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts options.CLI, logger log.Logger) error {
-	logger.Info(fmt.Sprintf("Preparing to upload symbol file: %s", symbolFile))
-
 	uploadOpts := map[string]string{}
 
 	if linuxOpts.ApplicationId != "" {
 		uploadOpts["appId"] = linuxOpts.ApplicationId
-		logger.Debug(fmt.Sprintf("Using ApplicationId: %s", linuxOpts.ApplicationId))
 	}
 	if linuxOpts.VersionName != "" {
 		uploadOpts["versionName"] = linuxOpts.VersionName
-		logger.Debug(fmt.Sprintf("Using VersionName: %s", linuxOpts.VersionName))
 	}
 	if linuxOpts.VersionCode != "" {
 		uploadOpts["versionCode"] = linuxOpts.VersionCode
-		logger.Debug(fmt.Sprintf("Using VersionCode: %s", linuxOpts.VersionCode))
 	}
 	if linuxOpts.ProjectRoot != "" {
 		uploadOpts["projectRoot"] = linuxOpts.ProjectRoot
-		logger.Debug(fmt.Sprintf("Using ProjectRoot: %s", linuxOpts.ProjectRoot))
 	}
 	if base := filepath.Base(symbolFile); base != "" {
 		uploadOpts["sharedObjectName"] = base
-		logger.Debug(fmt.Sprintf("Shared object name: %s", base))
 	}
 	if linuxOpts.Overwrite {
 		uploadOpts["overwrite"] = "true"
-		logger.Debug("Overwrite option enabled")
 	}
 
 	fileField := map[string]server.FileField{
 		"soFile": server.LocalFile(symbolFile),
 	}
 
-	logger.Info(fmt.Sprintf("Uploading %s to Bugsnag...", filepath.Base(symbolFile)))
 	if err := server.ProcessFileRequest(
 		opts.ApiKey,
 		"/linux",
@@ -67,8 +58,6 @@ func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts op
 	); err != nil {
 		return fmt.Errorf("uploading Linux symbol file %q: %w", symbolFile, err)
 	}
-
-	logger.Info(fmt.Sprintf("Successfully uploaded symbol file: %s", symbolFile))
 	return nil
 }
 
@@ -120,7 +109,7 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 				if err != nil {
 					return fmt.Errorf("getting build ID for %s: %w", file, err)
 				}
-				logger.Debug(fmt.Sprintf("Valid symbol file: %s (BuildID: %s)", file, buildID))
+				logger.Info(fmt.Sprintf("Found symbol file: %s", file))
 				fileBuildIDMap[file] = buildID
 			} else {
 				logger.Debug(fmt.Sprintf("Skipping non-symbol file: %s", file))
