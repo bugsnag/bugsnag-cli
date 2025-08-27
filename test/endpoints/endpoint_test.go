@@ -1,10 +1,10 @@
 package endpoints
 
 import (
-	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"strings"
 	"testing"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
 
@@ -100,47 +100,9 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 				Globals: options.Globals{
 					Port: 9999,
 				},
-				Upload: struct {
-					Retries            int                            `help:"The number of retry attempts before failing an upload request" default:"0"`
-					Timeout            int                            `help:"The number of seconds to wait before failing an upload request" default:"300"`
-					UploadAPIRootUrl   string                         `help:"The upload server hostname, optionally containing port number"`
-					All                options.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-					AndroidAab         options.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-					AndroidNdk         options.AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
-					AndroidProguard    options.AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
-					DartSymbol         options.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-					XcodeBuild         options.XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-					Dsym               options.Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-					XcodeArchive       options.XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
-					Js                 options.Js                     `cmd:"" help:"Upload source maps for JavaScript"`
-					ReactNative        options.ReactNative            `cmd:"" help:"Upload source maps for React Native"`
-					ReactNativeAndroid options.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
-					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-					UnityIos           options.UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
-					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
-				}(struct {
-					Retries            int
-					Timeout            int
-					UploadAPIRootUrl   string
-					All                options.DiscoverAndUploadAny
-					AndroidAab         options.AndroidAabMapping
-					AndroidNdk         options.AndroidNdkMapping
-					AndroidProguard    options.AndroidProguardMapping
-					DartSymbol         options.DartSymbol
-					XcodeBuild         options.XcodeBuild
-					Dsym               options.Dsym
-					XcodeArchive       options.XcodeArchive
-					Js                 options.Js
-					ReactNative        options.ReactNative
-					ReactNativeAndroid options.ReactNativeAndroid
-					ReactNativeIos     options.ReactNativeIos
-					UnityAndroid       options.UnityAndroid
-					UnityIos           options.UnityIos
-					Breakpad           options.Breakpad
-				}{
+				Upload: options.Upload{
 					UploadAPIRootUrl: "https://custom.bugsnag.com",
-				}),
+				},
 			},
 			expectPrefix: "https://custom.bugsnag.com:9999/symbols",
 		},
@@ -152,47 +114,9 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 				Globals: options.Globals{
 					Port: 8080,
 				},
-				Upload: struct {
-					Retries            int                            `help:"The number of retry attempts before failing an upload request" default:"0"`
-					Timeout            int                            `help:"The number of seconds to wait before failing an upload request" default:"300"`
-					UploadAPIRootUrl   string                         `help:"The upload server hostname, optionally containing port number"`
-					All                options.DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-					AndroidAab         options.AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-					AndroidNdk         options.AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
-					AndroidProguard    options.AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
-					DartSymbol         options.DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-					XcodeBuild         options.XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-					Dsym               options.Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-					XcodeArchive       options.XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
-					Js                 options.Js                     `cmd:"" help:"Upload source maps for JavaScript"`
-					ReactNative        options.ReactNative            `cmd:"" help:"Upload source maps for React Native"`
-					ReactNativeAndroid options.ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-					ReactNativeIos     options.ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
-					UnityAndroid       options.UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-					UnityIos           options.UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
-					Breakpad           options.Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
-				}(struct {
-					Retries            int
-					Timeout            int
-					UploadAPIRootUrl   string
-					All                options.DiscoverAndUploadAny
-					AndroidAab         options.AndroidAabMapping
-					AndroidNdk         options.AndroidNdkMapping
-					AndroidProguard    options.AndroidProguardMapping
-					DartSymbol         options.DartSymbol
-					XcodeBuild         options.XcodeBuild
-					Dsym               options.Dsym
-					XcodeArchive       options.XcodeArchive
-					Js                 options.Js
-					ReactNative        options.ReactNative
-					ReactNativeAndroid options.ReactNativeAndroid
-					ReactNativeIos     options.ReactNativeIos
-					UnityAndroid       options.UnityAndroid
-					UnityIos           options.UnityIos
-					Breakpad           options.Breakpad
-				}{
-					UploadAPIRootUrl: "http://%",
-				}),
+				Upload: options.Upload{
+					UploadAPIRootUrl: "https://custom.bugsnag.com",
+				},
 			},
 			expectErr: true,
 		},

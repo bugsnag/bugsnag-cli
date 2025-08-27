@@ -181,6 +181,17 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload linux", "upload linux <path>":
+		if commands.ApiKey == "" {
+			logger.Fatal("missing api key, please specify using `--api-key`")
+		}
+
+		err := upload.ProcessLinux(commands, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "create-build", "create-build <path>":
 		// Create Build Info
 		CreateBuildOptions, err := build.GatherBuildInfo(commands)
