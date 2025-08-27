@@ -454,3 +454,8 @@ Given(/^I build the Unity project for iOS$/) do
   @output = `./build_ios.sh`
   Dir.chdir(base_dir)
 end
+
+And(/^I sort the sourcemaps by path$/) do
+  list = Maze::Server.list_for('sourcemap')
+  list.sort_by_request_path!
+end
