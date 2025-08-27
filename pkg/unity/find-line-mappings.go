@@ -68,21 +68,24 @@ func GetIosLineMapping(path string) (string, error) {
 	if utils.FileExists(mappingPath) {
 		return mappingPath, nil
 	}
-	fmt.Println(mappingPath)
 
 	// Try fallback: backup directory
 	mappingPath = filepath.Join(path, "Il2CppOutputProject", "Source", "il2cppOutput", "Symbols", "LineNumberMappings.json")
 	if utils.FileExists(mappingPath) {
 		return mappingPath, nil
 	}
-	fmt.Println(mappingPath)
 
 	// Try fallback: temp directory
 	mappingPath = filepath.Join(path, "Temp", "il2cppOutput", "il2cppOutput", "Symbols", "LineNumberMappings.json")
 	if utils.FileExists(mappingPath) {
 		return mappingPath, nil
 	}
-	fmt.Println(mappingPath)
+
+	// Unity 2021 Line Mapping Path Location
+	mappingPath = filepath.Join(path, "Library", "Il2cppBuildCache", "iOS", "il2cppOutput", "Symbols", "LineNumberMappings.json")
+	if utils.FileExists(mappingPath) {
+		return mappingPath, nil
+	}
 
 	return "", fmt.Errorf("unable to find line mapping file in your project: %s", path)
 }
