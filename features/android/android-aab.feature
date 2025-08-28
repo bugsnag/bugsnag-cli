@@ -113,7 +113,7 @@ Feature: Android AAB Integration Test
       | --api-key                       | 1234567890ABCDEF1234567890ABCDEF    |
       | features/android/fixtures/app/  |                                     |
       | --verbose                       |                                     |
-    And I wait to receive 1 sourcemaps
+    And I wait to receive 2 sourcemaps
     And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
