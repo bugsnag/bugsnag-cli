@@ -45,8 +45,6 @@ Feature: React Native iOS Integration Tests
       | --plist                                                       | features/react-native/fixtures/generated/old-arch/$RN_VERSION/reactnative.xcarchive/Products/Applications/reactnative.app/Info.plist    |
       | --xcode-project                                               | features/react-native/fixtures/generated/old-arch/$RN_VERSION/ios/reactnative.xcodeproj                                                 |
       | --scheme                                                      | reactnative                                                                                                                             |
-      | --bundle-version                                              | 2                                                                                                                                       |
-      | --version-name                                                | 2.0                                                                                                                                     |
       | features/react-native/fixtures/generated/old-arch/$RN_VERSION |                                                                                                                                         |
     And I wait to receive 1 sourcemaps
     Then the sourcemaps are valid for the API
