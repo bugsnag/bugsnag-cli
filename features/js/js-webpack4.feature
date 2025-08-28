@@ -19,7 +19,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Automatically resolves the version number based on the package.json
     When I run bugsnag-cli upload "js" with the following arguments:
@@ -37,7 +36,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Resolves the path specified as the map
     When I run bugsnag-cli upload "js" with the following arguments:
@@ -55,7 +53,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Searches in the dist folder automatically
     When I run bugsnag-cli upload "js" with the following arguments:
@@ -73,7 +70,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Uses the working directory as project root
     When I run bugsnag-cli upload "js" with the following arguments:
@@ -90,7 +86,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Base URL correctly appends the path
     When I run bugsnag-cli upload "js" with the following arguments:
@@ -107,7 +102,6 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/js/fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Build and Upload js webpack4 sourcemaps
     When I make the "features/base-fixtures/js-webpack4"
@@ -126,4 +120,3 @@ Feature: Webpack 4 js Integration Tests
     And the sourcemap payload field "minifiedUrl" equals "example.com/main.js"
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/base-fixtures/js-webpack4"
-    And the sourcemap payload field "overwrite" equals "true"

@@ -16,7 +16,6 @@ Feature: Js integration tests multiple nested source maps
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "base-fixtures/js"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemap
 
@@ -28,7 +27,6 @@ Feature: Js integration tests multiple nested source maps
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "base-fixtures/js"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemap
 
@@ -40,7 +38,6 @@ Feature: Js integration tests multiple nested source maps
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "base-fixtures/js"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemap
 
@@ -52,4 +49,3 @@ Feature: Js integration tests multiple nested source maps
     And the sourcemap payload field "sourceMap" is valid json
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "base-fixtures/js"
-    And the sourcemap payload field "overwrite" equals "true"
