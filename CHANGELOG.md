@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.3.2] - 2025-08-28
+
+### Fixed
+
+- Ensure the value passed to `--plist` for the `xcode-archive` command is correctly parsed [#231](https://github.com/bugsnag/bugsnag-cli/pull/231)
+
+### Changed
+
+- Update the processing of the plist file for the xcode and dsym commands to use the `howett.net/plist` library [#231](https://github.com/bugsnag/bugsnag-cli/pull/231)
+
 ## [3.3.1] - 2025-08-27
 
 ### Fixed
