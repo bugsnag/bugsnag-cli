@@ -54,7 +54,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -63,7 +62,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -72,7 +70,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -81,7 +78,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -90,7 +86,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
     And the sourcemap payload field "versionCode" equals "1"
     And the sourcemap payload field "versionName" equals "1.0"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -101,7 +96,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appVersionCode" equals "1"
     And the sourcemap payload field "soBuildId" is not null
     And the sourcemap payload field "appId" equals "com.bugsnag.example.unity.android"
-    And the sourcemap payload field "overwrite" equals "true"
 
   Scenario: Unity Android integration test with Unity Line Mappings passing version numbers
     Given I build the Unity project for Android
@@ -124,7 +118,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "versionCode" equals "999.99"
     And the sourcemap payload field "versionName" equals "123.456"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -133,7 +126,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "versionCode" equals "999.99"
     And the sourcemap payload field "versionName" equals "123.456"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -142,7 +134,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "versionCode" equals "999.99"
     And the sourcemap payload field "versionName" equals "123.456"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -151,7 +142,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "versionCode" equals "999.99"
     And the sourcemap payload field "versionName" equals "123.456"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -160,7 +150,6 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
     And the sourcemap payload field "versionCode" equals "999.99"
     And the sourcemap payload field "versionName" equals "123.456"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
@@ -171,5 +160,4 @@ Feature: Unity Android integration tests
     And the sourcemap payload field "appVersionCode" equals "999.99"
     And the sourcemap payload field "soBuildId" is not null
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
-    And the sourcemap payload field "overwrite" equals "true"
 
