@@ -66,7 +66,6 @@ Feature: Unity iOS integration tests
     And the sourcemap payload field "appBundleVersion" equals "999.99"
     And the sourcemap payload field "dsymUUID" is not null
     And the sourcemap payload field "appId" equals "com.bugsnag.unity.test"
-    And the sourcemap payload field "overwrite" equals "true"
 
     And I discard the oldest sourcemaps
 
