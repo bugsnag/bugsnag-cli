@@ -107,13 +107,12 @@ Feature: Android AAB Integration Test
       | versionName  | 1.0                                  |
 
   Scenario: Uploading Android AAB file when command is run from within app directory
-    When I run bugsnag-cli with upload android-aab --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/android/fixtures/app/ --verbose
     When I run bugsnag-cli upload "android-aab" with the following arguments:
       | --upload-api-root-url           | http://localhost:$MAZE_RUNNER_PORT  |
       | --api-key                       | 1234567890ABCDEF1234567890ABCDEF    |
       | features/android/fixtures/app/  |                                     |
       | --verbose                       |                                     |
-    And I wait to receive 2 sourcemaps
+    And I wait to receive 1 sourcemaps
     And "f3112c3dbdd73ae5dee677e407af196f101e97f5" should be used as "build ID"
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
