@@ -472,4 +472,5 @@ When("I run bugsnag-cli upload {string} with the following arguments:") do |comm
   full_command = "bugsnag-cli upload #{command} #{args}"
   puts "Running command: #{full_command}"
   @output = `bin/#{arch}-#{os}-#{full_command} 2>&1`
+  puts "Output: #{@output}"
 end

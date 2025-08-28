@@ -23,7 +23,7 @@ Feature: Dart Integration Tests
       | --version-name                                                  | 2.0                                                                               |
       | --bundle-version                                                | 1.0                                                                               |
       | --ios-app-path                                                  | features/dart/fixtures/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App |
-      | features/dart/fixtures/app-debug-info/app.android-arm64.symbols |                                                                                   |
+      | features/dart/fixtures/app-debug-info/app.ios-arm64.symbols |                                                                                   |
     And I wait to receive 1 sourcemaps
     Then the sourcemaps are valid for the API
     Then the sourcemaps Content-Type header is valid multipart form-data
