@@ -459,3 +459,17 @@ And(/^I sort the sourcemaps by path$/) do
   list = Maze::Server.list_for('sourcemap')
   list.sort_by_request_path!
 end
+
+When("I run bugsnag-cli upload {string} with the following arguments:") do |command, table|
+  args = table.rows_hash.map { |k, v|
+    if v.nil? || v.empty?
+      k
+    else
+      "#{k} #{v}"
+    end
+  }.join(" ")
+
+  full_command = "bugsnag-cli upload #{command} #{args}"
+  puts "Running command: #{full_command}"
+  @output = `bin/#{arch}-#{os}-#{full_command} 2>&1`
+end
