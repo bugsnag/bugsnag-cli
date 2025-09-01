@@ -8,6 +8,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // ProcessDsymUpload locates and uploads dSYM files from an Xcode archive.
@@ -49,9 +50,14 @@ func ProcessDsymUpload(xcarchivePath string, opts options.CLI, logger log.Logger
 	opts.Upload.XcodeArchive.Shared.ProjectRoot = ios.GetDefaultProjectRoot(opts.Upload.XcodeArchive.Path[0], opts.Upload.XcodeArchive.Shared.ProjectRoot)
 	logger.Info(fmt.Sprintf("Setting `--project-root`: %s", opts.Upload.XcodeArchive.Shared.ProjectRoot))
 
+	// Set the Info.plist path if not already specified
+	if opts.Upload.XcodeArchive.Shared.Plist == "" {
+		opts.Upload.XcodeArchive.Shared.Plist = utils.Path(filepath.Join(xcarchivePath, "Info.plist"))
+	}
+
 	// Process and upload the located dSYM files
 	err = ios.ProcessDsymUpload(
-		filepath.Join(xcarchivePath, "Info.plist"),
+		string(opts.Upload.XcodeArchive.Shared.Plist),
 		opts.Upload.XcodeArchive.Shared.ProjectRoot,
 		opts,
 		dwarfInfo,

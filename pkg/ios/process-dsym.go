@@ -2,12 +2,13 @@ package ios
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
-	"path/filepath"
-	"strings"
 )
 
 // ProcessDsymUpload uploads dSYM files to the specified endpoint.
@@ -23,7 +24,7 @@ import (
 //
 // Returns:
 // - An error if any part of the process fails; nil otherwise.
-func ProcessDsymUpload(plistPath, projectRoot string, options options.CLI, dwarfInfo []*DwarfInfo, logger log.Logger) error {
+func ProcessDsymUpload(plistPath string, projectRoot string, options options.CLI, dwarfInfo []*DwarfInfo, logger log.Logger) error {
 	var (
 		plistData     *PlistData
 		uploadOptions map[string]string
