@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
@@ -77,10 +76,9 @@ func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts op
 //   - error: non-nil if scanning, build ID resolution, or upload fails.
 func ProcessLinux(opts options.CLI, logger log.Logger) error {
 	linuxOpts := opts.Upload.Linux
-	fileBuildIDMap := make(map[string]string)
-	seenBuildIDs := make(map[string]bool)
 
 	var fileList []string
+	var soFileList []string
 	var err error
 
 	for _, path := range linuxOpts.Path {
@@ -105,39 +103,23 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 				continue
 			}
 			if ok {
-				buildID, err := elf.GetBuildId(file)
-				if err != nil {
-					return fmt.Errorf("getting build ID for %s: %w", file, err)
-				}
-				fileBuildIDMap[file] = buildID
+				soFileList = append(soFileList, file)
+				logger.Debug(fmt.Sprintf("Found symbol file: %s", file))
 			} else {
 				logger.Debug(fmt.Sprintf("Skipping non-symbol file: %s", file))
 			}
-		}
-
-		// Deduplicate symbol files by build ID
-		logger.Debug("Deduplicating files by Build ID...")
-		for file, buildID := range fileBuildIDMap {
-			if seenBuildIDs[buildID] {
-				logger.Debug(fmt.Sprintf("Duplicate build ID %s detected, skipping %s", buildID, file))
-				delete(fileBuildIDMap, file)
-				continue
-			} else {
-				seenBuildIDs[buildID] = true
-			}
-			logger.Info(fmt.Sprintf("Found symbol file: %s", file))
 		}
 
 		if linuxOpts.ProjectRoot != "" {
 			logger.Debug(fmt.Sprintf("Using project root: %s", linuxOpts.ProjectRoot))
 		}
 
-		if len(fileBuildIDMap) == 0 {
-			logger.Warn("No valid symbol files found to upload")
+		if len(soFileList) == 0 {
+			logger.Warn("No symbol files found to upload")
 			return nil
 		}
 
-		for file := range fileBuildIDMap {
+		for _, file := range soFileList {
 			if err := uploadSymbolFile(file, linuxOpts, opts, logger); err != nil {
 				return err
 			}
