@@ -215,7 +215,7 @@ func LocationOf(something string) string {
 }
 
 // IsSymbolFile determines whether the given file path points to a native library
-// or debug symbol file. It inspects the ELF sections for symbol or debug information.
+// or debug symbol file.
 //
 // Parameters:
 //   - path: The file system path to check.
@@ -235,22 +235,5 @@ func IsSymbolFile(path string) (bool, error) {
 	}
 	defer f.Close()
 
-	// Symbol/debug section names of interest
-	debugSections := map[string]struct{}{
-		".symtab":        {},
-		".debug":         {}, // some toolchains
-		".debug_aranges": {},
-		".debug_info":    {},
-		".debug_abbrev":  {},
-		".debug_line":    {},
-		".debug_str":     {},
-	}
-
-	for _, section := range f.Sections {
-		if _, found := debugSections[section.Name]; found || strings.HasPrefix(section.Name, ".debug") {
-			return true, nil
-		}
-	}
-
-	return false, nil
+	return true, nil
 }

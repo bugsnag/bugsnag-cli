@@ -3,6 +3,7 @@ package upload
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
@@ -28,9 +29,6 @@ func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts op
 	}
 	if linuxOpts.VersionName != "" {
 		uploadOpts["versionName"] = linuxOpts.VersionName
-	}
-	if linuxOpts.VersionCode != "" {
-		uploadOpts["versionCode"] = linuxOpts.VersionCode
 	}
 	if linuxOpts.ProjectRoot != "" {
 		uploadOpts["projectRoot"] = linuxOpts.ProjectRoot
@@ -68,7 +66,6 @@ func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts op
 //
 // Behavior:
 //   - Scans provided paths for build folders or symbol files.
-//   - Resolves duplicates by ELF build ID.
 //   - Reads metadata (appId, versionName) if provided.
 //   - Uploads all recognized symbol files to the Bugsnag /linux endpoint.
 //
@@ -82,10 +79,9 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 	var err error
 
 	for _, path := range linuxOpts.Path {
-		logger.Info(fmt.Sprintf("Scanning path: %s", path))
-
 		// Build a list of potential symbol files
 		if utils.IsDir(path) {
+			logger.Info(fmt.Sprintf("Scanning path: %s", path))
 			fileList, err = utils.BuildFileList([]string{path})
 			if err != nil {
 				return fmt.Errorf("building file list from %q: %w", path, err)
@@ -97,15 +93,20 @@ func ProcessLinux(opts options.CLI, logger log.Logger) error {
 
 		// Filter for valid ELF symbol files
 		for _, file := range fileList {
-			ok, err := utils.IsSymbolFile(file)
-			if err != nil {
-				logger.Debug(fmt.Sprintf("Skipping file %s", file))
-				continue
-			}
-			if ok {
-				soFileList = append(soFileList, file)
-				logger.Debug(fmt.Sprintf("Found symbol file: %s", file))
+			// Check for .so, .so.debug, and .debug files
+			if strings.HasSuffix(file, ".so") || strings.HasSuffix(file, ".so.debug") || strings.HasSuffix(file, ".debug") {
+				ok, err := utils.IsSymbolFile(file)
+				if err != nil {
+					return err
+				}
+				if ok {
+					soFileList = append(soFileList, file)
+					logger.Debug(fmt.Sprintf("Found symbol file: %s", file))
+				} else {
+					logger.Debug(fmt.Sprintf("%s is not a valid symbol file.", file))
+				}
 			} else {
+				// Skip files not matching the common suffixes
 				logger.Debug(fmt.Sprintf("Skipping non-symbol file: %s", file))
 			}
 		}
