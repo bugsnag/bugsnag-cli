@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 )
 
-var package_version = "3.3.2"
+var package_version = "3.4.0"
 
 func main() {
 	commands := options.CLI{}
@@ -176,6 +176,17 @@ func main() {
 		}
 
 		err := upload.ProcessBreakpad(commands, logger)
+
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "upload linux", "upload linux <path>":
+		if commands.ApiKey == "" {
+			logger.Fatal("missing api key, please specify using `--api-key`")
+		}
+
+		err := upload.ProcessLinux(commands, logger)
 
 		if err != nil {
 			logger.Fatal(err.Error())

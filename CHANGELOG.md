@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.4.0] - 2025-09-12
+
+### Added
+
+- Add support for uploading Linux C/C++ symbol files [#232](https://github.com/bugsnag/bugsnag-cli/pull/232)
+
 ## [3.3.2] - 2025-09-01
 
 ### Fixed

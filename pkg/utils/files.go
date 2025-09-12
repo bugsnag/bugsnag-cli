@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"debug/elf"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -210,4 +212,28 @@ func LocationOf(something string) string {
 	cmd := exec.Command("which", something)
 	location, _ := cmd.Output()
 	return strings.TrimSpace(string(location))
+}
+
+// IsSymbolFile determines whether the given file path points to a native library
+// or debug symbol file.
+//
+// Parameters:
+//   - path: The file system path to check.
+//
+// Returns:
+//   - bool: true if the file is recognized as a symbol/debug file, false otherwise.
+//   - error: non-nil only if the ELF file cannot be read due to an I/O error.
+//     If the file is not an ELF, it returns (false, nil).
+func IsSymbolFile(path string) (bool, error) {
+	f, err := elf.Open(path)
+	if err != nil {
+		// Not a valid ELF file: treat as a non-symbol file, not as an error
+		if errors.Is(err, elf.ErrNoSymbols) || strings.Contains(err.Error(), "bad magic number") {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to open ELF file %q: %w", path, err)
+	}
+	defer f.Close()
+
+	return true, nil
 }
