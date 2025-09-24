@@ -111,7 +111,7 @@ steps:
       - label: ":video_game: Unity Android Integration Tests"
         depends_on: build
         env:
-          UNITY_VERSION: 6000.0.49f1
+          UNITY_VERSION: 6000.2.2f1
         agents:
           queue: macos-15-isolated
         commands:
@@ -128,7 +128,7 @@ steps:
       - label: ":video_game: Unity iOS Integration Tests"
         depends_on: build
         env:
-          UNITY_VERSION: 6000.0.49f1
+          UNITY_VERSION: 6000.2.2f1
         agents:
           queue: macos-15-isolated
         commands:
