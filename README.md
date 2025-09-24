@@ -41,6 +41,20 @@ npm install @bugsnag/cli`
 
 It can then be executed from your project scripts at `/node_modules/.bin/bugsnag-cli` or using `npx @bugsnag/cli`.
 
+### Homebrew
+
+To install via Homebrew, first add the BugSnag tap:
+
+```bash
+brew tap bugsnag/tap
+```
+
+Then install the CLI:
+
+```bash
+brew install bugsnag-cli
+```
+
 ## Supported commands
 
 ### Create builds
