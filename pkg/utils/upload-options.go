@@ -127,7 +127,7 @@ func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl str
 	// If codeBundleId is set, use that instead of appVersion
 	if codeBundleId != "" {
 		uploadOptions["codeBundleId"] = codeBundleId
-	} else {
+	} else if versionName != "" {
 		uploadOptions["appVersion"] = versionName
 	}
 
