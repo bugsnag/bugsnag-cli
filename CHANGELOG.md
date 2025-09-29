@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Fixed 
+
+- Ensure that we handle `CodeBundleId` for the `upload js` command correctly [#234](https://github.com/bugsnag/bugsnag-cli/pull/234)
+
 ## [3.4.0] - 2025-09-12
 
 ### Added

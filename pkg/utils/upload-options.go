@@ -124,7 +124,10 @@ func BuildReactNativeUploadOptions(appVersion string, versionCode string, codeBu
 func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	if versionName != "" {
+	// If codeBundleId is set, use that instead of appVersion
+	if codeBundleId != "" {
+		uploadOptions["codeBundleId"] = codeBundleId
+	} else if versionName != "" {
 		uploadOptions["appVersion"] = versionName
 	}
 
@@ -136,10 +139,6 @@ func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl str
 
 	if projectRoot != "" {
 		uploadOptions["projectRoot"] = projectRoot
-	}
-
-	if codeBundleId != "" {
-		uploadOptions["codeBundleId"] = codeBundleId
 	}
 
 	if overwrite {
