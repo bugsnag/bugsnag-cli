@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- `bugsnag-cli-placeholder` now throws an `Error` instead of just logging to the console. This immediately stops execution and should return a stack trace if the CLI is not successfully installed [#239](https://github.com/bugsnag/bugsnag-cli/pull/239)
+
 ## [3.4.1] - 2025-09-30
 
 ### Fixed 
