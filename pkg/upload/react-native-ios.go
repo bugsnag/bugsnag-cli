@@ -202,7 +202,7 @@ func ProcessReactNativeIos(globalOptions options.CLI, logger log.Logger) error {
 	}
 
 	// Set the options for the source map upload
-	globalOptions.Upload.ReactNativeSourcemap = options.ReactNativeSourcemap{
+	globalOptions.Upload.ReactNativeSourcemaps = options.ReactNativeSourcemaps{
 		VersionName:   iosOptions.ReactNative.VersionName,
 		BundleVersion: iosOptions.Ios.BundleVersion,
 		CodeBundleId:  iosOptions.ReactNative.CodeBundleId,

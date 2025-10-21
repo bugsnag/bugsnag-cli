@@ -122,23 +122,23 @@ type Upload struct {
 	UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
 
 	// required options
-	All                  DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
-	AndroidAab           AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
-	AndroidNdk           AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
-	AndroidProguard      AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
-	DartSymbol           DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
-	XcodeBuild           XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
-	Dsym                 Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
-	XcodeArchive         XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
-	Js                   Js                     `cmd:"" help:"Upload source maps for JavaScript"`
-	ReactNative          ReactNative            `cmd:"" help:"Upload source maps for React Native"`
-	ReactNativeAndroid   ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
-	ReactNativeIos       ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
-	ReactNativeSourcemap ReactNativeSourcemap   `cmd:"" help:"Upload source maps for React Native"`
-	UnityAndroid         UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
-	UnityIos             UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
-	Breakpad             Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
-	Linux                LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
+	All                   DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
+	AndroidAab            AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
+	AndroidNdk            AndroidNdkMapping      `cmd:"" help:"Process and upload NDK symbol files for Android"`
+	AndroidProguard       AndroidProguardMapping `cmd:"" help:"Process and upload Proguard/R8 mapping files for Android"`
+	DartSymbol            DartSymbol             `cmd:"" help:"Process and upload symbol files for Flutter" name:"dart"`
+	XcodeBuild            XcodeBuild             `cmd:"" help:"Upload dSYMs for iOS from a build"`
+	Dsym                  Dsym                   `cmd:"" help:"(deprecated) Upload dSYMs for iOS"`
+	XcodeArchive          XcodeArchive           `cmd:"" help:"Upload dSYMs for iOS from a Xcode archive"`
+	Js                    Js                     `cmd:"" help:"Upload source maps for JavaScript"`
+	ReactNative           ReactNative            `cmd:"" help:"Upload source maps for React Native"`
+	ReactNativeAndroid    ReactNativeAndroid     `cmd:"" help:"Upload source maps for React Native Android"`
+	ReactNativeIos        ReactNativeIos         `cmd:"" help:"Upload source maps for React Native iOS"`
+	ReactNativeSourcemaps ReactNativeSourcemaps  `cmd:"" help:"Upload source maps for React Native"`
+	UnityAndroid          UnityAndroid           `cmd:"" help:"Upload Android mappings and NDK symbol files from Unity projects"`
+	UnityIos              UnityIos               `cmd:"" help:"Upload iOS mappings and dSYMs from Unity projects"`
+	Breakpad              Breakpad               `cmd:"" help:"Upload breakpad .sym files"`
+	Linux                 LinuxOptions           `cmd:"" help:"Upload symbol/mapping files"`
 }
 
 // Unique CLI options

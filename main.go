@@ -98,6 +98,12 @@ func main() {
 			logger.Fatal(err.Error())
 		}
 
+	case "upload react-native-sourcemaps", "upload react-native-sourcemaps <path>":
+		err := upload.ProcessReactNativeSourcemaps(commands, logger)
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
 	case "upload react-native-android", "upload react-native-android <path>":
 
 		err := upload.ProcessReactNativeAndroid(commands, logger)

@@ -51,7 +51,7 @@ type ReactNativeIos struct {
 	Overwrite   bool                   `help:"Whether to ignore and overwrite existing uploads with same identifier, rather than failing if a matching file exists"`
 }
 
-type ReactNativeSourcemap struct {
+type ReactNativeSourcemaps struct {
 	Path          utils.Path `arg:"" name:"path" help:"The path to the root of the React Native project to upload files from" type:"path" default:"."`
 	ProjectRoot   string     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
 	VersionName   string     `help:"The version of the application"`

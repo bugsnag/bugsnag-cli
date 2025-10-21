@@ -27,26 +27,22 @@ import (
 // Returns:
 //   - error: Non-nil if validation or upload fails.
 func ProcessReactNativeSourcemaps(globalOptions options.CLI, logger log.Logger) error {
-	reactNativeOpts := globalOptions.Upload.ReactNativeSourcemap
+	reactNativeOpts := globalOptions.Upload.ReactNativeSourcemaps
 	uploadOpts := make(map[string]string)
-
 	// Validate versioning identifiers
-	if reactNativeOpts.VersionName == "" &&
-		(reactNativeOpts.VersionCode == "" || reactNativeOpts.BundleVersion == "") &&
-		reactNativeOpts.CodeBundleId == "" {
-
+	if reactNativeOpts.VersionName == "" && reactNativeOpts.CodeBundleId == "" {
 		var versionLabel string
 		switch reactNativeOpts.Platform {
 		case "android":
-			versionLabel = "version code"
+			versionLabel = "version name, version code, or code bundle ID"
 		case "ios":
-			versionLabel = "bundle version"
+			versionLabel = "version name, bundle version, or code bundle ID"
 		default:
-			versionLabel = "version code"
+			versionLabel = "version name"
 		}
 
 		return fmt.Errorf(
-			"missing required identifiers: you must set at least version name, %s, and code bundle ID to uniquely identify the build",
+			"missing required identifiers: you must set at least %s to uniquely identify the build",
 			versionLabel,
 		)
 	}

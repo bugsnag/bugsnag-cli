@@ -168,7 +168,7 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 		}
 
 		// Set the options for the source map upload
-		globalOptions.Upload.ReactNativeSourcemap = options.ReactNativeSourcemap{
+		globalOptions.Upload.ReactNativeSourcemaps = options.ReactNativeSourcemaps{
 			VersionName:  androidOptions.ReactNative.VersionName,
 			VersionCode:  androidOptions.Android.VersionCode,
 			CodeBundleId: androidOptions.ReactNative.CodeBundleId,
