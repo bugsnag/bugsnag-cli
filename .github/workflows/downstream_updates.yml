@@ -18,7 +18,10 @@ jobs:
       RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.target_version || github.event.release.tag_name }}
     strategy:
       matrix:
-        downstream_repo: ['bugsnag/bugsnag-unity']
+        downstream_repo: [
+          'bugsnag/bugsnag-unity',
+          'bugsnag/homebrew-tap'
+        ]
     steps:
       - name: Install libcurl4-openssl-dev and net-tools
         run: |
