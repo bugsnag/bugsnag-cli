@@ -66,7 +66,7 @@ func ProcessReactNativeSourcemaps(globalOptions options.CLI, logger log.Logger) 
 
 	// Development mode flag
 	if reactNativeOpts.Dev {
-		logger.Debug("Development build detected — marking upload as dev=true")
+		logger.Debug("Development build — marking upload as dev=true")
 		uploadOpts["dev"] = "true"
 	}
 
