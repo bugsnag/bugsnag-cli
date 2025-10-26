@@ -80,7 +80,7 @@ func ProcessReactNativeSourcemaps(globalOptions options.CLI, logger log.Logger) 
 	}
 
 	// Platform and overwrite flag
-	uploadOpts["platform"] = reactNativeOpts.Platform
+	uploadOpts["platform"] = string(reactNativeOpts.Platform)
 	if reactNativeOpts.Overwrite {
 		uploadOpts["overwrite"] = "true"
 	}
