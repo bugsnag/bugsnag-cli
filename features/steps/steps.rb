@@ -76,6 +76,10 @@ Then('I should see the path ambiguous error') do
   Maze.check.include(run_output, "Path ambiguous: more than one AAB file was found")
 end
 
+Then('the error should contain {string}') do |error_message|
+  Maze.check.include(run_output, error_message)
+end
+
 Then('the sourcemap is valid for the dSYM Build API') do
   steps %(
     And the sourcemap payload field "apiKey" equals "#{$api_key}"

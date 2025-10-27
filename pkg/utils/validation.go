@@ -10,6 +10,7 @@ type Paths []string
 type Path string
 type Provider string
 type LogLevels string
+type Platform string
 
 // Validate that the path(s) exist
 func (p Paths) Validate() error {
@@ -21,7 +22,7 @@ func (p Paths) Validate() error {
 	return nil
 }
 
-// Validate that the path exist
+// Validate that the path exists
 func (p Path) Validate() error {
 	if _, err := os.Stat(string(p)); err != nil {
 		return err
@@ -39,7 +40,7 @@ func ContainsString(slice []string, target string) bool {
 	return false
 }
 
-// Check that the source control provider is valid
+// Validate Check that the source control provider is valid
 func (p *Provider) Validate() error {
 	switch strings.ToLower(string(*p)) {
 	case "github", "github-enterprise", "bitbucket", "bitbucket-server", "gitlab", "gitlab-onpremise":
@@ -58,5 +59,15 @@ func (l LogLevels) Validate() error {
 		return nil
 	default:
 		return fmt.Errorf("invalid log level: %s", l)
+	}
+}
+
+// Validate that the platform is valid
+func (p Platform) Validate() error {
+	switch strings.ToLower(string(p)) {
+	case "android", "ios", "vega":
+		return nil
+	default:
+		return fmt.Errorf("invalid platform: %s", p)
 	}
 }

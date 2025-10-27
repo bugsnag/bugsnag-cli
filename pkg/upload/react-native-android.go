@@ -2,14 +2,14 @@ package upload
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -24,10 +24,9 @@ import (
 //
 // Returns:
 //   - error: non-nil if an error occurs during processing or uploading.
-func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
-	androidOptions := options.Upload.ReactNativeAndroid
+func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) error {
+	androidOptions := globalOptions.Upload.ReactNativeAndroid
 	var err error
-	var uploadOptions map[string]string
 	var rootDirPath string
 	var variantDirName string
 	var bundleDirPath string
@@ -137,7 +136,7 @@ func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
 			}
 		}
 
-		if androidOptions.Android.AppManifest != "" && (options.ApiKey == "" || androidOptions.ReactNative.VersionName == "" || androidOptions.Android.VersionCode == "") {
+		if androidOptions.Android.AppManifest != "" && (globalOptions.ApiKey == "" || androidOptions.ReactNative.VersionName == "" || androidOptions.Android.VersionCode == "") {
 
 			manifestData, err := android.ParseAndroidManifestXML(androidOptions.Android.AppManifest)
 
@@ -145,13 +144,13 @@ func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
 				return err
 			}
 
-			if options.ApiKey == "" {
+			if globalOptions.ApiKey == "" {
 				for key, value := range manifestData.Application.MetaData.Name {
 					if value == "com.bugsnag.android.API_KEY" {
-						options.ApiKey = manifestData.Application.MetaData.Value[key]
+						globalOptions.ApiKey = manifestData.Application.MetaData.Value[key]
 					}
 				}
-				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", options.ApiKey))
+				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", globalOptions.ApiKey))
 			}
 
 			// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from AndroidManifest.xml
@@ -168,20 +167,22 @@ func ProcessReactNativeAndroid(options options.CLI, logger log.Logger) error {
 			}
 		}
 
-		uploadOptions, err = utils.BuildReactNativeUploadOptions(androidOptions.ReactNative.VersionName, androidOptions.Android.VersionCode, androidOptions.ReactNative.CodeBundleId, androidOptions.ReactNative.Dev, androidOptions.ProjectRoot, androidOptions.Overwrite, "android")
-
-		if err != nil {
-			return err
+		// Set the options for the source map upload
+		globalOptions.Upload.ReactNativeSourcemaps = options.ReactNativeSourcemaps{
+			VersionName:  androidOptions.ReactNative.VersionName,
+			VersionCode:  androidOptions.Android.VersionCode,
+			CodeBundleId: androidOptions.ReactNative.CodeBundleId,
+			Dev:          androidOptions.ReactNative.Dev,
+			ProjectRoot:  androidOptions.ProjectRoot,
+			SourceMap:    androidOptions.ReactNative.SourceMap,
+			Bundle:       androidOptions.ReactNative.Bundle,
+			Overwrite:    androidOptions.Overwrite,
+			Platform:     "android",
 		}
 
-		fileFieldData := make(map[string]server.FileField)
-		fileFieldData["sourceMap"] = server.LocalFile(androidOptions.ReactNative.SourceMap)
-		fileFieldData["bundle"] = server.LocalFile(androidOptions.ReactNative.Bundle)
-
-		err = server.ProcessFileRequest(options.ApiKey, "/react-native-source-map", uploadOptions, fileFieldData, androidOptions.ReactNative.SourceMap, options, logger)
+		err = ProcessReactNativeSourcemaps(globalOptions, logger)
 
 		if err != nil {
-
 			return err
 		}
 	}

@@ -1,0 +1,22 @@
+agents:
+  queue: macos-15
+
+steps:
+  - label: ':react: Integration Tests'
+    key: "react-native-cli"
+    timeout_in_minutes: 15
+    env:
+    commands:
+      - "chmod +x bin/arm64-macos-bugsnag-cli"
+      - "bundle install"
+      - "bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --document-server-port=$((MAZE_RUNNER_PORT + 1)) features/react-native/react-native.feature"
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+    retry:
+      automatic:
+        - exit_status: "*"
+          limit: 1

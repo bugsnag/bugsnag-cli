@@ -78,49 +78,6 @@ func BuildDsymUploadOptions(projectRoot string) (map[string]string, error) {
 	return uploadOptions, nil
 }
 
-func BuildReactNativeUploadOptions(appVersion string, versionCode string, codeBundleId string, dev bool, projectRoot string, overwrite bool, platform string) (map[string]string, error) {
-	uploadOptions := make(map[string]string)
-
-	// Return early if all three of these are empty/undefined
-	if appVersion == "" && versionCode == "" && codeBundleId == "" {
-		var platformSpecificTerminology string
-		if platform == "android" {
-			platformSpecificTerminology = "version code"
-		} else if platform == "ios" {
-			platformSpecificTerminology = "bundle version"
-		}
-
-		return nil, fmt.Errorf("you must set at least the version name, %s and code bundle ID to uniquely identify the build", platformSpecificTerminology)
-	}
-
-	// If codeBundleId is set, use that instead of appVersion and versionCode
-	if codeBundleId != "" {
-		uploadOptions["codeBundleId"] = codeBundleId
-	} else {
-		uploadOptions["appVersion"] = appVersion
-
-		if platform == "android" {
-			uploadOptions["appVersionCode"] = versionCode
-		} else if platform == "ios" {
-			uploadOptions["appBundleVersion"] = versionCode
-		}
-	}
-
-	if dev {
-		uploadOptions["dev"] = "true"
-	}
-
-	uploadOptions["projectRoot"] = projectRoot
-
-	uploadOptions["platform"] = platform
-
-	if overwrite {
-		uploadOptions["overwrite"] = "true"
-	}
-
-	return uploadOptions, nil
-}
-
 func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
