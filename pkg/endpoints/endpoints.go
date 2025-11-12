@@ -2,18 +2,19 @@ package endpoints
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"net/url"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
 )
 
 // Constants defining upload and build endpoint instances.
 const (
-	HUB_PREFIX     = "00000" // API keys starting with this indicate usage of the Hub instance.
-	HUB_UPLOAD     = "https://upload.insighthub.smartbear.com"
-	HUB_BUILD      = "https://build.insighthub.smartbear.com"
-	BUGSNAG_UPLOAD = "https://upload.bugsnag.com"
-	BUGSNAG_BUILD  = "https://build.bugsnag.com"
+	SECONDARY_API_PREFIX      = "00000" // API keys starting with this indicate usage of the secondary instance.
+	SECONDARY_UPLOAD_ENDPOINT = "https://upload.bugsnag.smartbear.com"
+	SECONDARY_BUILD_ENDPOINT  = "https://build.bugsnag.smartbear.com"
+	PRIMARY_UPLOAD_ENDPOINT   = "https://upload.bugsnag.com"
+	PRIMARY_BUILD_ENDPOINT    = "https://build.bugsnag.com"
 )
 
 // BuildEndpointURL constructs a complete URL from a base URI and optional port.
@@ -63,10 +64,10 @@ func GetDefaultUploadEndpoint(apiKey string, endpointPath string, options option
 
 	if options.Upload.UploadAPIRootUrl != "" {
 		endpoint = options.Upload.UploadAPIRootUrl
-	} else if strings.HasPrefix(apiKey, HUB_PREFIX) {
-		endpoint = HUB_UPLOAD
+	} else if strings.HasPrefix(apiKey, SECONDARY_API_PREFIX) {
+		endpoint = SECONDARY_UPLOAD_ENDPOINT
 	} else {
-		endpoint = BUGSNAG_UPLOAD
+		endpoint = PRIMARY_UPLOAD_ENDPOINT
 	}
 
 	endpoint, err := BuildEndpointURL(endpoint+endpointPath, options.Port)
@@ -95,10 +96,10 @@ func GetDefaultBuildEndpoint(apiKey string, options options.CLI) (string, error)
 
 	if options.CreateBuild.BuildApiRootUrl != "" {
 		endpoint = options.CreateBuild.BuildApiRootUrl
-	} else if strings.HasPrefix(apiKey, HUB_PREFIX) {
-		endpoint = HUB_BUILD
+	} else if strings.HasPrefix(apiKey, SECONDARY_API_PREFIX) {
+		endpoint = SECONDARY_BUILD_ENDPOINT
 	} else {
-		endpoint = BUGSNAG_BUILD
+		endpoint = PRIMARY_BUILD_ENDPOINT
 	}
 
 	endpoint, err := BuildEndpointURL(endpoint, options.Port)
