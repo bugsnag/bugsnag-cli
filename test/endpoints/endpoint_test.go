@@ -72,14 +72,14 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 	}{
 		{
 			name:         "Uses InsightHub endpoint with HUB prefix",
-			apiKey:       endpoints.HUB_PREFIX + "123",
+			apiKey:       endpoints.SECONDARY_API_PREFIX + "123",
 			endpointPath: "/upload",
 			options: options.CLI{
 				Globals: options.Globals{
 					Port: 9999,
 				},
 			},
-			expectPrefix: endpoints.HUB_UPLOAD + ":9999/upload",
+			expectPrefix: endpoints.SECONDARY_UPLOAD_ENDPOINT + ":9999/upload",
 		},
 		{
 			name:         "Uses Bugsnag endpoint with non-HUB key",
@@ -90,7 +90,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					Port: 0,
 				},
 			},
-			expectPrefix: endpoints.BUGSNAG_UPLOAD + "/upload",
+			expectPrefix: endpoints.PRIMARY_UPLOAD_ENDPOINT + "/upload",
 		},
 		{
 			name:         "Uses custom UploadAPIRootUrl if provided",
@@ -145,13 +145,13 @@ func TestGetDefaultBuildEndpoint(t *testing.T) {
 	}{
 		{
 			name:   "Uses InsightHub build endpoint with HUB prefix",
-			apiKey: endpoints.HUB_PREFIX + "XYZ",
+			apiKey: endpoints.SECONDARY_API_PREFIX + "XYZ",
 			options: options.CLI{
 				Globals: options.Globals{
 					Port: 9000,
 				},
 			},
-			expectPrefix: endpoints.HUB_BUILD,
+			expectPrefix: endpoints.SECONDARY_BUILD_ENDPOINT,
 		},
 		{
 			name:   "Uses Bugsnag build endpoint with non-HUB key",
@@ -161,7 +161,7 @@ func TestGetDefaultBuildEndpoint(t *testing.T) {
 					Port: 0,
 				},
 			},
-			expectPrefix: endpoints.BUGSNAG_BUILD,
+			expectPrefix: endpoints.PRIMARY_BUILD_ENDPOINT,
 		},
 		{
 			name:   "Uses custom BuildApiRootUrl if provided",
