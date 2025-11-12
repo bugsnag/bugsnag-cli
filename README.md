@@ -36,7 +36,7 @@ The script downloads the appropriate binary and attempts to install it to `~/.lo
 If your project uses `npm` or `yarn`, the CLI can be installed by adding the [`@bugsnag/cli`](https://www.npmjs.com/package/@bugsnag/cli) package:
 
 ```sh
-npm install @bugsnag/cli`
+npm install @bugsnag/cli
 ```
 
 It can then be executed from your project scripts at `/node_modules/.bin/bugsnag-cli` or using `npx @bugsnag/cli`.

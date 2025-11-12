@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 )
 
-var package_version = "3.4.1"
+var package_version = "3.5.0"
 
 func main() {
 	commands := options.CLI{}
@@ -94,6 +94,12 @@ func main() {
 
 		err := upload.ProcessReactNative(commands, logger)
 
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "upload react-native-sourcemaps", "upload react-native-sourcemaps <path>":
+		err := upload.ProcessReactNativeSourcemaps(commands, logger)
 		if err != nil {
 			logger.Fatal(err.Error())
 		}

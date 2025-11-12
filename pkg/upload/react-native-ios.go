@@ -2,11 +2,11 @@ package upload
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/ios"
-	"github.com/bugsnag/bugsnag-cli/pkg/server"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"path/filepath"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/ios"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
@@ -23,8 +23,8 @@ import (
 //
 // Returns:
 //   - error: non-nil if an error occurs during processing or uploading.
-func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
-	iosOptions := options.Upload.ReactNativeIos
+func ProcessReactNativeIos(globalOptions options.CLI, logger log.Logger) error {
+	iosOptions := globalOptions.Upload.ReactNativeIos
 	var (
 		rootDirPath      string
 		plistData        *ios.PlistData
@@ -104,7 +104,7 @@ func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
 		logger.Debug(fmt.Sprintf("Found Xcode archive Path: %s", xcodeArchivePath))
 
 		// Attempt to parse information from the .xcworkspace file if values aren't provided on the command line
-		if iosOptions.ReactNative.Bundle == "" || (iosOptions.Ios.Plist == "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "")) {
+		if iosOptions.ReactNative.Bundle == "" || (iosOptions.Ios.Plist == "" && (globalOptions.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "")) {
 			// Check to see if we have the Info.Plist path
 			if iosOptions.Ios.Plist != "" {
 				if !utils.FileExists(iosOptions.Ios.Plist) {
@@ -172,7 +172,7 @@ func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
 		return fmt.Errorf("Could not find a source map, please specify the path by using --source-map or SOURCEMAP_FILE environment variable")
 	}
 
-	if iosOptions.Ios.Plist != "" && (options.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "") {
+	if iosOptions.Ios.Plist != "" && (globalOptions.ApiKey == "" || iosOptions.ReactNative.VersionName == "" || iosOptions.Ios.BundleVersion == "") {
 		// Read data from the plist
 		plistData, err = ios.GetPlistData(iosOptions.Ios.Plist)
 		if err != nil {
@@ -194,27 +194,29 @@ func ProcessReactNativeIos(options options.CLI, logger log.Logger) error {
 			}
 		}
 
-		if options.ApiKey == "" {
-			options.ApiKey = plistData.BugsnagProjectDetails.ApiKey
-			logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", options.ApiKey))
+		if globalOptions.ApiKey == "" {
+			globalOptions.ApiKey = plistData.BugsnagProjectDetails.ApiKey
+			logger.Debug(fmt.Sprintf("Using API key from Info.plist: %s", globalOptions.ApiKey))
 		}
 
 	}
 
-	uploadOptions, err := utils.BuildReactNativeUploadOptions(iosOptions.ReactNative.VersionName, iosOptions.Ios.BundleVersion, iosOptions.ReactNative.CodeBundleId, iosOptions.ReactNative.Dev, iosOptions.ProjectRoot, iosOptions.Overwrite, "ios")
-
-	if err != nil {
-		return err
+	// Set the options for the source map upload
+	globalOptions.Upload.ReactNativeSourcemaps = options.ReactNativeSourcemaps{
+		VersionName:   iosOptions.ReactNative.VersionName,
+		BundleVersion: iosOptions.Ios.BundleVersion,
+		CodeBundleId:  iosOptions.ReactNative.CodeBundleId,
+		Dev:           iosOptions.ReactNative.Dev,
+		ProjectRoot:   iosOptions.ProjectRoot,
+		SourceMap:     iosOptions.ReactNative.SourceMap,
+		Bundle:        iosOptions.ReactNative.Bundle,
+		Overwrite:     iosOptions.Overwrite,
+		Platform:      "ios",
 	}
 
-	fileFieldData := make(map[string]server.FileField)
-	fileFieldData["sourceMap"] = server.LocalFile(iosOptions.ReactNative.SourceMap)
-	fileFieldData["bundle"] = server.LocalFile(iosOptions.ReactNative.Bundle)
-
-	err = server.ProcessFileRequest(options.ApiKey, "/react-native-source-map", uploadOptions, fileFieldData, iosOptions.ReactNative.SourceMap, options, logger)
+	err = ProcessReactNativeSourcemaps(globalOptions, logger)
 
 	if err != nil {
-
 		return err
 	}
 
