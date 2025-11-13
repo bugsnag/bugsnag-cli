@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.5.1] - 2025-11-13
+
+### Changed
+
+- Update the default URLs for the secondary endpoints [#244](https://github.com/bugsnag/bugsnag-cli/pull/244)
+
 ## [3.5.0] - 2025-11-12
 
 ### Added
