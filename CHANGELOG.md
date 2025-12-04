@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Changed
+
+- Add a fallback path for AndroidManifest.xml when processing Proguard uploads []()
+
 ## [3.5.1] - 2025-11-13
 
 ### Changed
