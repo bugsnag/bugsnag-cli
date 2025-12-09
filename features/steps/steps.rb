@@ -471,7 +471,7 @@ end
 Before('@CleanAndBuildNodeJs') do
   @fixture_dir = "#{base_dir}/features/node/fixtures/"
   Dir.chdir(@fixture_dir)
-  @output =`npm run clean && npm ci && node build.js`
+  @output =`npm run clean && npm i && node build.js`
   Dir.chdir(base_dir)
 
   steps %(
