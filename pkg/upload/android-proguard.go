@@ -28,8 +28,6 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 	proguardOptions := options.Upload.AndroidProguard
 
 	var mappingFile string
-	var primaryAppManifestPath string
-	var fallbackAppManifestPath string
 	var err error
 
 	for _, path := range proguardOptions.Path {
@@ -58,11 +56,8 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 
 			// Attempt to locate AndroidManifest.xml for the variant if not set
 			if proguardOptions.AppManifest == "" {
-				primaryAppManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", proguardOptions.Variant, "AndroidManifest.xml")
-
-				fallbackAppManifestPath = filepath.Join(path, "app", "build", "intermediates", "merged_manifests", proguardOptions.Variant, "process"+proguardOptions.Variant+"Manifest", "AndroidManifest.xml")
-
-				proguardOptions.AppManifest = android.FindAndroidManifest([]string{primaryAppManifestPath, fallbackAppManifestPath})
+				mergedManifestPath := filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
+				proguardOptions.AppManifest = android.FindAndroidManifest(mergedManifestPath, proguardOptions.Variant)
 
 				if proguardOptions.AppManifest == "" {
 					logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
@@ -79,11 +74,7 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 				if filepath.Base(mergedManifestPath) == "merged_manifests" {
 					proguardOptions.Variant, err = android.GetVariantDirectory(mergedManifestPath)
 					if err == nil {
-						primaryAppManifestPath = filepath.Join(mergedManifestPath, proguardOptions.Variant, "AndroidManifest.xml")
-
-						fallbackAppManifestPath = filepath.Join(mergedManifestPath, proguardOptions.Variant, "process"+proguardOptions.Variant+"Manifest", "AndroidManifest.xml")
-
-						proguardOptions.AppManifest = android.FindAndroidManifest([]string{primaryAppManifestPath, fallbackAppManifestPath})
+						proguardOptions.AppManifest = android.FindAndroidManifest(mergedManifestPath, proguardOptions.Variant)
 
 						if proguardOptions.AppManifest == "" {
 							logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")

@@ -1,19 +1,33 @@
 package android
 
-import "github.com/bugsnag/bugsnag-cli/pkg/utils"
+import (
+	"path/filepath"
 
-// FindAndroidManifest locates and returns the first existing AndroidManifest.xml path.
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
+)
+
+// FindAndroidManifest locates and returns the first existing AndroidManifest.xml
+// for a given build directory and variant.
 //
-// This function iterates through a list of candidate file paths and returns the
-// first one that exists on disk. This is useful when Android build outputs may
-// place the manifest in multiple variant-specific directories.
+// This function constructs and checks multiple potential manifest locations that
+// vary based on Android build outputs. It returns the first manifest file found
+// on disk.
 //
 // Parameters:
-//   - paths: A slice of possible manifest file locations.
+//   - path: The Android merged_manifests directory.
+//   - variant: The build variant (e.g., "debug", "release") whose manifest paths
+//     should be searched.
 //
 // Returns:
-//   - string: The first existing manifest path, or an empty string if none are found.
-func FindAndroidManifest(paths []string) string {
+//   - string: The resolved manifest path if found, otherwise an empty string.
+func FindAndroidManifest(path string, variant string) string {
+
+	primaryAppManifestPath := filepath.Join(path, variant, "AndroidManifest.xml")
+
+	fallbackAppManifestPath := filepath.Join(path, variant, "process"+variant+"Manifest", "AndroidManifest.xml")
+
+	paths := []string{primaryAppManifestPath, fallbackAppManifestPath}
+
 	for _, path := range paths {
 		if utils.FileExists(path) {
 			return path
