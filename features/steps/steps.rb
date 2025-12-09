@@ -188,6 +188,10 @@ And(/^I wait for the build to succeed$/) do
   Maze.check.not_include(run_output, "Error 1")
 end
 
+And(/^I wait for the Node\.js sourcemaps to generate$/) do
+  Maze.check.include(`ls #{@fixture_dir}/dist`, 'index.js.map')
+end
+
 When(/^I make the "([^"]*)"$/) do |arg|
   @output = `make #{arg} 2>&1`
 end
@@ -463,3 +467,15 @@ And(/^I sort the sourcemaps by path$/) do
   list = Maze::Server.list_for('sourcemap')
   list.sort_by_request_path!
 end
+
+Before('@CleanAndBuildNodeJs') do
+  @fixture_dir = "#{base_dir}/features/node/fixtures/"
+  Dir.chdir(@fixture_dir)
+  @output =`npm run clean && npm ci && node build.js`
+  Dir.chdir(base_dir)
+
+  steps %(
+    And I wait for the Node.js sourcemaps to generate
+  )
+end
+
