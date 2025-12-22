@@ -397,6 +397,26 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 			return err
 		}
 
+		// Filter out source maps inside projectRoot/node_modules
+		if jsOptions.ProjectRoot != "" {
+			nmRoot, err := filepath.Abs(filepath.Join(jsOptions.ProjectRoot, "node_modules"))
+			if err == nil {
+				filtered := []string{}
+				for _, sm := range sourceMapPaths {
+					absSm, err := filepath.Abs(sm)
+					if err != nil {
+						continue
+					}
+					if strings.HasPrefix(absSm, nmRoot+string(filepath.Separator)) {
+						logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", absSm))
+						continue
+					}
+					filtered = append(filtered, sm)
+				}
+				sourceMapPaths = filtered
+			}
+		}
+
 		// Check that we now have a source map path
 		if len(sourceMapPaths) == 0 {
 			return fmt.Errorf("could not find a source map, please specify the path by using --source-map")
