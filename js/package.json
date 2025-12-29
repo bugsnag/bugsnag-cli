@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
+    "proxy-agent": "^6.5.0",
     "yaml": "^2.7.0"
   },
   "files": [
