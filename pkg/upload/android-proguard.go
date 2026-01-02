@@ -56,9 +56,11 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 
 			// Attempt to locate AndroidManifest.xml for the variant if not set
 			if proguardOptions.AppManifest == "" {
-				mergedManifestPath := filepath.Join(path, "app", "build", "intermediates", "merged_manifests")
-				proguardOptions.AppManifest = android.FindAndroidManifest(mergedManifestPath, proguardOptions.Variant)
-
+				buildFolder := filepath.Join(path, "app", "build")
+				proguardOptions.AppManifest, err = android.FindAndroidManifest(buildFolder, proguardOptions.Variant)
+				if err != nil {
+					return err
+				}
 				if proguardOptions.AppManifest == "" {
 					logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
 				}
@@ -70,15 +72,14 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 
 			// Try to find manifest and variant if missing
 			if proguardOptions.AppManifest == "" && proguardOptions.Variant == "" {
-				mergedManifestPath := filepath.Join(path, "..", "..", "..", "..", "intermediates", "merged_manifests")
-				if filepath.Base(mergedManifestPath) == "merged_manifests" {
-					proguardOptions.Variant, err = android.GetVariantDirectory(mergedManifestPath)
-					if err == nil {
-						proguardOptions.AppManifest = android.FindAndroidManifest(mergedManifestPath, proguardOptions.Variant)
-
-						if proguardOptions.AppManifest == "" {
-							logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
-						}
+				buildFolder := filepath.Join(path, "..", "..", "..", "..")
+				if filepath.Base(buildFolder) == "build" {
+					proguardOptions.AppManifest, err = android.FindAndroidManifest(buildFolder, proguardOptions.Variant)
+					if err != nil {
+						return err
+					}
+					if proguardOptions.AppManifest == "" {
+						logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 package android
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -14,25 +15,37 @@ import (
 // on disk.
 //
 // Parameters:
-//   - path: The Android merged_manifests directory.
+//   - buildFolder: The root build directory where Android build outputs are located.
 //   - variant: The build variant (e.g., "debug", "release") whose manifest paths
 //     should be searched.
 //
 // Returns:
 //   - string: The resolved manifest path if found, otherwise an empty string.
-func FindAndroidManifest(path string, variant string) string {
+//   - error: Non-nil if the manifest cannot be found.
+func FindAndroidManifest(buildFolder string, variant string) (string, error) {
+	var err error
 
-	primaryAppManifestPath := filepath.Join(path, variant, "AndroidManifest.xml")
+	mergedManifestPath := filepath.Join(buildFolder, "intermediates", "merged_manifests")
 
-	fallbackAppManifestPath := filepath.Join(path, variant, "process"+variant+"Manifest", "AndroidManifest.xml")
+	if variant == "" {
+		variant, err = GetVariantDirectory(mergedManifestPath)
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	primaryAppManifestPath := filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
+
+	fallbackAppManifestPath := filepath.Join(mergedManifestPath, variant, "process"+variant+"Manifest", "AndroidManifest.xml")
 
 	paths := []string{primaryAppManifestPath, fallbackAppManifestPath}
 
 	for _, path := range paths {
 		if utils.FileExists(path) {
-			return path
+			return path, nil
 		}
 	}
 
-	return ""
+	return "", fmt.Errorf("unable to locate AndroidManifest.xml for variant %s", variant)
 }

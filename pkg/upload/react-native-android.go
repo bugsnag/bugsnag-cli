@@ -119,20 +119,14 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 		}
 
 		if androidOptions.Android.AppManifest == "" {
-			// RN versions <= 0.74 intermediates/merged_manifests/<androidOptions.Android.Variant>/AndroidManifest.xml"
-			appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "AndroidManifest.xml")
-			if utils.FileExists(appManifestPathExpected) {
-				androidOptions.Android.AppManifest = appManifestPathExpected
+			androidOptions.Android.AppManifest, err = android.FindAndroidManifest(buildDirPath, androidOptions.Android.Variant)
+			if err != nil {
+				return err
+			}
+			if androidOptions.Android.AppManifest != "" {
 				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
 			} else {
-				// RN versions > 0.74 "intermediates/merged_manifests/androidOptions.Android.Variant, <androidOptions.Android.Variant>/AndroidManifest.xml"
-				appManifestPathExpected = filepath.Join(buildDirPath, "intermediates", "merged_manifests", androidOptions.Android.Variant, "process"+cases.Title(language.English).String(androidOptions.Android.Variant)+"Manifest", "AndroidManifest.xml")
-				if utils.FileExists(appManifestPathExpected) {
-					androidOptions.Android.AppManifest = appManifestPathExpected
-					logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
-				} else {
-					logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
-				}
+				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
 			}
 		}
 
