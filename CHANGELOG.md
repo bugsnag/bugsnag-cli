@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Updated the logic for the `upload js` command to ignore the top level `node_modules` directory when processing source maps. [#251](https://github.com/bugsnag/bugsnag-cli/pull/251)
 - Add a fallback path for AndroidManifest.xml when processing Android related uploads (Proguard, NDK and React Native) [#249](https://github.com/bugsnag/bugsnag-cli/pull/249)
 
 ## [3.5.1] - 2025-11-13
