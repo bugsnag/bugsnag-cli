@@ -39,7 +39,7 @@ func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath stri
 	if ndkOpts.AppManifest != "" {
 		return nil
 	}
-	appBuildPath := filepath.Join(libPath, "..")
+	appBuildPath := filepath.Join(libPath, "..", "..")
 	ndkOpts.AppManifest, err = android.FindAndroidManifest(appBuildPath, ndkOpts.Variant)
 	if err != nil {
 		return err
