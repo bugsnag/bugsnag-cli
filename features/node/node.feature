@@ -1,5 +1,7 @@
 Feature: Node.js Integration Tests
-  @CleanAndBuildNodeJs
+  Background:
+    Given the NodeJS fixture is built
+
   Scenario: Upload Node.js sourcemaps providing a directory
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --base-url=example.com --version-name=2.3.4 features/node/fixtures/dist
     And I wait to receive 2 sourcemaps
@@ -21,7 +23,6 @@ Feature: Node.js Integration Tests
     And the sourcemap payload field "minifiedFile" is not empty
     And the sourcemap payload field "projectRoot" ends with "features/node/fixtures"
 
-  @CleanAndBuildNodeJs
   Scenario: Upload a single Node.js sourcemap using all CLI flags
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --bundle-url=example.com --version-name=2.3.4 --source-map=features/node/fixtures/dist/index.js.map --bundle=features/node/fixtures/dist/index.js --project-root=features/node/fixtures features/node/fixtures/dist
     And I wait to receive 1 sourcemaps
