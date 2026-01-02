@@ -166,7 +166,8 @@ steps:
         download:
           - bin/arm64-macos-bugsnag-cli
         upload:
-          - maze_output/**/*
+          - maze_output/maze_output.zip
+          - maze_output/failed/*
 
   - group: ":react: React Native"
     steps:
