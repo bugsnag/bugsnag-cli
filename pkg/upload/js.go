@@ -159,9 +159,27 @@ func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.L
 		}
 		return nil
 	})
+
 	if err != nil {
 		return []string{}, err
 	}
+
+	// Filter out source maps inside node_modules directories
+	filtered := []string{}
+	for _, sm := range sourceMapPaths {
+		absSm, err := filepath.Abs(sm)
+		if err != nil {
+			continue
+		}
+		if strings.HasPrefix(absSm, "node_modules"+string(filepath.Separator)) {
+			logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", absSm))
+			continue
+		}
+		filtered = append(filtered, sm)
+	}
+
+	sourceMapPaths = filtered
+
 	if len(sourceMapPaths) == 0 {
 		logger.Warn(fmt.Sprintf("No source maps found in: %s", outputPath))
 	} else {
@@ -395,26 +413,6 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 		sourceMapPaths, err := resolveSourceMapPaths(jsOptions.SourceMap, outputPath, logger)
 		if err != nil {
 			return err
-		}
-
-		// Filter out source maps inside projectRoot/node_modules
-		if jsOptions.ProjectRoot != "" {
-			nmRoot, err := filepath.Abs(filepath.Join(jsOptions.ProjectRoot, "node_modules"))
-			if err == nil {
-				filtered := []string{}
-				for _, sm := range sourceMapPaths {
-					absSm, err := filepath.Abs(sm)
-					if err != nil {
-						continue
-					}
-					if strings.HasPrefix(absSm, nmRoot+string(filepath.Separator)) {
-						logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", absSm))
-						continue
-					}
-					filtered = append(filtered, sm)
-				}
-				sourceMapPaths = filtered
-			}
 		}
 
 		// Check that we now have a source map path
