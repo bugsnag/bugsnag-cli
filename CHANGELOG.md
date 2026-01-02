@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Add a fallback path for AndroidManifest.xml when processing Proguard uploads [#249](https://github.com/bugsnag/bugsnag-cli/pull/249)
+- Add a fallback path for AndroidManifest.xml when processing Android related uploads (Proguard, NDK and React Native) [#249](https://github.com/bugsnag/bugsnag-cli/pull/249)
 
 ## [3.5.1] - 2025-11-13
 

@@ -15,17 +15,17 @@ import (
 // on disk.
 //
 // Parameters:
-//   - buildFolder: The root build directory where Android build outputs are located.
+//   - appBuildPath: The root build directory where Android build outputs are located.
 //   - variant: The build variant (e.g., "debug", "release") whose manifest paths
 //     should be searched.
 //
 // Returns:
 //   - string: The resolved manifest path if found, otherwise an empty string.
 //   - error: Non-nil if the manifest cannot be found.
-func FindAndroidManifest(buildFolder string, variant string) (string, error) {
+func FindAndroidManifest(appBuildPath string, variant string) (string, error) {
 	var err error
 
-	mergedManifestPath := filepath.Join(buildFolder, "intermediates", "merged_manifests")
+	mergedManifestPath := filepath.Join(appBuildPath, "intermediates", "merged_manifests")
 
 	if variant == "" {
 		variant, err = GetVariantDirectory(mergedManifestPath)

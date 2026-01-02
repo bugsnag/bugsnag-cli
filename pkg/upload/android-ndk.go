@@ -35,18 +35,16 @@ func resolveMergedLibPath(input string) (string, error) {
 //   - libPath: resolved path to merged_native_libs.
 //   - logger: logger used to emit debug output.
 func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath string, logger log.Logger) error {
+	var err error
 	if ndkOpts.AppManifest != "" {
 		return nil
 	}
-	buildFolder := filepath.Join(libPath, "..")
-	manifestPath, err := android.FindAndroidManifest(buildFolder, ndkOpts.Variant)
+	appBuildPath := filepath.Join(libPath, "..")
+	ndkOpts.AppManifest, err = android.FindAndroidManifest(appBuildPath, ndkOpts.Variant)
 	if err != nil {
 		return err
 	}
-	if utils.FileExists(manifestPath) {
-		ndkOpts.AppManifest = manifestPath
-		logger.Debug(fmt.Sprintf("Found AndroidManifest.xml at %s", ndkOpts.AppManifest))
-	}
+	logger.Debug(fmt.Sprintf("Found AndroidManifest.xml at %s", ndkOpts.AppManifest))
 	return nil
 }
 

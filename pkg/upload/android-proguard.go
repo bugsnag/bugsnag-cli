@@ -56,8 +56,8 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 
 			// Attempt to locate AndroidManifest.xml for the variant if not set
 			if proguardOptions.AppManifest == "" {
-				buildFolder := filepath.Join(path, "app", "build")
-				proguardOptions.AppManifest, err = android.FindAndroidManifest(buildFolder, proguardOptions.Variant)
+				appBuildPath := filepath.Join(path, "app", "build")
+				proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
 				if err != nil {
 					return err
 				}
@@ -72,9 +72,9 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 
 			// Try to find manifest and variant if missing
 			if proguardOptions.AppManifest == "" && proguardOptions.Variant == "" {
-				buildFolder := filepath.Join(path, "..", "..", "..", "..")
-				if filepath.Base(buildFolder) == "build" {
-					proguardOptions.AppManifest, err = android.FindAndroidManifest(buildFolder, proguardOptions.Variant)
+				appBuildPath := filepath.Join(path, "..", "..", "..", "..")
+				if filepath.Base(appBuildPath) == "build" {
+					proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
 					if err != nil {
 						return err
 					}
