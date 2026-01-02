@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 )
 
@@ -38,52 +37,44 @@ func TestPopulateSourceMap(t *testing.T) {
 	}
 }
 
-func TestProcessJs_IgnoresNodeModulesSourceMaps(t *testing.T) {
+func TestResolveSourceMapPaths_IgnoresNodeModulesAndCssMaps(t *testing.T) {
 	logger := log.NewLoggerWrapper("debug")
 
-	tmpDir := t.TempDir()
+	// Create a temporary directory structure
+	tempDir := t.TempDir()
 
-	projectRoot := filepath.Join(tmpDir, "project")
-	distDir := filepath.Join(projectRoot, "dist")
-	nodeModulesDir := filepath.Join(projectRoot, "node_modules", "dep")
-
-	if err := os.MkdirAll(distDir, 0o755); err != nil {
-		t.Fatalf("failed to create dist dir: %v", err)
+	// Valid source map
+	validMap := filepath.Join(tempDir, "app.js.map")
+	if err := os.WriteFile(validMap, []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write valid source map: %v", err)
 	}
-	if err := os.MkdirAll(nodeModulesDir, 0o755); err != nil {
+
+	// CSS source map (should be ignored)
+	cssMap := filepath.Join(tempDir, "styles.css.map")
+	if err := os.WriteFile(cssMap, []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write css source map: %v", err)
+	}
+
+	// node_modules source map (should be ignored)
+	nodeModulesDir := filepath.Join(tempDir, "node_modules", "lib")
+	if err := os.MkdirAll(nodeModulesDir, 0755); err != nil {
 		t.Fatalf("failed to create node_modules dir: %v", err)
 	}
-
-	// Sourcemap that should be kept
-	validMap := filepath.Join(distDir, "app.js.map")
-	if err := os.WriteFile(validMap, []byte(`{"version":3,"sources":[],"names":[],"mappings":""}`), 0o644); err != nil {
-		t.Fatalf("failed to write valid sourcemap: %v", err)
+	nodeModulesMap := filepath.Join(nodeModulesDir, "lib.js.map")
+	if err := os.WriteFile(nodeModulesMap, []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write node_modules source map: %v", err)
 	}
 
-	// Sourcemap inside node_modules that should be ignored
-	ignoredMap := filepath.Join(nodeModulesDir, "dep.js.map")
-	if err := os.WriteFile(ignoredMap, []byte(`{"version":3,"sources":[],"names":[],"mappings":""}`), 0o644); err != nil {
-		t.Fatalf("failed to write ignored sourcemap: %v", err)
+	paths, err := upload.ResolveSourceMapPaths("", tempDir, logger)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
-	opts := options.CLI{
-		Globals: options.Globals{
-			ApiKey: "test-api-key",
-		},
-		Upload: options.Upload{
-			Js: options.Js{
-				Path:        []string{distDir},
-				ProjectRoot: projectRoot,
-				BaseUrl:     "https://example.com/",
-			},
-		},
+	if len(paths) != 1 {
+		t.Fatalf("expected 1 source map, got %d", len(paths))
 	}
 
-	err := upload.ProcessJs(opts, logger)
-
-	// We expect ProcessJs to progress past sourcemap discovery.
-	// Any error here should NOT be due to missing sourcemaps.
-	if err != nil && strings.Contains(err.Error(), "could not find a source map") {
-		t.Fatalf("node_modules sourcemaps were not ignored; no valid sourcemaps detected")
+	if paths[0] != validMap {
+		t.Errorf("expected source map %s, got %s", validMap, paths[0])
 	}
 }
