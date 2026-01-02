@@ -129,7 +129,7 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 	return ""
 }
 
-// resolveSourceMapPaths attempts to find the source map(s) by walking the build directory
+// ResolveSourceMapPaths attempts to find the source map(s) by walking the build directory
 // if a source map path is not specified.
 //
 // Parameters:
@@ -138,7 +138,7 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 //
 // Returns:
 // - list of source map file paths, or an error.
-func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.Logger) ([]string, error) {
+func ResolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.Logger) ([]string, error) {
 	if sourceMapPath != "" {
 		if utils.FileExists(sourceMapPath) {
 			logger.Debug(fmt.Sprintf("Using user specified source map file %s", sourceMapPath))
@@ -151,14 +151,17 @@ func resolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.L
 	var sourceMapPaths []string
 	err := filepath.WalkDir(outputPath, func(fullPath string, dirEntry fs.DirEntry, err error) error {
 		if !dirEntry.IsDir() && strings.HasSuffix(dirEntry.Name(), ".map") {
-			if !strings.HasSuffix(dirEntry.Name(), ".css.map") {
-				sourceMapPaths = append(sourceMapPaths, fullPath)
-			} else {
+			if strings.HasSuffix(dirEntry.Name(), ".css.map") {
 				logger.Debug(fmt.Sprintf("Skipping .css.map file %s", fullPath))
+			} else if strings.Contains(fullPath, "node_modules") {
+				logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", fullPath))
+			} else {
+				sourceMapPaths = append(sourceMapPaths, fullPath)
 			}
 		}
 		return nil
 	})
+
 	if err != nil {
 		return []string{}, err
 	}
@@ -392,29 +395,9 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 		jsOptions.VersionName = resolveVersion(jsOptions.VersionName, path, logger)
 
 		// Check that the source map(s) exists and error out if it doesn't
-		sourceMapPaths, err := resolveSourceMapPaths(jsOptions.SourceMap, outputPath, logger)
+		sourceMapPaths, err := ResolveSourceMapPaths(jsOptions.SourceMap, outputPath, logger)
 		if err != nil {
 			return err
-		}
-
-		// Filter out source maps inside projectRoot/node_modules
-		if jsOptions.ProjectRoot != "" {
-			nmRoot, err := filepath.Abs(filepath.Join(jsOptions.ProjectRoot, "node_modules"))
-			if err == nil {
-				filtered := []string{}
-				for _, sm := range sourceMapPaths {
-					absSm, err := filepath.Abs(sm)
-					if err != nil {
-						continue
-					}
-					if strings.HasPrefix(absSm, nmRoot+string(filepath.Separator)) {
-						logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", absSm))
-						continue
-					}
-					filtered = append(filtered, sm)
-				}
-				sourceMapPaths = filtered
-			}
 		}
 
 		// Check that we now have a source map path
