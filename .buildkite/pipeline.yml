@@ -155,6 +155,20 @@ steps:
         upload:
           - maze_output/**/*
 
+  - label: "Node.js Integration Tests"
+    depends_on: build
+    commands:
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle install
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/node
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/maze_output.zip
+          - maze_output/failed/*
+
   - group: ":react: React Native"
     steps:
       - label: ":large_blue_circle: :large_blue_circle: :large_blue_circle: REACT NATIVE ANDROID STEPS :large_blue_circle: :large_blue_circle: :large_blue_circle:"

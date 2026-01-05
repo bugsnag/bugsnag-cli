@@ -1,0 +1,10 @@
+{
+  "name": "fixture",
+  "private": true,
+  "dependencies": {
+    "esbuild": "^0.21.0"
+  },
+  "scripts": {
+    "clean": "rm -rf dist"
+  }
+}
