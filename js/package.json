@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "3.5.1",
+  "version": "3.6.0",
   "description": "BugSnag CLI",
   "main": "dist/bugsnag-cli-wrapper.js",
   "types": "dist/bugsnag-cli-wrapper.d.ts",
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/bugsnag/bugsnag-cli#readme",
   "dependencies": {
+    "proxy-agent": "^6.5.0",
     "yaml": "^2.7.0"
   },
   "files": [
@@ -39,7 +40,7 @@
     "prepublish": "npm run build && cp bin/bugsnag-cli-placeholder bin/bugsnag-cli"
   },
   "devDependencies": {
-    "@types/node": "^24.0.4",
+    "@types/node": "^25.0.3",
     "typescript": "^5.8.3"
   }
 }
