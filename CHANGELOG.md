@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Fixed
+
+- Fix proxy support in the Node package by replacing proxy-agent with undici.ProxyAgent. [#254](https://github.com/bugsnag/bugsnag-cli/pull/254)
+
 ## [3.6.0] - 2026-01-06
 
 ### Changed
