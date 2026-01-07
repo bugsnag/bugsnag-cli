@@ -225,12 +225,17 @@ When('I install the bugsnag-cli via {string} in a new directory') do |package_ma
     @init_output = `pnpm init -y`
     @install_output = `pnpm add #{@bugsnag_cli_package_path}`
   end
-
-  Dir.chdir(base_dir)
 end
 
 Then('the {string} directory should contain {string}') do |directory, package|
   Maze.check.include(`ls #{@fixture_dir}/#{directory}`, package)
+end
+
+And('it should return the help text when I run {string}') do |command|
+  Dir.chdir(@fixture_dir)
+  @output = `#{command}`
+  Maze.check.include(@output, "Usage: #{binary} <command>")
+  Dir.chdir(base_dir)
 end
 
 Given('I build the Unity project for Android') do
