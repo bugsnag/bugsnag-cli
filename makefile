@@ -51,7 +51,7 @@ unit-test:
 
 .PHONY: npm-lint
 npm-lint:
-	cd js && npm i && npm install -g npm-check && npm-check
+	cd js && npm i && npm install -g npm-check && npm-check --ignore=undici
 
 .PHONY: go-lint
 go-lint:

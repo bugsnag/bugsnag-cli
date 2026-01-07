@@ -40,7 +40,26 @@ steps:
     commands:
       - bundle install
       - chmod +x bin/arm64-macos-bugsnag-cli
-      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/cli
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) --exclude features/cli/installation.feature features/cli
+    plugins:
+      artifacts#v1.5.0:
+        download:
+          - bin/arm64-macos-bugsnag-cli
+        upload:
+          - maze_output/**/*
+
+  - label: "Node {{matrix}} Package Installation Tests"
+    depends_on: build
+    matrix:
+      - "18"
+      - "20"
+      - "22"
+    env:
+      NODE_VERSION: "{{matrix}}"
+    commands:
+      - bundle install
+      - chmod +x bin/arm64-macos-bugsnag-cli
+      - bundle exec maze-runner --port=$((MAZE_RUNNER_PORT)) features/cli/installation.feature
     plugins:
       artifacts#v1.5.0:
         download:
