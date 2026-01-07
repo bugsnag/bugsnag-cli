@@ -4,7 +4,7 @@ const { createWriteStream } = require('fs')
 const path = require('path')
 const os = require('os')
 const YAML = require('yaml')
-const ProxyAgent = require('proxy-agent')
+const { ProxyAgent, fetch } = require('undici')
 const packageJson = require('./package.json')
 
 const supportedPlatformsConfig = fs.readFileSync(
@@ -58,11 +58,14 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
             fs.mkdirSync(binDir, { recursive: true })
         }
 
-        const agent = new ProxyAgent()
+        const proxy =
+            process.env.HTTPS_PROXY ||
+            process.env.HTTP_PROXY ||
+            process.env.https_proxy ||
+            process.env.http_proxy
+        const options = proxy ? { dispatcher: new ProxyAgent(proxy) } : {}
 
-        const resp = await fetch(downloadUrl, {
-            dispatcher: agent
-        })
+        const resp = await fetch(downloadUrl, options)
 
         if (resp.ok && resp.body) {
             const writer = createWriteStream(outputPath)
