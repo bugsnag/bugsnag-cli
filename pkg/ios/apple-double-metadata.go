@@ -8,7 +8,14 @@ import (
 // AppleDouble magic number (big-endian)
 const appleDoubleMagic = 0x00051607
 
-// IsAppleDoubleMetaData reports whether the given file is an AppleDouble metadata file.
+// IsAppleDoubleMetaData checks whether a given file is an AppleDouble metadata file.
+//
+// Parameters:
+// - path: The file path to examine.
+//
+// Returns:
+// - A boolean indicating whether the file is AppleDouble metadata.
+// - An error if the file cannot be opened or read.
 func IsAppleDoubleMetaData(path string) (bool, error) {
 	f, err := os.Open(path)
 

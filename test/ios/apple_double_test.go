@@ -8,14 +8,6 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 )
 
-// Minimal AppleDouble header:
-// Magic:   0x00051607
-// Version: 0x00020000
-var appleDoubleHeader = []byte{
-	0x00, 0x05, 0x16, 0x07,
-	0x00, 0x02, 0x00, 0x00,
-}
-
 func TestIsAppleDouble(t *testing.T) {
 	dir := t.TempDir()
 
