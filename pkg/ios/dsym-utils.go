@@ -42,7 +42,6 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	if utils.IsDir(path) {
 		// Check for dSYMs within it
 		dsymLocations = findDsyms(path)
-
 	} else {
 
 		// If path is pointing to a .zip file, we will extract it and look for dSYMS within it to get dsymLocations
@@ -60,12 +59,10 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 				logger.Debug(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
 				dsymLocations = findDsyms(tempDir)
 			}
-
 		} else {
 			// If path points to a file, then we will assume it is a dSYM and use it as-is
 			dsymLocations = append(dsymLocations, path)
 		}
-
 	}
 
 	// If we have found dSYMs, use dwarfdump to get the UUID etc for each dSYM
@@ -75,6 +72,22 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 		}
 
 		for _, dsymLocation := range dsymLocations {
+			fileInfo, err := os.Stat(dsymLocation)
+
+			if err != nil {
+				return nil, tempDir, err
+			}
+
+			// Skip empty *.dSYM if requested
+			if fileInfo.Size() == 0 {
+				if ignoreEmptyDsym {
+					logger.Info(fmt.Sprintf("%s is empty, skipping", dsymLocation))
+					continue
+				} else {
+					return nil, tempDir, fmt.Errorf("%s is empty", dsymLocation)
+				}
+			}
+
 			filesFound, err := os.ReadDir(dsymLocation)
 
 			if err != nil {
@@ -87,45 +100,22 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 			}
 
 			for _, file := range filesFound {
-				dsymFilePath := filepath.Join(dsymLocation, file.Name())
-
-				// Skip AppleDouble metadata files
-				if appleDouble, err := IsAppleDoubleMetaData(dsymFilePath); err != nil {
-					return nil, tempDir, err
-				} else if appleDouble {
-					logger.Info(fmt.Sprintf("%s is an AppleDouble file, skipping", file.Name()))
-					continue
-				}
-
-				fileInfo, err := os.Stat(dsymFilePath)
-				if err != nil {
-					return nil, tempDir, err
-				}
-
-				// Skip empty files if requested
-				if fileInfo.Size() == 0 {
-					if ignoreEmptyDsym {
-						logger.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
-						continue
-					} else {
-						return nil, tempDir, fmt.Errorf("%s is empty", file.Name())
-					}
-				}
-
 				// Extract DWARF info
 				info := getDwarfFileInfo(dsymLocation, file.Name())
-				if len(info) == 0 {
-					if ignoreMissingDwarf {
-						logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", fileInfo.Name()))
-						continue
-					} else {
-						return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", fileInfo.Name())
-					}
+				if len(info) > 0 {
+					dwarfInfo = append(dwarfInfo, info...)
 				}
-
-				dwarfInfo = append(dwarfInfo, info...)
 			}
 		}
+
+		if len(dwarfInfo) == 0 {
+			if ignoreMissingDwarf {
+				logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", dwarfInfo))
+			} else {
+				return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", dwarfInfo)
+			}
+		}
+
 	}
 
 	return dwarfInfo, tempDir, nil
