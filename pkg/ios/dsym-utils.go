@@ -87,15 +87,25 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 			}
 
 			for _, file := range filesFound {
+				appleDouble, err := IsAppleDoubleMetaData(file.Name())
+				if err != nil {
+					return nil, tempDir, err
+				}
+
+				if appleDouble {
+					logger.Info(fmt.Sprintf("%s is an AppleDouble file, skipping", file.Name()))
+					continue
+				}
+
 				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
 
 				if fileInfo.Size() > 0 {
 					info := getDwarfFileInfo(dsymLocation, file.Name())
 					if len(info) == 0 {
 						if ignoreMissingDwarf {
-							logger.Info(fmt.Sprintf("%s is not a valid DWARF file, skipping", fileInfo.Name()))
+							logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", fileInfo.Name()))
 						} else {
-							return nil, tempDir, fmt.Errorf("%s is not a valid DWARF file", fileInfo.Name())
+							return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", fileInfo.Name())
 						}
 					}
 					dwarfInfo = append(dwarfInfo, info...)
