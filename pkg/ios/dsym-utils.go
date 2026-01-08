@@ -87,35 +87,43 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 			}
 
 			for _, file := range filesFound {
-				appleDouble, err := IsAppleDoubleMetaData(file.Name())
-				if err != nil {
-					return nil, tempDir, err
-				}
+				dsymFilePath := filepath.Join(dsymLocation, file.Name())
 
-				if appleDouble {
+				// Skip AppleDouble metadata files
+				if appleDouble, err := IsAppleDoubleMetaData(dsymFilePath); err != nil {
+					return nil, tempDir, err
+				} else if appleDouble {
 					logger.Info(fmt.Sprintf("%s is an AppleDouble file, skipping", file.Name()))
 					continue
 				}
 
-				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
+				fileInfo, err := os.Stat(dsymFilePath)
+				if err != nil {
+					return nil, tempDir, err
+				}
 
-				if fileInfo.Size() > 0 {
-					info := getDwarfFileInfo(dsymLocation, file.Name())
-					if len(info) == 0 {
-						if ignoreMissingDwarf {
-							logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", fileInfo.Name()))
-						} else {
-							return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", fileInfo.Name())
-						}
-					}
-					dwarfInfo = append(dwarfInfo, info...)
-				} else {
+				// Skip empty files if requested
+				if fileInfo.Size() == 0 {
 					if ignoreEmptyDsym {
 						logger.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
+						continue
 					} else {
 						return nil, tempDir, fmt.Errorf("%s is empty", file.Name())
 					}
 				}
+
+				// Extract DWARF info
+				info := getDwarfFileInfo(dsymLocation, file.Name())
+				if len(info) == 0 {
+					if ignoreMissingDwarf {
+						logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", fileInfo.Name()))
+						continue
+					} else {
+						return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", fileInfo.Name())
+					}
+				}
+
+				dwarfInfo = append(dwarfInfo, info...)
 			}
 		}
 	}
