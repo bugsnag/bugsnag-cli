@@ -106,16 +106,15 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 					dwarfInfo = append(dwarfInfo, info...)
 				}
 			}
-		}
 
-		if len(dwarfInfo) == 0 {
-			if ignoreMissingDwarf {
-				logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", dwarfInfo))
-			} else {
-				return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", dwarfInfo)
+			if len(dwarfInfo) == 0 {
+				if ignoreMissingDwarf {
+					logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", dsymLocation))
+				} else {
+					return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", dsymLocation)
+				}
 			}
 		}
-
 	}
 
 	return dwarfInfo, tempDir, nil
