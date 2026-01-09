@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Changed
+
+- Update the logic and order when checking for empty dSYMS and missing DWARF information for dSYM uploads. [#256](https://github.com/bugsnag/bugsnag-cli/pull/256)
+
 ## [3.6.1] - 2026-01-07
 
 ### Fixed
