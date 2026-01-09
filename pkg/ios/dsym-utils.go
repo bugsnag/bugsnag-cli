@@ -104,7 +104,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 
 			for _, file := range filesFound {
 				// Extract DWARF info
-				info := getDwarfFileInfo(dsymLocation, file.Name())
+				info := getDwarfFileInfo(dwarfLocation, file.Name())
 				if len(info) > 0 {
 					dwarfInfo = append(dwarfInfo, info...)
 				}
