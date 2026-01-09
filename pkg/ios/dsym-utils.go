@@ -37,6 +37,7 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	var tempDir string
 	var dsymLocations []string
 	var dwarfInfo []*DwarfInfo
+	var dwarfLocation string
 
 	// If path is set and is a directory
 	if utils.IsDir(path) {
@@ -88,10 +89,12 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 				}
 			}
 
-			filesFound, err := os.ReadDir(dsymLocation)
+			dwarfLocation = filepath.Join(dsymLocation, "Contents", "Resources", "DWARF")
+
+			filesFound, err := os.ReadDir(dwarfLocation)
 
 			if err != nil {
-				// If not a directory, then we'll assume that the path is pointing straight to a file
+				// If not a directory, then we'll assume that the path is pointing straight to a DWARF file
 				if strings.Contains(err.Error(), "not a directory") {
 					fileName := filepath.Base(dsymLocation)
 					dsymLocation = filepath.Dir(dsymLocation)
@@ -175,7 +178,7 @@ func findDsyms(root string) []string {
 
 		// If the file is a dSYM, add it to the list (unless it resides within the __MACOSX directory)
 		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
-			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
+			dsyms = append(dsyms, path)
 		}
 
 		return nil
