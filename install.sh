@@ -91,7 +91,7 @@ display_help() {
 EOS
 }
 
-VERSION="3.6.1"
+VERSION="3.7.0"
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in

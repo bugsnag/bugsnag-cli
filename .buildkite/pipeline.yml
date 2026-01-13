@@ -175,6 +175,7 @@ steps:
           - maze_output/**/*
 
   - label: "Node.js Integration Tests"
+    branches: "!release/*"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
