@@ -50,6 +50,7 @@ steps:
 
   - label: "Node {{matrix}} Package Installation Tests"
     depends_on: build
+    branches: "!release/*"
     matrix:
       - "18"
       - "20"
@@ -175,7 +176,6 @@ steps:
           - maze_output/**/*
 
   - label: "Node.js Integration Tests"
-    branches: "!release/*"
     depends_on: build
     commands:
       - chmod +x bin/arm64-macos-bugsnag-cli
