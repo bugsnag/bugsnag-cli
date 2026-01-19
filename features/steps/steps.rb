@@ -34,6 +34,18 @@ Then('I should see a log level of {string} when no dSYM files could be found') d
   Maze.check.include(run_output, message)
 end
 
+Then('I should see a log level of {string} when the dSYM files is empty') do |log_level|
+  message_regex = /#{Regexp.escape(log_level)}\s+Error\ locating\ dSYM\ files:\s+(\/[^\/\s]+)+\.dSYM\s+is\ empty/
+  regex = Regexp.new(message_regex)
+  Maze.check.match(regex, run_output)
+end
+
+Then('I should see a log level of {string} when the DWARF file is not valid') do |log_level|
+  message_regex = /#{Regexp.escape(log_level)}\s+Error\ locating\ dSYM\ files:\s+(\/[^\/\s]+)+\.dSYM\s+does\ not\ contain\ valid\ DWARF\ information/
+  regex = Regexp.new(message_regex)
+  Maze.check.match(regex, run_output)
+end
+
 Then('I should see a log level of {string} when no dSYM files could be uploaded') do |log_level|
   message = log_level + ' failed after'
   Maze.check.include(run_output, message)

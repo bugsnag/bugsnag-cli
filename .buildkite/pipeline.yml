@@ -50,6 +50,7 @@ steps:
 
   - label: "Node {{matrix}} Package Installation Tests"
     depends_on: build
+    branches: "!release/*"
     matrix:
       - "18"
       - "20"

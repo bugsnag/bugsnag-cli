@@ -3,15 +3,16 @@ package ios
 import (
 	"bytes"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/log"
-	"github.com/bugsnag/bugsnag-cli/pkg/options"
-	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/options"
+	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
 // GetLatestXcodeArchiveForScheme retrieves the latest xcarchive for a given scheme.

@@ -37,12 +37,12 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 	var tempDir string
 	var dsymLocations []string
 	var dwarfInfo []*DwarfInfo
+	var dwarfLocation string
 
 	// If path is set and is a directory
 	if utils.IsDir(path) {
 		// Check for dSYMs within it
 		dsymLocations = findDsyms(path)
-
 	} else {
 
 		// If path is pointing to a .zip file, we will extract it and look for dSYMS within it to get dsymLocations
@@ -60,12 +60,10 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 				logger.Debug(fmt.Sprintf("Unzipped %s to %s for uploading", fileName, tempDir))
 				dsymLocations = findDsyms(tempDir)
 			}
-
 		} else {
 			// If path points to a file, then we will assume it is a dSYM and use it as-is
 			dsymLocations = append(dsymLocations, path)
 		}
-
 	}
 
 	// If we have found dSYMs, use dwarfdump to get the UUID etc for each dSYM
@@ -75,10 +73,28 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 		}
 
 		for _, dsymLocation := range dsymLocations {
-			filesFound, err := os.ReadDir(dsymLocation)
+			fileInfo, err := os.Stat(dsymLocation)
 
 			if err != nil {
-				// If not a directory, then we'll assume that the path is pointing straight to a file
+				return nil, tempDir, err
+			}
+
+			// Skip empty *.dSYM if requested
+			if fileInfo.Size() == 0 {
+				if ignoreEmptyDsym {
+					logger.Info(fmt.Sprintf("%s is empty, skipping", dsymLocation))
+					continue
+				} else {
+					return nil, tempDir, fmt.Errorf("%s is empty", dsymLocation)
+				}
+			}
+
+			dwarfLocation = filepath.Join(dsymLocation, "Contents", "Resources", "DWARF")
+
+			filesFound, err := os.ReadDir(dwarfLocation)
+
+			if err != nil {
+				// If not a directory, then we'll assume that the path is pointing straight to a DWARF file
 				if strings.Contains(err.Error(), "not a directory") {
 					fileName := filepath.Base(dsymLocation)
 					dsymLocation = filepath.Dir(dsymLocation)
@@ -87,24 +103,18 @@ func FindDsymsInPath(path string, ignoreEmptyDsym, ignoreMissingDwarf bool, logg
 			}
 
 			for _, file := range filesFound {
-				fileInfo, _ := os.Stat(filepath.Join(dsymLocation, file.Name()))
-
-				if fileInfo.Size() > 0 {
-					info := getDwarfFileInfo(dsymLocation, file.Name())
-					if len(info) == 0 {
-						if ignoreMissingDwarf {
-							logger.Info(fmt.Sprintf("%s is not a valid DWARF file, skipping", fileInfo.Name()))
-						} else {
-							return nil, tempDir, fmt.Errorf("%s is not a valid DWARF file", fileInfo.Name())
-						}
-					}
+				// Extract DWARF info
+				info := getDwarfFileInfo(dwarfLocation, file.Name())
+				if len(info) > 0 {
 					dwarfInfo = append(dwarfInfo, info...)
+				}
+			}
+
+			if len(dwarfInfo) == 0 {
+				if ignoreMissingDwarf {
+					logger.Info(fmt.Sprintf("%s does not contain valid DWARF information, skipping", dsymLocation))
 				} else {
-					if ignoreEmptyDsym {
-						logger.Info(fmt.Sprintf("%s is empty, skipping", file.Name()))
-					} else {
-						return nil, tempDir, fmt.Errorf("%s is empty", file.Name())
-					}
+					return nil, tempDir, fmt.Errorf("%s does not contain valid DWARF information", dsymLocation)
 				}
 			}
 		}
@@ -168,7 +178,7 @@ func findDsyms(root string) []string {
 
 		// If the file is a dSYM, add it to the list (unless it resides within the __MACOSX directory)
 		if strings.HasSuffix(strings.ToLower(info.Name()), ".dsym") && !strings.Contains(strings.ToLower(path), "__macosx") {
-			dsyms = append(dsyms, filepath.Join(path, "Contents", "Resources", "DWARF"))
+			dsyms = append(dsyms, path)
 		}
 
 		return nil
