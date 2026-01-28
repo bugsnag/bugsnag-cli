@@ -73,7 +73,7 @@ func ProcessReactNativeSourcemaps(globalOptions options.CLI, logger log.Logger) 
 	// Determine project root
 	if reactNativeOpts.ProjectRoot == "" {
 		uploadOpts["projectRoot"] = string(reactNativeOpts.Path)
-		logger.Debug(fmt.Sprintf("Project root not provided — using inferred path: %s", uploadOpts["projectRoot"]))
+		logger.Debug(fmt.Sprintf("ProjectCommands root not provided — using inferred path: %s", uploadOpts["projectRoot"]))
 	} else {
 		uploadOpts["projectRoot"] = reactNativeOpts.ProjectRoot
 		logger.Debug(fmt.Sprintf("Using specified project root: %s", reactNativeOpts.ProjectRoot))

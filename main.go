@@ -6,6 +6,7 @@ import (
 	"github.com/alecthomas/kong"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/build"
+	"github.com/bugsnag/bugsnag-cli/pkg/data_access"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
@@ -40,7 +41,27 @@ func main() {
 		logger.Info("Performing dry run - no data will be sent to BugSnag")
 	}
 
+	dataAccessService := data_access.NewService()
+
 	switch kongCtx.Command() {
+
+	case "create project":
+		err := dataAccessService.Projects.Create(commands, logger)
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "get project":
+		err := dataAccessService.Projects.Get(commands, logger)
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
+
+	case "update project":
+		err := dataAccessService.Projects.Update(commands, logger)
+		if err != nil {
+			logger.Fatal(err.Error())
+		}
 
 	case "upload all <path>":
 

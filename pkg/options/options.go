@@ -1,6 +1,7 @@
 package options
 
 import (
+	"github.com/bugsnag/bugsnag-cli/pkg/options/data_access"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -147,6 +148,9 @@ type CLI struct {
 	CreateAndroidBuildId CreateAndroidBuildId `cmd:"" help:"Generate a reproducible Build ID from .dex files"`
 	CreateBuild          CreateBuild          `cmd:"" help:"Provide extra information whenever you build, release, or deploy your application"`
 	Upload               Upload               `cmd:"" help:"Upload symbol/mapping files"`
+	Create               data_access.Create   `cmd:"" help:"Create stuff"`
+	Get                  data_access.Get      `cmd:"" help:"Get stuff"`
+	Update               data_access.Update   `cmd:"" help:"Update stuff"`
 }
 
 type CreateAndroidBuildId struct {
