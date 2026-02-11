@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Added
+
+- Add support for aarch64 in the install scripts [#260](https://github.com/bugsnag/bugsnag-cli/pull/260)
+
 ## [3.7.0] - 2026-01-19
 
 ### Changed
