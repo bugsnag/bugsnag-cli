@@ -121,7 +121,11 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 		if androidOptions.Android.AppManifest == "" {
 			androidOptions.Android.AppManifest, err = android.FindAndroidManifest(appBuildPath, androidOptions.Android.Variant)
 			if err != nil {
-				return err
+				// Only fail if the values from manifest are not provided
+				if globalOptions.ApiKey == "" || androidOptions.ReactNative.VersionName == "" || androidOptions.Android.VersionCode == "" {
+					return err
+				}
+				logger.Debug(fmt.Sprintf("Could not find AndroidManifest.xml: %s", err.Error()))
 			}
 			if androidOptions.Android.AppManifest != "" {
 				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
