@@ -12,6 +12,18 @@ Feature: Android NDK Integration Test
       | versionName  | 2.0                                  |
       | overwrite    | true                                 |
 
+  Scenario: Upload a single Android NDK sourcemap using all CLI flags without AndroidManifest.xml
+    When I run bugsnag-cli with upload android-ndk --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --application-id="2.0" --variant=release --version-code=2 --version-name=2.0 features/android/fixtures/app/build/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libbugsnag-ndk.so
+    And I wait to receive 1 sourcemaps
+    Then the sourcemaps are valid for the API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF     |
+      | appId        | 2.0                                  |
+      | versionCode  | 2                                    |
+      | versionName  | 2.0                                  |
+      | overwrite    | true                                 |
+
   Scenario: Upload a single Android NDK sourcemap providing the app-manifest CLI flag
     When I run bugsnag-cli with upload android-ndk --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml features/android/fixtures/app/build/intermediates/merged_native_libs/release/out/lib/arm64-v8a/libbugsnag-ndk.so
     And I wait to receive 1 sourcemaps

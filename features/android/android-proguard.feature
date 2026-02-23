@@ -13,6 +13,19 @@ Feature: Android Proguard Integration Test
       | versionName  | 2.0                                   |
       | overwrite    | true                                  |
 
+  Scenario: Upload an Android Proguard mapping file using all CLI flags without AndroidManifest.xml 
+    When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --application-id="com.exampleApp.android" --build-uuid=1234567890abcdefghijklmnopqrstuvwxyz --variant=release --version-code=2 --version-name=2.0 features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
+    And I wait to receive 1 sourcemaps
+    Then the sourcemaps are valid for the API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    Then the sourcemap payload fields should be:
+      | apiKey       | 1234567890ABCDEF1234567890ABCDEF      |
+      | appId        | com.exampleApp.android                |
+      | buildUUID    | 1234567890abcdefghijklmnopqrstuvwxyz  |
+      | versionCode  | 2                                     |
+      | versionName  | 2.0                                   |
+      | overwrite    | true                                  |
+
   Scenario: Upload an Android Proguard mapping file providing the app-manifest CLI flag
     When I run bugsnag-cli with upload android-proguard --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --app-manifest=features/android/fixtures/app/build/intermediates/merged_manifests/release/AndroidManifest.xml features/android/fixtures/app/build/outputs/mapping/release/mapping.txt
     And I wait to receive 1 sourcemaps

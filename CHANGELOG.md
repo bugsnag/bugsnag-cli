@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Changed
+
+- Changed AndroidManifest.xml handling for Android-related uploads (NDK, Proguard, and React Native Android) to log warnings instead of returning errors when the manifest file cannot be found or read. [#264](https://github.com/bugsnag/bugsnag-cli/pull/264)
+
 ## [3.7.0] - 2026-01-19
 
 ### Changed

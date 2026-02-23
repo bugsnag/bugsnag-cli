@@ -59,10 +59,7 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 				appBuildPath := filepath.Join(path, "app", "build")
 				proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
 				if err != nil {
-					return err
-				}
-				if proguardOptions.AppManifest == "" {
-					logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
+					logger.Warn(fmt.Sprintf("Unable to locate AndroidManifest.xml: %s", err.Error()))
 				}
 			}
 
@@ -76,10 +73,7 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 				if filepath.Base(appBuildPath) == "build" {
 					proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
 					if err != nil {
-						return err
-					}
-					if proguardOptions.AppManifest == "" {
-						logger.Info("Unable to locate AndroidManifest.xml for variant; proceeding without manifest path")
+						logger.Warn(fmt.Sprintf("Unable to locate AndroidManifest.xml: %s", err.Error()))
 					}
 				}
 			}
@@ -90,73 +84,73 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 			logger.Debug("Reading data from AndroidManifest.xml")
 			manifestData, err := android.ParseAndroidManifestXML(proguardOptions.AppManifest)
 			if err != nil {
-				return err
-			}
-
-			if options.ApiKey == "" {
-				for key, value := range manifestData.Application.MetaData.Name {
-					if value == "com.bugsnag.android.API_KEY" {
-						options.ApiKey = manifestData.Application.MetaData.Value[key]
+				logger.Warn(fmt.Sprintf("Unable to read AndroidManifest.xml: %s", err.Error()))
+			} else {
+				if options.ApiKey == "" {
+					for key, value := range manifestData.Application.MetaData.Name {
+						if value == "com.bugsnag.android.API_KEY" {
+							options.ApiKey = manifestData.Application.MetaData.Value[key]
+						}
 					}
-				}
-				if options.ApiKey != "" {
-					logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", options.ApiKey))
-				}
-			}
-
-			if proguardOptions.ApplicationId == "" {
-				proguardOptions.ApplicationId = manifestData.ApplicationId
-				if proguardOptions.ApplicationId != "" {
-					logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", proguardOptions.ApplicationId))
-				}
-			}
-
-			if proguardOptions.NoBuildUuid {
-				proguardOptions.BuildUuid = ""
-				logger.Info("No build ID will be used")
-			} else if proguardOptions.BuildUuid == "" {
-				for i := range manifestData.Application.MetaData.Name {
-					if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
-						proguardOptions.BuildUuid = manifestData.Application.MetaData.Value[i]
+					if options.ApiKey != "" {
+						logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", options.ApiKey))
 					}
 				}
 
-				if len(proguardOptions.DexFiles) == 0 && proguardOptions.Variant != "" {
-					proguardOptions.DexFiles = android.FindVariantDexFiles(mappingFile, proguardOptions.Variant)
+				if proguardOptions.ApplicationId == "" {
+					proguardOptions.ApplicationId = manifestData.ApplicationId
+					if proguardOptions.ApplicationId != "" {
+						logger.Debug(fmt.Sprintf("Using %s as application ID from AndroidManifest.xml", proguardOptions.ApplicationId))
+					}
 				}
 
-				if proguardOptions.BuildUuid == "" && len(proguardOptions.DexFiles) > 0 {
-					safeDexFile, err := android.GetDexFiles(proguardOptions.DexFiles)
-					if err != nil {
-						return err
+				if proguardOptions.NoBuildUuid {
+					proguardOptions.BuildUuid = ""
+					logger.Info("No build ID will be used")
+				} else if proguardOptions.BuildUuid == "" {
+					for i := range manifestData.Application.MetaData.Name {
+						if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
+							proguardOptions.BuildUuid = manifestData.Application.MetaData.Value[i]
+						}
 					}
 
-					signature, err := android.GetAppSignatureFromFiles(safeDexFile)
-					if err != nil {
-						return err
+					if len(proguardOptions.DexFiles) == 0 && proguardOptions.Variant != "" {
+						proguardOptions.DexFiles = android.FindVariantDexFiles(mappingFile, proguardOptions.Variant)
 					}
 
-					proguardOptions.BuildUuid = fmt.Sprintf("%x", signature)
+					if proguardOptions.BuildUuid == "" && len(proguardOptions.DexFiles) > 0 {
+						safeDexFile, err := android.GetDexFiles(proguardOptions.DexFiles)
+						if err != nil {
+							return err
+						}
 
-					if proguardOptions.BuildUuid != "" {
-						logger.Debug(fmt.Sprintf("Using %s as build ID from classes.dex", proguardOptions.BuildUuid))
+						signature, err := android.GetAppSignatureFromFiles(safeDexFile)
+						if err != nil {
+							return err
+						}
+
+						proguardOptions.BuildUuid = fmt.Sprintf("%x", signature)
+
+						if proguardOptions.BuildUuid != "" {
+							logger.Debug(fmt.Sprintf("Using %s as build ID from classes.dex", proguardOptions.BuildUuid))
+						}
+					} else {
+						logger.Debug(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", proguardOptions.BuildUuid))
 					}
-				} else {
-					logger.Debug(fmt.Sprintf("Using %s as build UUID from AndroidManifest.xml", proguardOptions.BuildUuid))
 				}
-			}
 
-			if proguardOptions.VersionCode == "" {
-				proguardOptions.VersionCode = manifestData.VersionCode
-				if proguardOptions.VersionCode != "" {
-					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", proguardOptions.VersionCode))
+				if proguardOptions.VersionCode == "" {
+					proguardOptions.VersionCode = manifestData.VersionCode
+					if proguardOptions.VersionCode != "" {
+						logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", proguardOptions.VersionCode))
+					}
 				}
-			}
 
-			if proguardOptions.VersionName == "" {
-				proguardOptions.VersionName = manifestData.VersionName
-				if proguardOptions.VersionName != "" {
-					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", proguardOptions.VersionName))
+				if proguardOptions.VersionName == "" {
+					proguardOptions.VersionName = manifestData.VersionName
+					if proguardOptions.VersionName != "" {
+						logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", proguardOptions.VersionName))
+					}
 				}
 			}
 		}
