@@ -1,3 +1,3 @@
 source "https://rubygems.org"
-gem "bugsnag-maze-runner", "~> 9.36"
+gem "bugsnag-maze-runner", "~> 10.11"
 gem 'cocoapods'
