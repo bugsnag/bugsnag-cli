@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
 
@@ -18,11 +19,12 @@ import (
 //   - appBuildPath: The root build directory where Android build outputs are located.
 //   - variant: The build variant (e.g., "debug", "release") whose manifest paths
 //     should be searched.
+//   - logger: logger used to emit debug output when manifest is not found.
 //
 // Returns:
 //   - string: The resolved manifest path if found, otherwise an empty string.
 //   - error: Non-nil if the manifest cannot be found.
-func FindAndroidManifest(appBuildPath string, variant string) (string, error) {
+func FindAndroidManifest(appBuildPath string, variant string, logger log.Logger) (string, error) {
 	var err error
 
 	mergedManifestPath := filepath.Join(appBuildPath, "intermediates", "merged_manifests")
@@ -47,5 +49,7 @@ func FindAndroidManifest(appBuildPath string, variant string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("unable to locate AndroidManifest.xml for variant %s", variant)
+	err = fmt.Errorf("unable to locate AndroidManifest.xml for variant %s", variant)
+	logger.Info(fmt.Sprintf("Unable to locate AndroidManifest.xml: %s", err.Error()))
+	return "", err
 }

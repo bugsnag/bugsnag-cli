@@ -40,9 +40,8 @@ func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath stri
 		return
 	}
 	appBuildPath := filepath.Join(libPath, "..", "..")
-	manifestPath, err := android.FindAndroidManifest(appBuildPath, ndkOpts.Variant)
+	manifestPath, err := android.FindAndroidManifest(appBuildPath, ndkOpts.Variant, logger)
 	if err != nil {
-		logger.Info(fmt.Sprintf("AndroidManifest.xml not located at: %s", err.Error()))
 		return
 	}
 	ndkOpts.AppManifest = manifestPath

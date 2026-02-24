@@ -57,10 +57,7 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 			// Attempt to locate AndroidManifest.xml for the variant if not set
 			if proguardOptions.AppManifest == "" {
 				appBuildPath := filepath.Join(path, "app", "build")
-				proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
-				if err != nil {
-					logger.Warn(fmt.Sprintf("Unable to locate AndroidManifest.xml: %s", err.Error()))
-				}
+				proguardOptions.AppManifest, _ = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant, logger)
 			}
 
 		} else {
@@ -71,10 +68,7 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 			if proguardOptions.AppManifest == "" && proguardOptions.Variant == "" {
 				appBuildPath := filepath.Join(path, "..", "..", "..", "..")
 				if filepath.Base(appBuildPath) == "build" {
-					proguardOptions.AppManifest, err = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant)
-					if err != nil {
-						logger.Warn(fmt.Sprintf("Unable to locate AndroidManifest.xml: %s", err.Error()))
-					}
+					proguardOptions.AppManifest, _ = android.FindAndroidManifest(appBuildPath, proguardOptions.Variant, logger)
 				}
 			}
 		}
