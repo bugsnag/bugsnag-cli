@@ -144,3 +144,39 @@ func TestProcessAndroidNdk_ManifestProvidedExplicitly_NoSearch(t *testing.T) {
 	assert.False(t, logger.HasWarning("Unable to locate AndroidManifest.xml"),
 		"Should not search for manifest when explicitly provided")
 }
+
+func TestProcessAndroidNdk_StrippedFile_Skipped(t *testing.T) {
+	// Use a stripped .so file from the fixtures
+	strippedFile := "../../features/android/fixtures/app/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libbugsnag-ndk.so"
+
+	logger := NewMockLogger()
+
+	opts := options.CLI{
+		Globals: options.Globals{
+			ApiKey: "test-api-key",
+		},
+		Upload: options.Upload{
+			AndroidNdk: options.AndroidNdkMapping{
+				Path:            []string{strippedFile},
+				Variant:         "release",
+				ApplicationId:   "com.test.app",
+				VersionCode:     "1",
+				VersionName:     "1.0",
+				AndroidNdkRoot:  "../../test/testdata/android/sdk/ndk/24.0.8215888",
+			},
+		},
+	}
+
+	err := upload.ProcessAndroidNDK(opts, logger)
+
+	// No error should be returned - file should just be skipped
+	assert.NoError(t, err, "Should not error when skipping stripped file")
+
+	// Verify that the stripped file was detected and skipped
+	assert.True(t, logger.HasInfo("Skipping") && logger.HasInfo("stripped"),
+		"Should log info message about skipping stripped file")
+	
+	// Verify the file name appears in the message
+	assert.True(t, logger.HasInfo("libbugsnag-ndk.so"),
+		"Should include file name in skip message")
+}

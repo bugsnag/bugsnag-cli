@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -213,6 +214,16 @@ func ProcessAndroidNDK(opts options.CLI, logger log.Logger) error {
 					return fmt.Errorf("creating temp directory: %w", err)
 				}
 				defer os.RemoveAll(workingDir)
+			}
+
+			// Check if the file is stripped before attempting to extract symbols
+			isStripped, err := elf.IsStripped(file)
+			if err != nil {
+				logger.Debug(fmt.Sprintf("Warning: Could not check if %s is stripped: %v", file, err))
+			}
+			if isStripped {
+				logger.Info(fmt.Sprintf("Skipping %s: file has been stripped of debug symbols", filepath.Base(file)))
+				continue
 			}
 
 			logger.Debug(fmt.Sprintf("Extracting symbols from %s", file))

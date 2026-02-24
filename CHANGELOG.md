@@ -4,6 +4,8 @@
 
 ### Changed
 
+- Android NDK uploads now check if .so files are stripped before attempting to extract debug symbols. Stripped files are skipped with an info message, preventing unnecessary objcopy operations.
+
 - Changed AndroidManifest.xml handling for Android-related uploads (NDK, Proguard, and React Native Android) to not error when the manifest file cannot be found or read. [#264](https://github.com/bugsnag/bugsnag-cli/pull/264)
 
 - Add support for aarch64 in the install scripts [#260](https://github.com/bugsnag/bugsnag-cli/pull/260)

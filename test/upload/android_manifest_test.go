@@ -68,6 +68,15 @@ func (m *MockLogger) HasDebug(substring string) bool {
 	return false
 }
 
+func (m *MockLogger) HasInfo(substring string) bool {
+	for _, msg := range m.InfoMessages {
+		if strings.Contains(msg, substring) {
+			return true
+		}
+	}
+	return false
+}
+
 func (m *MockLogger) Reset() {
 	m.DebugMessages = []string{}
 	m.InfoMessages = []string{}
