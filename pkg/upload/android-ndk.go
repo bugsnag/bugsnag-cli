@@ -40,12 +40,7 @@ func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath stri
 		return
 	}
 	appBuildPath := filepath.Join(libPath, "..", "..")
-	manifestPath, err := android.FindAndroidManifest(appBuildPath, ndkOpts.Variant, logger)
-	if err != nil {
-		return
-	}
-	ndkOpts.AppManifest = manifestPath
-	logger.Debug(fmt.Sprintf("Found AndroidManifest.xml at %s", ndkOpts.AppManifest))
+	ndkOpts.AppManifest = android.FindAndroidManifest(appBuildPath, ndkOpts.Variant, logger)
 }
 
 // resolveProjectRootIfNeeded sets the project root directory in ndkOpts if it hasn't already been set.
