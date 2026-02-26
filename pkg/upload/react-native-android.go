@@ -31,7 +31,6 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 	var variantDirName string
 	var bundleDirPath string
 	var variantFileFormat string
-	var appManifestPathExpected string
 
 	for _, path := range androidOptions.Path {
 
@@ -119,15 +118,7 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 		}
 
 		if androidOptions.Android.AppManifest == "" {
-			androidOptions.Android.AppManifest, err = android.FindAndroidManifest(appBuildPath, androidOptions.Android.Variant)
-			if err != nil {
-				return err
-			}
-			if androidOptions.Android.AppManifest != "" {
-				logger.Debug(fmt.Sprintf("Found app manifest at: %s", androidOptions.Android.AppManifest))
-			} else {
-				logger.Debug(fmt.Sprintf("No app manifest found at: %s", appManifestPathExpected))
-			}
+			androidOptions.Android.AppManifest = android.FindAndroidManifest(appBuildPath, androidOptions.Android.Variant, logger)
 		}
 
 		if androidOptions.Android.AppManifest != "" && (globalOptions.ApiKey == "" || androidOptions.ReactNative.VersionName == "" || androidOptions.Android.VersionCode == "") {
@@ -135,28 +126,28 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 			manifestData, err := android.ParseAndroidManifestXML(androidOptions.Android.AppManifest)
 
 			if err != nil {
-				return err
-			}
-
-			if globalOptions.ApiKey == "" {
-				for key, value := range manifestData.Application.MetaData.Name {
-					if value == "com.bugsnag.android.API_KEY" {
-						globalOptions.ApiKey = manifestData.Application.MetaData.Value[key]
+				logger.Warn(fmt.Sprintf("Unable to read AndroidManifest.xml: %s", err.Error()))
+			} else {
+				if globalOptions.ApiKey == "" {
+					for key, value := range manifestData.Application.MetaData.Name {
+						if value == "com.bugsnag.android.API_KEY" {
+							globalOptions.ApiKey = manifestData.Application.MetaData.Value[key]
+						}
 					}
-				}
-				logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", globalOptions.ApiKey))
-			}
-
-			// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from AndroidManifest.xml
-			if androidOptions.ReactNative.CodeBundleId == "" {
-				if androidOptions.ReactNative.VersionName == "" {
-					androidOptions.ReactNative.VersionName = manifestData.VersionName
-					logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", androidOptions.ReactNative.VersionName))
+					logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", globalOptions.ApiKey))
 				}
 
-				if androidOptions.Android.VersionCode == "" {
-					androidOptions.Android.VersionCode = manifestData.VersionCode
-					logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", androidOptions.Android.VersionCode))
+				// If we've not passed --code-bundle-id, proceed to populate versionName and versionCode from AndroidManifest.xml
+				if androidOptions.ReactNative.CodeBundleId == "" {
+					if androidOptions.ReactNative.VersionName == "" {
+						androidOptions.ReactNative.VersionName = manifestData.VersionName
+						logger.Debug(fmt.Sprintf("Using %s as version name from AndroidManifest.xml", androidOptions.ReactNative.VersionName))
+					}
+
+					if androidOptions.Android.VersionCode == "" {
+						androidOptions.Android.VersionCode = manifestData.VersionCode
+						logger.Debug(fmt.Sprintf("Using %s as version code from AndroidManifest.xml", androidOptions.Android.VersionCode))
+					}
 				}
 			}
 		}
