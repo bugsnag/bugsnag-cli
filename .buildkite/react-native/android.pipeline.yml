@@ -7,7 +7,7 @@ steps:
     timeout_in_minutes: 15
     env:
       JAVA_VERSION: "17"
-      NODE_VERSION: "18"
+      NODE_VERSION: "22"
       RN_VERSION: "{{matrix}}"
       RCT_NEW_ARCH_ENABLED: "0"
       BUILD_ANDROID: "true"
@@ -19,6 +19,7 @@ steps:
       - "0.70"
       - "0.73"
       - "0.75"
+      - "0.83"
     plugins:
       artifacts#v1.5.0:
         download:
