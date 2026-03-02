@@ -5,6 +5,7 @@ const { resolve } = require('path')
 const fs = require('fs')
 const androidUtils = require('./react-native/android-utils')
 const iosUtils = require('./react-native/ios-utils')
+const manifestUtils = require('./react-native/manifest-utils')
 
 if (!process.env.RN_VERSION) {
     console.error('Please provide a React Native version')
@@ -53,6 +54,11 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     iosUtils.configureIOSProject(fixtureDir)
 
     execSync(`npm install --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
+    // Remove package attribute from all AndroidManifest.xml files in node_modules if rn 0.80+ to avoid manifest merger issues with the Bugsnag Android SDK
+    const [major, minor] = reactNativeVersion.split('.').map(Number)
+    if (major > 0 || (major === 0 && minor >= 80)) {
+        manifestUtils.removePackageAttributeFromManifests(fixtureDir)
+    }
 }
 
 // Build the android fixture
