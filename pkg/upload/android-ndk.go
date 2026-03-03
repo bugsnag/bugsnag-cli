@@ -29,23 +29,18 @@ func resolveMergedLibPath(input string) (string, error) {
 // resolveAppManifestIfNeeded sets the AndroidManifest.xml path in ndkOpts if it hasn't already been set.
 //
 // It infers the manifest location based on the provided native lib path and variant.
+// If the manifest cannot be found or read, a warning is logged instead of returning an error.
 //
 // Parameters:
 //   - ndkOpts: AndroidNdkMapping options struct (will be mutated).
 //   - libPath: resolved path to merged_native_libs.
 //   - logger: logger used to emit debug output.
-func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath string, logger log.Logger) error {
-	var err error
+func resolveAppManifestIfNeeded(ndkOpts *options.AndroidNdkMapping, libPath string, logger log.Logger) {
 	if ndkOpts.AppManifest != "" {
-		return nil
+		return
 	}
 	appBuildPath := filepath.Join(libPath, "..", "..")
-	ndkOpts.AppManifest, err = android.FindAndroidManifest(appBuildPath, ndkOpts.Variant)
-	if err != nil {
-		return err
-	}
-	logger.Debug(fmt.Sprintf("Found AndroidManifest.xml at %s", ndkOpts.AppManifest))
-	return nil
+	ndkOpts.AppManifest = android.FindAndroidManifest(appBuildPath, ndkOpts.Variant, logger)
 }
 
 // resolveProjectRootIfNeeded sets the project root directory in ndkOpts if it hasn't already been set.
@@ -168,10 +163,7 @@ func ProcessAndroidNDK(opts options.CLI, logger log.Logger) error {
 					return err
 				}
 			}
-			err := resolveAppManifestIfNeeded(&ndkOpts, libPath, logger)
-			if err != nil {
-				return err
-			}
+			resolveAppManifestIfNeeded(&ndkOpts, libPath, logger)
 			resolveProjectRootIfNeeded(&ndkOpts, libPath)
 		}
 

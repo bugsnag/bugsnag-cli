@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.8.0] - 2026-03-03
+
+### Changed
+
+- Changed AndroidManifest.xml handling for Android-related uploads (NDK, Proguard, and React Native Android) to not error when the manifest file cannot be found or read. [#264](https://github.com/bugsnag/bugsnag-cli/pull/264)
+
+- Add support for aarch64 in the install scripts [#260](https://github.com/bugsnag/bugsnag-cli/pull/260)
+
 ## [3.7.0] - 2026-01-19
 
 ### Changed
