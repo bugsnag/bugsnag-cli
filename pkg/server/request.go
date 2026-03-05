@@ -121,10 +121,12 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
 func ProcessFileRequest(apiKey string, endpointPath string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
 
-	// log the uploadoptions filefielddata and filename for debugging purposes
-	fmt.Printf("fileFieldData: %v\n", fileFieldData)
-	for key, value := range fileFieldData {
-		fmt.Printf("fileFieldData key: %s, value: %v\n", key, value)
+	// Check if the fileName itself should be excluded based on exclude patterns
+	if len(options.Upload.Exclude) > 0 {
+		if utils.IsFileExcluded(fileName, options.Upload.Exclude) {
+			logger.Info(fmt.Sprintf("Skipping the upload of: %s (matches exclude pattern)", fileName))
+			return nil
+		}
 	}
 
 	if apiKey != "" {
