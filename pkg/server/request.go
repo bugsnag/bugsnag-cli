@@ -121,6 +121,12 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 //   - error: An error if any step of the file processing fails. Nil if the process is successful.
 func ProcessFileRequest(apiKey string, endpointPath string, uploadOptions map[string]string, fileFieldData map[string]FileField, fileName string, options options.CLI, logger log.Logger) error {
 
+	// log the uploadoptions filefielddata and filename for debugging purposes
+	fmt.Printf("fileFieldData: %v\n", fileFieldData)
+	for key, value := range fileFieldData {
+		fmt.Printf("fileFieldData key: %s, value: %v\n", key, value)
+	}
+
 	if apiKey != "" {
 		uploadOptions["apiKey"] = apiKey
 	} else {
