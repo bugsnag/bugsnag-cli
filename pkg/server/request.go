@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"io"
@@ -259,8 +258,12 @@ func processRequest(request *http.Request, timeout int, retryCount int, logger l
 //   - error: An error if any step of the request processing fails. Nil if the process is successful.
 func sendRequest(request *http.Request, timeout int, logger log.Logger) error {
 	// Configure transport to use HTTP/1.1 only
+	var protocols http.Protocols
+	protocols.SetHTTP1(true)
+	protocols.SetHTTP2(false)
+
 	transport := &http.Transport{
-		TLSNextProto: make(map[string]func(authority string, c *tls.Conn) http.RoundTripper),
+		Protocols: &protocols,
 	}
 
 	client := &http.Client{
