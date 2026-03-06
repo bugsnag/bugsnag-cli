@@ -1,5 +1,11 @@
 # Changelog
 
+## unreleased
+
+### Added
+
+- Add `--exclude` option to all upload commands to exclude files matching specific patterns. Supports wildcards like `*.map` for file extensions, exact filenames, and substring matching for paths (e.g., `node_modules`, `/dist/`). [#269](https://github.com/bugsnag/bugsnag-cli/pull/269)
+
 ## [3.8.0] - 2026-03-03
 
 ### Changed
