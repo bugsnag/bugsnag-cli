@@ -1,6 +1,6 @@
 module github.com/bugsnag/bugsnag-cli
 
-go 1.25.4
+go 1.26.1
 
 require (
 	github.com/alecthomas/kong v0.7.1
