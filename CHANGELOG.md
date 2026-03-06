@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Configure HTTP client to use HTTP/1.1 instead of HTTP/2 for all upload and build API requests.
+- Configure HTTP client to use HTTP/1.1 instead of HTTP/2 for all upload and build API requests. [#270](https://github.com/bugsnag/bugsnag-cli/pull/270)
 
 ## [3.8.0] - 2026-03-03
 
