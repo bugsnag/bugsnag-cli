@@ -15,7 +15,7 @@ func TestHTTPTransportUsesHTTP1Only(t *testing.T) {
 		receivedProto = r.Proto
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"success": true}`))
+		_, _ = w.Write([]byte(`{"success": true}`))
 	}))
 	defer testServer.Close()
 
