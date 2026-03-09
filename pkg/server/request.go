@@ -257,8 +257,18 @@ func processRequest(request *http.Request, timeout int, retryCount int, logger l
 // Returns:
 //   - error: An error if any step of the request processing fails. Nil if the process is successful.
 func sendRequest(request *http.Request, timeout int, logger log.Logger) error {
+	// Configure transport to use HTTP/1.1 only
+	var protocols http.Protocols
+	protocols.SetHTTP1(true)
+	protocols.SetHTTP2(false)
+
+	transport := &http.Transport{
+		Protocols: &protocols,
+	}
+
 	client := &http.Client{
-		Timeout: time.Duration(timeout) * time.Second,
+		Timeout:   time.Duration(timeout) * time.Second,
+		Transport: transport,
 	}
 
 	response, err := client.Do(request)
