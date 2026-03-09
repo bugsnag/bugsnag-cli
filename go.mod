@@ -4,6 +4,7 @@ go 1.26.1
 
 require (
 	github.com/alecthomas/kong v0.7.1
+	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pkg/errors v0.9.1

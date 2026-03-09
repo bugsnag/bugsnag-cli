@@ -120,8 +120,7 @@ type Upload struct {
 	Retries          int      `help:"The number of retry attempts before failing an upload request" default:"0"`
 	Timeout          int      `help:"The number of seconds to wait before failing an upload request" default:"300"`
 	UploadAPIRootUrl string   `help:"The upload server hostname, optionally containing port number"`
-	Exclude          []string `help:"Exclude files matching these patterns (supports wildcards like *.map, path/to/*, etc.)"`
-
+	Exclude          []string `help:"Exclude files matching these patterns. Patterns are matched against paths relative to the command execution directory. Supports wildcards (*.map), exact filenames (file.js.map), and path components (node_modules, /dist/)"`
 	// required options
 	All                   DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
 	AndroidAab            AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
