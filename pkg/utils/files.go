@@ -70,6 +70,15 @@ func IsFileExcluded(filePath string, excludePatterns []string) bool {
 			return true
 		}
 
+		// If pattern doesn't start with **, also try matching with **/ prepended
+		// This allows patterns like "node_modules/**" to match anywhere in the path
+		if !strings.HasPrefix(pattern, "**/") {
+			matched, err = doublestar.Match("**/"+pattern, filePath)
+			if err == nil && matched {
+				return true
+			}
+		}
+
 		// Try matching against the base name
 		matched, err = doublestar.Match(pattern, filepath.Base(filePath))
 		if err == nil && matched {
