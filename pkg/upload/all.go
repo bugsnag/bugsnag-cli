@@ -48,7 +48,15 @@ func All(options options.CLI, logger log.Logger) error {
 			fileFieldData["file"] = server.LocalFile(file)
 		}
 
-		err := server.ProcessFileRequest(options.ApiKey, "", uploadOptions, fileFieldData, file, options, logger)
+		err := server.ProcessFileRequest(
+			options.ApiKey,
+			"",
+			uploadOptions,
+			fileFieldData,
+			file,
+			options,
+			logger,
+		)
 		if err != nil {
 			return err
 		}

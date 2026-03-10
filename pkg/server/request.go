@@ -3,7 +3,6 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/bugsnag/bugsnag-cli/pkg/endpoints"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"

@@ -365,7 +365,15 @@ func uploadSingleSourceMap(sourceMapPath string, bundlePath string, bundleUrl st
 	fileFieldData["sourceMap"] = sourceMapFile
 	fileFieldData["minifiedFile"] = server.LocalFile(bundlePath)
 
-	err = server.ProcessFileRequest(options.ApiKey, "/sourcemap", uploadOptions, fileFieldData, sourceMapPath, options, logger)
+	err = server.ProcessFileRequest(
+		options.ApiKey,
+		"/sourcemap",
+		uploadOptions,
+		fileFieldData,
+		sourceMapPath,
+		options,
+		logger,
+	)
 
 	if err != nil {
 		return fmt.Errorf("encountered error when uploading js sourcemap: %s", err.Error())
