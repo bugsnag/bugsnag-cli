@@ -18,6 +18,13 @@ Feature: Exclude option tests
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --exclude=features/js/fixtures/js-multiple-maps/dist/** --project-root=features/js/fixtures/js-multiple-maps features/js/fixtures/js-multiple-maps/dist/
     Then I should receive no sourcemaps
 
+  Scenario: Exclude with absolute path
+    Given I get the current working directory
+    When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --exclude=$ABS_PATH/features/js/fixtures/js-multiple-maps/dist/other.js.map --project-root=features/js/fixtures/js-multiple-maps features/js/fixtures/js-multiple-maps/dist/
+    And I wait to receive 1 sourcemap
+    Then the sourcemaps are valid for the API
+    And the sourcemap payload field "minifiedUrl" equals "example.com/main.js"
+
   Scenario: Exclude with path glob pattern
     When I run bugsnag-cli with upload js --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --base-url=example.com --exclude=**/dist/** --project-root=features/js/fixtures/js-multiple-maps features/js/fixtures/js-multiple-maps/dist/
     Then I should receive no sourcemaps
