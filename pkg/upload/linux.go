@@ -49,7 +49,7 @@ func uploadSymbolFile(symbolFile string, linuxOpts options.LinuxOptions, opts op
 		"/linux",
 		uploadOpts,
 		fileField,
-		filepath.Base(symbolFile),
+		symbolFile,
 		opts,
 		logger,
 	); err != nil {

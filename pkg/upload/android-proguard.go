@@ -168,12 +168,28 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 		fileFieldData["proguard"] = server.LocalFile(outputFile)
 
 		// Attempt upload to Bugsnag API
-		err = server.ProcessFileRequest(options.ApiKey, "/proguard", uploadOptions, fileFieldData, outputFile, options, logger)
+		err = server.ProcessFileRequest(
+			options.ApiKey,
+			"/proguard",
+			uploadOptions,
+			fileFieldData,
+			outputFile,
+			options,
+			logger,
+		)
 
 		// Retry at base endpoint if 404 received
 		if err != nil && strings.Contains(err.Error(), "404 Not Found") {
 			logger.Debug("Retrying upload for proguard at base endpoint")
-			err = server.ProcessFileRequest(options.ApiKey, "", uploadOptions, fileFieldData, outputFile, options, logger)
+			err = server.ProcessFileRequest(
+				options.ApiKey,
+				"",
+				uploadOptions,
+				fileFieldData,
+				outputFile,
+				options,
+				logger,
+			)
 		}
 
 		if err != nil {

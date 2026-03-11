@@ -92,7 +92,7 @@ func UploadAndroidNdk(
 			"/ndk-symbol",
 			params,
 			fileField,
-			filepath.Base(originalFile),
+			originalFile,
 			opts,
 			logger,
 		)

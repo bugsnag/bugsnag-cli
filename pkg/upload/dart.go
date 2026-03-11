@@ -48,7 +48,15 @@ func Dart(options options.CLI, logger log.Logger) error {
 			fileFieldData := make(map[string]server.FileField)
 			fileFieldData["symbolFile"] = server.LocalFile(file)
 
-			err := server.ProcessFileRequest(options.ApiKey, "/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
+			err := server.ProcessFileRequest(
+				options.ApiKey,
+				"/dart-symbol",
+				uploadOptions,
+				fileFieldData,
+				file,
+				options,
+				logger,
+			)
 
 			if err != nil {
 
@@ -91,7 +99,15 @@ func Dart(options options.CLI, logger log.Logger) error {
 			if options.DryRun {
 				err = nil
 			} else {
-				err = server.ProcessFileRequest(options.ApiKey, "/dart-symbol", uploadOptions, fileFieldData, file, options, logger)
+				err = server.ProcessFileRequest(
+					options.ApiKey,
+					"/dart-symbol",
+					uploadOptions,
+					fileFieldData,
+					file,
+					options,
+					logger,
+				)
 			}
 
 			if err != nil {

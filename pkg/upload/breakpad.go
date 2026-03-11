@@ -71,7 +71,15 @@ func ProcessBreakpad(globalOptions options.CLI, logger log.Logger) error {
 		)
 
 		// Send the file upload request to the Breakpad symbol endpoint
-		err = server.ProcessFileRequest(apiKey, "/breakpad-symbol"+queryParams, formFields, fileFieldData, file, globalOptions, logger)
+		err = server.ProcessFileRequest(
+			apiKey,
+			"/breakpad-symbol"+queryParams,
+			formFields,
+			fileFieldData,
+			file,
+			globalOptions,
+			logger,
+		)
 		if err != nil {
 			return err
 		}

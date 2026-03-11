@@ -60,12 +60,28 @@ func ProcessDsymUpload(plistPath string, projectRoot string, options options.CLI
 		}
 
 		// Attempt to upload the dSYM file.
-		err = server.ProcessFileRequest(options.ApiKey, "/dsym", uploadOptions, fileFieldData, dsym.UUID, options, logger)
+		err = server.ProcessFileRequest(
+			options.ApiKey,
+			"/dsym",
+			uploadOptions,
+			fileFieldData,
+			dsym.UUID,
+			options,
+			logger,
+		)
 		if err != nil {
 			// Retry with the base endpoint if a 404 error occurs.
 			if strings.Contains(err.Error(), "404 Not Found") {
 				logger.Debug(fmt.Sprintf("Retrying upload for dSYM %s at base endpoint", dsymInfo))
-				err = server.ProcessFileRequest(options.ApiKey, "", uploadOptions, fileFieldData, dsym.UUID, options, logger)
+				err = server.ProcessFileRequest(
+					options.ApiKey,
+					"",
+					uploadOptions,
+					fileFieldData,
+					dsym.UUID,
+					options,
+					logger,
+				)
 			}
 			if err != nil {
 				return fmt.Errorf("failed to upload dSYM %s: %w", dsymInfo, err)
