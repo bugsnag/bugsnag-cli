@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/bmatcuk/doublestar/v4"
 )
 
 const (
@@ -49,6 +51,41 @@ func FilePathWalkDir(root string) ([]string, error) {
 func IsDir(path string) bool {
 	pathInfo, err := os.Stat(path)
 	return err == nil && pathInfo.IsDir()
+}
+
+// IsFileExcluded checks if a file path matches any of the exclude patterns.
+// It supports wildcards including *.map, path/to/*, and recursive patterns like node_modules/**.
+//
+// Parameters:
+//   - filePath: The file path to check.
+//   - excludePatterns: A list of patterns to match against (supports ** for recursive matching).
+//
+// Returns:
+//   - bool: True if the file matches any exclude pattern, false otherwise.
+func IsFileExcluded(filePath string, excludePatterns []string) bool {
+	for _, pattern := range excludePatterns {
+		// Try matching the pattern against the full path using doublestar (supports **)
+		matched, err := doublestar.Match(pattern, filePath)
+		if err == nil && matched {
+			return true
+		}
+
+		// If pattern doesn't start with **, also try matching with **/ prepended
+		// This allows patterns like "node_modules/**" to match anywhere in the path
+		if !strings.HasPrefix(pattern, "**/") {
+			matched, err = doublestar.Match("**/"+pattern, filePath)
+			if err == nil && matched {
+				return true
+			}
+		}
+
+		// Try matching against the base name
+		matched, err = doublestar.Match(pattern, filepath.Base(filePath))
+		if err == nil && matched {
+			return true
+		}
+	}
+	return false
 }
 
 // BuildFileList compiles a list of files from the provided paths.

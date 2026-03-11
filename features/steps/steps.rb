@@ -489,3 +489,8 @@ Given('the NodeJS fixture is built') do
   Dir.chdir(base_dir)
   Maze.check.include(`ls #{@fixture_dir}/dist`, 'index.js.map')
 end
+
+Given('I get the current working directory') do
+  @current_dir = Dir.pwd
+  ENV['ABS_PATH'] = @current_dir
+end

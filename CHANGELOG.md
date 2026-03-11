@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.9.0] - 2026-03-11
+
+### Added
+
+- Add `--exclude` option to all upload commands to exclude files matching specific patterns. Supports wildcards like `*.map` for file extensions, exact filenames, and substring matching for paths (e.g., `node_modules`, `/dist/`). [#269](https://github.com/bugsnag/bugsnag-cli/pull/269)
+
+### Changed
+
+- Configure HTTP client to use HTTP/1.1 instead of HTTP/2 for all upload and build API requests. [#270](https://github.com/bugsnag/bugsnag-cli/pull/270)
+
 ## [3.8.0] - 2026-03-03
 
 ### Changed

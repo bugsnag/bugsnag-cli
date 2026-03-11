@@ -117,10 +117,10 @@ type Breakpad struct {
 
 type Upload struct {
 	// shared options
-	Retries          int    `help:"The number of retry attempts before failing an upload request" default:"0"`
-	Timeout          int    `help:"The number of seconds to wait before failing an upload request" default:"300"`
-	UploadAPIRootUrl string `help:"The upload server hostname, optionally containing port number"`
-
+	Retries          int      `help:"The number of retry attempts before failing an upload request" default:"0"`
+	Timeout          int      `help:"The number of seconds to wait before failing an upload request" default:"300"`
+	UploadAPIRootUrl string   `help:"The upload server hostname, optionally containing port number"`
+	Exclude          []string `help:"Exclude files matching these patterns. Supports wildcards (*.map), recursive globs (node_modules/**, **/*.test.js) and exact filenames (file.js.map). Non-absolute path patterns are relative to the current directory."`
 	// required options
 	All                   DiscoverAndUploadAny   `cmd:"" help:"Upload any symbol/mapping files"`
 	AndroidAab            AndroidAabMapping      `cmd:"" help:"Process and upload application bundle files for Android"`
