@@ -35,6 +35,8 @@ jobs:
           -d '{
             "event_type": "update-cli",
             "client_payload": {
-              "cli_version": "${{ env.RELEASE_VERSION }}"
+              "cli_version": "${{ env.RELEASE_VERSION }}",
+              "target_submodule":"bugsnag-cli",
+              "target_version": "${{ env.RELEASE_VERSION }}"
             }
           }'
