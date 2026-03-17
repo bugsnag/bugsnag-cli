@@ -600,6 +600,14 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 
 		outputPath := path
 
+		// If the path is a .map file and no explicit --source-map is set,
+		// treat the path as the source map itself
+		if jsOptions.SourceMap == "" && strings.HasSuffix(path, ".map") && utils.FileExists(path) && !utils.IsDir(path) {
+			jsOptions.SourceMap = path
+			// For a direct .map file, use its directory as the output path
+			outputPath = filepath.Dir(path)
+		}
+
 		// Set a default value for projectRoot if it's not defined
 		jsOptions.ProjectRoot = resolveProjectRoot(jsOptions.ProjectRoot, path)
 		logger.Debug(fmt.Sprintf("Using project root %s", jsOptions.ProjectRoot))
