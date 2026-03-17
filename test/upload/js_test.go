@@ -178,6 +178,108 @@ func TestExtractSourceMappingURL(t *testing.T) {
 			t.Errorf("expected data URL, got '%s'", url)
 		}
 	})
+
+	// TC39 ECMA-426 Spec Compliance Tests
+	t.Run("Ignores sourceMappingURL in string literal", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "in-string.js")
+		content := "let a = \"//# sourceMappingURL=fake.js.map\";\nconsole.log(a);\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		// Should be empty because quote in comment invalidates it
+		if url != "" {
+			t.Errorf("expected empty string (should ignore sourceMappingURL when quote appears in comment line), got '%s'", url)
+		}
+	})
+
+	t.Run("Finds sourceMappingURL at end after code", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "after-code.js")
+		content := "console.log('test');\n//# sourceMappingURL=valid.js.map"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "valid.js.map" {
+			t.Errorf("expected 'valid.js.map', got '%s'", url)
+		}
+	})
+
+	t.Run("Returns empty when comment contains */", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "with-close-comment.js")
+		content := "console.log('test');\n//# sourceMappingURL=bad.js.map */\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "" {
+			t.Errorf("expected empty string (comment contains */), got '%s'", url)
+		}
+	})
+
+	t.Run("Handles whitespace-only lines", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "with-whitespace.js")
+		content := "console.log('test');\n   \n//# sourceMappingURL=whitespace.js.map\n   "
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "whitespace.js.map" {
+			t.Errorf("expected 'whitespace.js.map', got '%s'", url)
+		}
+	})
+
+	t.Run("Processes lines in reverse order", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "reverse-order.js")
+		// First comment should be ignored (in middle of file)
+		// Second comment should be found (at end of file)
+		content := "//# sourceMappingURL=wrong.js.map\nconsole.log('test');\n//# sourceMappingURL=correct.js.map\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "correct.js.map" {
+			t.Errorf("expected 'correct.js.map' (from last comment), got '%s'", url)
+		}
+	})
+
+	t.Run("Stops at non-comment content", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "non-comment.js")
+		// Should find nothing because there's code after the sourceMappingURL
+		content := "//# sourceMappingURL=before-code.js.map\nconsole.log('test');\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		// Scanning from the end, we hit "console.log" before the comment
+		if url != "" {
+			t.Errorf("expected empty string (code appears after sourceMappingURL when reading from end), got '%s'", url)
+		}
+	})
 }
 
 func TestResolveBundlePaths(t *testing.T) {

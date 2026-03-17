@@ -137,7 +137,8 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 }
 
 // ExtractSourceMappingURL extracts the sourceMappingURL from a JavaScript bundle file.
-// It reads the last portion of the file to find the sourceMappingURL comment.
+// Implements the JavaScriptExtractSourceMapURL algorithm from TC39 ECMA-426 spec
+// (section 11.1.2.1), using the "without parsing" approach.
 //
 // Parameters:
 // - filePath: path to the bundle file.
@@ -147,52 +148,105 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 // - The source map URL/path if found, empty string if not found.
 // - Error only if file cannot be read.
 func ExtractSourceMappingURL(filePath string, logger log.Logger) (string, error) {
-	file, err := os.Open(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return "", fmt.Errorf("cannot open bundle file %s: %s", filePath, err)
-	}
-	defer file.Close()
-
-	// Get file size
-	info, err := file.Stat()
-	if err != nil {
-		return "", fmt.Errorf("cannot stat bundle file %s: %s", filePath, err)
-	}
-
-	// Read last 1000 bytes (sourceMappingURL is typically at the end)
-	readSize := int64(1000)
-	if info.Size() < readSize {
-		readSize = info.Size()
-	}
-
-	_, err = file.Seek(-readSize, io.SeekEnd)
-	if err != nil {
-		// If file is too small, read from beginning
-		_, err = file.Seek(0, io.SeekStart)
-		if err != nil {
-			return "", fmt.Errorf("cannot seek in bundle file %s: %s", filePath, err)
-		}
-	}
-
-	data := make([]byte, readSize)
-	n, err := file.Read(data)
-	if err != nil && err != io.EOF {
 		return "", fmt.Errorf("cannot read bundle file %s: %s", filePath, err)
 	}
 
-	content := string(data[:n])
+	source := string(data)
 
-	// Match both modern (//# ) and legacy (//@ ) syntax
-	// Regex matches: //# sourceMappingURL=<url> or //@ sourceMappingURL=<url>
-	re := regexp.MustCompile(`(?://[@#])\s*sourceMappingURL=(.+?)(?:\s|$)`)
-	matches := re.FindStringSubmatch(content)
+	// Split by line terminators as defined in ECMA-426: CR+LF, LF, CR, U+2028, U+2029
+	lines := splitLines(source)
 
-	if len(matches) > 1 {
-		sourceMappingURL := strings.TrimSpace(matches[1])
-		return sourceMappingURL, nil
+	// Process lines in reverse order
+	for i := len(lines) - 1; i >= 0; i-- {
+		lineStr := lines[i]
+		line := []rune(lineStr)
+		position := 0
+		lineLength := len(line)
+
+		// Scan through the line character by character
+		for position < lineLength {
+			first := line[position]
+
+			// Check for // (single-line comment start)
+			if first == '/' && position+1 < lineLength {
+				position++
+				second := line[position]
+
+				if second == '/' {
+					// Found //, rest of line is a comment
+					position++
+					comment := string(line[position:])
+
+					// Validate comment doesn't contain quotes or */
+					if strings.ContainsAny(comment, "\"'`") {
+						return "", nil
+					}
+					if strings.Contains(comment, "*/") {
+						return "", nil
+					}
+
+					// Try to match sourceMappingURL pattern
+					sourceMapURL := matchSourceMapURL(comment)
+					if sourceMapURL != "" {
+						return sourceMapURL, nil
+					}
+
+					// Comment processed, continue to next line
+					break
+				} else {
+					// Found / but not //, this is invalid
+					return "", nil
+				}
+			} else if isWhitespace(first) {
+				// Skip whitespace
+				position++
+			} else {
+				// Found non-whitespace, non-comment token - stop searching
+				return "", nil
+			}
+		}
 	}
 
 	return "", nil
+}
+
+// splitLines splits a string by JavaScript line terminators as defined in ECMA-426.
+// Line terminators: CR+LF (\r\n), LF (\n), CR (\r), U+2028 (Line Separator), U+2029 (Paragraph Separator)
+func splitLines(source string) []string {
+	// Replace all line terminators with \n, then split
+	source = strings.ReplaceAll(source, "\r\n", "\n")
+	source = strings.ReplaceAll(source, "\r", "\n")
+	source = strings.ReplaceAll(source, "\u2028", "\n")
+	source = strings.ReplaceAll(source, "\u2029", "\n")
+	return strings.Split(source, "\n")
+}
+
+// isWhitespace checks if a rune is ECMAScript whitespace.
+// Per ECMA-262: Space, Tab, Vertical Tab, Form Feed, NBSP, ZWNBSP, and other Unicode "Space_Separator"
+func isWhitespace(r rune) bool {
+	switch r {
+	case ' ', '\t', '\v', '\f', '\u00A0', '\uFEFF':
+		return true
+	default:
+		// Check for Unicode Space_Separator category (Zs)
+		return r == '\u1680' || (r >= '\u2000' && r <= '\u200A') || r == '\u202F' || r == '\u205F' || r == '\u3000'
+	}
+}
+
+// matchSourceMapURL implements the MatchSourceMapURL algorithm from ECMA-426 spec.
+// Pattern: ^[@#]\s*sourceMappingURL=(\S*?)\s*$
+func matchSourceMapURL(comment string) string {
+	// Pattern matches: [@#] followed by optional whitespace, then "sourceMappingURL=", then non-whitespace URL, then optional trailing whitespace
+	re := regexp.MustCompile(`^[@#]\s*sourceMappingURL=(\S*?)\s*$`)
+	matches := re.FindStringSubmatch(comment)
+
+	if len(matches) > 1 {
+		return matches[1]
+	}
+
+	return ""
 }
 
 // ResolveBundlePaths finds JavaScript bundle files in the specified directory.
