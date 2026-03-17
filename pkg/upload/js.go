@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -14,6 +15,12 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
+
+// SourceMapBundle represents a paired bundle file and its corresponding source map.
+type SourceMapBundle struct {
+	BundlePath    string
+	SourceMapPath string
+}
 
 // resolveProjectRoot determines the project root directory.
 // If a project root is provided, it returns that value.
@@ -129,48 +136,221 @@ func resolveVersion(versionName string, path string, logger log.Logger) string {
 	return ""
 }
 
-// ResolveSourceMapPaths attempts to find the source map(s) by walking the build directory
-// if a source map path is not specified.
+// ExtractSourceMappingURL extracts the sourceMappingURL from a JavaScript bundle file.
+// It reads the last portion of the file to find the sourceMappingURL comment.
 //
 // Parameters:
-// - sourceMapPath: user-specified source map path (can be empty).
-// - outputPath: directory to scan for source maps.
+// - filePath: path to the bundle file.
+// - logger: logger instance.
 //
 // Returns:
-// - list of source map file paths, or an error.
-func ResolveSourceMapPaths(sourceMapPath string, outputPath string, logger log.Logger) ([]string, error) {
-	if sourceMapPath != "" {
-		if utils.FileExists(sourceMapPath) {
-			logger.Debug(fmt.Sprintf("Using user specified source map file %s", sourceMapPath))
-			return []string{sourceMapPath}, nil
-		} else {
-			return []string{}, fmt.Errorf("unable to find specified source map file: %s", sourceMapPath)
+// - The source map URL/path if found, empty string if not found.
+// - Error only if file cannot be read.
+func ExtractSourceMappingURL(filePath string, logger log.Logger) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("cannot open bundle file %s: %s", filePath, err)
+	}
+	defer file.Close()
+
+	// Get file size
+	info, err := file.Stat()
+	if err != nil {
+		return "", fmt.Errorf("cannot stat bundle file %s: %s", filePath, err)
+	}
+
+	// Read last 1000 bytes (sourceMappingURL is typically at the end)
+	readSize := int64(1000)
+	if info.Size() < readSize {
+		readSize = info.Size()
+	}
+
+	_, err = file.Seek(-readSize, io.SeekEnd)
+	if err != nil {
+		// If file is too small, read from beginning
+		_, err = file.Seek(0, io.SeekStart)
+		if err != nil {
+			return "", fmt.Errorf("cannot seek in bundle file %s: %s", filePath, err)
 		}
 	}
 
-	var sourceMapPaths []string
+	data := make([]byte, readSize)
+	n, err := file.Read(data)
+	if err != nil && err != io.EOF {
+		return "", fmt.Errorf("cannot read bundle file %s: %s", filePath, err)
+	}
+
+	content := string(data[:n])
+
+	// Match both modern (//# ) and legacy (//@ ) syntax
+	// Regex matches: //# sourceMappingURL=<url> or //@ sourceMappingURL=<url>
+	re := regexp.MustCompile(`(?://[@#])\s*sourceMappingURL=(.+?)(?:\s|$)`)
+	matches := re.FindStringSubmatch(content)
+
+	if len(matches) > 1 {
+		sourceMappingURL := strings.TrimSpace(matches[1])
+		return sourceMappingURL, nil
+	}
+
+	return "", nil
+}
+
+// ResolveBundlePaths finds JavaScript bundle files in the specified directory.
+// If bundlePath is explicitly provided, it returns that single path.
+//
+// Parameters:
+// - bundlePath: user-specified bundle path (can be empty).
+// - outputPath: directory to scan for bundle files.
+// - logger: logger instance.
+//
+// Returns:
+// - list of bundle file paths, or an error.
+func ResolveBundlePaths(bundlePath string, outputPath string, logger log.Logger) ([]string, error) {
+	if bundlePath != "" {
+		if utils.FileExists(bundlePath) {
+			logger.Debug(fmt.Sprintf("Using user specified bundle file %s", bundlePath))
+			return []string{bundlePath}, nil
+		} else {
+			return []string{}, fmt.Errorf("unable to find specified bundle file: %s", bundlePath)
+		}
+	}
+
+	var bundlePaths []string
+	supportedExtensions := []string{".js", ".jsx", ".ts", ".tsx"}
+
 	err := filepath.WalkDir(outputPath, func(fullPath string, dirEntry fs.DirEntry, err error) error {
-		if !dirEntry.IsDir() && strings.HasSuffix(dirEntry.Name(), ".map") {
-			if strings.HasSuffix(dirEntry.Name(), ".css.map") {
-				logger.Debug(fmt.Sprintf("Skipping .css.map file %s", fullPath))
-			} else if strings.Contains(fullPath, "node_modules") {
-				logger.Debug(fmt.Sprintf("Skipping source map in node_modules: %s", fullPath))
-			} else {
-				sourceMapPaths = append(sourceMapPaths, fullPath)
+		if err != nil {
+			return err
+		}
+
+		if dirEntry.IsDir() {
+			return nil
+		}
+
+		// Skip files in node_modules
+		if strings.Contains(fullPath, "node_modules") {
+			logger.Debug(fmt.Sprintf("Skipping bundle in node_modules: %s", fullPath))
+			return nil
+		}
+
+		// Check if file has a supported extension
+		for _, ext := range supportedExtensions {
+			if strings.HasSuffix(dirEntry.Name(), ext) {
+				bundlePaths = append(bundlePaths, fullPath)
+				break
 			}
 		}
+
 		return nil
 	})
 
 	if err != nil {
 		return []string{}, err
 	}
-	if len(sourceMapPaths) == 0 {
+
+	if len(bundlePaths) == 0 {
+		logger.Warn(fmt.Sprintf("No bundle files found in: %s", outputPath))
+	} else {
+		logger.Debug(fmt.Sprintf("Found %d potential bundle file(s)", len(bundlePaths)))
+	}
+
+	return bundlePaths, nil
+}
+
+// ResolveSourceMapPaths attempts to find source map(s) by scanning bundle files
+// for sourceMappingURL comments.
+//
+// Parameters:
+// - sourceMapPath: user-specified source map path (can be empty).
+// - bundlePath: user-specified bundle path (can be empty).
+// - outputPath: directory to scan for bundle files.
+// - logger: logger instance.
+//
+// Returns:
+// - list of SourceMapBundle pairs, or an error.
+func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath string, logger log.Logger) ([]SourceMapBundle, error) {
+	// If both source map and bundle are explicitly specified, return them as a pair
+	if sourceMapPath != "" && bundlePath != "" {
+		if !utils.FileExists(sourceMapPath) {
+			return []SourceMapBundle{}, fmt.Errorf("unable to find specified source map file: %s", sourceMapPath)
+		}
+		if !utils.FileExists(bundlePath) {
+			return []SourceMapBundle{}, fmt.Errorf("unable to find specified bundle file: %s", bundlePath)
+		}
+		logger.Debug(fmt.Sprintf("Using user specified source map %s and bundle %s", sourceMapPath, bundlePath))
+		return []SourceMapBundle{{BundlePath: bundlePath, SourceMapPath: sourceMapPath}}, nil
+	}
+
+	// If only source map is specified, try to find the bundle by stripping .map suffix (legacy behavior)
+	if sourceMapPath != "" {
+		if !utils.FileExists(sourceMapPath) {
+			return []SourceMapBundle{}, fmt.Errorf("unable to find specified source map file: %s", sourceMapPath)
+		}
+		logger.Debug(fmt.Sprintf("Using user specified source map file %s", sourceMapPath))
+		
+		// Try to find bundle by stripping .map suffix
+		withoutSuffix, found := strings.CutSuffix(sourceMapPath, ".map")
+		if found && utils.FileExists(withoutSuffix) {
+			logger.Info(fmt.Sprintf("Automatically using the bundle at path %s based on stripping the .map suffix.", withoutSuffix))
+			return []SourceMapBundle{{BundlePath: withoutSuffix, SourceMapPath: sourceMapPath}}, nil
+		}
+		// If no bundle found, return empty bundle path (bundle is optional)
+		return []SourceMapBundle{{BundlePath: "", SourceMapPath: sourceMapPath}}, nil
+	}
+
+	// Discover bundles and extract source map URLs from sourceMappingURL comments
+	bundlePaths, err := ResolveBundlePaths(bundlePath, outputPath, logger)
+	if err != nil {
+		return []SourceMapBundle{}, err
+	}
+
+	var results []SourceMapBundle
+	for _, bundleFile := range bundlePaths {
+		sourceMappingURL, err := ExtractSourceMappingURL(bundleFile, logger)
+		if err != nil {
+			logger.Warn(fmt.Sprintf("Error reading bundle file %s: %s", bundleFile, err))
+			continue
+		}
+
+		if sourceMappingURL == "" {
+			logger.Debug(fmt.Sprintf("No sourceMappingURL found in %s", bundleFile))
+			continue
+		}
+
+		// Check for data URLs (inline source maps)
+		if strings.HasPrefix(sourceMappingURL, "data:") {
+			logger.Warn(fmt.Sprintf("Skipping inline source map (data URL) in %s", bundleFile))
+			continue
+		}
+
+		// Resolve relative path
+		var sourceMapFile string
+		if filepath.IsAbs(sourceMappingURL) {
+			sourceMapFile = sourceMappingURL
+		} else {
+			sourceMapFile = filepath.Join(filepath.Dir(bundleFile), sourceMappingURL)
+		}
+
+		// Check if source map file exists
+		if !utils.FileExists(sourceMapFile) {
+			logger.Warn(fmt.Sprintf("Source map file %s referenced in %s does not exist", sourceMapFile, bundleFile))
+			continue
+		}
+
+		logger.Info(fmt.Sprintf("Found source map %s for bundle %s", sourceMapFile, bundleFile))
+		results = append(results, SourceMapBundle{
+			BundlePath:    bundleFile,
+			SourceMapPath: sourceMapFile,
+		})
+	}
+
+	if len(results) == 0 {
 		logger.Warn(fmt.Sprintf("No source maps found in: %s", outputPath))
 	} else {
-		logger.Info(fmt.Sprintf("Found source map(s): %s", strings.Join(sourceMapPaths, ", ")))
+		logger.Info(fmt.Sprintf("Found %d source map(s)", len(results)))
 	}
-	return sourceMapPaths, nil
+
+	return results, nil
 }
 
 // ReadSourceMap reads a JSON source map into memory.
@@ -289,36 +469,6 @@ func AddSources(sourceMapContents map[string]interface{}, sourceMapPath string, 
 	return false
 }
 
-// resolveBundlePath attempts to find the bundle path by changing the extension
-// of the source map if bundle path is not specified.
-//
-// Parameters:
-// - bundlePath: user-specified bundle path (can be empty).
-// - sourceMapPath: path to the source map.
-//
-// Returns:
-// - resolved bundle path or error.
-func resolveBundlePath(bundlePath string, sourceMapPath string, logger log.Logger) (string, error) {
-	if bundlePath != "" {
-		if utils.FileExists(bundlePath) {
-			return bundlePath, nil
-		} else {
-			return "", fmt.Errorf("unable to find specified bundle: %s", bundlePath)
-		}
-	}
-
-	withoutSuffix, found := strings.CutSuffix(sourceMapPath, ".map")
-	if !found {
-		return "", nil
-	}
-
-	if utils.FileExists(withoutSuffix) {
-		logger.Info(fmt.Sprintf("Automatically using the bundle at path %s based on stripping the .map suffix.", withoutSuffix))
-		return withoutSuffix, nil
-	}
-	return "", nil
-}
-
 // uploadSingleSourceMap uploads a single source map.
 //
 // Parameters:
@@ -402,14 +552,14 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 
 		jsOptions.VersionName = resolveVersion(jsOptions.VersionName, path, logger)
 
-		// Check that the source map(s) exists and error out if it doesn't
-		sourceMapPaths, err := ResolveSourceMapPaths(jsOptions.SourceMap, outputPath, logger)
+		// Resolve source map and bundle pairs
+		sourceMapBundles, err := ResolveSourceMapPaths(jsOptions.SourceMap, jsOptions.Bundle, outputPath, logger)
 		if err != nil {
 			return err
 		}
 
-		// Check that we now have a source map path
-		if len(sourceMapPaths) == 0 {
+		// Check that we found at least one source map
+		if len(sourceMapBundles) == 0 {
 			return fmt.Errorf("could not find a source map, please specify the path by using --source-map")
 		}
 
@@ -434,23 +584,17 @@ func ProcessJs(options options.CLI, logger log.Logger) error {
 			jsOptions.BaseUrl += "/"
 		}
 
-		for _, sourceMapPath := range sourceMapPaths {
-
-			bundlePath, err := resolveBundlePath(jsOptions.Bundle, sourceMapPath, logger)
-			if err != nil {
-				return err
-			}
-
+		for _, bundle := range sourceMapBundles {
 			var bundleUrl string
 			if jsOptions.BundleUrl != "" {
 				bundleUrl = jsOptions.BundleUrl
 			} else {
 				// For directory uploads, add the relative path of the bundle to the base URL
-				bundleUrl = jsOptions.BaseUrl + strings.TrimPrefix(strings.TrimPrefix(bundlePath, path), "/")
+				bundleUrl = jsOptions.BaseUrl + strings.TrimPrefix(strings.TrimPrefix(bundle.BundlePath, path), "/")
 				logger.Debug(fmt.Sprintf("Generated URL %s using the base URL %s", bundleUrl, jsOptions.BaseUrl))
 			}
 
-			err = uploadSingleSourceMap(sourceMapPath, bundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, logger)
+			err = uploadSingleSourceMap(bundle.SourceMapPath, bundle.BundlePath, bundleUrl, jsOptions.VersionName, jsOptions.CodeBundleId, jsOptions.ProjectRoot, options, logger)
 			if err != nil {
 				return err
 			}

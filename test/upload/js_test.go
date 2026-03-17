@@ -43,38 +43,224 @@ func TestResolveSourceMapPaths_IgnoresNodeModulesAndCssMaps(t *testing.T) {
 	// Create a temporary directory structure
 	tempDir := t.TempDir()
 
+	// Create a valid bundle with sourceMappingURL
+	validBundle := filepath.Join(tempDir, "app.js")
+	bundleContent := "console.log('test');\n//# sourceMappingURL=app.js.map\n"
+	if err := os.WriteFile(validBundle, []byte(bundleContent), 0644); err != nil {
+		t.Fatalf("failed to write valid bundle: %v", err)
+	}
+
 	// Valid source map
 	validMap := filepath.Join(tempDir, "app.js.map")
 	if err := os.WriteFile(validMap, []byte("{}"), 0644); err != nil {
 		t.Fatalf("failed to write valid source map: %v", err)
 	}
 
-	// CSS source map (should be ignored)
+	// CSS source map (should be ignored - no .css bundle)
 	cssMap := filepath.Join(tempDir, "styles.css.map")
 	if err := os.WriteFile(cssMap, []byte("{}"), 0644); err != nil {
 		t.Fatalf("failed to write css source map: %v", err)
 	}
 
-	// node_modules source map (should be ignored)
+	// node_modules bundle and source map (should be ignored)
 	nodeModulesDir := filepath.Join(tempDir, "node_modules", "lib")
 	if err := os.MkdirAll(nodeModulesDir, 0755); err != nil {
 		t.Fatalf("failed to create node_modules dir: %v", err)
+	}
+	nodeModulesBundle := filepath.Join(nodeModulesDir, "lib.js")
+	nodeModulesBundleContent := "console.log('lib');\n//# sourceMappingURL=lib.js.map\n"
+	if err := os.WriteFile(nodeModulesBundle, []byte(nodeModulesBundleContent), 0644); err != nil {
+		t.Fatalf("failed to write node_modules bundle: %v", err)
 	}
 	nodeModulesMap := filepath.Join(nodeModulesDir, "lib.js.map")
 	if err := os.WriteFile(nodeModulesMap, []byte("{}"), 0644); err != nil {
 		t.Fatalf("failed to write node_modules source map: %v", err)
 	}
 
-	paths, err := upload.ResolveSourceMapPaths("", tempDir, logger)
+	bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if len(paths) != 1 {
-		t.Fatalf("expected 1 source map, got %d", len(paths))
+	if len(bundles) != 1 {
+		t.Fatalf("expected 1 source map bundle, got %d", len(bundles))
 	}
 
-	if paths[0] != validMap {
-		t.Errorf("expected source map %s, got %s", validMap, paths[0])
+	if bundles[0].BundlePath != validBundle {
+		t.Errorf("expected bundle %s, got %s", validBundle, bundles[0].BundlePath)
 	}
+
+	if bundles[0].SourceMapPath != validMap {
+		t.Errorf("expected source map %s, got %s", validMap, bundles[0].SourceMapPath)
+	}
+}
+
+func TestExtractSourceMappingURL(t *testing.T) {
+	logger := log.NewLoggerWrapper("debug")
+	tempDir := t.TempDir()
+
+	t.Run("Modern syntax with //#", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "modern.js")
+		content := "console.log('test');\n//# sourceMappingURL=modern.js.map\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "modern.js.map" {
+			t.Errorf("expected 'modern.js.map', got '%s'", url)
+		}
+	})
+
+	t.Run("Legacy syntax with //@", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "legacy.js")
+		content := "console.log('test');\n//@ sourceMappingURL=legacy.js.map\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "legacy.js.map" {
+			t.Errorf("expected 'legacy.js.map', got '%s'", url)
+		}
+	})
+
+	t.Run("No sourceMappingURL", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "no-url.js")
+		content := "console.log('test');\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "" {
+			t.Errorf("expected empty string, got '%s'", url)
+		}
+	})
+
+	t.Run("Relative path", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "relative.js")
+		content := "console.log('test');\n//# sourceMappingURL=../maps/relative.js.map\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if url != "../maps/relative.js.map" {
+			t.Errorf("expected '../maps/relative.js.map', got '%s'", url)
+		}
+	})
+
+	t.Run("Data URL (inline source map)", func(t *testing.T) {
+		bundlePath := filepath.Join(tempDir, "inline.js")
+		content := "console.log('test');\n//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozfQ==\n"
+		if err := os.WriteFile(bundlePath, []byte(content), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		url, err := upload.ExtractSourceMappingURL(bundlePath, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !strings.HasPrefix(url, "data:") {
+			t.Errorf("expected data URL, got '%s'", url)
+		}
+	})
+}
+
+func TestResolveBundlePaths(t *testing.T) {
+	logger := log.NewLoggerWrapper("debug")
+	tempDir := t.TempDir()
+
+	// Create various bundle files
+	jsBundle := filepath.Join(tempDir, "app.js")
+	if err := os.WriteFile(jsBundle, []byte("console.log('js');"), 0644); err != nil {
+		t.Fatalf("failed to write js bundle: %v", err)
+	}
+
+	jsxBundle := filepath.Join(tempDir, "component.jsx")
+	if err := os.WriteFile(jsxBundle, []byte("export const Comp = () => {};"), 0644); err != nil {
+		t.Fatalf("failed to write jsx bundle: %v", err)
+	}
+
+	tsBundle := filepath.Join(tempDir, "types.ts")
+	if err := os.WriteFile(tsBundle, []byte("const x: number = 1;"), 0644); err != nil {
+		t.Fatalf("failed to write ts bundle: %v", err)
+	}
+
+	tsxBundle := filepath.Join(tempDir, "tsx-comp.tsx")
+	if err := os.WriteFile(tsxBundle, []byte("export const TSXComp = () => <div />;"), 0644); err != nil {
+		t.Fatalf("failed to write tsx bundle: %v", err)
+	}
+
+	// Should be ignored
+	cssFile := filepath.Join(tempDir, "styles.css")
+	if err := os.WriteFile(cssFile, []byte("body { color: red; }"), 0644); err != nil {
+		t.Fatalf("failed to write css file: %v", err)
+	}
+
+	// Should be ignored
+	mjsBundle := filepath.Join(tempDir, "module.mjs")
+	if err := os.WriteFile(mjsBundle, []byte("export const x = 1;"), 0644); err != nil {
+		t.Fatalf("failed to write mjs bundle: %v", err)
+	}
+
+	t.Run("Finds all supported extensions", func(t *testing.T) {
+		paths, err := upload.ResolveBundlePaths("", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(paths) != 4 {
+			t.Fatalf("expected 4 bundles, got %d", len(paths))
+		}
+
+		// Check that all expected files are found
+		foundFiles := make(map[string]bool)
+		for _, path := range paths {
+			foundFiles[filepath.Base(path)] = true
+		}
+
+		expectedFiles := []string{"app.js", "component.jsx", "types.ts", "tsx-comp.tsx"}
+		for _, expected := range expectedFiles {
+			if !foundFiles[expected] {
+				t.Errorf("expected to find %s, but it was not found", expected)
+			}
+		}
+
+		// Check that unsupported files are not found
+		if foundFiles["styles.css"] {
+			t.Error("css file should not be included")
+		}
+		if foundFiles["module.mjs"] {
+			t.Error("mjs file should not be included")
+		}
+	})
+
+	t.Run("Returns explicit bundle path", func(t *testing.T) {
+		paths, err := upload.ResolveBundlePaths(jsBundle, tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(paths) != 1 {
+			t.Fatalf("expected 1 bundle, got %d", len(paths))
+		}
+
+		if paths[0] != jsBundle {
+			t.Errorf("expected %s, got %s", jsBundle, paths[0])
+		}
+	})
 }
