@@ -22,6 +22,9 @@ type SourceMapBundle struct {
 	SourceMapPath string
 }
 
+// Precompiled regexp for matching sourceMappingURL comments.
+var sourceMapURLRe = regexp.MustCompile(`^[@#]\s*sourceMappingURL=(\S*?)\s*$`)
+
 // resolveProjectRoot determines the project root directory.
 // If a project root is provided, it returns that value.
 // Otherwise, it defaults to searching up the directory tree.
@@ -193,8 +196,10 @@ func ExtractSourceMappingURL(filePath string, logger log.Logger) (string, error)
 						return sourceMapURL, nil
 					}
 
-					// Comment processed, continue to next line
-					break
+					// Comment processed and did not contain a sourceMappingURL.
+					// Per the "scan from end" algorithm, the presence of any trailing
+					// non-matching line comment should terminate the search.
+					return "", nil
 				} else {
 					// Found / but not //, this is invalid
 					return "", nil
@@ -239,8 +244,7 @@ func isWhitespace(r rune) bool {
 // Pattern: ^[@#]\s*sourceMappingURL=(\S*?)\s*$
 func matchSourceMapURL(comment string) string {
 	// Pattern matches: [@#] followed by optional whitespace, then "sourceMappingURL=", then non-whitespace URL, then optional trailing whitespace
-	re := regexp.MustCompile(`^[@#]\s*sourceMappingURL=(\S*?)\s*$`)
-	matches := re.FindStringSubmatch(comment)
+	matches := sourceMapURLRe.FindStringSubmatch(comment)
 
 	if len(matches) > 1 {
 		return matches[1]
@@ -278,6 +282,11 @@ func ResolveBundlePaths(bundlePath string, outputPath string, logger log.Logger)
 		}
 
 		if dirEntry.IsDir() {
+			// Skip walking node_modules directories entirely to avoid slow traversals.
+			if dirEntry.Name() == "node_modules" {
+				logger.Debug(fmt.Sprintf("Skipping node_modules directory: %s", fullPath))
+				return fs.SkipDir
+			}
 			return nil
 		}
 

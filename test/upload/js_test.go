@@ -191,9 +191,9 @@ func TestExtractSourceMappingURL(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		// Should be empty because quote in comment invalidates it
+		// Should be empty because sourceMappingURL inside a string literal must be ignored
 		if url != "" {
-			t.Errorf("expected empty string (should ignore sourceMappingURL when quote appears in comment line), got '%s'", url)
+			t.Errorf("expected empty string (should ignore sourceMappingURL inside a string literal), got '%s'", url)
 		}
 	})
 
