@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Refactor JS source map uploads to scan bundle files and extract the sourceMappingURL comment to find the corresponding `.map` file [#273](https://github.com/bugsnag/bugsnag-cli/pull/273)
+
 ## [3.9.0] - 2026-03-11
 
 ### Added
