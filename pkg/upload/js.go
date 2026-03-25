@@ -301,6 +301,8 @@ func ResolveBundlePaths(bundlePath string, outputPath string, logger log.Logger)
 			if strings.HasSuffix(dirEntry.Name(), ext) {
 				bundlePaths = append(bundlePaths, fullPath)
 				break
+			} else {
+				logger.Debug(fmt.Sprintf("Skipping non supported filetype: %s", fullPath))
 			}
 		}
 
@@ -311,9 +313,7 @@ func ResolveBundlePaths(bundlePath string, outputPath string, logger log.Logger)
 		return []string{}, err
 	}
 
-	if len(bundlePaths) == 0 {
-		logger.Warn(fmt.Sprintf("No bundle files found in: %s", outputPath))
-	} else {
+	if len(bundlePaths) > 0 {
 		logger.Debug(fmt.Sprintf("Found %d potential bundle file(s)", len(bundlePaths)))
 	}
 
@@ -408,10 +408,8 @@ func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath s
 		})
 	}
 
-	if len(results) == 0 {
-		logger.Warn(fmt.Sprintf("No source maps found in: %s", outputPath))
-	} else {
-		logger.Info(fmt.Sprintf("Found %d source map(s)", len(results)))
+	if len(results) > 0 {
+		logger.Debug(fmt.Sprintf("Found %d source map(s)", len(results)))
 	}
 
 	return results, nil
