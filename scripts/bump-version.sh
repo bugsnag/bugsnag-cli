@@ -11,8 +11,11 @@ else
   exit 1
 fi
 
-echo Bumping the version number to $VERSION
+echo "Bumping the version number to $VERSION in main.go, js/package.json, CHANGELOG.md and install.sh"
+
 sed -i '' "s/package_version = \".*\"/package_version = \"$VERSION\"/" main.go
 sed -i '' "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" js/package.json
 sed -i '' "s/## unreleased/## \[$VERSION\] - $(date '+%Y-%m-%d')/" CHANGELOG.md
 sed -i '' "s/VERSION=\".*\"/VERSION=\"$VERSION\"/" install.sh
+
+echo "Version bumped to $VERSION, please commit the changes and push to the release branch"
