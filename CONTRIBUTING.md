@@ -50,7 +50,7 @@ Enhancement suggestions are welcome! When suggesting a feature:
 
 We actively welcome your pull requests:
 
-1. **Fork the repository** and create your branch from `main`
+1. **Fork the repository** and create your branch from `next`
 2. **Follow the development setup** instructions below
 3. **Make your changes** following our coding standards
 4. **Add or update tests** as appropriate
