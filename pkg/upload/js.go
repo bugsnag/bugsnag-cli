@@ -354,7 +354,7 @@ func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath s
 		// Try to find bundle by stripping .map suffix
 		withoutSuffix, found := strings.CutSuffix(sourceMapPath, ".map")
 		if found && utils.FileExists(withoutSuffix) {
-			logger.Info(fmt.Sprintf("Automatically using the bundle at path %s based on stripping the .map suffix.", withoutSuffix))
+			logger.Debug(fmt.Sprintf("Automatically using the bundle at path %s based on stripping the .map suffix.", withoutSuffix))
 			return []SourceMapBundle{{BundlePath: withoutSuffix, SourceMapPath: sourceMapPath}}, nil
 		}
 		// If no bundle found, return empty bundle path (bundle is optional)
@@ -369,6 +369,7 @@ func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath s
 
 	var results []SourceMapBundle
 	for _, bundleFile := range bundlePaths {
+		logger.Debug(fmt.Sprintf("Attempting to locate sourcemap in bundle %s", bundleFile))
 		sourceMappingURL, err := ExtractSourceMappingURL(bundleFile, logger)
 		if err != nil {
 			logger.Warn(fmt.Sprintf("Error reading bundle file %s: %s", bundleFile, err))
@@ -382,7 +383,7 @@ func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath s
 
 		// Check for data URLs (inline source maps)
 		if strings.HasPrefix(sourceMappingURL, "data:") {
-			logger.Warn(fmt.Sprintf("Skipping inline source map (data URL) in %s", bundleFile))
+			logger.Debug(fmt.Sprintf("Skipping inline source map (data URL) in %s", bundleFile))
 			continue
 		}
 
