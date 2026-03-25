@@ -95,9 +95,17 @@ func buildFileRequest(url string, fieldData map[string]string, fileFieldData map
 
 	writer.Close()
 
-	request, err := http.NewRequest("POST", url, body)
+	// Store the body bytes so we can recreate the body for retries
+	bodyBytes := body.Bytes()
+
+	request, err := http.NewRequest("POST", url, bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, err
+	}
+
+	// Set GetBody to allow the request body to be re-read on retry attempts
+	request.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(bytes.NewReader(bodyBytes)), nil
 	}
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
@@ -190,8 +198,13 @@ func ProcessBuildRequest(apiKey string, payload []byte, options options.CLI, log
 		return fmt.Errorf("error getting upload endpoint: %w", err)
 	}
 
-	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", endpoint, bytes.NewReader(payload))
 	req.Header.Add("Content-Type", "application/json")
+
+	// Set GetBody to allow the request body to be re-read on retry attempts
+	req.GetBody = func() (io.ReadCloser, error) {
+		return io.NopCloser(bytes.NewReader(payload)), nil
+	}
 
 	if !options.DryRun {
 		logger.Info(fmt.Sprintf("Sending build information to %s", endpoint))
@@ -237,6 +250,15 @@ func processRequest(request *http.Request, timeout int, retryCount int, logger l
 		}
 
 		logger.Warn("Request Failed, Retrying...")
+
+		// Reset the request body for retry using GetBody if available
+		if request.GetBody != nil {
+			body, bodyErr := request.GetBody()
+			if bodyErr != nil {
+				return errors.Wrap(bodyErr, "failed to reset request body for retry")
+			}
+			request.Body = body
+		}
 
 		time.Sleep(time.Second)
 	}
