@@ -6,6 +6,10 @@
 
 - Refactor JS source map uploads to scan bundle files and extract the sourceMappingURL comment to find the corresponding `.map` file [#273](https://github.com/bugsnag/bugsnag-cli/pull/273)
 
+### Fixed
+
+- Log a DEBUG message rather than error when we can't find a Xcode archive for React Native iOS. [#276](https://github.com/bugsnag/bugsnag-cli/pull/276)
+
 ## [3.9.0] - 2026-03-11
 
 ### Added
