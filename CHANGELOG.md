@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Ensure that we only search for an Xcarchive when we need to extract information from it. [#276](https://github.com/bugsnag/bugsnag-cli/pull/276)
+- Log a DEBUG message rather than error when we can't find a Xcode archive for React Native iOS. [#276](https://github.com/bugsnag/bugsnag-cli/pull/276)
 
 ## [3.9.0] - 2026-03-11
 
