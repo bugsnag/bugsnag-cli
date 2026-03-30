@@ -5,7 +5,7 @@
 ### Fixed
 
 - Log a DEBUG message rather than error when we can't find a Xcode archive for React Native iOS. [#276](https://github.com/bugsnag/bugsnag-cli/pull/276)
-- Fixed retry failures caused by request body not being reset between retry attempts. [#277](https://github.com/bugsnag/bugsnag-cli/pull/277)
+- Fixed upload failures when using `--retries` option by rebuilding HTTP requests for each retry attempt, preventing "ContentLength with Body length 0" errors. [#277](https://github.com/bugsnag/bugsnag-cli/pull/277)
 
 ## [3.9.0] - 2026-03-11
 
