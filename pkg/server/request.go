@@ -253,8 +253,9 @@ func processRequest(buildRequest requestBuilder, timeout int, retryCount int, lo
 			break
 		}
 
-		logger.Warn("Request Failed, Retrying...")
+		logger.Warn(fmt.Sprintf("BugSnag API request attempt %d failed:", i))
 		logger.Warn(err.Error())
+		logger.Warn("Retrying...")
 
 		time.Sleep(time.Second)
 	}
