@@ -93,7 +93,7 @@ func ProcessReactNativeIos(globalOptions options.CLI, logger log.Logger) error {
 				xcodeArchivePath, err = ios.GetLatestXcodeArchiveForScheme(iosOptions.Ios.Scheme)
 
 				if err != nil {
-					return fmt.Errorf("error locating latest Xcode archive from Xcode project (scheme: %s), please specify the xcarchive path directly using --xcarchive-path: %w", iosOptions.Ios.Scheme, err)
+					logger.Debug(fmt.Sprintf("Latest Xcode archive from Xcode project (scheme: %s) not found: %s", iosOptions.Ios.Scheme, err.Error()))
 				}
 			}
 
