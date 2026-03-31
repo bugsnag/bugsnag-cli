@@ -20,7 +20,8 @@ jobs:
       matrix:
         downstream_repo: [
           'bugsnag/bugsnag-unity',
-          'bugsnag/homebrew-tap'
+          'bugsnag/homebrew-tap',
+          'bugsnag/bugsnag-gradle-plugin'
         ]
     steps:
       - name: Install libcurl4-openssl-dev and net-tools
@@ -35,6 +36,8 @@ jobs:
           -d '{
             "event_type": "update-cli",
             "client_payload": {
-              "cli_version": "${{ env.RELEASE_VERSION }}"
+              "cli_version": "${{ env.RELEASE_VERSION }}",
+              "target_submodule":"bugsnag-cli",
+              "target_version": "${{ env.RELEASE_VERSION }}"
             }
           }'

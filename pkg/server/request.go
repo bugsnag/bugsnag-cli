@@ -23,6 +23,9 @@ type FileField interface {
 	writeToForm(writer *multipart.Writer, key string) error
 }
 
+// requestBuilder is a function type that builds a fresh HTTP request for each attempt
+type requestBuilder func() (*http.Request, error)
+
 type LocalFile string
 
 func (localFile LocalFile) writeToForm(writer *multipart.Writer, key string) error {
@@ -140,15 +143,15 @@ func ProcessFileRequest(apiKey string, endpointPath string, uploadOptions map[st
 		return fmt.Errorf("error getting upload endpoint: %w", err)
 	}
 
-	req, err := buildFileRequest(endpoint, uploadOptions, fileFieldData)
-	if err != nil {
-		return fmt.Errorf("error building file request: %w", err)
-	}
-
 	if !options.DryRun {
 		logger.Info(fmt.Sprintf("Uploading %s to %s", filepath.Base(fileName), endpoint))
 
-		err = processRequest(req, options.Upload.Timeout, options.Upload.Retries, logger)
+		// Create a builder function that constructs a fresh request for each attempt
+		buildRequest := func() (*http.Request, error) {
+			return buildFileRequest(endpoint, uploadOptions, fileFieldData)
+		}
+
+		err = processRequest(buildRequest, options.Upload.Timeout, options.Upload.Retries, logger)
 
 		if err != nil {
 			if strings.Contains(err.Error(), "409") {
@@ -190,13 +193,20 @@ func ProcessBuildRequest(apiKey string, payload []byte, options options.CLI, log
 		return fmt.Errorf("error getting upload endpoint: %w", err)
 	}
 
-	req, _ := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
-	req.Header.Add("Content-Type", "application/json")
-
 	if !options.DryRun {
 		logger.Info(fmt.Sprintf("Sending build information to %s", endpoint))
 
-		err := processRequest(req, options.Upload.Timeout, options.Upload.Retries, logger)
+		// Create a builder function that constructs a fresh request for each attempt
+		buildRequest := func() (*http.Request, error) {
+			req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(payload))
+			if err != nil {
+				return nil, err
+			}
+			req.Header.Add("Content-Type", "application/json")
+			return req, nil
+		}
+
+		err := processRequest(buildRequest, options.Upload.Timeout, options.Upload.Retries, logger)
 		if err != nil {
 			return err
 		}
@@ -211,20 +221,27 @@ func ProcessBuildRequest(apiKey string, payload []byte, options options.CLI, log
 }
 
 // processRequest sends an HTTP request using sendRequest function with retry logic.
+// It builds a fresh request for each attempt to avoid state pollution from previous attempts.
 // It attempts to send the request multiple times, specified by retryCount parameter,
 // and waits for a short duration between each attempt.
 // If all attempts fail, it returns an error indicating the failure after the specified number of attempts.
 // Parameters:
-//   - request: The HTTP request to be sent.
+//   - buildRequest: A function that builds a fresh HTTP request for each attempt.
 //   - timeout: Timeout duration for the HTTP request in seconds.
 //   - retryCount: Number of times to retry the request in case of failure.
 //
 // Returns:
 //   - error: An error indicating the reason for failure or nil if the request is successful.
-func processRequest(request *http.Request, timeout int, retryCount int, logger log.Logger) error {
+func processRequest(buildRequest requestBuilder, timeout int, retryCount int, logger log.Logger) error {
 	var err error
 	i := 0
 	for {
+		// Build a fresh request for each attempt
+		request, buildErr := buildRequest()
+		if buildErr != nil {
+			return errors.Wrap(buildErr, "failed to build request")
+		}
+
 		err = sendRequest(request, timeout, logger)
 		if err == nil {
 			return nil
@@ -236,7 +253,9 @@ func processRequest(request *http.Request, timeout int, retryCount int, logger l
 			break
 		}
 
-		logger.Warn("Request Failed, Retrying...")
+		logger.Warn(fmt.Sprintf("BugSnag API request attempt %d failed:", i))
+		logger.Warn(err.Error())
+		logger.Warn("Retrying...")
 
 		time.Sleep(time.Second)
 	}
