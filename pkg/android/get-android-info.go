@@ -28,14 +28,14 @@ type AndroidManifestData struct {
 }
 
 type AndroidManifestApplicationData struct {
-	XMLName  xml.Name                `xml:"application"`
-	MetaData AndroidManifestMetaData `xml:"meta-data"`
+	XMLName  xml.Name                  `xml:"application"`
+	MetaData []AndroidManifestMetaData `xml:"meta-data"`
 }
 
 type AndroidManifestMetaData struct {
 	XMLName xml.Name `xml:"meta-data"`
-	Name    []string `xml:"name,attr"`
-	Value   []string `xml:"value,attr"`
+	Name    string   `xml:"name,attr"`
+	Value   string   `xml:"value,attr"`
 }
 
 func isXMLContent(buffer []byte) bool {
@@ -183,13 +183,23 @@ func getAndroidProtobufData(path string) (*AndroidManifestData, error) {
 				Space: "",
 				Local: "application",
 			},
-			MetaData: AndroidManifestMetaData{
-				XMLName: xml.Name{
-					Space: "",
-					Local: "meta-data",
+			MetaData: []AndroidManifestMetaData{
+				{
+					XMLName: xml.Name{
+						Space: "",
+						Local: "meta-data",
+					},
+					Name:  "com.bugsnag.android.API_KEY",
+					Value: aabManifestData["apiKey"],
 				},
-				Name:  []string{"com.bugsnag.android.API_KEY", "com.bugsnag.android.BUILD_UUID"},
-				Value: []string{aabManifestData["apiKey"], aabManifestData["buildUuid"]},
+				{
+					XMLName: xml.Name{
+						Space: "",
+						Local: "meta-data",
+					},
+					Name:  "com.bugsnag.android.BUILD_UUID",
+					Value: aabManifestData["buildUuid"],
+				},
 			},
 		},
 	}

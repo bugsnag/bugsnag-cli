@@ -98,9 +98,9 @@ func populateMetadataFromManifest(opts *options.CLI, ndkOpts *options.AndroidNdk
 	}
 
 	if opts.ApiKey == "" {
-		for key, name := range manifestData.Application.MetaData.Name {
-			if name == "com.bugsnag.android.API_KEY" {
-				opts.ApiKey = manifestData.Application.MetaData.Value[key]
+		for _, metaData := range manifestData.Application.MetaData {
+			if metaData.Name == "com.bugsnag.android.API_KEY" {
+				opts.ApiKey = metaData.Value
 				logger.Debug(fmt.Sprintf("API key found: %s", opts.ApiKey))
 				break
 			}
