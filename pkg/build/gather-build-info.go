@@ -100,9 +100,10 @@ func PopulateFromAndroidManifest(path string) CreateBuildInfo {
 		return CreateBuildInfo{}
 	}
 
-	for key, value := range androidData.Application.MetaData.Name {
-		if value == "com.bugsnag.android.API_KEY" {
-			apiKey = androidData.Application.MetaData.Value[key]
+	for _, metaData := range androidData.Application.MetaData {
+		if metaData.Name == "com.bugsnag.android.API_KEY" {
+			apiKey = metaData.Value
+			break
 		}
 	}
 
