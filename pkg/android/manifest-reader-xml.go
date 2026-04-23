@@ -15,14 +15,14 @@ type Manifest struct {
 }
 
 type Application struct {
-	XMLName  xml.Name `xml:"application"`
-	MetaData MetaData `xml:"meta-data"`
+	XMLName  xml.Name   `xml:"application"`
+	MetaData []MetaData `xml:"meta-data"`
 }
 
 type MetaData struct {
 	XMLName xml.Name `xml:"meta-data"`
-	Name    []string `xml:"name,attr"`
-	Value   []string `xml:"value,attr"`
+	Name    string   `xml:"name,attr"`
+	Value   string   `xml:"value,attr"`
 }
 
 // ParseAndroidManifestXML - Pulls information from a human-readable xml file into a struct

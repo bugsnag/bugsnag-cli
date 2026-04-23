@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.10.1] - 2026-04-23
+
+### Fixed
+
+- Resolve API key parsing issue in Android Manifest; when multiple meta-data entries exist. [#281](https://github.com/bugsnag/bugsnag-cli/pull/281)
+
+
+
 ## [3.10.0] - 2026-03-31
 
 ### Changed

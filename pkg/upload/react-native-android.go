@@ -129,9 +129,10 @@ func ProcessReactNativeAndroid(globalOptions options.CLI, logger log.Logger) err
 				logger.Warn(fmt.Sprintf("Unable to read AndroidManifest.xml: %s", err.Error()))
 			} else {
 				if globalOptions.ApiKey == "" {
-					for key, value := range manifestData.Application.MetaData.Name {
-						if value == "com.bugsnag.android.API_KEY" {
-							globalOptions.ApiKey = manifestData.Application.MetaData.Value[key]
+					for _, metaData := range manifestData.Application.MetaData {
+						if metaData.Name == "com.bugsnag.android.API_KEY" {
+							globalOptions.ApiKey = metaData.Value
+							break
 						}
 					}
 					logger.Debug(fmt.Sprintf("Using %s as API key from AndroidManifest.xml", globalOptions.ApiKey))

@@ -81,9 +81,10 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 				logger.Warn(fmt.Sprintf("Unable to read AndroidManifest.xml: %s", err.Error()))
 			} else {
 				if options.ApiKey == "" {
-					for key, value := range manifestData.Application.MetaData.Name {
-						if value == "com.bugsnag.android.API_KEY" {
-							options.ApiKey = manifestData.Application.MetaData.Value[key]
+					for _, metaData := range manifestData.Application.MetaData {
+						if metaData.Name == "com.bugsnag.android.API_KEY" {
+							options.ApiKey = metaData.Value
+							break
 						}
 					}
 					if options.ApiKey != "" {
@@ -102,9 +103,10 @@ func ProcessAndroidProguard(options options.CLI, logger log.Logger) error {
 					proguardOptions.BuildUuid = ""
 					logger.Info("No build ID will be used")
 				} else if proguardOptions.BuildUuid == "" {
-					for i := range manifestData.Application.MetaData.Name {
-						if manifestData.Application.MetaData.Name[i] == "com.bugsnag.android.BUILD_UUID" {
-							proguardOptions.BuildUuid = manifestData.Application.MetaData.Value[i]
+					for _, metaData := range manifestData.Application.MetaData {
+						if metaData.Name == "com.bugsnag.android.BUILD_UUID" {
+							proguardOptions.BuildUuid = metaData.Value
+							break
 						}
 					}
 
