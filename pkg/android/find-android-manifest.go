@@ -1,12 +1,23 @@
 package android
 
+package android
+
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
 )
+
+// capitalizeFirstLetter returns the input string with the first letter capitalized.
+func capitalizeFirstLetter(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
+}
 
 // FindAndroidManifest locates and returns the first existing AndroidManifest.xml
 // for a given build directory and variant.
@@ -39,7 +50,9 @@ func FindAndroidManifest(appBuildPath string, variant string, logger log.Logger)
 
 	primaryAppManifestPath := filepath.Join(mergedManifestPath, variant, "AndroidManifest.xml")
 
-	fallbackAppManifestPath := filepath.Join(mergedManifestPath, variant, "process"+variant+"Manifest", "AndroidManifest.xml")
+	// Fix: Capitalize first letter of variant for fallback path
+	capitalizedVariant := capitalizeFirstLetter(variant)
+	fallbackAppManifestPath := filepath.Join(mergedManifestPath, variant, "process"+capitalizedVariant+"Manifest", "AndroidManifest.xml")
 
 	paths := []string{primaryAppManifestPath, fallbackAppManifestPath}
 
@@ -55,3 +68,13 @@ func FindAndroidManifest(appBuildPath string, variant string, logger log.Logger)
 	logger.Info(fmt.Sprintf("No AndroidManifest.xml located for variant %s", variant))
 	return ""
 }
+
+		} else {
+			logger.Debug(fmt.Sprintf("AndroidManifest.xml not found at: %s", path))
+		}
+	}
+
+	logger.Info(fmt.Sprintf("No AndroidManifest.xml located for variant %s", variant))
+	return ""
+}
+
