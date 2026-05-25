@@ -366,3 +366,171 @@ func TestResolveBundlePaths(t *testing.T) {
 		}
 	})
 }
+
+// TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps tests the TIER 3B fallback mechanism
+// for bundlers like Vite that use 'sourcemaps: hidden' configuration.
+//
+// Vite with hidden sourcemaps:
+// - Creates .map files on disk
+// - Does NOT add sourceMappingURL comments to bundle files
+// - Standard ECMA-426 source map discovery fails
+//
+// This test verifies the fallback .map suffix matching works correctly.
+func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
+	logger := log.NewLoggerWrapper("debug")
+
+	t.Run("Finds source map by .map suffix when sourceMappingURL missing (Vite hidden mode)", func(t *testing.T) {
+		tempDir := t.TempDir()
+		
+		// Simulate Vite hidden sourcemaps: bundle WITHOUT sourceMappingURL comment
+		bundlePath := filepath.Join(tempDir, "app.js")
+		bundleContent := "console.log('vite app');\n// No sourceMappingURL comment - hidden sourcemaps\n"
+		if err := os.WriteFile(bundlePath, []byte(bundleContent), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		// Create corresponding .map file
+		mapPath := filepath.Join(tempDir, "app.js.map")
+		mapContent := `{"version":3,"sources":["src/main.ts"],"mappings":"test"}`
+		if err := os.WriteFile(mapPath, []byte(mapContent), 0644); err != nil {
+			t.Fatalf("failed to write source map: %v", err)
+		}
+
+		// Resolve source maps without explicit --source-map parameter (auto-discovery)
+		bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Should find 1 bundle+map pair via TIER 3B fallback
+		if len(bundles) != 1 {
+			t.Fatalf("expected 1 source map bundle (TIER 3B fallback), got %d", len(bundles))
+		}
+
+		if bundles[0].BundlePath != bundlePath {
+			t.Errorf("expected bundle path %s, got %s", bundlePath, bundles[0].BundlePath)
+		}
+
+		if bundles[0].SourceMapPath != mapPath {
+			t.Errorf("expected map path %s, got %s", mapPath, bundles[0].SourceMapPath)
+		}
+	})
+
+	t.Run("Prefers sourceMappingURL comment over .map suffix fallback", func(t *testing.T) {
+		tempDir := t.TempDir()
+		
+		// Bundle WITH sourceMappingURL comment (priority over suffix matching)
+		bundlePath := filepath.Join(tempDir, "priority.js")
+		bundleContent := "console.log('test');\n//# sourceMappingURL=custom.js.map\n"
+		if err := os.WriteFile(bundlePath, []byte(bundleContent), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		// Create the referenced source map
+		customMapPath := filepath.Join(tempDir, "custom.js.map")
+		if err := os.WriteFile(customMapPath, []byte("{}"), 0644); err != nil {
+			t.Fatalf("failed to write custom map: %v", err)
+		}
+
+		// Also create a .map suffix file (should NOT be used)
+		suffixMapPath := filepath.Join(tempDir, "priority.js.map")
+		if err := os.WriteFile(suffixMapPath, []byte("{}"), 0644); err != nil {
+			t.Fatalf("failed to write suffix map: %v", err)
+		}
+
+		bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Should use the sourceMappingURL reference, NOT the .map suffix file
+		if len(bundles) != 1 {
+			t.Fatalf("expected 1 source map bundle, got %d", len(bundles))
+		}
+
+		if bundles[0].SourceMapPath != customMapPath {
+			t.Errorf("expected to use sourceMappingURL reference %s, but got %s", customMapPath, bundles[0].SourceMapPath)
+		}
+	})
+
+	t.Run("Skips bundle when no sourceMappingURL and no .map suffix file exists", func(t *testing.T) {
+		tempDir := t.TempDir()
+		
+		// Bundle WITHOUT sourceMappingURL comment
+		orphanBundle := filepath.Join(tempDir, "orphan.js")
+		if err := os.WriteFile(orphanBundle, []byte("console.log('orphan');"), 0644); err != nil {
+			t.Fatalf("failed to write bundle: %v", err)
+		}
+
+		// NO .map file - should be skipped
+
+		bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		// Should find nothing for this orphan bundle (neither comment nor suffix file)
+		if len(bundles) != 0 {
+			t.Fatalf("expected 0 source map bundles (orphan bundle without map file), got %d", len(bundles))
+		}
+	})
+
+	t.Run("Works with React/TypeScript bundle names", func(t *testing.T) {
+		tempDir := t.TempDir()
+		
+		// Realistic Vite React+TS bundle name: bundle-abc123.min.js
+		complexBundlePath := filepath.Join(tempDir, "index-abc123.min.js")
+		if err := os.WriteFile(complexBundlePath, []byte("var app={};"), 0644); err != nil {
+			t.Fatalf("failed to write complex bundle: %v", err)
+		}
+
+		// Corresponding .map file with same naming
+		complexMapPath := filepath.Join(tempDir, "index-abc123.min.js.map")
+		if err := os.WriteFile(complexMapPath, []byte("{}"), 0644); err != nil {
+			t.Fatalf("failed to write complex map: %v", err)
+		}
+
+		bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(bundles) != 1 {
+			t.Fatalf("expected 1 source map bundle, got %d", len(bundles))
+		}
+
+		if bundles[0].SourceMapPath != complexMapPath {
+			t.Errorf("expected map path %s, got %s", complexMapPath, bundles[0].SourceMapPath)
+		}
+	})
+
+	t.Run("TIER 3B fallback only used in auto-discovery mode (no explicit params)", func(t *testing.T) {
+		tempDir := t.TempDir()
+		
+		// When explicit --source-map and --bundle are provided, use those (TIER 1)
+		// When explicit --source-map only, find bundle by suffix (TIER 2)
+		// When neither, auto-discover via sourceMappingURL (TIER 3A)
+		// When neither + no sourceMappingURL, try .map suffix (TIER 3B)
+
+		// For TIER 3B test: no explicit params = auto-discovery
+		testBundle := filepath.Join(tempDir, "tier3b.js")
+		if err := os.WriteFile(testBundle, []byte("var x=1;"), 0644); err != nil {
+			t.Fatalf("failed to write test bundle: %v", err)
+		}
+
+		testMap := filepath.Join(tempDir, "tier3b.js.map")
+		if err := os.WriteFile(testMap, []byte("{}"), 0644); err != nil {
+			t.Fatalf("failed to write test map: %v", err)
+		}
+
+		// Call with no explicit sourceMapPath or bundlePath (auto-discovery mode)
+		bundles, err := upload.ResolveSourceMapPaths("", "", tempDir, logger)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		if len(bundles) != 1 {
+			t.Fatalf("expected 1 bundle in TIER 3B fallback, got %d", len(bundles))
+		}
+	})
+}
