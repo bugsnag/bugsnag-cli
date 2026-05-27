@@ -378,6 +378,31 @@ func ResolveSourceMapPaths(sourceMapPath string, bundlePath string, outputPath s
 
 		if sourceMappingURL == "" {
 			logger.Debug(fmt.Sprintf("No sourceMappingURL found in %s", bundleFile))
+			
+			// TIER 3B Fallback: .map suffix matching for bundlers without sourceMappingURL comments
+			// This handles cases like Vite with 'sourcemaps: hidden' configuration, where:
+			// - The .map file exists on disk
+			// - But the bundle does NOT contain a sourceMappingURL comment
+			// - Standard ECMA-426 source map discovery would fail
+			// 
+			// Strategy: Try to find a .map file with the same base name as the bundle
+			// Example: bundle.js → bundle.js.map, or app.min.js → app.min.js.map
+			//
+			// This is ONLY attempted when:
+			// 1. sourceMappingURL comment is missing (current condition)
+			// 2. A .map file exists at the expected location
+			// 3. No explicit --source-map or --bundle parameters were provided (auto-discovery mode)
+			mapFilePath := bundleFile + ".map"
+			if utils.FileExists(mapFilePath) {
+				logger.Info(fmt.Sprintf("Found source map %s by .map suffix matching (TIER 3B fallback for hidden sourcemaps)", mapFilePath))
+				results = append(results, SourceMapBundle{
+					BundlePath:    bundleFile,
+					SourceMapPath: mapFilePath,
+				})
+				continue
+			}
+			logger.Debug(fmt.Sprintf("No .map file found at %s", mapFilePath))
+			
 			continue
 		}
 
