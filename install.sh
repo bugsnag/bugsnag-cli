@@ -107,7 +107,7 @@ display_help() {
 EOS
 }
 
-VERSION="3.10.1"
+VERSION="3.10.2"
 
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
