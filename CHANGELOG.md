@@ -1,11 +1,20 @@
 # Changelog
 
+## [3.10.2] - 2026-06-03
+
+### Added
+
+- Support auto-discovery of hidden source maps (e.g., Vite with `sourcemaps: 'hidden'`) by falling back to `.map` suffix matching when no `sourceMappingURL` comment is found in bundle files. [#285](https://github.com/bugsnag/bugsnag-cli/issues/285)
+
+### Security
+
+- Bump esbuild to 0.25.0 to address CORS misconfiguration vulnerability in dev server.[#287](https://github.com/bugsnag/bugsnag-cli/pull/287)
+
 ## [3.10.1] - 2026-04-23
 
 ### Fixed
 
 - Resolve API key parsing issue in Android Manifest; when multiple meta-data entries exist. [#281](https://github.com/bugsnag/bugsnag-cli/pull/281)
-
 
 
 ## [3.10.0] - 2026-03-31
