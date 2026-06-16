@@ -1,7 +1,5 @@
 package android
 
-package android
-
 import (
 	"fmt"
 	"path/filepath"
@@ -68,13 +66,3 @@ func FindAndroidManifest(appBuildPath string, variant string, logger log.Logger)
 	logger.Info(fmt.Sprintf("No AndroidManifest.xml located for variant %s", variant))
 	return ""
 }
-
-		} else {
-			logger.Debug(fmt.Sprintf("AndroidManifest.xml not found at: %s", path))
-		}
-	}
-
-	logger.Info(fmt.Sprintf("No AndroidManifest.xml located for variant %s", variant))
-	return ""
-}
-
