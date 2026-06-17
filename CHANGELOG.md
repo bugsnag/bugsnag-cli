@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+- This change ensures that bugsnag-cli finds all dex files
+
 ## [3.10.2] - 2026-06-03
 
 ### Added

@@ -57,7 +57,7 @@ func FindVariantDexFiles(mappingFilePath string, variant string) []string {
 	buildRoot := filepath.Join(filepath.Dir(mappingFilePath), "..", "..", "..", "intermediates", "dex", variant)
 
 	if utils.IsDir(buildRoot) {
-		matches, _ := filepath.Glob(filepath.Join(buildRoot, "*", "classes.dex"))
+		matches, _ := filepath.Glob(filepath.Join(buildRoot, "*", "classes*.dex"))
 		return matches
 	}
 
