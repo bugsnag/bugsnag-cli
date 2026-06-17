@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Correctly handle capitalization in fallback AndroidManifest.xml search path (e.g., processStagingReleaseManifest) to support case-sensitive filesystems like Linux/Alpine. Previously, the search used incorrect capitalization, causing manifest detection to fail on some systems.
 ## [3.10.2] - 2026-06-03
 
 ### Added
