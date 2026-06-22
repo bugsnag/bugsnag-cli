@@ -71,10 +71,10 @@ module.exports = {
     ]
     // React Native 0.75+ introduced SCRIPT_PHASE_BASED_BUILD_OPTIMIZATION which can cause archive export failures
     // Disable it for compatibility
-    const rnVersion = parseFloat(process.env.RN_VERSION || '0.70')
-    if (rnVersion >= 0.75) {
-      archiveArgs.push('SCRIPT_PHASE_BASED_BUILD_OPTIMIZATION=NO')
-    }
+    // const rnVersion = parseFloat(process.env.RN_VERSION || '0.70')
+    // if (rnVersion >= 0.75) {
+    //   archiveArgs.push('SCRIPT_PHASE_BASED_BUILD_OPTIMIZATION=NO')
+    // }
 
     if (exportArchive) {
       archiveArgs.splice(8, 0, '-archivePath', `${fixtureDir}/reactnative.xcarchive`)
