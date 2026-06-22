@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 // BuildDartUploadOptions - Builds the upload options for processing dart files
@@ -73,9 +75,37 @@ func BuildAndroidProguardUploadOptions(applicationId string, versionName string,
 func BuildDsymUploadOptions(projectRoot string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	uploadOptions["projectRoot"] = projectRoot
+	// Normalize projectRoot to absolute path
+	normalizedRoot := normalizeProjectRoot(projectRoot)
+	if normalizedRoot != "" {
+		uploadOptions["projectRoot"] = normalizedRoot
+	}
 
 	return uploadOptions, nil
+}
+
+// normalizeProjectRoot converts a path to absolute, handling various input formats.
+// - If path starts with "/", it's already absolute, use as-is
+// - If path starts with ".", it's relative to CWD, convert to absolute
+// - Otherwise, treat as absolute path missing leading slash, prepend "/"
+func normalizeProjectRoot(projectRoot string) string {
+	if projectRoot == "" {
+		return ""
+	}
+
+	// Already absolute path (starts with /)
+	if strings.HasPrefix(projectRoot, "/") {
+		return projectRoot
+	}
+
+	// Relative path (starts with . or /) - convert to absolute
+	if strings.HasPrefix(projectRoot, ".") {
+		abs, _ := filepath.Abs(projectRoot)
+		return abs
+	}
+
+	// Path without leading slash - treat as absolute, prepend /
+	return "/" + projectRoot
 }
 
 func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {

@@ -103,6 +103,7 @@ func GetLatestXcodeArchiveForScheme(scheme string) (string, error) {
 
 // FindXcarchivePath searches for an Xcode archive (.xcarchive) within the provided paths.
 // If a directory is given, it attempts to locate the latest archive associated with a scheme.
+// First checks the local build/ directory, then falls back to system archives.
 //
 // Parameters:
 // - options: CLI options containing upload paths and shared settings.
@@ -126,6 +127,21 @@ func FindXcarchivePath(options options.CLI, logger log.Logger) (string, error) {
 			// If the path is a directory, search for an Xcode archive inside it
 			logger.Info(fmt.Sprintf("Searching for an Xcode archive in %s", path))
 
+			// First check for archives in local build directory
+			localBuildPath := filepath.Join(path, "build")
+			if utils.IsDir(localBuildPath) {
+				entries, err := os.ReadDir(localBuildPath)
+				if err == nil {
+					for _, entry := range entries {
+						if entry.IsDir() && strings.HasSuffix(entry.Name(), ".xcarchive") {
+							xcarchivePath = filepath.Join(localBuildPath, entry.Name())
+							logger.Info(fmt.Sprintf("Found Xcode archive in local build directory: %s", xcarchivePath))
+							return xcarchivePath, nil
+						}
+					}
+				}
+			}
+
 			// Check if the directory contains an Xcode project or workspace
 			if IsPathAnXcodeProjectOrWorkspace(path) {
 				// Determine the scheme if it is not set
@@ -136,7 +152,7 @@ func FindXcarchivePath(options options.CLI, logger log.Logger) (string, error) {
 					}
 				}
 
-				// Retrieve the latest Xcode archive for the determined scheme
+				// Retrieve the latest Xcode archive for the determined scheme from system archives
 				xcarchivePath, _ = GetLatestXcodeArchiveForScheme(options.Upload.XcodeArchive.Shared.Scheme)
 			}
 		}
