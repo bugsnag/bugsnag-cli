@@ -126,18 +126,36 @@ func FindXcarchivePath(options options.CLI, logger log.Logger) (string, error) {
 			// If the path is a directory, search for an Xcode archive inside it
 			logger.Info(fmt.Sprintf("Searching for an Xcode archive in %s", path))
 
-			// Check if the directory contains an Xcode project or workspace
-			if IsPathAnXcodeProjectOrWorkspace(path) {
-				// Determine the scheme if it is not set
-				if options.Upload.XcodeArchive.Shared.Scheme == "" {
-					options.Upload.XcodeArchive.Shared.Scheme, err = GetDefaultScheme(path)
-					if err != nil {
-						return "", fmt.Errorf("error determining default scheme: %w", err)
+			// First, check for a local build directory with archives
+			buildDir := filepath.Join(path, "build")
+			if utils.IsDir(buildDir) {
+				// Look for any .xcarchive directory in the build folder
+				files, err := os.ReadDir(buildDir)
+				if err == nil {
+					for _, file := range files {
+						if file.IsDir() && strings.HasSuffix(file.Name(), ".xcarchive") {
+							xcarchivePath = filepath.Join(buildDir, file.Name())
+							logger.Info(fmt.Sprintf("Found local Xcode archive at %s", xcarchivePath))
+							break
+						}
 					}
 				}
+			}
 
-				// Retrieve the latest Xcode archive for the determined scheme
-				xcarchivePath, _ = GetLatestXcodeArchiveForScheme(options.Upload.XcodeArchive.Shared.Scheme)
+			// If not found locally, check if the directory contains an Xcode project or workspace
+			if xcarchivePath == "" {
+				if IsPathAnXcodeProjectOrWorkspace(path) {
+					// Determine the scheme if it is not set
+					if options.Upload.XcodeArchive.Shared.Scheme == "" {
+						options.Upload.XcodeArchive.Shared.Scheme, err = GetDefaultScheme(path)
+						if err != nil {
+							return "", fmt.Errorf("error determining default scheme: %w", err)
+						}
+					}
+
+					// Retrieve the latest Xcode archive for the determined scheme
+					xcarchivePath, _ = GetLatestXcodeArchiveForScheme(options.Upload.XcodeArchive.Shared.Scheme)
+				}
 			}
 		}
 	}
