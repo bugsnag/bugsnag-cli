@@ -64,3 +64,4 @@ Feature: Unity iOS integration tests
     Then the sourcemap is valid for the dSYM Build API
     Then the sourcemaps Content-Type header is valid multipart form-data
     And the sourcemap payload field "apiKey" equals "1234567890ABCDEF1234567890ABCDEF"
+
