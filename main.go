@@ -11,7 +11,7 @@ import (
 	"github.com/bugsnag/bugsnag-cli/pkg/upload"
 )
 
-var package_version = "3.10.2"
+var package_version = "3.10.3"
 
 func main() {
 	commands := options.CLI{}
