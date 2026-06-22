@@ -39,7 +39,7 @@ func ProcessUnityIos(globalOptions options.CLI, logger log.Logger) error {
 			logger.Debug(fmt.Sprintf("Using default Unity scheme: %s", unityOptions.DsymShared.Scheme))
 		}
 
-		if unityOptions.DsymShared.ProjectRoot == "" {
+		if unityOptions.DsymShared.ProjectRoot == "" || unityOptions.DsymShared.ProjectRoot == "." {
 			if utils.IsDir(path) {
 				unityOptions.DsymShared.ProjectRoot = path
 			} else {
