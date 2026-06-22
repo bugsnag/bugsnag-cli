@@ -367,6 +367,9 @@ Before('@BuildRNAndroid') do
       ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/react/release/index.android.bundle"
     when 0.71
       ENV['BUNDLE_PATH'] = "#{base_path}/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    when 0.73, 0.74
+      # RN 0.73 and 0.74 use the same path structure as 0.72+
+      ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
     when 0.75
       ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
     end
