@@ -85,7 +85,7 @@ type DsymShared struct {
 	IgnoreMissingDwarf bool       `help:"Throw warnings instead of errors when a dSYM with missing DWARF data is found"`
 	Configuration      string     `help:"The configuration used to build the application"`
 	Scheme             string     `help:"The name of the Xcode options.Scheme used to build the application"`
-	ProjectRoot        string     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" type:"path"`
+	ProjectRoot        string     `help:"The path to strip from the beginning of source file names referenced in stacktraces on the BugSnag dashboard" default:"."`
 	Plist              utils.Path `help:"The path to a .plist file from which to obtain build information" type:"path"`
 	XcodeProject       utils.Path `help:"The path to an Xcode project, workspace or containing directory from which to obtain build information" type:"path"`
 }

@@ -164,6 +164,13 @@ Then('the sourcemap payload field "minifiedFile" is not empty') do
   Maze.check.not_equal(Maze::Server.sourcemaps.current[:body]['minifiedFile'].length, 0)
 end
 
+Then('the sourcemap payload field {string} is an absolute path') do |field|
+  value = Maze::Server.sourcemaps.current[:body][field]
+  is_absolute = value.start_with?('/')
+  Maze.check.true(is_absolute,
+    "Expected sourcemap field '#{field}' to be an absolute path, but got '#{value}'")
+end
+
 Then('{string} should be used as {string}') do |value, field|
   Maze.check.include(run_output, "Using #{value} as #{field} from")
 end
@@ -360,6 +367,9 @@ Before('@BuildRNAndroid') do
       ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/react/release/index.android.bundle"
     when 0.71
       ENV['BUNDLE_PATH'] = "#{base_path}/ASSETS/createBundleReleaseJsAndAssets/index.android.bundle"
+    when 0.73, 0.74
+      # RN 0.73 and 0.74 use the same path structure as 0.72+
+      ENV['BUNDLE_PATH'] = "#{base_path}/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle"
     when 0.75
       ENV['APP_MANIFEST_PATH'] = "#{base_path}/intermediates/merged_manifests/release/processReleaseManifest/AndroidManifest.xml"
     end
