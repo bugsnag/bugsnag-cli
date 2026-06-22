@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
-	"github.com/bugsnag/bugsnag-cli/pkg/elf"
-	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/bugsnag/bugsnag-cli/pkg/elf"
+	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
@@ -46,7 +47,7 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 	for _, path := range unityOptions.Path {
 		aabPath = string(unityOptions.AabPath)
 
-		if unityOptions.ProjectRoot == "" {
+		if unityOptions.ProjectRoot == "" || unityOptions.ProjectRoot == "." {
 			if utils.IsDir(path) {
 				unityOptions.ProjectRoot = path
 			} else {
