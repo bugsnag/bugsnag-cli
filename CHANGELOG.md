@@ -1,9 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [3.10.3] - 2026-06-22
 
 ### Fixed
+
 - Correctly handle capitalization in fallback AndroidManifest.xml search path (e.g., processStagingReleaseManifest) to support case-sensitive filesystems like Linux/Alpine. Previously, the search used incorrect capitalization, causing manifest detection to fail on some systems.
+- Fix a project root path related issue to upload dysm file.[#292](https://github.com/bugsnag/bugsnag-cli/pull/292)
+
 ## [3.10.2] - 2026-06-03
 
 ### Added
