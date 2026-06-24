@@ -77,7 +77,7 @@ const downloadBinaryFromGitHub = async (downloadUrl, outputPath) => {
         fs.chmodSync(outputPath, 0o755)
         console.log('Binary downloaded successfully!')
     } catch (err) {
-        console.error('Error downloading binary:', err.message)
+        handleError(`Error downloading binary: ${err.message}`)
     }
 }
 
