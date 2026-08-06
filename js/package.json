@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/cli",
-  "version": "3.10.3",
+  "version": "3.10.4",
   "description": "BugSnag CLI",
   "main": "dist/bugsnag-cli-wrapper.js",
   "types": "dist/bugsnag-cli-wrapper.d.ts",
@@ -41,6 +41,6 @@
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "typescript": "^6.0.2"
+    "typescript": "^7.0.2"
   }
 }
