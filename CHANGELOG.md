@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.10.4] - 2026-07-22
+
+### Security
+
+- Bump Go toolchain version from 1.26.1 to 1.26.3.
+- Bump TypeScript version in the JS wrapper package from 6.0.2 to 7.0.2.
+
+
 ## [3.10.3] - 2026-06-22
 
 ### Fixed
