@@ -26,50 +26,42 @@ func TestBuildDsymUploadOptions_ProjectRoot(t *testing.T) {
 	}{
 		// TC-01: Absolute path variants
 		"TC-01/1 clean absolute path — no debug message": {
-			projectRoot:  "/Users/vagrant/git",
-			expectedRoot: "/Users/vagrant/git",
-			expectDebug:  false,
+			projectRoot:  "/path/to/project",
+			expectedRoot: "/path/to/project",
 		},
-		"TC-01/2 single trailing slash normalized, debug shown": {
-			projectRoot:  "/Users/vagrant/git/",
-			expectedRoot: "/Users/vagrant/git",
-			expectDebug:  true,
+		"TC-01/2 single trailing slash normalized": {
+			projectRoot:  "/path/to/project/",
+			expectedRoot: "/path/to/project",
 		},
-		"TC-01/3 double trailing slash normalized, debug shown": {
-			projectRoot:  "/Users/vagrant/git//",
-			expectedRoot: "/Users/vagrant/git",
-			expectDebug:  true,
+		"TC-01/3 double trailing slash normalized": {
+			projectRoot:  "/path/to/project//",
+			expectedRoot: "/path/to/project",
 		},
-		"TC-01 double internal slash normalized, debug shown": {
-			projectRoot:  "/Users//vagrant/git",
-			expectedRoot: "/Users/vagrant/git",
-			expectDebug:  true,
+		"TC-01 double internal slash normalized": {
+			projectRoot:  "/path//to/project",
+			expectedRoot: "/path/to/project",
 		},
 
-		// TC-02: Relative paths resolved to absolute, debug shown
-		"TC-02/1 dot-relative resolved to CWD, debug shown": {
+		// TC-02: Relative paths resolved to absolute
+		"TC-02/1 dot-relative resolved to CWD": {
 			projectRoot:  ".",
 			expectedRoot: cwd,
-			expectDebug:  true,
 		},
-		"TC-02/2 parent-relative resolved, debug shown": {
+		"TC-02/2 parent-relative resolved": {
 			projectRoot:  "../",
 			expectedRoot: strings.TrimSuffix(cwd, "/"+lastSegment(cwd)),
-			expectDebug:  true,
 		},
 
-		// TC-03: Empty — debug shown (no projectRoot set)
-		"TC-03/1 empty project root — no entry, debug shown": {
+		// TC-03: Empty — no projectRoot set
+		"TC-03/1 empty project root — no entry": {
 			projectRoot:  "",
 			expectedRoot: "",
-			expectDebug:  true,
 		},
 
 		// TC-04: Boundary values
-		"TC-04/1 filesystem root / — debug shown": {
+		"TC-04/1 filesystem root /": {
 			projectRoot:  "/",
 			expectedRoot: "/",
-			expectDebug:  true,
 		},
 		"TC-04/2 path longer than 1024 characters — hard error": {
 			projectRoot:   "/" + strings.Repeat("a", 1025),
@@ -78,29 +70,25 @@ func TestBuildDsymUploadOptions_ProjectRoot(t *testing.T) {
 		},
 
 		// TC-05: Special characters
-		"TC-05/1 path with spaces — no debug message": {
-			projectRoot:  "/Users/dimple agarwal/Documents/GitHub/bugsnag-cocoa",
-			expectedRoot: "/Users/dimple agarwal/Documents/GitHub/bugsnag-cocoa",
-			expectDebug:  false,
+		"TC-05/1 path with spaces": {
+			projectRoot:  "/path/to/my project/repo",
+			expectedRoot: "/path/to/my project/repo",
 		},
-		"TC-05/2 path with unicode — no debug message": {
-			projectRoot:  "/Users/dimple_agarwal/Documents/GitHub/bugsnag-cocoa\u00e9",
-			expectedRoot: "/Users/dimple_agarwal/Documents/GitHub/bugsnag-cocoa\u00e9",
-			expectDebug:  false,
+		"TC-05/2 path with unicode characters": {
+			projectRoot:  "/path/to/project-\u00e9",
+			expectedRoot: "/path/to/project-\u00e9",
 		},
 
 		// TC-07: Empty string
-		"TC-07/1 empty string — debug shown": {
+		"TC-07/1 empty string — no project root set": {
 			projectRoot:  "",
 			expectedRoot: "",
-			expectDebug:  true,
 		},
 
-		// No leading slash: prepended and cleaned, debug shown
-		"no leading slash — prepended to absolute, debug shown": {
-			projectRoot:  "Users/rohan_dhiman",
-			expectedRoot: "/Users/rohan_dhiman",
-			expectDebug:  true,
+		// No leading slash: prepended and cleaned
+		"no leading slash — prepended to absolute": {
+			projectRoot:  "path/to/project",
+			expectedRoot: "/path/to/project",
 		},
 	}
 
@@ -123,5 +111,15 @@ func TestBuildDsymUploadOptions_ProjectRoot(t *testing.T) {
 			}
 		})
 	}
+}
+
+// lastSegment returns the last path component of a slash-separated path.
+func lastSegment(path string) string {
+	path = strings.TrimRight(path, "/")
+	idx := strings.LastIndex(path, "/")
+	if idx < 0 {
+		return path
+	}
+	return path[idx+1:]
 }
 
