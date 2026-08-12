@@ -95,7 +95,7 @@ func ProcessXcodeBuild(options options.CLI, logger log.Logger) error {
 		// Default project root to current directory if not set
 		if xcodeBuildOptions.Shared.ProjectRoot == "" {
 			xcodeBuildOptions.Shared.ProjectRoot, _ = os.Getwd()
-			logger.Info(fmt.Sprintf("Setting `--project-root` to current working directory: %s", xcodeBuildOptions.Shared.ProjectRoot))
+			logger.Debug(fmt.Sprintf("--project-root not set or empty: using current working directory %q as project root", xcodeBuildOptions.Shared.ProjectRoot))
 		}
 
 		// Validate dSYM path
