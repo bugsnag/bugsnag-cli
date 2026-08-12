@@ -53,6 +53,14 @@ func ProcessDsymUpload(plistPath string, projectRoot string, options options.CLI
 		if err != nil {
 			return fmt.Errorf("failed to build dSYM upload options: %w", err)
 		}
+		if normalized, ok := uploadOptions["projectRoot"]; ok {
+			if normalized != projectRoot {
+				logger.Debug(fmt.Sprintf("project root normalized from %q to %q", projectRoot, normalized))
+			}
+			logger.Debug(fmt.Sprintf("using project root: %q", normalized))
+		} else {
+			logger.Debug("no project root set: file paths will not be stripped")
+		}
 
 		// Prepare the file data for uploading.
 		fileFieldData := map[string]server.FileField{

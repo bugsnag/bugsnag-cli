@@ -75,8 +75,11 @@ func BuildAndroidProguardUploadOptions(applicationId string, versionName string,
 func BuildDsymUploadOptions(projectRoot string) (map[string]string, error) {
 	uploadOptions := make(map[string]string)
 
-	// Normalize projectRoot to absolute path
-	normalizedRoot := normalizeProjectRoot(projectRoot)
+	// Normalize projectRoot to a clean absolute path.
+	normalizedRoot, err := normalizeProjectRoot(projectRoot)
+	if err != nil {
+		return nil, err
+	}
 	if normalizedRoot != "" {
 		uploadOptions["projectRoot"] = normalizedRoot
 	}
@@ -84,28 +87,42 @@ func BuildDsymUploadOptions(projectRoot string) (map[string]string, error) {
 	return uploadOptions, nil
 }
 
-// normalizeProjectRoot converts a path to absolute, handling various input formats.
-// - If path starts with "/", it's already absolute, use as-is
-// - If path starts with ".", it's relative to CWD, convert to absolute
-// - Otherwise, treat as absolute path missing leading slash, prepend "/"
-func normalizeProjectRoot(projectRoot string) string {
+// normalizeProjectRoot converts a path to a cleaned absolute path, handling various input formats:
+//   - Empty string: returned as-is (treated as "no project root" — no stripping performed)
+//   - Absolute path (starts with "/"): cleaned with filepath.Clean to collapse duplicate/trailing slashes
+//   - Dot-relative path (starts with "." e.g. ".", "../../../"): resolved to absolute via the CWD
+//   - Other (no leading slash): treated as an absolute path with a missing "/", prepended and cleaned
+//
+// Returns an error only if the path exceeds 1024 characters or CWD resolution fails.
+func normalizeProjectRoot(projectRoot string) (string, error) {
 	if projectRoot == "" {
-		return ""
+		return "", nil
 	}
 
-	// Already absolute path (starts with /)
-	if strings.HasPrefix(projectRoot, "/") {
-		return projectRoot
+	const maxPathLength = 1024
+	if len(projectRoot) > maxPathLength {
+		return "", fmt.Errorf("project root path exceeds the maximum allowed length of %d characters", maxPathLength)
 	}
 
-	// Relative path (starts with . or /) - convert to absolute
-	if strings.HasPrefix(projectRoot, ".") {
-		abs, _ := filepath.Abs(projectRoot)
-		return abs
+	var resolved string
+
+	switch {
+	case strings.HasPrefix(projectRoot, "/"):
+		// Already absolute: clean to collapse double/trailing slashes
+		resolved = filepath.Clean(projectRoot)
+	case strings.HasPrefix(projectRoot, "."):
+		// Dot-relative (e.g. ".", "../../../"): resolve against CWD
+		abs, err := filepath.Abs(projectRoot)
+		if err != nil {
+			return "", fmt.Errorf("failed to resolve relative project root %q: %w", projectRoot, err)
+		}
+		resolved = abs
+	default:
+		// No leading slash: treat as absolute path with missing "/", clean after prepending
+		resolved = filepath.Clean("/" + projectRoot)
 	}
 
-	// Path without leading slash - treat as absolute, prepend /
-	return "/" + projectRoot
+	return resolved, nil
 }
 
 func BuildJsUploadOptions(versionName string, codeBundleId string, bundleUrl string, projectRoot string, overwrite bool) (map[string]string, error) {
