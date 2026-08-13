@@ -122,4 +122,3 @@ func lastSegment(path string) string {
 	}
 	return path[idx+1:]
 }
-
