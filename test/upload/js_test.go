@@ -381,7 +381,7 @@ func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
 
 	t.Run("Finds source map by .map suffix when sourceMappingURL missing (Vite hidden mode)", func(t *testing.T) {
 		tempDir := t.TempDir()
-		
+
 		// Simulate Vite hidden sourcemaps: bundle WITHOUT sourceMappingURL comment
 		bundlePath := filepath.Join(tempDir, "app.js")
 		bundleContent := "console.log('vite app');\n// No sourceMappingURL comment - hidden sourcemaps\n"
@@ -418,7 +418,7 @@ func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
 
 	t.Run("Prefers sourceMappingURL comment over .map suffix fallback", func(t *testing.T) {
 		tempDir := t.TempDir()
-		
+
 		// Bundle WITH sourceMappingURL comment (priority over suffix matching)
 		bundlePath := filepath.Join(tempDir, "priority.js")
 		bundleContent := "console.log('test');\n//# sourceMappingURL=custom.js.map\n"
@@ -455,7 +455,7 @@ func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
 
 	t.Run("Skips bundle when no sourceMappingURL and no .map suffix file exists", func(t *testing.T) {
 		tempDir := t.TempDir()
-		
+
 		// Bundle WITHOUT sourceMappingURL comment
 		orphanBundle := filepath.Join(tempDir, "orphan.js")
 		if err := os.WriteFile(orphanBundle, []byte("console.log('orphan');"), 0644); err != nil {
@@ -477,7 +477,7 @@ func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
 
 	t.Run("Works with React/TypeScript bundle names", func(t *testing.T) {
 		tempDir := t.TempDir()
-		
+
 		// Realistic Vite React+TS bundle name: bundle-abc123.min.js
 		complexBundlePath := filepath.Join(tempDir, "index-abc123.min.js")
 		if err := os.WriteFile(complexBundlePath, []byte("var app={};"), 0644); err != nil {
@@ -506,7 +506,7 @@ func TestResolveSourceMapPaths_TIER3B_ViteHiddenSourcemaps(t *testing.T) {
 
 	t.Run("TIER 3B fallback only used in auto-discovery mode (no explicit params)", func(t *testing.T) {
 		tempDir := t.TempDir()
-		
+
 		// When explicit --source-map and --bundle are provided, use those (TIER 1)
 		// When explicit --source-map only, find bundle by suffix (TIER 2)
 		// When neither, auto-discover via sourceMappingURL (TIER 3A)
