@@ -1,5 +1,22 @@
 # Changelog
 
+
+## [3.10.5] - 2026-08-21
+
+### Fixed
+
+fix: normalize --project-root before dSYM upload
+
+| Input | Result |
+|---|---|
+| `/path/to/project/` | `/path/to/project` (trailing slash stripped) |
+| `/path//to/project` | `/path/to/project` (double slash collapsed) |
+| `path/to/project` | `/path/to/project` (leading `/` added) |
+| `./` or `.` or `../..` | Resolved to absolute path via `filepath.Abs` |
+| *(empty)* | No `projectRoot` sent |
+| Path > 1024 chars | Hard error, upload blocked |
+
+
 ## [3.10.4] - 2026-07-22
 
 ### Security
