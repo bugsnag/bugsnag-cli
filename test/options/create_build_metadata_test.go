@@ -23,9 +23,9 @@ func TestMetadata_UnmarshalText(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			name:  "Empty input",
-			input: []byte(""),
-			want:  options.Metadata{"": ""},
+			name:      "Empty input",
+			input:     []byte(""),
+			expectErr: true,
 		},
 		{
 			name:  "Key with empty value",
@@ -50,7 +50,7 @@ func TestMetadata_UnmarshalText(t *testing.T) {
 				return
 			}
 			if err != nil {
-				t.Errorf("unexpected error: %v", err)
+				t.Fatalf("unexpected error: %v", err)
 			}
 			if len(m) != len(tt.want) {
 				t.Errorf("expected map length %d, got %d", len(tt.want), len(m))

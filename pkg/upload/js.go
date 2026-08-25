@@ -517,8 +517,11 @@ func addSourcesContent(section map[string]interface{}, sourceMapPath string, log
 			}
 		}
 		if !filepath.IsAbs(sourcePath) {
-			// Resolve the path relative to the source map
-			sourcePath, _ = filepath.Abs(filepath.Join(filepath.Dir(sourceMapPath), sourcePath))
+			basePath := filepath.Dir(sourceMapPath)
+			if isWebpack {
+				basePath = resolveProjectRoot("", basePath)
+			}
+			sourcePath, _ = filepath.Abs(filepath.Join(basePath, sourcePath))
 		}
 		logger.Debug(fmt.Sprintf("Attempting to read the source %s.", sourcePath))
 		content, err := os.ReadFile(sourcePath)

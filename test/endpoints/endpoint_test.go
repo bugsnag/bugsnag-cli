@@ -115,7 +115,7 @@ func TestGetDefaultUploadEndpoint(t *testing.T) {
 					Port: 8080,
 				},
 				Upload: options.Upload{
-					UploadAPIRootUrl: "https://custom.bugsnag.com",
+					UploadAPIRootUrl: "http://%",
 				},
 			},
 			expectErr: true,

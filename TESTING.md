@@ -54,6 +54,7 @@ make unit-test
 ```
 
 This executes `go test -race ./test/...` with output formatted via [gotestfmt](https://github.com/gotesttools/gotestfmt).
+The unit-test fixtures are checked into `test/testdata/`; they do not need to be generated locally. Tests that invoke `xcodebuild` run only when Xcode is available.
 
 ## Linting
 

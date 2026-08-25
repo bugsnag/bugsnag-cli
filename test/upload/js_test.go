@@ -17,7 +17,7 @@ func TestPopulateSourceMap(t *testing.T) {
 	sourceMapPath := "../testdata/js-nosources/dist/main.js.map"
 	results, err := upload.ReadSourceMap(sourceMapPath, logger)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	modified := upload.AddSources(results, sourceMapPath, logger)
@@ -30,7 +30,10 @@ func TestPopulateSourceMap(t *testing.T) {
 	}
 	contents := results["sourcesContent"].([]*string)
 	if len(contents) != 3 {
-		t.Error("SourcesContent is not 3 long")
+		t.Fatalf("SourcesContent is not 3 long")
+	}
+	if contents[2] == nil {
+		t.Fatal("contents 2 should be populated")
 	}
 	if !strings.Contains(*contents[2], "const element = document.createElement('div');") {
 		t.Error("contents 2 should be populated")

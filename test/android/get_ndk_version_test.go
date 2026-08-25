@@ -9,9 +9,9 @@ import (
 
 func TestGetNDKVersion(t *testing.T) {
 	t.Log("Testing getting Android NDK major version")
-	results, err := android.GetNdkVersion("/opt/homebrew/share/android-commandlinetools/ndk/24.0.8215888")
+	results, err := android.GetNdkVersion("../testdata/android/sdk/ndk/24.0.8215888")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	assert.Equal(t, 24, results, "The versions should match")
 }

@@ -62,13 +62,11 @@ func TestIsFileExcluded(t *testing.T) {
 	})
 
 	t.Run("Matches wildcard path pattern with basename", func(t *testing.T) {
-		// filepath.Match works on basenames, so node_modules/* will match files in node_modules
-		// but the actual match happens via substring matching in the implementation
-		excluded := utils.IsFileExcluded("node_modules/package/file.js", []string{"node_modules"})
-		assert.True(t, excluded, "Should exclude files with node_modules in path via substring")
+		excluded := utils.IsFileExcluded("node_modules/package/file.js", []string{"node_modules/**"})
+		assert.True(t, excluded, "Should exclude files under node_modules")
 
-		excluded = utils.IsFileExcluded("src/temp/file.js", []string{"temp"})
-		assert.True(t, excluded, "Should exclude files with temp in path via substring")
+		excluded = utils.IsFileExcluded("src/temp/file.js", []string{"**/temp/**"})
+		assert.True(t, excluded, "Should exclude files under temp directories")
 	})
 
 	t.Run("Matches exact filename", func(t *testing.T) {
@@ -80,11 +78,11 @@ func TestIsFileExcluded(t *testing.T) {
 	})
 
 	t.Run("Matches substring path", func(t *testing.T) {
-		excluded := utils.IsFileExcluded("src/node_modules/lib/file.js", []string{"node_modules"})
-		assert.True(t, excluded, "Should exclude files with path containing substring")
+		excluded := utils.IsFileExcluded("src/node_modules/lib/file.js", []string{"**/node_modules/**"})
+		assert.True(t, excluded, "Should exclude nested node_modules files")
 
-		excluded = utils.IsFileExcluded("dist/vendor/bundle.js", []string{"vendor"})
-		assert.True(t, excluded, "Should exclude files with vendor in path")
+		excluded = utils.IsFileExcluded("dist/vendor/bundle.js", []string{"**/vendor/**"})
+		assert.True(t, excluded, "Should exclude files under vendor directories")
 	})
 
 	t.Run("Does not match when pattern doesn't apply", func(t *testing.T) {
@@ -96,7 +94,7 @@ func TestIsFileExcluded(t *testing.T) {
 	})
 
 	t.Run("Handles multiple patterns", func(t *testing.T) {
-		patterns := []string{"*.map", "*.log", "node_modules"}
+		patterns := []string{"*.map", "*.log", "node_modules/**"}
 
 		excluded := utils.IsFileExcluded("file.map", patterns)
 		assert.True(t, excluded, "Should match first pattern")
@@ -128,14 +126,13 @@ func TestIsFileExcluded(t *testing.T) {
 	})
 
 	t.Run("Handles directory path patterns", func(t *testing.T) {
-		// Substring matching for directory paths
-		excluded := utils.IsFileExcluded("build/dist/main.js", []string{"build"})
+		excluded := utils.IsFileExcluded("build/dist/main.js", []string{"build/**"})
 		assert.True(t, excluded, "Should match files with build in path")
 
-		excluded = utils.IsFileExcluded("src/build/main.js", []string{"build"})
-		assert.True(t, excluded, "Should match build as substring in path")
+		excluded = utils.IsFileExcluded("src/build/main.js", []string{"**/build/**"})
+		assert.True(t, excluded, "Should match nested build directories")
 
-		excluded = utils.IsFileExcluded("src/main.js", []string{"build"})
+		excluded = utils.IsFileExcluded("src/main.js", []string{"**/build/**"})
 		assert.False(t, excluded, "Should not match when build is not in path")
 	})
 
@@ -147,9 +144,9 @@ func TestIsFileExcluded(t *testing.T) {
 		excluded = utils.IsFileExcluded("node_modules/package/lib/deep/file.js", []string{"node_modules/**"})
 		assert.True(t, excluded, "Should exclude deeply nested files in node_modules")
 
-		// node_modules/** only matches if node_modules is at the start of the path
+		// Unanchored patterns are also matched at nested path levels.
 		excluded = utils.IsFileExcluded("src/node_modules/package/file.js", []string{"node_modules/**"})
-		assert.False(t, excluded, "node_modules/** pattern only matches at path start")
+		assert.True(t, excluded, "node_modules/** pattern matches at any path level")
 
 		excluded = utils.IsFileExcluded("src/components/file.js", []string{"node_modules/**"})
 		assert.False(t, excluded, "Should not exclude files outside node_modules")

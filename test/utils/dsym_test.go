@@ -1,6 +1,7 @@
 package utils_testing
 
 import (
+	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,6 +9,13 @@ import (
 
 	"github.com/bugsnag/bugsnag-cli/pkg/ios"
 )
+
+func requireXcodebuild(t *testing.T) {
+	t.Helper()
+	if _, err := exec.LookPath("xcodebuild"); err != nil {
+		t.Skip("xcodebuild is required for this test")
+	}
+}
 
 // Tests expected scenarios where project root is set based on the value of <path> or --project-root
 func TestDefaultProjectRoot(t *testing.T) {
@@ -43,6 +51,8 @@ func TestDefaultProjectRoot(t *testing.T) {
 
 // Tests expected common use cases when determining the default scheme
 func TestGetDefaultScheme(t *testing.T) {
+	requireXcodebuild(t)
+
 	tt := map[string]struct {
 		pathValue      string
 		expectedScheme string
@@ -73,17 +83,19 @@ func TestGetDefaultScheme(t *testing.T) {
 
 // Tests expected common error scenarios when determining the default scheme
 func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
+	requireXcodebuild(t)
+
 	tt := map[string]struct {
 		pathValue            string
 		expectedExceptionMsg string
 	}{
 		"multiple schemes found results in exception": {
 			pathValue:            "../testdata/ios/MultipleSchemeExample/MultipleSchemeExample.xcodeproj",
-			expectedExceptionMsg: "Multiple schemes found",
+			expectedExceptionMsg: "multiple schemes found",
 		},
 		"no schemes found results in exception": {
 			pathValue:            "../testdata/ios/parent_root",
-			expectedExceptionMsg: "No schemes found",
+			expectedExceptionMsg: "no schemes found",
 		},
 	}
 
@@ -91,6 +103,7 @@ func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			_, err := ios.GetDefaultScheme(tc.pathValue)
 
+			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.expectedExceptionMsg)
 		})
 	}
@@ -98,49 +111,41 @@ func TestGetDefaultSchemeErrorScenarios(t *testing.T) {
 
 // Tests expected use cases when fetching build settings
 func TestGetXcodeBuildSettings(t *testing.T) {
+	requireXcodebuild(t)
+
 	tt := map[string]struct {
 		pathValue      string
 		scheme         string
 		expectedResult *ios.XcodeBuildSettings
 	}{
 		"successfully retrieve build settings for xcodeproj and scheme": {
-			pathValue: "../../features/base-fixtures/rn0_72/ios/rn0_72.xcodeproj",
-			scheme:    "rn0_72",
+			pathValue: "../testdata/ios/SingleSchemeExample/SingleSchemeExample.xcodeproj",
+			scheme:    "SingleSchemeExample",
 			expectedResult: &ios.XcodeBuildSettings{
-				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
-				InfoPlistPath:         "Info.plist",
-				BuiltProductsDir:      "Build/Products/Release-iphoneos",
-				DsymName:              "rn0_72.app.dSYM",
+				ConfigurationBuildDir: "Build/Products/Debug-iphoneos",
+				InfoPlistPath:         "SingleSchemeExample.app/Info.plist",
+				BuiltProductsDir:      "Build/Products/Debug-iphoneos",
+				DsymName:              "SingleSchemeExample.app.dSYM",
 			},
 		},
 		"successfully retrieve build settings for xcworkspace and scheme": {
-			pathValue: "../../features/base-fixtures/rn0_69/ios/rn0_69.xcworkspace",
-			scheme:    "rn0_69",
+			pathValue: "../testdata/ios/BuildSettingsExample.xcworkspace",
+			scheme:    "BuildSettingsScheme",
 			expectedResult: &ios.XcodeBuildSettings{
-				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
-				InfoPlistPath:         "Info.plist",
-				BuiltProductsDir:      "Build/Products/Release-iphoneos",
-				DsymName:              "rn0_69.app.dSYM",
+				ConfigurationBuildDir: "Build/Products/Debug-iphoneos",
+				InfoPlistPath:         "SingleSchemeExample.app/Info.plist",
+				BuiltProductsDir:      "Build/Products/Debug-iphoneos",
+				DsymName:              "SingleSchemeExample.app.dSYM",
 			},
 		},
 		"successfully retrieve build settings for path to project root and scheme": {
-			pathValue: "../../features/base-fixtures/rn0_70/ios/",
-			scheme:    "rn0_70",
+			pathValue: "../testdata/ios/SingleSchemeExample",
+			scheme:    "SingleSchemeExample",
 			expectedResult: &ios.XcodeBuildSettings{
-				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
-				InfoPlistPath:         "Info.plist",
-				BuiltProductsDir:      "Build/Products/Release-iphoneos",
-				DsymName:              "rn0_70.app.dSYM",
-			},
-		},
-		"successfully retrieve build settings for projectRoot and scheme": {
-			pathValue: "../../features/base-fixtures/rn0_69/ios/",
-			scheme:    "rn0_69",
-			expectedResult: &ios.XcodeBuildSettings{
-				ConfigurationBuildDir: "Build/Products/Release-iphoneos",
-				InfoPlistPath:         "Info.plist",
-				BuiltProductsDir:      "Build/Products/Release-iphoneos",
-				DsymName:              "rn0_69.app.dSYM",
+				ConfigurationBuildDir: "Build/Products/Debug-iphoneos",
+				InfoPlistPath:         "SingleSchemeExample.app/Info.plist",
+				BuiltProductsDir:      "Build/Products/Debug-iphoneos",
+				DsymName:              "SingleSchemeExample.app.dSYM",
 			},
 		},
 	}
@@ -154,6 +159,7 @@ func TestGetXcodeBuildSettings(t *testing.T) {
 			assert.Contains(t, actualResult.ConfigurationBuildDir, tc.expectedResult.ConfigurationBuildDir)
 			assert.Contains(t, actualResult.InfoPlistPath, tc.expectedResult.InfoPlistPath)
 			assert.Contains(t, actualResult.BuiltProductsDir, tc.expectedResult.BuiltProductsDir)
+			assert.Equal(t, tc.expectedResult.DsymName, actualResult.DsymName)
 		})
 	}
 }
