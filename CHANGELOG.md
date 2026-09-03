@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [3.10.6] - 2026-09-03
 
 ### Security
 
