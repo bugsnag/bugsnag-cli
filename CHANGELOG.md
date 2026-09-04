@@ -4,7 +4,7 @@
 
 ### Security
 
-- Bump Go toolchain version from 1.26.3 to 1.26.6 to address CVE-2026-39821 and CVE-2026-56859.
+- Bump Go toolchain version from 1.26.3 to 1.26.6 to address CVE-2026-39821 and CVE-2026-56859
 
 ## [3.10.5] - 2026-08-21
 
