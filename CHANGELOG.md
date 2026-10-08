@@ -1,5 +1,12 @@
 # Changelog
 
+
+## [3.10.7] - 2026-10-08
+
+### Security
+
+- Fix security vulnerabilities in the indirect and direct Go dependencies golang.org/x/text and golang.org/x/sys, by upgrading them to patched versions.
+
 ## [3.10.6] - 2026-09-03
 
 ### Security
