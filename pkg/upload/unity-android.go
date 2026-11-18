@@ -1,11 +1,13 @@
 package upload
 
 import (
+	"errors"
 	"fmt"
 	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/unity"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/android"
@@ -162,7 +164,19 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 			}
 		}
 
-		for originalFile, symbolPath := range symbolFileList {
+		// Upload in a stable order, and keep going when a single library is rejected
+		// (e.g. third-party libraries such as Firebase's) so that libil2cpp.so and
+		// LineNumberMappings.json are still uploaded. All failures are reported at the end.
+		originalFiles := make([]string, 0, len(symbolFileList))
+		for originalFile := range symbolFileList {
+			originalFiles = append(originalFiles, originalFile)
+		}
+		sort.Strings(originalFiles)
+
+		var uploadErrors []error
+
+		for _, originalFile := range originalFiles {
+			symbolPath := symbolFileList[originalFile]
 			err = android.UploadAndroidNdk(
 				map[string]string{originalFile: symbolPath},
 				manifestData["apiKey"],
@@ -176,7 +190,10 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 			)
 
 			if err != nil {
-				return err
+				// Already logged by UploadAndroidNdk. Skip the line mappings for this
+				// file as they are of no use without its symbols.
+				uploadErrors = append(uploadErrors, err)
+				continue
 			}
 
 			if filepath.Base(symbolPath) == "libil2cpp.so" && !unityOptions.UnityShared.NoUploadIl2cppMapping {
@@ -197,9 +214,15 @@ func ProcessUnityAndroid(globalOptions options.CLI, logger log.Logger) error {
 				)
 
 				if err != nil {
-					return err
+					uploadErr := fmt.Errorf("failed to upload Unity line mappings %s: %w", lineMappingFile, err)
+					logger.Error(uploadErr.Error())
+					uploadErrors = append(uploadErrors, uploadErr)
 				}
 			}
+		}
+
+		if len(uploadErrors) > 0 {
+			return fmt.Errorf("%d of %d file(s) failed to upload:\n%w", len(uploadErrors), len(originalFiles), errors.Join(uploadErrors...))
 		}
 	}
 

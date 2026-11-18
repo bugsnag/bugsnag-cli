@@ -1,8 +1,10 @@
 package android
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
+	"sort"
 
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
@@ -62,8 +64,13 @@ func buildUploadOptions(appID, versionCode, versionName, projectRoot, fileName s
 //   - opts: CLI options, including `--overwrite`
 //   - logger: Logger instance for debug/info/error output
 //
+// A failure to upload one file does not stop the remaining files from being
+// uploaded: the server may reject individual libraries (e.g. third-party
+// libraries in an unsupported format), and that should not prevent the app's
+// own symbols from being uploaded. Files are uploaded in a stable, sorted order.
+//
 // Returns:
-//   - error: Non-nil if any file fails to upload
+//   - error: Non-nil if any file fails to upload; combines the errors of all failed files
 func UploadAndroidNdk(
 	symbolFiles map[string]string,
 	apiKey string,
@@ -80,7 +87,16 @@ func UploadAndroidNdk(
 		return nil
 	}
 
-	for originalFile, symbolPath := range symbolFiles {
+	originalFiles := make([]string, 0, len(symbolFiles))
+	for originalFile := range symbolFiles {
+		originalFiles = append(originalFiles, originalFile)
+	}
+	sort.Strings(originalFiles)
+
+	var uploadErrors []error
+
+	for _, originalFile := range originalFiles {
+		symbolPath := symbolFiles[originalFile]
 		fileField := map[string]server.FileField{
 			"soFile": server.LocalFile(symbolPath),
 		}
@@ -97,9 +113,11 @@ func UploadAndroidNdk(
 			logger,
 		)
 		if err != nil {
-			return fmt.Errorf("failed to upload NDK symbol for %s: %w", originalFile, err)
+			uploadErr := fmt.Errorf("failed to upload NDK symbol for %s: %w", originalFile, err)
+			logger.Error(uploadErr.Error())
+			uploadErrors = append(uploadErrors, uploadErr)
 		}
 	}
 
-	return nil
+	return errors.Join(uploadErrors...)
 }
