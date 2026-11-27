@@ -1,6 +1,13 @@
 # Changelog
 
 
+## Unreleased
+
+### Fixed
+
+- `upload dart` now supports iOS symbol files written as Mach-O dSYM companion files by newer versions of Flutter, which previously failed with `bad magic number '[207 250 237 254]'`. ELF symbol files from older Flutter versions are still supported. [#300](https://github.com/bugsnag/bugsnag-cli/issues/300)
+- `upload dart` now returns an error instead of crashing when `dwarfdump` cannot read a UUID from the iOS app binary for the symbol file's architecture.
+
 ## [3.10.7] - 2026-10-08
 
 ### Security

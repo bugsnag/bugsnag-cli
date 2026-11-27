@@ -24,6 +24,18 @@ Feature: Dart Integration Tests
       | buildId           | E30C1BE5-DEB6-373C-98B4-52D827B7FF0D  |
       | overwrite         | true                                  |
 
+  Scenario: Upload a single iOS Dart Mach-O symbol file, detecting the iOS app path
+    When I run bugsnag-cli with upload dart --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite --version-name=2.0 --bundle-version=1.0 features/dart/fixtures/macho/app-debug-info/app.ios-arm64.symbols
+    And I wait to receive 1 sourcemaps
+    Then the sourcemaps are valid for the API
+    Then the sourcemaps Content-Type header is valid multipart form-data
+    Then the sourcemap payload fields should be:
+      | apiKey            | 1234567890ABCDEF1234567890ABCDEF      |
+      | appVersion        | 2.0                                   |
+      | appBundleVersion  | 1.0                                   |
+      | buildId           | 031CEFFD-4B20-3251-80D3-C561BE312E67  |
+      | overwrite         | true                                  |
+
 
   Scenario: Upload multiple Dart sourcemaps providing no flags to the CLI
     When I run bugsnag-cli with upload dart --upload-api-root-url=http://localhost:$MAZE_RUNNER_PORT --api-key=1234567890ABCDEF1234567890ABCDEF --overwrite features/dart/fixtures/app-debug-info

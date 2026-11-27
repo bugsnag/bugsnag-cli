@@ -11,6 +11,7 @@ import (
 
 	"github.com/bugsnag/bugsnag-cli/pkg/elf"
 	"github.com/bugsnag/bugsnag-cli/pkg/log"
+	"github.com/bugsnag/bugsnag-cli/pkg/macho"
 	"github.com/bugsnag/bugsnag-cli/pkg/options"
 	"github.com/bugsnag/bugsnag-cli/pkg/server"
 	"github.com/bugsnag/bugsnag-cli/pkg/utils"
@@ -80,7 +81,7 @@ func Dart(options options.CLI, logger log.Logger) error {
 			}
 
 			var arch string
-			arch, err = elf.GetArch(file)
+			arch, err = GetIosSymbolFileArch(file)
 			if err != nil {
 				return err
 			}
@@ -150,6 +151,23 @@ func GetIosAppPath(symbolFile string) (string, error) {
 	return "", fmt.Errorf("unable to find iOS app path, try adding --ios-app-path")
 }
 
+// GetIosSymbolFileArch - Gets the architecture of a Dart iOS symbol file.
+// Newer versions of Flutter write iOS symbol files as Mach-O dSYM companion
+// files, whereas older versions wrote them as ELF files, so both are supported.
+func GetIosSymbolFileArch(symbolFile string) (string, error) {
+	arch, machoErr := macho.GetArch(symbolFile)
+	if machoErr == nil {
+		return arch, nil
+	}
+
+	arch, elfErr := elf.GetArch(symbolFile)
+	if elfErr == nil {
+		return arch, nil
+	}
+
+	return "", fmt.Errorf("unable to determine the architecture of %s: %v; %v", symbolFile, machoErr, elfErr)
+}
+
 // DwarfDumpUuid - Gets the UUID/Build ID from the Dwarf debug info of a file for a given Arch
 func DwarfDumpUuid(symbolFile string, dwarfFile string, arch string) (string, error) {
 	dwarfDumpLocation, err := exec.LookPath("dwarfdump")
@@ -166,6 +184,11 @@ func DwarfDumpUuid(symbolFile string, dwarfFile string, arch string) (string, er
 	cmd := exec.Command(dwarfDumpLocation, "--uuid", dwarfFile, "--arch", arch)
 	output, _ := cmd.CombinedOutput()
 	outputArray := strings.Fields(string(output))
+
+	// Expected output: "UUID: <uuid> (<arch>) <path>"
+	if len(outputArray) < 3 {
+		return "", fmt.Errorf("unable to read UUID from %s for arch %s: %s", dwarfFile, arch, strings.TrimSpace(string(output)))
+	}
 
 	uuidArray[outputArray[2]] = outputArray[1]
 
